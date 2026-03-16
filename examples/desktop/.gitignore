@@ -1,0 +1,24 @@
+# Desktop specific ignores
+
+# macOS
+*.app
+*.dmg
+*.pkg
+
+# Windows
+*.exe
+*.msi
+*.msix
+setup.exe
+
+# Linux
+*.deb
+*.rpm
+*.AppImage
+*.snap
+*.flatpak
+
+# Bundle outputs
+/bundle/
+/bundles/
+/target/release/bundle/

@@ -1,0 +1,17 @@
+[package]
+name = "example-web-ssr"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dioxus = { workspace = true }
+dioxus-ui-system = { path = "../../dioxus-ui-system" }
+example-shared = { path = "../shared" }
+tokio = { version = "1", features = ["full"] }
+axum = { version = "0.7", features = ["macros"] }
+tracing = "0.1"
+
+[features]
+default = ["web", "ssr"]
+web = ["dioxus/web", "dioxus-ui-system/web", "example-shared/web"]
+ssr = ["dioxus/ssr", "dioxus-ui-system/web", "example-shared/web"]

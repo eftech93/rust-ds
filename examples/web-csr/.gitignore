@@ -1,0 +1,9 @@
+# Web CSR specific ignores
+/dist/
+/node_modules/
+package-lock.json
+yarn.lock
+
+# Dioxus web build
+static/
+public/dist/

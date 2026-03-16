@@ -1,0 +1,15 @@
+[package]
+name = "example-desktop"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dioxus = { workspace = true }
+dioxus-ui-system = { path = "../../dioxus-ui-system" }
+example-shared = { path = "../shared" }
+tracing = "0.1"
+
+[features]
+default = ["desktop"]
+web = ["dioxus/web", "dioxus-ui-system/web", "example-shared/web"]
+desktop = ["dioxus/desktop", "dioxus-ui-system/desktop", "example-shared/desktop"]

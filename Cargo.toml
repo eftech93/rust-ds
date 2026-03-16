@@ -1,0 +1,14 @@
+[workspace]
+members = [
+    "dioxus-ui-system",
+    "examples/shared",
+    "examples/web-csr",
+    "examples/web-ssr",
+    "examples/desktop",
+    "examples/mobile",
+]
+resolver = "2"
+
+[workspace.dependencies]
+dioxus = { version = "0.6", features = ["router"] }
+serde = { version = "1.0", features = ["derive"] }

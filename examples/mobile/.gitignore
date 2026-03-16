@@ -1,0 +1,20 @@
+# Mobile specific ignores
+
+# iOS
+/ios/build/
+/ios/Pods/
+/ios/Podfile.lock
+*.ipa
+*.dSYM
+
+# Android
+/android/build/
+/android/app/build/
+/android/.gradle/
+/android/local.properties
+*.apk
+*.aab
+
+# Generated project files (when using dx bundle)
+/ios/project.xcodeproj/
+/ios/project.xcworkspace/
