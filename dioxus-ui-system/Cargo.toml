@@ -1,6 +1,6 @@
 [package]
 name = "dioxus-ui-system"
-version = "0.1.0"
+version = "0.0.1"
 edition = "2021"
 authors = ["Your Name <your.email@example.com>"]
 description = "A pure Rust design system for Dioxus with Atomic Design principles"
@@ -9,10 +9,11 @@ repository = "https://github.com/yourusername/dioxus-ui-system"
 keywords = ["dioxus", "ui", "design-system", "components", "rust"]
 categories = ["gui", "web-programming", "wasm"]
 rust-version = "1.70"
+readme = "README.md"
 
 [dependencies]
-dioxus = { workspace = true }
-serde = { workspace = true }
+dioxus = { version = "0.6", features = ["router"] }
+serde = { version = "1.0", features = ["derive"] }
 
 [features]
 default = ["web"]
