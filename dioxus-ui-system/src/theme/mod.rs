@@ -14,4 +14,4 @@ pub use tokens::{
     ThemeTokens, ThemeMode, ColorScale, Color, SpacingScale, 
     RadiusScale, TypographyScale, Typography, ShadowScale
 };
-pub use context::{ThemeContext, ThemeProvider, use_theme, use_style, ThemeToggle};
+pub use context::{ThemeContext, ThemeProvider, use_theme, use_style, ThemeToggle, ThemeSelector};

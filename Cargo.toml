@@ -6,6 +6,7 @@ members = [
     "examples/web-ssr",
     "examples/desktop",
     "examples/mobile",
+    "docs",
 ]
 resolver = "2"
 

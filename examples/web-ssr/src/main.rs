@@ -15,7 +15,7 @@
 
 use axum::{response::Html, routing::get, Router};
 use dioxus::prelude::*;
-use example_shared::ComponentShowcaseInner;
+use example_shared::{ComponentShowcaseInner, LayoutShowcaseInner};
 
 #[tokio::main]
 async fn main() {
@@ -104,23 +104,84 @@ async fn static_handler(axum::extract::Path(path): axum::extract::Path<String>) 
 fn App() -> Element {
     rsx! {
         ThemeProvider {
+            AppWithViewSwitcher {}
+        }
+    }
+}
+
+/// App with view switcher for Components and Layouts
+#[component]
+fn AppWithViewSwitcher() -> Element {
+    let mut current_view = use_signal(|| "components".to_string());
+    
+    rsx! {
+        div {
+            style: "font-family: 'Inter', system-ui, -apple-system, sans-serif;",
+            
+            // SSR Banner with View Switcher
             div {
-                style: "font-family: 'Inter', system-ui, -apple-system, sans-serif;",
+                style: "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;",
                 
-                // SSR Banner
                 div {
-                    style: "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px; text-align: center;",
+                    style: "display: flex; align-items: center; gap: 16px;",
                     
-                    Label {
-                        size: TextSize::Small,
-                        weight: TextWeight::Medium,
-                        "🔥 Server-Side Rendered"
+                    span {
+                        style: "font-weight: 600;",
+                        "🔥 SSR"
+                    }
+                    
+                    // View buttons
+                    div {
+                        style: "display: flex; gap: 8px;",
+                        
+                        ViewButton {
+                            label: "Components",
+                            is_active: current_view() == "components",
+                            onclick: move || current_view.set("components".to_string()),
+                        }
+                        
+                        ViewButton {
+                            label: "Layouts",
+                            is_active: current_view() == "layouts",
+                            onclick: move || current_view.set("layouts".to_string()),
+                        }
                     }
                 }
                 
-                // Use the inner showcase that doesn't include its own ThemeProvider
-                ComponentShowcaseInner {}
+                span {
+                    style: "font-size: 12px; opacity: 0.8;",
+                    "Dioxus UI System"
+                }
             }
+            
+            // Main content
+            if current_view() == "components" {
+                ComponentShowcaseInner {}
+            } else {
+                LayoutShowcaseInner {}
+            }
+        }
+    }
+}
+
+/// View switcher button
+#[derive(Props, Clone, PartialEq)]
+struct ViewButtonProps {
+    label: String,
+    is_active: bool,
+    onclick: EventHandler<()>,
+}
+
+#[component]
+fn ViewButton(props: ViewButtonProps) -> Element {
+    let bg_color = if props.is_active { "rgba(255,255,255,0.2)" } else { "transparent" };
+    let border = if props.is_active { "1px solid rgba(255,255,255,0.4)" } else { "1px solid transparent" };
+    
+    rsx! {
+        button {
+            style: "padding: 6px 14px; border-radius: 6px; border: {border}; background: {bg_color}; color: white; cursor: pointer; font-weight: 500; font-size: 14px; transition: all 150ms;",
+            onclick: move |_| props.onclick.call(()),
+            "{props.label}"
         }
     }
 }

@@ -65,3 +65,34 @@ Make sure you have the wasm32 target:
 ```bash
 rustup target add wasm32-unknown-unknown
 ```
+
+## Deploying to GitHub Pages
+
+This example is configured for automatic deployment to GitHub Pages.
+
+### Setup
+
+1. Go to your repository Settings → Pages
+2. Set Source to "GitHub Actions"
+3. Update `Dioxus.toml` with your repository name:
+   ```toml
+   [web.app]
+   base_path = "/your-repo-name/"
+   ```
+
+### Automatic Deployment
+
+The site deploys automatically on every push to `main`. The workflow is defined in `.github/workflows/deploy.yml`.
+
+### Manual Deployment
+
+To build locally for deployment:
+
+```bash
+# Build for production
+dx build --release
+
+# The dist/ folder contains the static files ready for deployment
+```
+
+See [GITHUB_PAGES_DEPLOYMENT.md](../../GITHUB_PAGES_DEPLOYMENT.md) for detailed instructions.

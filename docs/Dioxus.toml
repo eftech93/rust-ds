@@ -1,0 +1,27 @@
+# Dioxus configuration for Documentation Site
+
+[application]
+name = "dioxus-ui-docs"
+default_platform = "web"
+out_dir = "release"
+
+[web.app]
+title = "Dioxus UI Documentation"
+# For local dev: comment out base_path
+# For GitHub Pages: uncomment and set to your repo name
+# base_path = "/rust-ds/"
+
+[web.watcher]
+reload_html = true
+
+[web.resource]
+style = []
+script = []
+
+[web.resource.dev]
+style = []
+script = []
+
+[bundle]
+# Disable wasm-opt to avoid binaryen compatibility issues
+wasm_opt = false

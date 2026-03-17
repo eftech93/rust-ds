@@ -72,7 +72,7 @@ pub struct HeaderProps {
 /// ```
 #[component]
 pub fn Header(props: HeaderProps) -> Element {
-    let theme = use_theme();
+    let _theme = use_theme();
     let sticky = props.sticky;
     let bordered = props.bordered;
     

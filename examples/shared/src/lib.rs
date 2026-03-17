@@ -3,8 +3,14 @@
 //! This crate provides a comprehensive showcase of all UI components
 //! that can be used across different platform examples.
 
+pub mod layout_showcase;
+
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
+use dioxus_ui_system::organisms::*;
+use dioxus_ui_system::atoms::{StepState, StepSize};
+use dioxus_ui_system::molecules::{StepItem, HorizontalStepper, VerticalStepper};
+pub use layout_showcase::{LayoutShowcase, LayoutShowcaseInner};
 
 /// Main showcase component that displays all UI components (includes ThemeProvider)
 #[component]
@@ -34,8 +40,19 @@ pub fn ComponentShowcaseInner() -> Element {
                 InputShowcase {}
                 BadgeShowcase {}
                 CardShowcase {}
+                CardsOrganismsShowcase {}
+                StepperShowcase {}
                 IconShowcase {}
                 TypographyShowcase {}
+                NewFormControlsShowcase {}
+                AlertShowcase {}
+                AvatarShowcase {}
+                DialogShowcase {}
+                TabsShowcase {}
+                AccordionShowcase {}
+                SkeletonShowcase {}
+                TooltipPopoverShowcase {}
+                DropdownMenuShowcase {}
                 InteractiveDemo {}
                 ThemeShowcase {}
             }
@@ -60,15 +77,19 @@ fn ShowcaseHeader() -> Element {
             
             MutedText {
                 size: TextSize::Large,
-                "A pure Rust design system for Dioxus"
+                "A pure Rust design system for Dioxus with 60+ components"
             }
             
             div {
-                style: "margin-top: 16px;",
+                style: "margin-top: 16px; display: flex; justify-content: center; gap: 8px;",
                 Badge {
                     variant: BadgeVariant::Success,
                     icon: Some("check".to_string()),
-                    "v0.1.0"
+                    "v0.2.0"
+                }
+                Badge {
+                    variant: BadgeVariant::Secondary,
+                    "Multi-Theme"
                 }
             }
         }
@@ -258,6 +279,391 @@ fn CardShowcase() -> Element {
     }
 }
 
+/// Card Organisms showcase - demonstrates all card organism variations
+#[component]
+fn CardsOrganismsShowcase() -> Element {
+    let mut notification_visible = use_signal(|| true);
+    
+    rsx! {
+        Card {
+            CardHeader {
+                title: "Card Organisms",
+                subtitle: Some("10+ pre-built card patterns".to_string()),
+            }
+            CardContent {
+                div {
+                    style: "display: flex; flex-direction: column; gap: 20px;",
+                    
+                    // Action Card
+                    ActionCard {
+                        title: "Deploy Project",
+                        description: "Your project is ready to deploy to production. Click the button below to start the deployment process.",
+                        action_label: "Deploy Now",
+                        on_action: move |_| println!("Deploying project..."),
+                        icon: Some("rocket".to_string()),
+                    }
+                    
+                    // Dual Action Card
+                    DualActionCard {
+                        title: "Save Changes?",
+                        description: "You have unsaved changes. Would you like to save them before leaving?",
+                        primary_label: "Save",
+                        secondary_label: "Discard",
+                        on_primary: move |_| println!("Saving..."),
+                        on_secondary: move |_| println!("Discarding..."),
+                    }
+                    
+                    // Profile Card
+                    ProfileCard {
+                        name: "Sarah Chen".to_string(),
+                        role: Some("Senior Engineer".to_string()),
+                        avatar_url: None,
+                        description: Some("Full-stack developer passionate about Rust and WebAssembly.".to_string()),
+                        action_label: "Connect".to_string(),
+                        on_action: Some(EventHandler::new(move |_| println!("Connecting to Sarah..."))),
+                        stats: vec![
+                            ("Projects".to_string(), "24".to_string()),
+                            ("Followers".to_string(), "1.2K".to_string()),
+                        ],
+                    }
+                    
+                    // Stat Cards Row
+                    div {
+                        style: "display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;",
+                        
+                        StatCard {
+                            label: "Revenue",
+                            value: "$48.2K",
+                            change: Some("+12%".to_string()),
+                            change_positive: Some(true),
+                            icon: Some("trending-up".to_string()),
+                            icon_bg: "#dbeafe".to_string(),
+                        }
+                        
+                        StatCard {
+                            label: "Users",
+                            value: "2,420",
+                            change: Some("+5%".to_string()),
+                            change_positive: Some(true),
+                            icon: Some("users".to_string()),
+                            icon_bg: "#dcfce7".to_string(),
+                        }
+                        
+                        StatCard {
+                            label: "Bounce Rate",
+                            value: "42%",
+                            change: Some("-3%".to_string()),
+                            change_positive: Some(true),
+                            icon: Some("activity".to_string()),
+                            icon_bg: "#fef3c7".to_string(),
+                        }
+                    }
+                    
+                    // Notification Cards
+                    if notification_visible() {
+                        NotificationCard {
+                            title: "Success!".to_string(),
+                            message: "Your changes have been saved successfully.".to_string(),
+                            notification_type: NotificationType::Success,
+                            on_dismiss: Some(EventHandler::new(move |_| notification_visible.set(false))),
+                        }
+                    }
+                    
+                    NotificationCard {
+                        title: "Update Available".to_string(),
+                        message: "A new version of the app is available.".to_string(),
+                        notification_type: NotificationType::Info,
+                        on_dismiss: None,
+                    }
+                    
+                    // Expandable Card
+                    ExpandableCard {
+                        title: "Advanced Settings",
+                        preview: rsx! {
+                            p { style: "margin: 0; color: #64748b; font-size: 14px;",
+                                "Click to expand and see more options..."
+                            }
+                        },
+                        expanded_content: rsx! {
+                            div {
+                                style: "display: flex; flex-direction: column; gap: 12px; padding-top: 12px;",
+                                
+                                Label { "API Key" }
+                                InputGroup {
+                                    label: "",
+                                    value: "sk-xxxxxxxxxxxx".to_string(),
+                                    input_type: InputType::Password,
+                                    onchange: move |_| {},
+                                }
+                                
+                                Checkbox {
+                                    checked: true,
+                                    label: Some("Enable notifications".to_string()),
+                                    onchange: move |_| {},
+                                }
+                            }
+                        },
+                        default_expanded: false,
+                    }
+                    
+                    // Pricing Cards Row
+                    div {
+                        style: "display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;",
+                        
+                        PricingCard {
+                            plan: "Starter".to_string(),
+                            price: "$9".to_string(),
+                            period: "/month".to_string(),
+                            description: Some("Perfect for individuals".to_string()),
+                            features: vec![
+                                "5 Projects".to_string(),
+                                "10GB Storage".to_string(),
+                                "Basic Support".to_string(),
+                            ],
+                            cta_label: "Get Started".to_string(),
+                            on_cta: EventHandler::new(move |_| println!("Selected Starter")),
+                            recommended: false,
+                        }
+                        
+                        PricingCard {
+                            plan: "Pro".to_string(),
+                            price: "$29".to_string(),
+                            period: "/month".to_string(),
+                            description: Some("For growing teams".to_string()),
+                            features: vec![
+                                "Unlimited Projects".to_string(),
+                                "100GB Storage".to_string(),
+                                "Priority Support".to_string(),
+                                "Advanced Analytics".to_string(),
+                            ],
+                            cta_label: "Upgrade".to_string(),
+                            on_cta: EventHandler::new(move |_| println!("Selected Pro")),
+                            recommended: true,
+                        }
+                    }
+                    
+                    // Image Card
+                    ImageCard {
+                        image_url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=300&fit=crop".to_string(),
+                        image_alt: "Abstract Design".to_string(),
+                        title: "Abstract Art".to_string(),
+                        description: "A beautiful abstract design with flowing colors.".to_string(),
+                        action_label: Some("View Gallery".to_string()),
+                        on_action: Some(EventHandler::new(move |_| println!("Viewing gallery..."))),
+                        aspect_ratio: "16/9".to_string(),
+                    }
+                    
+                    // Image Action Card
+                    ImageActionCard {
+                        image_url: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=400&h=250&fit=crop".to_string(),
+                        title: "Design System".to_string(),
+                        description: "Learn how to build scalable design systems for your team.".to_string(),
+                        primary_label: "Read".to_string(),
+                        secondary_label: "Save".to_string(),
+                        on_primary: EventHandler::new(move |_| println!("Reading article...")),
+                        on_secondary: EventHandler::new(move |_| println!("Saving article...")),
+                        badge: Some("New".to_string()),
+                    }
+                    
+                    // Horizontal Card
+                    HorizontalCard {
+                        image_url: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=200&h=200&fit=crop".to_string(),
+                        title: "Featured Article".to_string(),
+                        description: "Discover the latest trends in UI design and how to apply them to your projects.".to_string(),
+                        action_label: Some("Read".to_string()),
+                        on_action: Some(EventHandler::new(move |_| println!("Reading..."))),
+                    }
+                    
+                    // Media Card
+                    MediaCard {
+                        title: "Getting Started Video".to_string(),
+                        media_type: MediaType::Video,
+                        media_url: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=400&h=225&fit=crop".to_string(),
+                        creator: Some("Dioxus UI Team".to_string()),
+                        duration: Some("5:32".to_string()),
+                        on_play: Some(EventHandler::new(move |_| println!("Playing video..."))),
+                        on_like: Some(EventHandler::new(move |_| println!("Liked!"))),
+                        on_share: Some(EventHandler::new(move |_| println!("Shared!"))),
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Stepper showcase section
+#[component]
+fn StepperShowcase() -> Element {
+    let mut active_step = use_signal(|| 1);
+    let mut wizard_step = use_signal(|| 0);
+    
+    let steps = vec![
+        StepItem::new("Account").with_description("Login details").with_icon("user"),
+        StepItem::new("Personal").with_description("Your info").with_icon("settings"),
+        StepItem::new("Review").with_description("Verify data").with_icon("check"),
+        StepItem::new("Complete").with_description("Done!").with_icon("star"),
+    ];
+    let steps_len = steps.len();
+    
+    let wizard_steps = vec![
+        WizardStep::new("Account Setup").with_description("Create your account"),
+        WizardStep::new("Profile").with_description("Add your details"),
+        WizardStep::new("Preferences").with_description("Set your preferences"),
+    ];
+    
+    rsx! {
+        Card {
+            CardHeader {
+                title: "Stepper",
+                subtitle: Some("Multi-step progress indicators".to_string()),
+            }
+            CardContent {
+                div {
+                    style: "display: flex; flex-direction: column; gap: 32px;",
+                    
+                    // Horizontal Stepper
+                    div {
+                        style: "display: flex; flex-direction: column; gap: 8px;",
+                        
+                        Label { size: TextSize::Small, color: TextColor::Muted, "Horizontal Stepper" }
+                        
+                        HorizontalStepper {
+                            steps: steps.clone(),
+                            active_step: active_step(),
+                            size: StepSize::Md,
+                            on_step_click: Some(EventHandler::new(move |step: usize| {
+                                active_step.set(step);
+                            })),
+                        }
+                    }
+                    
+                    // Step Navigation
+                    div {
+                        style: "display: flex; justify-content: center; gap: 8px;",
+                        
+                        Button {
+                            variant: ButtonVariant::Secondary,
+                            size: ButtonSize::Sm,
+                            disabled: active_step() == 0,
+                            onclick: move |_| if active_step() > 0 { active_step -= 1 },
+                            "Previous"
+                        }
+                        
+                        Button {
+                            variant: ButtonVariant::Primary,
+                            size: ButtonSize::Sm,
+                            disabled: active_step() >= steps_len - 1,
+                            onclick: move |_| if active_step() < steps_len - 1 { active_step += 1 },
+                            "Next"
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Vertical Stepper
+                    div {
+                        style: "display: flex; flex-direction: column; gap: 8px;",
+                        
+                        Label { size: TextSize::Small, color: TextColor::Muted, "Vertical Stepper" }
+                        
+                        div {
+                            style: "max-width: 300px;",
+                            
+                            VerticalStepper {
+                                steps: vec![
+                                    StepItem::new("Upload").with_description("File uploaded successfully").with_state(StepState::Completed),
+                                    StepItem::new("Process").with_description("Processing your file...").with_state(StepState::Active),
+                                    StepItem::new("Review").with_description("Pending"),
+                                    StepItem::new("Publish").with_description("Pending"),
+                                ],
+                                active_step: 1,
+                                size: StepSize::Md,
+                            }
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Compact Stepper
+                    div {
+                        style: "display: flex; flex-direction: column; gap: 8px;",
+                        
+                        Label { size: TextSize::Small, color: TextColor::Muted, "Compact Stepper" }
+                        
+                        CompactStepper {
+                            steps: steps.clone(),
+                            active_step: active_step(),
+                            size: StepSize::Sm,
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Wizard
+                    div {
+                        style: "display: flex; flex-direction: column; gap: 8px;",
+                        
+                        Label { size: TextSize::Small, color: TextColor::Muted, "Wizard with Content" }
+                        
+                        Wizard {
+                            steps: wizard_steps,
+                            active_step: wizard_step(),
+                            on_step_change: EventHandler::new(move |step: usize| wizard_step.set(step)),
+                            on_finish: EventHandler::new(move |_| println!("Wizard completed!")),
+                            title: Some("Setup Wizard".to_string()),
+                            
+                            div {
+                                style: "padding: 16px; background: #f8fafc; border-radius: 8px;",
+                                
+                                match wizard_step() {
+                                    0 => rsx! {
+                                        div {
+                                            style: "display: flex; flex-direction: column; gap: 12px;",
+                                            Label { "Step 1: Account Setup" }
+                                            p { style: "margin: 0; color: #64748b;", "Please enter your account details." }
+                                            InputGroup {
+                                                label: "Email",
+                                                value: "".to_string(),
+                                                input_type: InputType::Email,
+                                                onchange: move |_| {},
+                                            }
+                                        }
+                                    },
+                                    1 => rsx! {
+                                        div {
+                                            style: "display: flex; flex-direction: column; gap: 12px;",
+                                            Label { "Step 2: Profile" }
+                                            p { style: "margin: 0; color: #64748b;", "Tell us about yourself." }
+                                            InputGroup {
+                                                label: "Full Name",
+                                                value: "".to_string(),
+                                                onchange: move |_| {},
+                                            }
+                                        }
+                                    },
+                                    2 => rsx! {
+                                        div {
+                                            style: "display: flex; flex-direction: column; gap: 12px;",
+                                            Label { "Step 3: Preferences" }
+                                            p { style: "margin: 0; color: #64748b;", "Choose your preferences." }
+                                            Checkbox {
+                                                checked: true,
+                                                label: Some("Enable notifications".to_string()),
+                                                onchange: move |_| {},
+                                            }
+                                        }
+                                    },
+                                    _ => rsx! { "Unknown step" },
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 /// Icon showcase section
 #[component]
 fn IconShowcase() -> Element {
@@ -373,6 +779,557 @@ fn TypographyShowcase() -> Element {
     }
 }
 
+/// New form controls showcase
+#[component]
+fn NewFormControlsShowcase() -> Element {
+    let mut checked = use_signal(|| false);
+    let mut radio_value = use_signal(|| "option1".to_string());
+    let mut switch_on = use_signal(|| true);
+    let mut selected = use_signal(|| "".to_string());
+    let mut textarea = use_signal(|| String::new());
+    
+    let options = vec![
+        SelectOption::new("", "Select an option..."),
+        SelectOption::new("option1", "Option 1"),
+        SelectOption::new("option2", "Option 2"),
+        SelectOption::new("option3", "Option 3"),
+    ];
+    
+    rsx! {
+        Card {
+            CardHeader {
+                title: "New Form Controls",
+                subtitle: Some("Checkbox, Radio, Switch, Select, TextArea".to_string()),
+            }
+            CardContent {
+                div {
+                    style: "display: flex; flex-direction: column; gap: 16px;",
+                    
+                    // Checkbox
+                    Checkbox {
+                        checked: checked(),
+                        label: Some("Accept terms and conditions".to_string()),
+                        onchange: move |v| checked.set(v),
+                    }
+                    
+                    // Radio
+                    div {
+                        style: "display: flex; flex-direction: column; gap: 8px;",
+                        
+                        Label { "Select an option:" }
+                        
+                        Radio {
+                            name: "radio-group".to_string(),
+                            value: "option1".to_string(),
+                            checked: radio_value() == "option1",
+                            label: Some("Option 1".to_string()),
+                            onchange: move |_| radio_value.set("option1".to_string()),
+                        }
+                        Radio {
+                            name: "radio-group".to_string(),
+                            value: "option2".to_string(),
+                            checked: radio_value() == "option2",
+                            label: Some("Option 2".to_string()),
+                            onchange: move |_| radio_value.set("option2".to_string()),
+                        }
+                        Radio {
+                            name: "radio-group".to_string(),
+                            value: "option3".to_string(),
+                            checked: radio_value() == "option3",
+                            label: Some("Option 3".to_string()),
+                            onchange: move |_| radio_value.set("option3".to_string()),
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Switch
+                    Switch {
+                        checked: switch_on(),
+                        label: Some(if switch_on() { "Notifications ON" } else { "Notifications OFF" }.to_string()),
+                        onchange: move |v| switch_on.set(v),
+                    }
+                    
+                    Separator {}
+                    
+                    // Select
+                    Label { "Choose from dropdown:" }
+                    Select {
+                        value: selected(),
+                        options: options,
+                        placeholder: Some("Select...".to_string()),
+                        onchange: move |v| selected.set(v),
+                    }
+                    
+                    Separator {}
+                    
+                    // TextArea
+                    Label { "Your message:" }
+                    TextArea {
+                        value: textarea(),
+                        placeholder: Some("Type your message here...".to_string()),
+                        rows: 3,
+                        max_length: Some(200),
+                        onchange: move |v| textarea.set(v),
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Alert showcase section
+#[component]
+fn AlertShowcase() -> Element {
+    rsx! {
+        Card {
+            CardHeader {
+                title: "Alerts",
+                subtitle: Some("Status messages and notifications".to_string()),
+            }
+            CardContent {
+                div {
+                    style: "display: flex; flex-direction: column; gap: 12px;",
+                    
+                    Alert {
+                        variant: AlertVariant::Default,
+                        title: Some("Note".to_string()),
+                        "This is a default alert with some information."
+                    }
+                    
+                    Alert {
+                        variant: AlertVariant::Success,
+                        title: Some("Success".to_string()),
+                        icon: Some("check-circle".to_string()),
+                        "Your changes have been saved successfully."
+                    }
+                    
+                    Alert {
+                        variant: AlertVariant::Warning,
+                        title: Some("Warning".to_string()),
+                        icon: Some("alert-triangle".to_string()),
+                        "Please review your settings before continuing."
+                    }
+                    
+                    Alert {
+                        variant: AlertVariant::Destructive,
+                        title: Some("Error".to_string()),
+                        icon: Some("alert-triangle".to_string()),
+                        "Something went wrong. Please try again."
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Avatar showcase section
+#[component]
+fn AvatarShowcase() -> Element {
+    rsx! {
+        Card {
+            CardHeader {
+                title: "Avatars",
+                subtitle: Some("User profile images with fallbacks".to_string()),
+            }
+            CardContent {
+                div {
+                    style: "display: flex; flex-direction: column; gap: 16px;",
+                    
+                    // Different sizes
+                    div {
+                        style: "display: flex; align-items: center; gap: 16px; flex-wrap: wrap;",
+                        
+                        Avatar {
+                            size: AvatarSize::Xs,
+                            name: Some("John Doe".to_string()),
+                            src: None,
+                            alt: "".to_string(),
+                            fallback: None,
+                            style: None,
+                            class: None,
+                        }
+                        Avatar {
+                            size: AvatarSize::Sm,
+                            name: Some("Jane Smith".to_string()),
+                            src: None,
+                            alt: "".to_string(),
+                            fallback: None,
+                            style: None,
+                            class: None,
+                        }
+                        Avatar {
+                            size: AvatarSize::Md,
+                            name: Some("Bob Wilson".to_string()),
+                            src: None,
+                            alt: "".to_string(),
+                            fallback: None,
+                            style: None,
+                            class: None,
+                        }
+                        Avatar {
+                            size: AvatarSize::Lg,
+                            name: Some("Alice Brown".to_string()),
+                            src: None,
+                            alt: "".to_string(),
+                            fallback: None,
+                            style: None,
+                            class: None,
+                        }
+                        Avatar {
+                            size: AvatarSize::Xl,
+                            name: Some("Charlie Davis".to_string()),
+                            src: None,
+                            alt: "".to_string(),
+                            fallback: None,
+                            style: None,
+                            class: None,
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // With image
+                    div {
+                        style: "display: flex; align-items: center; gap: 16px;",
+                        
+                        Label { "With initials fallback:" }
+                        Avatar {
+                            size: AvatarSize::Lg,
+                            name: Some("Sarah Connor".to_string()),
+                            src: None,
+                            alt: "".to_string(),
+                            fallback: None,
+                            style: None,
+                            class: None,
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Dialog showcase section
+#[component]
+fn DialogShowcase() -> Element {
+    let mut dialog_open = use_signal(|| false);
+    let mut alert_open = use_signal(|| false);
+    
+    rsx! {
+        Card {
+            CardHeader {
+                title: "Dialogs",
+                subtitle: Some("Modal windows and alerts".to_string()),
+            }
+            CardContent {
+                div {
+                    style: "display: flex; flex-direction: column; gap: 12px;",
+                    
+                    Button {
+                        variant: ButtonVariant::Primary,
+                        onclick: move |_| dialog_open.set(true),
+                        "Open Dialog"
+                    }
+                    
+                    Button {
+                        variant: ButtonVariant::Destructive,
+                        onclick: move |_| alert_open.set(true),
+                        "Open Alert Dialog"
+                    }
+                    
+                    Dialog {
+                        open: dialog_open(),
+                        on_close: move |_| dialog_open.set(false),
+                        title: Some("Example Dialog".to_string()),
+                        description: Some("This is a dialog component with rich content.".to_string()),
+                        
+                        p {
+                            style: "margin: 0; font-size: 14px; color: #64748b; line-height: 1.5;",
+                            "Dialogs are great for displaying important information or getting user confirmation for actions."
+                        }
+                        
+                        DialogFooter {
+                            align: DialogFooterAlign::End,
+                            
+                            Button {
+                                variant: ButtonVariant::Ghost,
+                                onclick: move |_| dialog_open.set(false),
+                                "Cancel"
+                            }
+                            
+                            Button {
+                                variant: ButtonVariant::Primary,
+                                onclick: move |_| dialog_open.set(false),
+                                "Confirm"
+                            }
+                        }
+                    }
+                    
+                    AlertDialog {
+                        open: alert_open(),
+                        on_close: move |_| alert_open.set(false),
+                        title: "Are you sure?".to_string(),
+                        description: "This action cannot be undone. This will permanently delete your account.".to_string(),
+                        on_confirm: move |_| alert_open.set(false),
+                        destructive: true,
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Tabs showcase section
+#[component]
+fn TabsShowcase() -> Element {
+    let mut active_tab = use_signal(|| "account".to_string());
+    
+    let tabs = vec![
+        TabItem::new("account", "Account").with_icon("settings"),
+        TabItem::new("password", "Password"),
+        TabItem::new("notifications", "Notifications"),
+    ];
+    
+    rsx! {
+        Card {
+            CardHeader {
+                title: "Tabs",
+                subtitle: Some("Tabbed content navigation".to_string()),
+            }
+            CardContent {
+                div {
+                    style: "display: flex; flex-direction: column; gap: 16px;",
+                    
+                    Tabs {
+                        tabs: tabs,
+                        active_tab: active_tab(),
+                        on_change: move |id| active_tab.set(id),
+                        
+                        TabPanel {
+                            if active_tab() == "account" {
+                                "Manage your account settings and preferences."
+                            } else if active_tab() == "password" {
+                                "Change your password and security settings."
+                            } else {
+                                "Configure your notification preferences."
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Accordion showcase section
+#[component]
+fn AccordionShowcase() -> Element {
+    let mut expanded = use_signal(|| vec!["item1".to_string()]);
+    
+    let items = vec![
+        AccordionItem::new("item1", "Is it accessible?", "Yes. It adheres to the WAI-ARIA design pattern."),
+        AccordionItem::new("item2", "Is it styled?", "Yes. It comes with default styles that match the other components."),
+        AccordionItem::new("item3", "Is it animated?", "Yes. It's animated by default, but you can disable it if you prefer."),
+    ];
+    
+    rsx! {
+        Card {
+            CardHeader {
+                title: "Accordion",
+                subtitle: Some("Collapsible content sections".to_string()),
+            }
+            CardContent {
+                Accordion {
+                    items: items,
+                    expanded: expanded(),
+                    on_change: move |ids| expanded.set(ids),
+                    multiple: true,
+                }
+            }
+        }
+    }
+}
+
+/// Skeleton showcase section
+#[component]
+fn SkeletonShowcase() -> Element {
+    let mut loading = use_signal(|| true);
+    
+    rsx! {
+        Card {
+            CardHeader {
+                title: "Skeleton",
+                subtitle: Some("Loading placeholders".to_string()),
+            }
+            CardContent {
+                div {
+                    style: "display: flex; flex-direction: column; gap: 16px;",
+                    
+                    Switch {
+                        checked: loading(),
+                        label: Some("Show Skeleton".to_string()),
+                        onchange: move |v| loading.set(v),
+                    }
+                    
+                    if loading() {
+                        div {
+                            style: "display: flex; flex-direction: column; gap: 12px;",
+                            
+                            div {
+                                style: "display: flex; align-items: center; gap: 12px;",
+                                SkeletonCircle { 
+                                    size: "48".to_string(), 
+                                    animate: true,
+                                    style: None,
+                                }
+                                div {
+                                    style: "flex: 1; display: flex; flex-direction: column; gap: 8px;",
+                                    Skeleton { 
+                                        width: Some("150px".to_string()),
+                                        height: None,
+                                        animate: true,
+                                        rounded: None,
+                                        style: None,
+                                        class: None,
+                                    }
+                                    Skeleton { 
+                                        width: Some("100px".to_string()),
+                                        height: None,
+                                        animate: true,
+                                        rounded: None,
+                                        style: None,
+                                        class: None,
+                                    }
+                                }
+                            }
+                            
+                            SkeletonText {
+                                lines: 3,
+                                animate: true,
+                                last_line_width: 60,
+                                style: None,
+                            }
+                        }
+                    } else {
+                        div {
+                            style: "display: flex; align-items: center; gap: 12px;",
+                            
+                            Avatar {
+                                size: AvatarSize::Lg,
+                                name: Some("Loading Complete".to_string()),
+                                src: None,
+                                alt: "".to_string(),
+                                fallback: None,
+                                style: None,
+                                class: None,
+                            }
+                            
+                            div {
+                                p { style: "margin: 0; font-weight: 600;", "Content Loaded" }
+                                p { style: "margin: 0; color: #64748b; font-size: 14px;", "The skeleton has been replaced with actual content." }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Tooltip and Popover showcase
+#[component]
+fn TooltipPopoverShowcase() -> Element {
+    rsx! {
+        Card {
+            CardHeader {
+                title: "Tooltips & Popovers",
+                subtitle: Some("Contextual information displays".to_string()),
+            }
+            CardContent {
+                div {
+                    style: "display: flex; flex-wrap: wrap; gap: 16px; align-items: center;",
+                    
+                    SimpleTooltip {
+                        text: "This is a tooltip".to_string(),
+                        placement: TooltipPlacement::Top,
+                        
+                        Button {
+                            variant: ButtonVariant::Secondary,
+                            "Hover for Tooltip"
+                        }
+                    }
+                    
+                    Popover {
+                        trigger: rsx! {
+                            Button {
+                                variant: ButtonVariant::Secondary,
+                                "Click for Popover"
+                            }
+                        },
+                        
+                        PopoverHeader {
+                            title: "Popover Title".to_string(),
+                            description: Some("This is a popover with more detailed content.".to_string()),
+                        }
+                        
+                        "Popovers can contain rich content, forms, and other interactive elements."
+                        
+                        PopoverFooter {
+                            Button {
+                                variant: ButtonVariant::Primary,
+                                "Action"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Dropdown menu showcase
+#[component]
+fn DropdownMenuShowcase() -> Element {
+    let mut last_action = use_signal(|| "No action yet".to_string());
+    
+    let items = vec![
+        DropdownMenuItem::new("edit", "Edit").with_icon("edit"),
+        DropdownMenuItem::new("duplicate", "Duplicate").with_icon("copy"),
+        DropdownMenuItem::new("delete", "Delete").with_icon("trash").disabled(true),
+    ];
+    
+    rsx! {
+        Card {
+            CardHeader {
+                title: "Dropdown Menu",
+                subtitle: Some("Contextual action menus".to_string()),
+            }
+            CardContent {
+                div {
+                    style: "display: flex; flex-direction: column; gap: 16px;",
+                    
+                    DropdownMenu {
+                        trigger: rsx! {
+                            Button {
+                                variant: ButtonVariant::Secondary,
+                                "Open Menu ▼"
+                            }
+                        },
+                        items: items,
+                        on_select: move |value| last_action.set(format!("Selected: {}", value)),
+                    }
+                    
+                    Label {
+                        color: TextColor::Muted,
+                        "{last_action}"
+                    }
+                }
+            }
+        }
+    }
+}
+
 /// Interactive demo section
 #[component]
 fn InteractiveDemo() -> Element {
@@ -451,7 +1408,7 @@ fn ThemeShowcase() -> Element {
         Card {
             CardHeader {
                 title: "Theme System",
-                subtitle: Some("Light, dark, and custom themes".to_string()),
+                subtitle: Some("7 preset themes: Light, Dark, Rose, Blue, Green, Violet, Orange".to_string()),
             }
             CardContent {
                 div {
@@ -459,7 +1416,16 @@ fn ThemeShowcase() -> Element {
                     
                     Label {
                         size: TextSize::Small,
-                        "Toggle between light and dark mode:"
+                        "Select a theme:"
+                    }
+                    
+                    ThemeSelector {}
+                    
+                    Separator {}
+                    
+                    Label {
+                        size: TextSize::Small,
+                        "Or toggle dark mode:"
                     }
                     
                     ThemeToggle {}
@@ -495,7 +1461,7 @@ fn ShowcaseFooter() -> Element {
                 Label {
                     size: TextSize::ExtraSmall,
                     color: TextColor::Muted,
-                    "Cross-platform Rust UI components"
+                    "60+ Cross-platform Rust UI components"
                 }
             }
         }
@@ -525,7 +1491,7 @@ pub fn AppHeader() -> Element {
             brand_title: "Dioxus UI",
             nav_items: nav_items,
             actions: rsx! {
-                ThemeToggle {}
+                ThemeSelector {}
             }
         }
     }

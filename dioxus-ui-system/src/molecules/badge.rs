@@ -80,7 +80,7 @@ pub struct BadgeProps {
 /// ```
 #[component]
 pub fn Badge(props: BadgeProps) -> Element {
-    let theme = use_theme();
+    let _theme = use_theme();
     let variant = props.variant.clone();
     let size = props.size.clone();
     let has_icon = props.icon.is_some();

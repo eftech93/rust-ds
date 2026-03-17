@@ -140,7 +140,7 @@ impl TextAlign {
 /// ```
 #[component]
 pub fn Label(props: LabelProps) -> Element {
-    let theme = use_theme();
+    let _theme = use_theme();
     
     let size = props.size.clone();
     let weight = props.weight.clone();
@@ -201,7 +201,7 @@ pub fn Label(props: LabelProps) -> Element {
         };
         
         // Line clamp
-        let base = if let Some(clamp) = line_clamp {
+        let base = if let Some(_clamp) = line_clamp {
             Style {
                 overflow: Some("hidden".into()),
                 ..base
