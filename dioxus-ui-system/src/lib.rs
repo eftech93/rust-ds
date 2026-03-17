@@ -46,7 +46,7 @@ pub mod prelude {
     pub use crate::theme::{
         ThemeTokens, ThemeMode, ColorScale, Color, 
         SpacingScale, RadiusScale, TypographyScale, Typography,
-        ThemeContext, ThemeProvider, use_theme, use_style, ThemeToggle,
+        ThemeContext, ThemeProvider, use_theme, use_style, ThemeToggle, ThemeSelector,
     };
     
     // Styles
@@ -59,6 +59,11 @@ pub mod prelude {
         Input, InputProps, InputType,
         Label, LabelProps, TextSize, TextWeight, TextColor, LabelElement, Heading, HeadingLevel, MutedText,
         Icon, IconProps, IconSize, IconColor, IconBtn as IconButton2,
+        Checkbox, CheckboxProps,
+        Radio, RadioProps, RadioGroup, RadioGroupProps, RadioDirection,
+        Switch, SwitchProps, SwitchSize,
+        Select, SelectProps, SelectOption, MultiSelect, MultiSelectProps,
+        TextArea, TextAreaProps, AutoResizeTextArea, AutoResizeTextAreaProps,
     };
     
     // Molecules
@@ -67,6 +72,15 @@ pub mod prelude {
         Card, CardProps, CardVariant, CardHeader, CardHeaderProps, 
         CardContent, CardContentProps, CardFooter, CardFooterProps, CardFooterJustify,
         Badge, BadgeProps, BadgeVariant, BadgeSize, StatusBadge, StatusBadgeProps, StatusType,
+        Alert, AlertProps, AlertVariant,
+        Avatar, AvatarProps, AvatarSize, AvatarGroup, AvatarGroupProps,
+        Breadcrumb, BreadcrumbProps, BreadcrumbItem,
+        Dialog, DialogProps, DialogFooter, DialogFooterProps, DialogFooterAlign, AlertDialog, AlertDialogProps,
+        DropdownMenu, DropdownMenuProps, DropdownMenuItem, DropdownAlign, DropdownMenuSeparator, DropdownMenuLabel, DropdownMenuLabelProps,
+        Popover, PopoverProps, PopoverPlacement, PopoverHeader, PopoverHeaderProps, PopoverFooter, PopoverFooterProps,
+        Separator, SeparatorProps, SeparatorOrientation,
+        Skeleton, SkeletonProps, SkeletonCircle, SkeletonCircleProps, SkeletonText, SkeletonTextProps, SkeletonCard, SkeletonCardProps,
+        Tooltip, TooltipProps, TooltipPlacement, SimpleTooltip, SimpleTooltipProps,
     };
     
     // Organisms
@@ -74,6 +88,9 @@ pub mod prelude {
         Header, HeaderProps, NavItem, HeaderNavLink, MobileMenuToggle,
         UserMenu, UserMenuProps, UserMenuItem,
         DataTable, DataTableProps, TableColumn, ColumnAlign, Pagination, PaginationProps,
+        Tabs, TabsProps, TabItem, TabsVariant, TabPanel, TabPanelProps, VerticalTabs, VerticalTabsProps,
+        Accordion, AccordionProps, AccordionItem, AccordionItem2, AccordionItem2Props,
+        Layout, LayoutProps, LayoutType, LayoutNavItem,
     };
 }
 

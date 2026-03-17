@@ -221,7 +221,7 @@ pub struct DataTableHeaderProps<T: Clone + PartialEq + 'static> {
 
 #[component]
 pub fn DataTableHeader<T: Clone + PartialEq>(props: DataTableHeaderProps<T>) -> Element {
-    let theme = use_theme();
+    let _theme = use_theme();
     
     let header_style = use_style(|t| {
         Style::new()
@@ -297,10 +297,10 @@ pub struct DataTableRowProps<T: Clone + PartialEq + 'static> {
 
 #[component]
 pub fn DataTableRow<T: Clone + PartialEq + 'static>(props: DataTableRowProps<T>) -> Element {
-    let theme = use_theme();
-    let key = (props.key_extractor)(&props.row);
+    let _theme = use_theme();
+    let _key = (props.key_extractor)(&props.row);
     let is_selected = props.is_selected;
-    let has_onclick = props.on_click.is_some();
+    let _has_onclick = props.on_click.is_some();
     
     let mut is_hovered = use_signal(|| false);
     

@@ -15,6 +15,8 @@ pub struct ThemeContext {
     pub set_theme: Callback<ThemeTokens>,
     /// Callback to toggle between light and dark modes
     pub toggle_mode: Callback<()>,
+    /// Callback to set theme by name (preset)
+    pub set_theme_by_name: Callback<String>,
 }
 
 impl ThemeContext {
@@ -117,10 +119,17 @@ pub fn ThemeProvider(
         });
     });
 
+    let set_theme_by_name = Callback::new(move |name: String| {
+        if let Some(new_theme) = ThemeTokens::by_name(&name) {
+            tokens.set(new_theme);
+        }
+    });
+
     use_context_provider(|| ThemeContext {
         tokens,
         set_theme,
         toggle_mode,
+        set_theme_by_name,
     });
 
     rsx! { {children} }
@@ -144,6 +153,66 @@ pub fn ThemeToggle() -> Element {
         button {
             onclick: move |_| theme.toggle_mode.call(()),
             "{button_text}"
+        }
+    }
+}
+
+/// Theme selector dropdown component
+///
+/// Allows users to select from all available preset themes
+#[component]
+pub fn ThemeSelector() -> Element {
+    let theme = use_theme();
+    let mut is_open = use_signal(|| false);
+    let current_mode = use_style(|t| t.mode.clone());
+    
+    let presets = ThemeTokens::presets();
+    
+    let current_name = match current_mode() {
+        super::tokens::ThemeMode::Light => "Light",
+        super::tokens::ThemeMode::Dark => "Dark",
+        super::tokens::ThemeMode::Brand(name) => match name.as_str() {
+            "rose" => "Rose",
+            "blue" => "Blue",
+            "green" => "Green",
+            "violet" => "Violet",
+            "orange" => "Orange",
+            _ => "Custom",
+        },
+    };
+
+    rsx! {
+        div {
+            style: "position: relative; display: inline-block;",
+            
+            // Trigger button
+            button {
+                style: "display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;",
+                onclick: move |_| is_open.toggle(),
+                
+                span { "🎨" }
+                span { "{current_name}" }
+                span { "▼" }
+            }
+            
+            // Dropdown
+            if is_open() {
+                div {
+                    style: "position: absolute; top: calc(100% + 4px); right: 0; min-width: 150px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 100;",
+                    
+                    for (name, _) in presets {
+                        button {
+                            style: "display: block; width: 100%; padding: 8px 12px; text-align: left; background: none; border: none; cursor: pointer; border-radius: 6px; margin: 2px;",
+                            style: if current_name.to_lowercase() == name { "background: #f1f5f9;" } else { "" },
+                            onclick: move |_| {
+                                theme.set_theme_by_name.call(name.to_string());
+                                is_open.set(false);
+                            },
+                            "{name.chars().next().unwrap().to_uppercase()}{&name[1..]}"
+                        }
+                    }
+                }
+            }
         }
     }
 }

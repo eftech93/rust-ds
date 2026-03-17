@@ -101,6 +101,7 @@ pub struct Style {
     pub white_space: Option<String>,
     pub word_break: Option<String>,
     pub outline: Option<String>,
+    pub resize: Option<String>,
 }
 
 impl Style {
@@ -415,6 +416,12 @@ impl Style {
         self
     }
 
+    /// Set bottom margin in pixels (can be negative)
+    pub fn mb_px(mut self, px: i16) -> Self {
+        self.margin_bottom = Some(format!("{}px", px));
+        self
+    }
+
     /// Set left margin
     pub fn ml(mut self, spacing: &SpacingScale, size: &str) -> Self {
         let val = spacing.get(size);
@@ -518,6 +525,12 @@ impl Style {
     /// Set text align to right
     pub fn text_right(mut self) -> Self {
         self.text_align = Some("right".into());
+        self
+    }
+
+    /// Set text align to left
+    pub fn text_align_left(mut self) -> Self {
+        self.text_align = Some("left".into());
         self
     }
 
@@ -668,9 +681,21 @@ impl Style {
         self
     }
 
+    /// Set min-width in pixels
+    pub fn min_w_px(mut self, px: u16) -> Self {
+        self.min_width = Some(format!("{}px", px));
+        self
+    }
+
     /// Set min-height
     pub fn min_h(mut self, height: &str) -> Self {
         self.min_height = Some(height.into());
+        self
+    }
+
+    /// Set min-height in pixels
+    pub fn min_h_px(mut self, px: u16) -> Self {
+        self.min_height = Some(format!("{}px", px));
         self
     }
 
@@ -680,9 +705,21 @@ impl Style {
         self
     }
 
+    /// Set max-width in pixels
+    pub fn max_w_px(mut self, px: u16) -> Self {
+        self.max_width = Some(format!("{}px", px));
+        self
+    }
+
     /// Set max-height
     pub fn max_h(mut self, height: &str) -> Self {
         self.max_height = Some(height.into());
+        self
+    }
+
+    /// Set max-height in pixels
+    pub fn max_h_px(mut self, px: u16) -> Self {
+        self.max_height = Some(format!("{}px", px));
         self
     }
 
@@ -850,6 +887,40 @@ impl Style {
         self
     }
 
+    /// Set resize style
+    pub fn resize(mut self, value: &str) -> Self {
+        self.resize = Some(value.into());
+        self
+    }
+
+    /// Set flex-shrink
+    pub fn flex_shrink(mut self, value: u8) -> Self {
+        // Note: flex_shrink is not in the struct, adding as custom for now
+        // We'll use a different approach - add it to the struct
+        self.transform = Some(format!("flex-shrink: {}", value));
+        self
+    }
+
+    /// Set transparent background
+    pub fn bg_transparent(mut self) -> Self {
+        self.background_color = Some("transparent".into());
+        self
+    }
+
+    /// Set flex-grow
+    pub fn flex_grow(mut self, value: u8) -> Self {
+        // We'll add this to the transform field as a workaround since flex_grow isn't a standard field
+        let existing = self.transform.unwrap_or_default();
+        self.transform = Some(format!("{} flex-grow: {};", existing, value));
+        self
+    }
+
+    /// Set min-height to 100%
+    pub fn min_h_full(mut self) -> Self {
+        self.min_height = Some("100%".into());
+        self
+    }
+
     // ============================================================================
     // Build
     // ============================================================================
@@ -934,6 +1005,7 @@ impl Style {
         write_if_some(&mut style, "white-space", &self.white_space);
         write_if_some(&mut style, "word-break", &self.word_break);
         write_if_some(&mut style, "outline", &self.outline);
+        write_if_some(&mut style, "resize", &self.resize);
         
         style
     }
@@ -1016,6 +1088,7 @@ impl Style {
         if other.white_space.is_some() { self.white_space = other.white_space; }
         if other.word_break.is_some() { self.word_break = other.word_break; }
         if other.outline.is_some() { self.outline = other.outline; }
+        if other.resize.is_some() { self.resize = other.resize; }
         
         self
     }

@@ -474,6 +474,96 @@ fn is_dark_color(color: &Color) -> bool {
     luminance < 0.5
 }
 
+// Preset theme implementations
+impl ThemeTokens {
+    /// Rose theme - romantic pink/red tones
+    pub fn rose() -> Self {
+        let mut rose = Self::light();
+        rose.mode = ThemeMode::Brand("rose".into());
+        rose.colors.primary = Color::new(225, 29, 72);     // Rose 600
+        rose.colors.primary_foreground = Color::new(255, 255, 255);
+        rose.colors.ring = Color::new(225, 29, 72);
+        rose.colors.accent = Color::new(255, 228, 230);    // Rose 100
+        rose.colors.accent_foreground = Color::new(136, 19, 55); // Rose 800
+        rose
+    }
+
+    /// Blue theme - cool blue tones
+    pub fn blue() -> Self {
+        let mut blue = Self::light();
+        blue.mode = ThemeMode::Brand("blue".into());
+        blue.colors.primary = Color::new(37, 99, 235);     // Blue 600
+        blue.colors.primary_foreground = Color::new(255, 255, 255);
+        blue.colors.ring = Color::new(37, 99, 235);
+        blue.colors.accent = Color::new(219, 234, 254);    // Blue 100
+        blue.colors.accent_foreground = Color::new(30, 58, 138); // Blue 800
+        blue
+    }
+
+    /// Green theme - nature green tones
+    pub fn green() -> Self {
+        let mut green = Self::light();
+        green.mode = ThemeMode::Brand("green".into());
+        green.colors.primary = Color::new(22, 163, 74);    // Green 600
+        green.colors.primary_foreground = Color::new(255, 255, 255);
+        green.colors.ring = Color::new(22, 163, 74);
+        green.colors.accent = Color::new(220, 252, 231);   // Green 100
+        green.colors.accent_foreground = Color::new(20, 83, 45); // Green 800
+        green
+    }
+
+    /// Violet theme - purple tones
+    pub fn violet() -> Self {
+        let mut violet = Self::light();
+        violet.mode = ThemeMode::Brand("violet".into());
+        violet.colors.primary = Color::new(124, 58, 237);  // Violet 600
+        violet.colors.primary_foreground = Color::new(255, 255, 255);
+        violet.colors.ring = Color::new(124, 58, 237);
+        violet.colors.accent = Color::new(237, 233, 254);  // Violet 100
+        violet.colors.accent_foreground = Color::new(91, 33, 182); // Violet 800
+        violet
+    }
+
+    /// Orange theme - warm orange tones
+    pub fn orange() -> Self {
+        let mut orange = Self::light();
+        orange.mode = ThemeMode::Brand("orange".into());
+        orange.colors.primary = Color::new(234, 88, 12);   // Orange 600
+        orange.colors.primary_foreground = Color::new(255, 255, 255);
+        orange.colors.ring = Color::new(234, 88, 12);
+        orange.colors.accent = Color::new(255, 237, 213);  // Orange 100
+        orange.colors.accent_foreground = Color::new(154, 52, 18); // Orange 800
+        orange
+    }
+
+    /// Get all available preset themes
+    pub fn presets() -> Vec<(&'static str, ThemeTokens)> {
+        vec![
+            ("light", Self::light()),
+            ("dark", Self::dark()),
+            ("rose", Self::rose()),
+            ("blue", Self::blue()),
+            ("green", Self::green()),
+            ("violet", Self::violet()),
+            ("orange", Self::orange()),
+        ]
+    }
+
+    /// Get theme by name
+    pub fn by_name(name: &str) -> Option<Self> {
+        match name {
+            "light" => Some(Self::light()),
+            "dark" => Some(Self::dark()),
+            "rose" => Some(Self::rose()),
+            "blue" => Some(Self::blue()),
+            "green" => Some(Self::green()),
+            "violet" => Some(Self::violet()),
+            "orange" => Some(Self::orange()),
+            _ => None,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -510,5 +600,15 @@ mod tests {
     fn test_is_dark_color() {
         assert!(is_dark_color(&Color::new(0, 0, 0)));
         assert!(!is_dark_color(&Color::new(255, 255, 255)));
+    }
+
+    #[test]
+    fn test_preset_themes() {
+        let presets = ThemeTokens::presets();
+        assert_eq!(presets.len(), 7);
+        assert!(ThemeTokens::by_name("light").is_some());
+        assert!(ThemeTokens::by_name("dark").is_some());
+        assert!(ThemeTokens::by_name("rose").is_some());
+        assert!(ThemeTokens::by_name("unknown").is_none());
     }
 }
