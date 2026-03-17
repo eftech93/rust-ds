@@ -269,18 +269,12 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                 }
                 
                 for (value, label) in selected_labels {
-                    span {
+                    MultiSelectTag {
                         key: "{value}",
-                        style: "{tag_style}",
-                        "{label}"
-                        button {
-                            style: "background: none; border: none; cursor: pointer; padding: 0; margin: 0; display: flex; align-items: center;",
-                            onclick: move |e: Event<MouseData>| {
-                                e.stop_propagation();
-                                remove_selected(value.clone());
-                            },
-                            "×"
-                        }
+                        value: value.clone(),
+                        label: label.clone(),
+                        tag_style: tag_style.clone(),
+                        on_remove: remove_selected,
                     }
                 }
                 
@@ -330,6 +324,33 @@ fn CheckBoxIndicator(props: CheckBoxIndicatorProps) -> Element {
     }
 }
 
+#[derive(Props, Clone, PartialEq)]
+struct MultiSelectTagProps {
+    value: String,
+    label: String,
+    tag_style: String,
+    on_remove: EventHandler<String>,
+}
+
+#[component]
+fn MultiSelectTag(props: MultiSelectTagProps) -> Element {
+    let value = props.value.clone();
+    rsx! {
+        span {
+            style: "{props.tag_style}",
+            "{props.label}"
+            button {
+                style: "background: none; border: none; cursor: pointer; padding: 0; margin: 0; display: flex; align-items: center;",
+                onclick: move |e: Event<MouseData>| {
+                    e.stop_propagation();
+                    props.on_remove.call(value.clone());
+                },
+                "×"
+            }
+        }
+    }
+}
+
 #[component]
 fn MultiSelectDropdown(props: MultiSelectDropdownProps) -> Element {
     let _theme = use_theme();
@@ -365,28 +386,47 @@ fn MultiSelectDropdown(props: MultiSelectDropdownProps) -> Element {
         div {
             style: "{dropdown_style}",
             
-            for option in props.options {
-                button {
+            for option in props.options.iter().cloned().collect::<Vec<_>>() {
+                DropdownOptionItem {
                     key: "{option.value}",
-                    style: "{item_style}",
-                    disabled: option.disabled,
-                    onclick: move |_| {
-                        props.on_select.call(option.value.clone());
-                    },
-                    
-                    div {
-                        style: "display: flex; align-items: center; gap: 8px;",
-                        
-                        // Checkbox
-                        CheckBoxIndicator { 
-                            is_selected: props.selected.contains(&option.value) 
-                        }
-                        
-                        span {
-                            style: if option.disabled { "opacity: 0.5;" } else { "" },
-                            "{option.label}"
-                        }
-                    }
+                    option: option.clone(),
+                    item_style: item_style.clone(),
+                    is_selected: props.selected.contains(&option.value),
+                    on_select: props.on_select,
+                }
+            }
+        }
+    }
+}
+
+#[derive(Props, Clone, PartialEq)]
+struct DropdownOptionItemProps {
+    option: SelectOption,
+    item_style: String,
+    is_selected: bool,
+    on_select: EventHandler<String>,
+}
+
+#[component]
+fn DropdownOptionItem(props: DropdownOptionItemProps) -> Element {
+    let value = props.option.value.clone();
+    rsx! {
+        button {
+            style: "{props.item_style}",
+            disabled: props.option.disabled,
+            onclick: move |_| {
+                props.on_select.call(value.clone());
+            },
+            
+            div {
+                style: "display: flex; align-items: center; gap: 8px;",
+                
+                // Checkbox
+                CheckBoxIndicator { is_selected: props.is_selected }
+                
+                span {
+                    style: if props.option.disabled { "opacity: 0.5;" } else { "" },
+                    "{props.option.label}"
                 }
             }
         }

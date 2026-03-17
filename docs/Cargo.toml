@@ -1,0 +1,13 @@
+[package]
+name = "dioxus-ui-docs"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+dioxus = { version = "0.6", features = ["web", "router"] }
+dioxus-ui-system = { path = "../dioxus-ui-system" }
+tracing = "0.1"
+
+[features]
+default = ["web"]
+web = ["dioxus/web"]

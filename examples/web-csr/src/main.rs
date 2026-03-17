@@ -1,7 +1,7 @@
-//! Web Client-Side Rendering Example
+//! Web Client-Side Rendering Example with Documentation
 //!
-//! This example demonstrates the Dioxus UI System running in a web browser
-//! using WebAssembly and client-side rendering.
+//! This example demonstrates the Dioxus UI System with a Storybook-like
+//! documentation interface.
 //!
 //! ## Running
 //!
@@ -9,21 +9,16 @@
 //! cd examples/web-csr
 //! dx serve --platform web
 //! ```
-//!
-//! Or with hot reload:
-//!
-//! ```bash
-//! dx serve --platform web --hot-reload
-//! ```
+
+mod docs;
 
 use dioxus::prelude::*;
+use dioxus_ui_system::prelude::*;
 use example_shared::{ComponentShowcase, LayoutShowcase};
+use docs::DocsPage;
 
 fn main() {
-    // Initialize logging
     dioxus::logger::init(tracing::Level::INFO).unwrap();
-    
-    // Launch the web app
     dioxus::launch(App);
 }
 
@@ -37,56 +32,101 @@ fn App() -> Element {
         
         div {
             style: "font-family: 'Inter', system-ui, -apple-system, sans-serif;",
-            AppWithViewSwitcher {}
+            AppWithNav {}
         }
     }
 }
 
-/// App with view switcher for Components and Layouts
+/// Main app with navigation between showcase and docs
 #[component]
-fn AppWithViewSwitcher() -> Element {
-    let mut current_view = use_signal(|| "components".to_string());
+fn AppWithNav() -> Element {
+    let mut current_page = use_signal(|| "showcase".to_string());
     
     rsx! {
         div {
-            // View switcher header
-            div {
-                style: "background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;",
-                
-                div {
-                    style: "display: flex; align-items: center; gap: 16px;",
-                    
-                    h1 {
-                        style: "margin: 0; font-size: 20px; font-weight: 700;",
-                        "Dioxus UI"
-                    }
-                    
-                    // View buttons
-                    div {
-                        style: "display: flex; gap: 8px;",
-                        
-                        ViewButton {
-                            label: "Components",
-                            is_active: current_view() == "components",
-                            onclick: move || current_view.set("components".to_string()),
-                        }
-                        
-                        ViewButton {
-                            label: "Layouts",
-                            is_active: current_view() == "layouts",
-                            onclick: move || current_view.set("layouts".to_string()),
-                        }
-                    }
-                }
-                
-                span {
-                    style: "font-size: 12px; opacity: 0.8;",
-                    "Web (CSR)"
-                }
+            // Header with navigation
+            Header {
+                brand_title: "Dioxus UI",
+                nav_items: vec![
+                    NavItem {
+                        label: "Showcase".to_string(),
+                        href: "#showcase".to_string(),
+                        icon: Some("layout".to_string()),
+                        active: current_page() == "showcase",
+                    },
+                    NavItem {
+                        label: "Docs".to_string(),
+                        href: "#docs".to_string(),
+                        icon: Some("book".to_string()),
+                        active: current_page() == "docs",
+                    },
+                ],
+                actions: rsx! {
+                    ThemeToggle {}
+                },
             }
             
             // Main content
-            if current_view() == "components" {
+            div {
+                div {
+                    style: "background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 12px 24px; display: flex; align-items: center; justify-content: center; gap: 16px;",
+                    
+                    NavTab {
+                        label: "🎨 Component Showcase",
+                        is_active: current_page() == "showcase",
+                        onclick: move |_| current_page.set("showcase".to_string()),
+                    }
+                    
+                    NavTab {
+                        label: "📚 Documentation",
+                        is_active: current_page() == "docs",
+                        onclick: move |_| current_page.set("docs".to_string()),
+                    }
+                }
+                
+                // Page content
+                div {
+                    style: "min-height: calc(100vh - 120px);",
+                    
+                    if current_page() == "showcase" {
+                        ShowcaseView {}
+                    } else {
+                        DocsPage {}
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Showcase view with component demos
+#[component]
+fn ShowcaseView() -> Element {
+    let mut current_tab = use_signal(|| "components".to_string());
+    
+    rsx! {
+        div {
+            // Sub-navigation for showcase
+            div {
+                style: "background: #f8fafc; border-bottom: 1px solid #e2e8f0; padding: 12px 24px; display: flex; gap: 8px;",
+                
+                Button {
+                    variant: if current_tab() == "components" { ButtonVariant::Primary } else { ButtonVariant::Ghost },
+                    size: ButtonSize::Sm,
+                    onclick: move |_| current_tab.set("components".to_string()),
+                    "Components"
+                }
+                
+                Button {
+                    variant: if current_tab() == "layouts" { ButtonVariant::Primary } else { ButtonVariant::Ghost },
+                    size: ButtonSize::Sm,
+                    onclick: move |_| current_tab.set("layouts".to_string()),
+                    "Layouts"
+                }
+            }
+            
+            // Content
+            if current_tab() == "components" {
                 ComponentShowcase {}
             } else {
                 LayoutShowcase {}
@@ -95,22 +135,22 @@ fn AppWithViewSwitcher() -> Element {
     }
 }
 
-/// View switcher button
+/// Navigation tab component
 #[derive(Props, Clone, PartialEq)]
-struct ViewButtonProps {
+struct NavTabProps {
     label: String,
     is_active: bool,
     onclick: EventHandler<()>,
 }
 
 #[component]
-fn ViewButton(props: ViewButtonProps) -> Element {
-    let bg_color = if props.is_active { "rgba(255,255,255,0.2)" } else { "transparent" };
-    let border = if props.is_active { "1px solid rgba(255,255,255,0.4)" } else { "1px solid transparent" };
+fn NavTab(props: NavTabProps) -> Element {
+    let bg_color_val = if props.is_active { "rgba(255,255,255,0.2)" } else { "transparent" };
+    let border_val = if props.is_active { "1px solid rgba(255,255,255,0.4)" } else { "1px solid transparent" };
     
     rsx! {
         button {
-            style: "padding: 6px 14px; border-radius: 6px; border: {border}; background: {bg_color}; color: white; cursor: pointer; font-weight: 500; font-size: 14px; transition: all 150ms;",
+            style: "padding: 8px 20px; border-radius: 8px; border: {border_val}; background: {bg_color_val}; color: white; cursor: pointer; font-weight: 500; font-size: 14px; transition: all 150ms;",
             onclick: move |_| props.onclick.call(()),
             "{props.label}"
         }

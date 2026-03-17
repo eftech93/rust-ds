@@ -327,17 +327,34 @@ dioxus-ui-system = { version = "0.1", default-features = false, features = ["mob
 
 ## Examples
 
-Run the example app:
+### Live Demo & Documentation (GitHub Pages)
+
+🚀 **View the documentation**: [https://your-username.github.io/rust-ds/](https://your-username.github.io/rust-ds/)
+
+The documentation site includes:
+- **60+ Components** with live examples and code snippets
+- **Multi-page Navigation** with sidebar menu
+- **Atoms**: Button, Input, Label, Icon, Checkbox, Radio, Switch, Select, TextArea, Step
+- **Molecules**: Card, Badge, Alert, Avatar, Dialog, Dropdown, Tooltip, Stepper
+- **Organisms**: Header, Layout, Tabs, Accordion, Cards, DataTable, Stepper Wizard
+- **Themes**: 7 presets, design tokens, custom theme creation guide
+- **Guides**: Quick start, styling, forms, layouts
+
+Automatically deployed to GitHub Pages on every push to `main`.
+
+See [GITHUB_PAGES_DEPLOYMENT.md](GITHUB_PAGES_DEPLOYMENT.md) for setup instructions.
+
+### Run Locally
 
 ```bash
 # Web
-cd example-app && dx serve --platform web
+cd examples/web-csr && dx serve --platform web
 
 # Desktop
-cd example-app && cargo run --features desktop
+cd examples/desktop && cargo run
 
 # Mobile (requires setup)
-cd example-app && dx build --platform ios
+cd examples/mobile && dx build --platform ios
 ```
 
 ## Project Structure
