@@ -74,8 +74,9 @@ yarn-error.log*
 package-lock.json
 yarn.lock
 
-# WASM build artifacts
-**/*.wasm
+# WASM build artifacts - ignore all except in docs/assets
+*.wasm
+!docs/assets/*.wasm
 wasm-pack.log
 
 # Generated HTML/JS in examples (if any)
