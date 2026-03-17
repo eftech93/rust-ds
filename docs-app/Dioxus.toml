@@ -3,7 +3,7 @@
 [application]
 name = "dioxus-ui-docs"
 default_platform = "web"
-out_dir = "release"
+out_dir = "docs"
 
 [web.app]
 title = "Dioxus UI Documentation"

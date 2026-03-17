@@ -1,11 +1,11 @@
 [package]
 name = "dioxus-ui-system"
-version = "0.0.2"
+version = "0.0.3"
 edition = "2021"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["Esteban Puello <eftech93@gmail.com>"]
 description = "A pure Rust design system for Dioxus with Atomic Design principles"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/yourusername/dioxus-ui-system"
+repository = "https://github.com/eftech93/rust-ds"
 keywords = ["dioxus", "ui", "design-system", "components", "rust"]
 categories = ["gui", "web-programming", "wasm"]
 rust-version = "1.70"

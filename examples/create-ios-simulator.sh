@@ -47,7 +47,7 @@ if [ $? -eq 0 ]; then
     echo ""
     echo "Next steps:"
     echo "  1. Build the app: cd examples/mobile && dx bundle --platform ios"
-    echo "  2. Install app: xcrun simctl install booted ~/Desktop/EFTECH93/rust-ds/target/dx/example-mobile/debug/ios/ExampleMobile.app"
+    echo "  2. Install app: xcrun simctl install booted ./target/dx/example-mobile/debug/ios/ExampleMobile.app"
     echo "  3. Run app: xcrun simctl launch booted com.example.ExampleMobile"
     echo ""
     echo "Or use the helper script:"
