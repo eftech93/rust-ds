@@ -54,6 +54,7 @@ pub fn ComponentShowcaseInner() -> Element {
                 TooltipPopoverShowcase {}
                 DropdownMenuShowcase {}
                 InteractiveDemo {}
+                ChartShowcase {}
                 ThemeShowcase {}
             }
             
@@ -1296,7 +1297,7 @@ fn DropdownMenuShowcase() -> Element {
     let items = vec![
         DropdownMenuItem::new("edit", "Edit").with_icon("edit"),
         DropdownMenuItem::new("duplicate", "Duplicate").with_icon("copy"),
-        DropdownMenuItem::new("delete", "Delete").with_icon("trash").disabled(true),
+        DropdownMenuItem::new("delete", "Delete").with_icon("trash").disabled(),
     ];
     
     rsx! {
@@ -1394,6 +1395,74 @@ fn InteractiveDemo() -> Element {
                                 color: IconColor::Current,
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Chart showcase with tooltip examples
+#[component]
+fn ChartShowcase() -> Element {
+    use dioxus_ui_system::organisms::charts::*;
+    
+    let bar_data = vec![
+        ChartDataPoint::new("Jan", 100.0),
+        ChartDataPoint::new("Feb", 150.0),
+        ChartDataPoint::new("Mar", 200.0),
+        ChartDataPoint::new("Apr", 180.0),
+        ChartDataPoint::new("May", 250.0),
+        ChartDataPoint::new("Jun", 300.0),
+    ];
+    
+    let pie_data = vec![
+        ChartDataPoint::new("Desktop", 45.0),
+        ChartDataPoint::new("Mobile", 35.0),
+        ChartDataPoint::new("Tablet", 20.0),
+    ];
+    
+    rsx! {
+        Card {
+            CardHeader {
+                title: "Charts with Tooltips",
+                subtitle: Some("Hover over chart elements to see tooltips".to_string()),
+            }
+            CardContent {
+                div {
+                    style: "display: flex; flex-direction: column; gap: 24px;",
+                    
+                    // Bar chart with tooltips
+                    div {
+                        BarChart {
+                            title: Some("Monthly Revenue (with tooltips)".to_string()),
+                            data: Some(bar_data.clone()),
+                            width: "100%".to_string(),
+                            height: "200px".to_string(),
+                            tooltip: ChartTooltip::with_formatter(|point, _| {
+                                format!("{}: ${:.0}K", point.label, point.value)
+                            }),
+                        }
+                    }
+                    
+                    // Pie chart with tooltips
+                    div {
+                        style: "display: flex; justify-content: center;",
+                        DonutChart {
+                            data: pie_data.clone(),
+                            width: "200px".to_string(),
+                            height: "200px".to_string(),
+                            show_center_text: true,
+                            tooltip: ChartTooltip::with_formatter(|point, _| {
+                                format!("{}: {:.0}%", point.label, point.value)
+                            }),
+                        }
+                    }
+                    
+                    Label {
+                        size: TextSize::ExtraSmall,
+                        color: TextColor::Muted,
+                        "Charts support custom tooltips, multiple series, and various chart types"
                     }
                 }
             }

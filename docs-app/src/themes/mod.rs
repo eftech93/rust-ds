@@ -59,7 +59,14 @@ pub fn ThemeOverviewPage() -> Element {
             
             Section { title: "Using Themes",
                 p { "Wrap your app with ThemeProvider:" }
-                CodeBlock { code: "#[component]\nfn App() -> Element {{\n    rsx! {{\n        ThemeProvider {{\n            // Your app here\n        }}\n    }}\n}}".to_string() }
+                CodeBlock { code: "#[component]
+fn App() -> Element {{
+    rsx! {{
+        ThemeProvider {{
+            // Your app here
+        }}
+    }}
+}}".to_string() }
             }
             
             Section { title: "Theme Controls",
@@ -67,6 +74,7 @@ pub fn ThemeOverviewPage() -> Element {
                 ExampleBox {
                     div { style: "display: flex; gap: 12px; flex-wrap: wrap;",
                         ThemeToggle {}
+                        ThemeSelector {}
                     }
                 }
             }
@@ -138,12 +146,71 @@ pub fn CustomThemePage() -> Element {
             
             Section { title: "Brand Theme",
                 p { "Create a theme based on a primary color:" }
-                CodeBlock { code: "use dioxus_ui_system::theme::{{ThemeTokens, Color}};\n\nfn my_theme() -> ThemeTokens {{\n    ThemeTokens::brand(\n        Color::new(220, 38, 38),  // Primary red color\n        \"acme\"                     // Brand name\n    )\n}}\n\n// Use in app\nThemeProvider {{ initial_theme: Some(my_theme()) }}".to_string() }
+                CodeBlock { code: r#"use dioxus_ui_system::theme::{ThemeTokens, Color};
+
+fn my_theme() -> ThemeTokens {
+    ThemeTokens::brand(
+        Color::new(220, 38, 38),  // Primary red color
+        "acme"                     // Brand name
+    )
+}
+
+// Use in app
+ThemeProvider { initial_theme: Some(my_theme()) }"#.to_string() }
             }
             
             Section { title: "Fully Custom Theme",
                 p { "Build a theme from scratch with full control:" }
-                CodeBlock { code: "use dioxus_ui_system::theme::{{\n    ThemeTokens, ColorTokens, SpacingTokens, \n    TypographyTokens, ShadowTokens, Color\n}};\n\nfn custom_theme() -> ThemeTokens {{\n    ThemeTokens {{\n        colors: ColorTokens {{\n            background: Color::new(250, 250, 250),\n            foreground: Color::new(15, 23, 42),\n            primary: Color::new(37, 99, 235),\n            secondary: Color::new(100, 116, 139),\n            muted: Color::new(241, 245, 249),\n            accent: Color::new(241, 245, 249),\n            destructive: Color::new(239, 68, 68),\n            border: Color::new(226, 232, 240),\n            input: Color::new(226, 232, 240),\n            ring: Color::new(37, 99, 235),\n        }},\n        spacing: SpacingTokens {{\n            unit: 4,\n            scale: vec![0, 4, 8, 12, 16, 24, 32, 48, 64],\n        }},\n        typography: TypographyTokens {{\n            font_family: \"Inter, system-ui, sans-serif\".to_string(),\n            font_size_sm: 14,\n            font_size_base: 16,\n            font_size_lg: 18,\n            font_size_xl: 20,\n            font_weight_normal: 400,\n            font_weight_medium: 500,\n            font_weight_semibold: 600,\n            font_weight_bold: 700,\n            line_height_tight: 1.25,\n            line_height_normal: 1.5,\n            line_height_relaxed: 1.75,\n        }},\n        shadows: ShadowTokens {{\n            sm: \"0 1px 2px 0 rgb(0 0 0 / 0.05)\".to_string(),\n            md: \"0 4px 6px -1px rgb(0 0 0 / 0.1)\".to_string(),\n            lg: \"0 10px 15px -3px rgb(0 0 0 / 0.1)\".to_string(),\n        }},\n        radii: RadiusTokens {{\n            sm: 6,\n            md: 8,\n            lg: 12,\n            xl: 16,\n        }},\n    }}\n}}".to_string() }
+                CodeBlock { code: r#"use dioxus_ui_system::theme::{
+    ThemeTokens, ColorTokens, SpacingTokens, 
+    TypographyTokens, ShadowTokens, Color
+};
+
+fn custom_theme() -> ThemeTokens {
+    ThemeTokens {
+        colors: ColorTokens {
+            background: Color::new(250, 250, 250),
+            foreground: Color::new(15, 23, 42),
+            primary: Color::new(37, 99, 235),
+            secondary: Color::new(100, 116, 139),
+            muted: Color::new(241, 245, 249),
+            accent: Color::new(241, 245, 249),
+            destructive: Color::new(239, 68, 68),
+            border: Color::new(226, 232, 240),
+            input: Color::new(226, 232, 240),
+            ring: Color::new(37, 99, 235),
+        },
+        spacing: SpacingTokens {
+            unit: 4,
+            scale: vec![0, 4, 8, 12, 16, 24, 32, 48, 64],
+        },
+        typography: TypographyTokens {
+            font_family: "Inter, system-ui, sans-serif".to_string(),
+            font_size_sm: 14,
+            font_size_base: 16,
+            font_size_lg: 18,
+            font_size_xl: 20,
+            font_weight_normal: 400,
+            font_weight_medium: 500,
+            font_weight_semibold: 600,
+            font_weight_bold: 700,
+            line_height_tight: 1.25,
+            line_height_normal: 1.5,
+            line_height_relaxed: 1.75,
+        },
+        shadows: ShadowTokens {
+            sm: "0 1px 2px 0 rgb(0 0 0 / 0.05)".to_string(),
+            md: "0 4px 6px -1px rgb(0 0 0 / 0.1)".to_string(),
+            lg: "0 10px 15px -3px rgb(0 0 0 / 0.1)".to_string(),
+        },
+        radii: RadiusTokens {
+            sm: 6,
+            md: 8,
+            lg: 12,
+            xl: 16,
+        },
+    }
+}"#.to_string() }
             }
             
             Section { title: "Dark Theme Tips",
@@ -161,16 +228,35 @@ pub fn CustomThemePage() -> Element {
 
 #[component]
 pub fn PresetThemesPage() -> Element {
-    let _theme = use_theme();
+    let theme = use_theme();
+    let mut selected_theme = use_signal(|| "light".to_string());
+    
+    // Update selected theme when theme changes
+    use_effect(move || {
+        let current = theme.tokens.read();
+        let name = match current.mode {
+            dioxus_ui_system::theme::ThemeMode::Light => "light",
+            dioxus_ui_system::theme::ThemeMode::Dark => "dark",
+            dioxus_ui_system::theme::ThemeMode::Brand(ref n) => match n.as_str() {
+                "rose" => "rose",
+                "blue" => "blue",
+                "green" => "green",
+                "violet" => "violet",
+                "orange" => "orange",
+                _ => "custom",
+            },
+        };
+        selected_theme.set(name.to_string());
+    });
     
     let presets = vec![
-        ("Light", "rgb(255,255,255)", "rgb(15,23,42)", "rgb(59,130,246)"),
-        ("Dark", "rgb(15,23,42)", "rgb(248,250,252)", "rgb(59,130,246)"),
-        ("Rose", "rgb(255,241,242)", "rgb(136,19,55)", "rgb(225,29,72)"),
-        ("Blue", "rgb(239,246,255)", "rgb(30,58,138)", "rgb(37,99,235)"),
-        ("Green", "rgb(240,253,244)", "rgb(20,83,45)", "rgb(22,163,74)"),
-        ("Violet", "rgb(245,243,255)", "rgb(76,29,149)", "rgb(124,58,237)"),
-        ("Orange", "rgb(255,247,237)", "rgb(124,45,18)", "rgb(234,88,12)"),
+        ("light", "Light", "Clean and bright default theme", "rgb(255,255,255)", "rgb(15,23,42)", "rgb(59,130,246)"),
+        ("dark", "Dark", "Easy on the eyes for low light", "rgb(15,23,42)", "rgb(248,250,252)", "rgb(59,130,246)"),
+        ("rose", "Rose", "Warm and inviting pink tones", "rgb(255,241,242)", "rgb(136,19,55)", "rgb(225,29,72)"),
+        ("blue", "Blue", "Professional and trustworthy", "rgb(239,246,255)", "rgb(30,58,138)", "rgb(37,99,235)"),
+        ("green", "Green", "Fresh and natural feel", "rgb(240,253,244)", "rgb(20,83,45)", "rgb(22,163,74)"),
+        ("violet", "Violet", "Creative and imaginative", "rgb(245,243,255)", "rgb(76,29,149)", "rgb(124,58,237)"),
+        ("orange", "Orange", "Energetic and vibrant", "rgb(255,247,237)", "rgb(124,45,18)", "rgb(234,88,12)"),
     ];
     
     rsx! {
@@ -180,32 +266,124 @@ pub fn PresetThemesPage() -> Element {
             h1 { style: "margin: 0; font-size: 32px; font-weight: 800;", "Preset Themes" }
             
             Section { title: "Available Themes",
-                p { "Dioxus UI includes 7 preset themes ready to use:" }
+                p { "Dioxus UI includes 7 preset themes ready to use. Click on any theme to apply it:" }
                 
                 div { style: "display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;",
-                    for (name, bg, text, accent) in presets {
-                        div {
-                            style: "border: 1px solid rgb(226,232,240); border-radius: 12px; overflow: hidden;",
-                            
-                            div {
-                                style: "height: 80px; background: {bg}; display: flex; align-items: center; justify-content: center; gap: 8px;",
-                                div { style: "width: 24px; height: 24px; border-radius: 6px; background: {text};" }
-                                div { style: "width: 24px; height: 24px; border-radius: 6px; background: {accent};" }
-                            }
-                            
-                            div {
-                                style: "padding: 16px;",
-                                h3 { style: "margin: 0 0 4px 0; font-size: 16px; font-weight: 600;", "{name}" }
-                                p { style: "margin: 0; font-size: 13px; color: rgb(100,116,139);", "Ready to use preset" }
-                            }
+                    for (id, name, description, bg, text, accent) in presets.clone() {
+                        ThemeCard {
+                            id: id.to_string(),
+                            name: name.to_string(),
+                            description: description.to_string(),
+                            bg: bg.to_string(),
+                            text: text.to_string(),
+                            accent: accent.to_string(),
+                            is_selected: selected_theme() == id,
+                            on_select: move |_| {
+                                selected_theme.set(id.to_string());
+                                theme.set_theme_by_name.call(id.to_string());
+                            },
                         }
                     }
                 }
             }
             
-            Section { title: "Applying Themes",
-                p { "Switch between themes using ThemeSelector or set programmatically:" }
-                CodeBlock { code: "// Get current theme\nlet theme = use_theme();\n\n// Set specific theme\nlet light = ThemeTokens::light();\nlet dark = ThemeTokens::dark();\n\n// In your app\nThemeProvider {{\n    initial_theme: Some(ThemeTokens::rose()),\n    children\n}}".to_string() }
+            Section { title: "Live Preview",
+                p { "See how your selected theme looks with real components:" }
+                ExampleBox {
+                    div { style: "display: flex; flex-direction: column; gap: 16px;",
+                        div { style: "display: flex; gap: 12px; flex-wrap: wrap;",
+                            Button { variant: ButtonVariant::Primary, "Primary" }
+                            Button { variant: ButtonVariant::Secondary, "Secondary" }
+                            Button { variant: ButtonVariant::Destructive, "Destructive" }
+                            Button { variant: ButtonVariant::Ghost, "Ghost" }
+                        }
+                        div { style: "display: flex; gap: 12px; flex-wrap: wrap; align-items: center;",
+                            Badge { "Default" }
+                            Badge { variant: BadgeVariant::Secondary, "Secondary" }
+                            Badge { variant: BadgeVariant::Success, "Success" }
+                            Badge { variant: BadgeVariant::Destructive, "Error" }
+                        }
+                        Alert { 
+                            variant: AlertVariant::Default, 
+                            title: Some("Theme Preview".to_string()),
+                            "This is how alerts appear with the current theme."
+                        }
+                    }
+                }
+            }
+            
+            Section { title: "Applying Themes Programmatically",
+                p { "Switch between themes in your code:" }
+                CodeBlock { code: "// Get current theme context
+let theme = use_theme();
+
+// Apply a preset theme by name
+theme.set_theme_by_name.call(\"rose\".to_string());
+
+// Or set a specific theme directly
+theme.set_theme.call(ThemeTokens::dark());
+
+// Toggle between light and dark
+theme.toggle_mode.call(());".to_string() }
+            }
+        }
+    }
+}
+
+#[derive(Props, Clone, PartialEq)]
+struct ThemeCardProps {
+    id: String,
+    name: String,
+    description: String,
+    bg: String,
+    text: String,
+    accent: String,
+    is_selected: bool,
+    on_select: EventHandler<()>,
+}
+
+#[component]
+fn ThemeCard(props: ThemeCardProps) -> Element {
+    let border_style = if props.is_selected {
+        "border: 2px solid rgb(59,130,246); box-shadow: 0 0 0 3px rgba(59,130,246,0.1);"
+    } else {
+        "border: 1px solid rgb(226,232,240);"
+    };
+    
+    let badge = if props.is_selected {
+        rsx! {
+            div {
+                style: "position: absolute; top: -8px; right: -8px; background: rgb(59,130,246); color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;",
+                "✓"
+            }
+        }
+    } else {
+        rsx! {}
+    };
+    
+    let hover_style = if !props.is_selected {
+        "&:hover { border-color: rgb(156,163,175); }"
+    } else {
+        ""
+    };
+    
+    rsx! {
+        div {
+            style: "position: relative; cursor: pointer; border-radius: 12px; overflow: hidden; transition: all 0.2s; {border_style} {hover_style}",
+            onclick: move |_| props.on_select.call(()),
+            
+            {badge}
+            
+            div {
+                style: "height: 80px; background: {props.bg}; display: flex; align-items: center; justify-content: center; gap: 8px;",
+                div { style: "width: 24px; height: 24px; border-radius: 6px; background: {props.text};" }
+                div { style: "width: 24px; height: 24px; border-radius: 6px; background: {props.accent};" }
+            }
+            
+            div {
+                style: "padding: 16px;",
+                h3 { style: "margin: 0 0 4px 0; font-size: 16px; font-weight: 600;", "{props.name}" }
+                p { style: "margin: 0; font-size: 13px; color: rgb(100,116,139);", "{props.description}" }
             }
         }
     }

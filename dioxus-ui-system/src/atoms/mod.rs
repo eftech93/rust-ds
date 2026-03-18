@@ -15,6 +15,7 @@ pub mod switch;
 pub mod select;
 pub mod textarea;
 pub mod step;
+pub mod box_component;
 
 // Re-export all atom components
 pub use button::{Button, ButtonProps, ButtonVariant, ButtonSize, ButtonType, IconButton};
@@ -27,3 +28,8 @@ pub use switch::{Switch, SwitchProps, SwitchSize};
 pub use select::{Select, SelectProps, SelectOption, MultiSelect, MultiSelectProps};
 pub use textarea::{TextArea, TextAreaProps, AutoResizeTextArea, AutoResizeTextAreaProps};
 pub use step::{StepIndicator, StepIndicatorProps, StepConnector, StepConnectorProps, StepLabel, StepLabelProps, StepState, StepSize};
+pub use box_component::{
+    Box, BoxProps, BoxDisplay, FlexDirection, FlexWrap, JustifyContent, AlignItems,
+    SpacingSize, RadiusSize, ShadowSize, BackgroundColor, BorderWidth, Overflow, Position,
+    VStack, HStack, Center,
+};

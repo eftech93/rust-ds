@@ -1,6 +1,6 @@
 [package]
 name = "dioxus-ui-system"
-version = "0.0.3"
+version = "0.0.4"
 edition = "2021"
 authors = ["Esteban Puello <eftech93@gmail.com>"]
 description = "A pure Rust design system for Dioxus with Atomic Design principles"

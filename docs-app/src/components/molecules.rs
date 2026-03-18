@@ -160,13 +160,81 @@ pub fn DialogPage() -> Element {
 
 #[component]
 pub fn DropdownPage() -> Element {
+    use dioxus_ui_system::molecules::{DropdownMenu, DropdownMenuItem, DropdownAlign};
+    
+    let items = vec![
+        DropdownMenuItem::new("profile", "Profile").with_icon("user"),
+        DropdownMenuItem::new("settings", "Settings").with_icon("settings"),
+        DropdownMenuItem::new("logout", "Logout").with_icon("log-out"),
+    ];
+    
+    let items_with_actions = vec![
+        DropdownMenuItem::new("copy", "Copy").with_icon("copy").with_shortcut("⌘C"),
+        DropdownMenuItem::new("cut", "Cut").with_icon("scissors").with_shortcut("⌘X"),
+        DropdownMenuItem::new("paste", "Paste").with_icon("clipboard").with_shortcut("⌘V"),
+    ];
+    
     rsx! {
         DocPage {
             title: "Dropdown",
-            description: "Contextual action menus.",
+            description: "Contextual action menus that appear when triggered by a button click.",
             
-            Section { title: "Basic",
-                p { "Dropdown menus provide access to actions in a compact way." }
+            Section { title: "Basic Dropdown",
+                ExampleBox {
+                    div { style: "display: flex; gap: 16px;",
+                        DropdownMenu {
+                            trigger: rsx! { Button { variant: ButtonVariant::Primary, "Open Menu" } },
+                            items: items.clone(),
+                            align: DropdownAlign::Start,
+                            on_select: move |id| println!("Selected: {}", id),
+                        }
+                    }
+                }
+                CodeBlock { code: "DropdownMenu {{
+    trigger: rsx! {{ Button {{ \"Open Menu\" }} }},
+    items: vec![
+        DropdownMenuItem::new(\"profile\", \"Profile\").with_icon(\"user\"),
+        DropdownMenuItem::new(\"settings\", \"Settings\").with_icon(\"settings\"),
+    ],
+    on_select: move |id| println!(\"Selected: {{}}\", id),
+}}".to_string() }
+            }
+            
+            Section { title: "With Separators and Shortcuts",
+                ExampleBox {
+                    DropdownMenu {
+                        trigger: rsx! { Button { variant: ButtonVariant::Secondary, "Edit Options" } },
+                        items: items_with_actions.clone(),
+                        align: DropdownAlign::Start,
+                        on_select: move |_| {},
+                    }
+                }
+            }
+            
+            Section { title: "Alignment",
+                p { "Dropdowns can be aligned to start, center, or end of the trigger:" }
+                ExampleBox {
+                    div { style: "display: flex; gap: 16px;",
+                        DropdownMenu {
+                            trigger: rsx! { Button { variant: ButtonVariant::Ghost, "Align Start" } },
+                            items: items.clone(),
+                            align: DropdownAlign::Start,
+                            on_select: move |_| {},
+                        }
+                        DropdownMenu {
+                            trigger: rsx! { Button { variant: ButtonVariant::Ghost, "Align Center" } },
+                            items: items.clone(),
+                            align: DropdownAlign::Center,
+                            on_select: move |_| {},
+                        }
+                        DropdownMenu {
+                            trigger: rsx! { Button { variant: ButtonVariant::Ghost, "Align End" } },
+                            items: items.clone(),
+                            align: DropdownAlign::End,
+                            on_select: move |_| {},
+                        }
+                    }
+                }
             }
         }
     }
@@ -174,13 +242,90 @@ pub fn DropdownPage() -> Element {
 
 #[component]
 pub fn TooltipPage() -> Element {
+    use dioxus_ui_system::molecules::{Tooltip, TooltipPlacement, SimpleTooltip};
+    
     rsx! {
         DocPage {
             title: "Tooltip",
-            description: "Contextual hints on hover.",
+            description: "Contextual hints that appear when hovering over elements.",
             
-            Section { title: "Basic",
-                p { "Tooltips display information when hovering over elements." }
+            Section { title: "Basic Tooltip",
+                ExampleBox {
+                    div { style: "display: flex; gap: 32px; justify-content: center; padding: 32px;",
+                        Tooltip {
+                            content: "This is a tooltip!".to_string(),
+                            placement: TooltipPlacement::Top,
+                            span { style: "padding: 8px 16px; background: rgb(226,232,240); border-radius: 6px; cursor: help;", "Hover me (Top)" }
+                        }
+                        Tooltip {
+                            content: "Bottom tooltip".to_string(),
+                            placement: TooltipPlacement::Bottom,
+                            span { style: "padding: 8px 16px; background: rgb(226,232,240); border-radius: 6px; cursor: help;", "Hover me (Bottom)" }
+                        }
+                    }
+                }
+                CodeBlock { code: "Tooltip {{
+    content: \"Tooltip text\".to_string(),
+    placement: TooltipPlacement::Top,
+    Button {{ \"Hover me\" }}
+}}".to_string() }
+            }
+            
+            Section { title: "Placements",
+                ExampleBox {
+                    div { style: "display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 32px; justify-items: center;",
+                        Tooltip { content: "Top placement".to_string(), placement: TooltipPlacement::Top,
+                            span { style: "padding: 8px 16px; background: rgb(226,232,240); border-radius: 6px;", "Top" }
+                        }
+                        Tooltip { content: "TopStart placement".to_string(), placement: TooltipPlacement::TopStart,
+                            span { style: "padding: 8px 16px; background: rgb(226,232,240); border-radius: 6px;", "TopStart" }
+                        }
+                        Tooltip { content: "TopEnd placement".to_string(), placement: TooltipPlacement::TopEnd,
+                            span { style: "padding: 8px 16px; background: rgb(226,232,240); border-radius: 6px;", "TopEnd" }
+                        }
+                        Tooltip { content: "Right placement".to_string(), placement: TooltipPlacement::Right,
+                            span { style: "padding: 8px 16px; background: rgb(226,232,240); border-radius: 6px;", "Right" }
+                        }
+                        Tooltip { content: "Center".to_string(), placement: TooltipPlacement::Top,
+                            span { style: "padding: 8px 16px; background: rgb(226,232,240); border-radius: 6px; font-weight: bold;", "Center" }
+                        }
+                        Tooltip { content: "Left placement".to_string(), placement: TooltipPlacement::Left,
+                            span { style: "padding: 8px 16px; background: rgb(226,232,240); border-radius: 6px;", "Left" }
+                        }
+                        Tooltip { content: "Bottom placement".to_string(), placement: TooltipPlacement::Bottom,
+                            span { style: "padding: 8px 16px; background: rgb(226,232,240); border-radius: 6px;", "Bottom" }
+                        }
+                        Tooltip { content: "BottomStart placement".to_string(), placement: TooltipPlacement::BottomStart,
+                            span { style: "padding: 8px 16px; background: rgb(226,232,240); border-radius: 6px;", "BottomStart" }
+                        }
+                        Tooltip { content: "BottomEnd placement".to_string(), placement: TooltipPlacement::BottomEnd,
+                            span { style: "padding: 8px 16px; background: rgb(226,232,240); border-radius: 6px;", "BottomEnd" }
+                        }
+                    }
+                }
+            }
+            
+            Section { title: "Simple Tooltip",
+                p { "For quick tooltips with just text, use SimpleTooltip:" }
+                ExampleBox {
+                    div { style: "display: flex; gap: 32px; justify-content: center; padding: 32px;",
+                        SimpleTooltip {
+                            text: "Click to save your changes".to_string(),
+                            placement: TooltipPlacement::Top,
+                            Button { variant: ButtonVariant::Primary, "Save Changes" }
+                        }
+                        SimpleTooltip {
+                            text: "Delete this item permanently".to_string(),
+                            placement: TooltipPlacement::Bottom,
+                            Button { variant: ButtonVariant::Destructive, "Delete" }
+                        }
+                    }
+                }
+                CodeBlock { code: "SimpleTooltip {{
+    text: \"Tooltip text\".to_string(),
+    placement: TooltipPlacement::Top,
+    Button {{ \"Click me\" }}
+}}".to_string() }
             }
         }
     }
@@ -372,5 +517,15 @@ fn Section(title: String, children: Element) -> Element {
 fn ExampleBox(children: Element) -> Element {
     rsx! {
         Card { variant: CardVariant::Default, padding: Some("24px".to_string()), {children} }
+    }
+}
+
+#[component]
+fn CodeBlock(code: String) -> Element {
+    rsx! {
+        pre {
+            style: "background: rgb(15,23,42); color: rgb(226,232,240); padding: 16px; border-radius: 8px; font-size: 14px; overflow-x: auto;",
+            code { "{code}" }
+        }
     }
 }

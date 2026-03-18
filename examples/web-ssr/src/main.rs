@@ -148,9 +148,15 @@ fn AppWithViewSwitcher() -> Element {
                     }
                 }
                 
-                span {
-                    style: "font-size: 12px; opacity: 0.8;",
-                    "Dioxus UI System"
+                div {
+                    style: "display: flex; align-items: center; gap: 12px;",
+                    
+                    ThemeSelector {}
+                    
+                    span {
+                        style: "font-size: 12px; opacity: 0.8;",
+                        "Dioxus UI System"
+                    }
                 }
             }
             

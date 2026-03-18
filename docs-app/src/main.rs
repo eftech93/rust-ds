@@ -39,6 +39,8 @@ pub enum Route {
     // Atoms
     #[route("/atoms")]
     AtomsPage {},
+    #[route("/atoms/box")]
+    BoxPage {},
     #[route("/atoms/button")]
     ButtonPage {},
     #[route("/atoms/input")]
@@ -103,6 +105,8 @@ pub enum Route {
     DataTablePage {},
     #[route("/organisms/stepper-wizard")]
     StepperWizardPage {},
+    #[route("/organisms/charts")]
+    ChartsPage {},
     
     // Themes
     #[route("/themes")]
@@ -188,6 +192,7 @@ fn Sidebar() -> Element {
                 // Atoms
                 NavSection { title: "Atoms", items: vec![
                     ("Overview", Route::AtomsPage {}),
+                    ("Box", Route::BoxPage {}),
                     ("Button", Route::ButtonPage {}),
                     ("Input", Route::InputPage {}),
                     ("Label", Route::LabelPage {}),
@@ -225,6 +230,7 @@ fn Sidebar() -> Element {
                     ("Cards", Route::CardsPage {}),
                     ("DataTable", Route::DataTablePage {}),
                     ("Stepper Wizard", Route::StepperWizardPage {}),
+                    ("Charts", Route::ChartsPage {}),
                 ], current_route: current_route.clone() }
                 
                 // Themes
@@ -337,6 +343,8 @@ fn DocCard(icon: String, title: String, description: String) -> Element {
 #[component]
 fn AtomsPage() -> Element { components::atoms::AtomsPage() }
 #[component]
+fn BoxPage() -> Element { components::atoms::BoxPage() }
+#[component]
 fn ButtonPage() -> Element { components::atoms::ButtonPage() }
 #[component]
 fn InputPage() -> Element { components::atoms::InputPage() }
@@ -400,6 +408,8 @@ fn CardsPage() -> Element { components::organisms::CardsPage() }
 fn DataTablePage() -> Element { components::organisms::DataTablePage() }
 #[component]
 fn StepperWizardPage() -> Element { components::organisms::StepperWizardPage() }
+#[component]
+fn ChartsPage() -> Element { components::organisms::ChartsPage() }
 
 // Themes
 #[component]

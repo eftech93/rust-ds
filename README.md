@@ -408,3 +408,8 @@ This project is licensed under the MIT OR Apache-2.0 license.
 - Inspired by [shadcn/ui](https://ui.shadcn.com/) and [Radix UI](https://www.radix-ui.com/)
 - Built with [Dioxus](https://dioxuslabs.com/)
 - Atomic Design methodology by Brad Frost
+
+
+# Run docs
+
+npx serve -l 9000  

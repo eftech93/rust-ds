@@ -21,6 +21,7 @@ pub fn OrganismsPage() -> Element {
                     li { "Cards - Advanced card patterns" }
                     li { "DataTable - Data display" }
                     li { "Stepper Wizard - Multi-step forms" }
+                    li { "Charts - Data visualization (Bar, Line, Pie, Sparkline)" }
                 }
             }
         }
@@ -496,6 +497,393 @@ pub fn StepperWizardPage() -> Element {
     }
 }
 
+#[component]
+pub fn ChartsPage() -> Element {
+    use dioxus_ui_system::organisms::charts::*;
+    use dioxus_ui_system::theme::tokens::Color;
+    
+    // Sample data for charts
+    let bar_data = vec![
+        ChartDataPoint::new("Jan", 100.0),
+        ChartDataPoint::new("Feb", 150.0),
+        ChartDataPoint::new("Mar", 200.0),
+        ChartDataPoint::new("Apr", 180.0),
+        ChartDataPoint::new("May", 250.0),
+        ChartDataPoint::new("Jun", 300.0),
+    ];
+    
+    let line_data = vec![
+        ChartDataPoint::new("Mon", 20.0),
+        ChartDataPoint::new("Tue", 45.0),
+        ChartDataPoint::new("Wed", 30.0),
+        ChartDataPoint::new("Thu", 60.0),
+        ChartDataPoint::new("Fri", 55.0),
+        ChartDataPoint::new("Sat", 80.0),
+        ChartDataPoint::new("Sun", 65.0),
+    ];
+    
+    let pie_data = vec![
+        ChartDataPoint::new("Desktop", 45.0),
+        ChartDataPoint::new("Mobile", 35.0),
+        ChartDataPoint::new("Tablet", 20.0),
+    ];
+    
+    let sparkline_data = vec![10.0, 15.0, 8.0, 20.0, 25.0, 18.0, 30.0, 22.0, 35.0, 28.0];
+    
+    rsx! {
+        DocPage {
+            title: "Charts",
+            description: "Pure Rust data visualization components with no external dependencies.",
+            
+            Section { title: "Bar Chart",
+                ExampleBox {
+                    BarChart {
+                        title: Some("Monthly Revenue".to_string()),
+                        data: Some(bar_data.clone()),
+                        width: "100%".to_string(),
+                        height: "300px".to_string(),
+                        variant: BarChartVariant::Vertical,
+                        show_values: false,
+                    }
+                }
+                CodeBlock { code: "BarChart {{
+    title: Some(\"Monthly Revenue\".to_string()),
+    data: Some(vec![
+        ChartDataPoint::new(\"Jan\", 100.0),
+        ChartDataPoint::new(\"Feb\", 150.0),
+        // ...
+    ]),
+    width: \"100%\".to_string(),
+    height: \"300px\".to_string(),
+}}".to_string() }
+            }
+            
+            Section { title: "Bar Chart with Tooltips",
+                p { "Hover over bars to see detailed values:" }
+                ExampleBox {
+                    BarChart {
+                        title: Some("Sales by Region".to_string()),
+                        data: Some(bar_data.clone()),
+                        width: "100%".to_string(),
+                        height: "300px".to_string(),
+                        variant: BarChartVariant::Vertical,
+                        tooltip: ChartTooltip::default(),
+                    }
+                }
+                CodeBlock { code: "// Basic tooltip (shows label and value)
+BarChart {{
+    data: Some(bar_data.clone()),
+    tooltip: ChartTooltip::default(),
+}}
+
+// Custom tooltip formatter
+BarChart {{
+    data: Some(bar_data.clone()),
+    tooltip: ChartTooltip::with_formatter(|point, series| {{
+        format!(\"{{}}: ${{:.2}}\", point.label, point.value)
+    }}),
+}}
+
+// Disable tooltips
+BarChart {{
+    data: Some(bar_data.clone()),
+    tooltip: ChartTooltip::disabled(),
+}}".to_string() }
+            }
+            
+            Section { title: "Line Chart",
+                ExampleBox {
+                    LineChart {
+                        title: Some("Weekly Traffic".to_string()),
+                        data: Some(line_data.clone()),
+                        width: "100%".to_string(),
+                        height: "250px".to_string(),
+                        variant: LineChartVariant::Line,
+                        show_points: true,
+                        tooltip: ChartTooltip::default(),
+                    }
+                }
+            }
+            
+            Section { title: "Multi-Series Line Chart with Tooltips",
+                p { "Hover over points to see values for each series:" }
+                ExampleBox {
+                    LineChart {
+                        title: Some("Revenue Comparison".to_string()),
+                        series: Some(vec![
+                            ChartSeries::new(
+                                "This Year",
+                                Color::new(59, 130, 246),
+                                vec![
+                                    ChartDataPoint::new("Q1", 120.0),
+                                    ChartDataPoint::new("Q2", 180.0),
+                                    ChartDataPoint::new("Q3", 220.0),
+                                    ChartDataPoint::new("Q4", 280.0),
+                                ]
+                            ),
+                            ChartSeries::new(
+                                "Last Year",
+                                Color::new(148, 163, 184),
+                                vec![
+                                    ChartDataPoint::new("Q1", 100.0),
+                                    ChartDataPoint::new("Q2", 140.0),
+                                    ChartDataPoint::new("Q3", 180.0),
+                                    ChartDataPoint::new("Q4", 220.0),
+                                ]
+                            ),
+                        ]),
+                        width: "100%".to_string(),
+                        height: "250px".to_string(),
+                        show_points: true,
+                        tooltip: ChartTooltip::with_formatter(|point, series| {
+                            let series_name = series.unwrap_or("");
+                            format!("{} - {}: ${:.0}K", series_name, point.label, point.value)
+                        }),
+                    }
+                }
+                CodeBlock { code: "// Multi-series with custom tooltips
+LineChart {{
+    series: Some(vec![
+        ChartSeries::new(\"This Year\", color1, data1),
+        ChartSeries::new(\"Last Year\", color2, data2),
+    ]),
+    tooltip: ChartTooltip::with_formatter(|point, series| {{
+        format!(\"{{}} - {{}}: ${{:.0}}K\", 
+            series.unwrap_or(\"\"), 
+            point.label, 
+            point.value
+        )
+    }}),
+}}".to_string() }
+            }
+            
+            Section { title: "Area Chart",
+                ExampleBox {
+                    LineChart {
+                        title: Some("Weekly Traffic (Area)".to_string()),
+                        data: Some(line_data.clone()),
+                        width: "100%".to_string(),
+                        height: "250px".to_string(),
+                        variant: LineChartVariant::Area,
+                        show_points: true,
+                    }
+                }
+            }
+            
+            Section { title: "Pie Chart",
+                ExampleBox {
+                    div { style: "display: flex; justify-content: center;",
+                        PieChart {
+                            title: Some("Traffic Sources".to_string()),
+                            data: pie_data.clone(),
+                            width: "400px".to_string(),
+                            height: "300px".to_string(),
+                            show_labels: true,
+                            legend_position: LegendPosition::Right,
+                            tooltip: ChartTooltip::default(),
+                        }
+                    }
+                }
+                CodeBlock { code: "PieChart {{
+    title: Some(\"Traffic Sources\".to_string()),
+    data: vec![
+        ChartDataPoint::new(\"Desktop\", 45.0),
+        ChartDataPoint::new(\"Mobile\", 35.0),
+        ChartDataPoint::new(\"Tablet\", 20.0),
+    ],
+    width: \"400px\".to_string(),
+    height: \"300px\".to_string(),
+    show_labels: true,
+    legend_position: LegendPosition::Right,
+    tooltip: ChartTooltip::default(),
+}}".to_string() }
+            }
+            
+            Section { title: "Pie Chart with Custom Tooltips",
+                p { "Hover over slices to see custom formatted values:" }
+                ExampleBox {
+                    div { style: "display: flex; justify-content: center;",
+                        PieChart {
+                            title: Some("Market Share".to_string()),
+                            data: vec![
+                                ChartDataPoint::new("Product A", 4500.0),
+                                ChartDataPoint::new("Product B", 3200.0),
+                                ChartDataPoint::new("Product C", 1800.0),
+                                ChartDataPoint::new("Product D", 1200.0),
+                            ],
+                            width: "350px".to_string(),
+                            height: "300px".to_string(),
+                            show_labels: false,
+                            legend_position: LegendPosition::Right,
+                            tooltip: ChartTooltip::with_formatter(|point, _| {
+                                format!("{}: {} units ({:.1}%)", 
+                                    point.label, 
+                                    point.value as i32,
+                                    point.value
+                                )
+                            }),
+                        }
+                    }
+                }
+                CodeBlock { code: "PieChart {{
+    data: vec![
+        ChartDataPoint::new(\"Product A\", 4500.0),
+        ChartDataPoint::new(\"Product B\", 3200.0),
+        // ...
+    ],
+    tooltip: ChartTooltip::with_formatter(|point, _| {{
+        format!(\"{{}}: {{}} units\", point.label, point.value as i32)
+    }}),
+}}".to_string() }
+            }
+            
+            Section { title: "Donut Chart",
+                ExampleBox {
+                    div { style: "display: flex; justify-content: center;",
+                        DonutChart {
+                            data: pie_data.clone(),
+                            width: "300px".to_string(),
+                            height: "300px".to_string(),
+                            show_center_text: true,
+                            legend_position: LegendPosition::Bottom,
+                        }
+                    }
+                }
+            }
+            
+            Section { title: "Gauge Chart",
+                ExampleBox {
+                    div { style: "display: flex; justify-content: center;",
+                        GaugeChart {
+                            data: vec![
+                                ChartDataPoint::new("Completed", 75.0),
+                                ChartDataPoint::new("Remaining", 25.0),
+                            ],
+                            width: "300px".to_string(),
+                            height: "200px".to_string(),
+                            legend_position: LegendPosition::None,
+                        }
+                    }
+                }
+            }
+            
+            Section { title: "Sparkline",
+                ExampleBox {
+                    div { style: "display: flex; flex-direction: column; gap: 16px;",
+                        div { style: "display: flex; align-items: center; gap: 12px;",
+                            span { "Revenue:" }
+                            Sparkline {
+                                data: sparkline_data.clone(),
+                                width: "120px".to_string(),
+                                height: "30px".to_string(),
+                                variant: SparklineVariant::Line,
+                                show_last_point: true,
+                            }
+                        }
+                        div { style: "display: flex; align-items: center; gap: 12px;",
+                            span { "Users:" }
+                            Sparkline {
+                                data: vec![50.0, 45.0, 55.0, 48.0, 60.0, 58.0, 65.0],
+                                width: "120px".to_string(),
+                                height: "30px".to_string(),
+                                variant: SparklineVariant::Area,
+                                color: Some(Color::new(34, 197, 94)),
+                                show_last_point: true,
+                            }
+                        }
+                        div { style: "display: flex; align-items: center; gap: 12px;",
+                            span { "Sales:" }
+                            Sparkline {
+                                data: vec![30.0, 35.0, 32.0, 40.0, 38.0, 45.0, 42.0],
+                                width: "120px".to_string(),
+                                height: "30px".to_string(),
+                                variant: SparklineVariant::Bars,
+                                color: Some(Color::new(234, 179, 8)),
+                            }
+                        }
+                    }
+                }
+                CodeBlock { code: "Sparkline {{
+    data: vec![10.0, 15.0, 8.0, 20.0, 25.0],
+    width: \"120px\".to_string(),
+    height: \"30px\".to_string(),
+    variant: SparklineVariant::Line,
+    show_last_point: true,
+}}".to_string() }
+            }
+            
+            Section { title: "Trend Indicator",
+                ExampleBox {
+                    div { style: "display: flex; flex-direction: column; gap: 16px;",
+                        div { style: "display: flex; align-items: center; gap: 12px;",
+                            span { "Stock Price:" }
+                            TrendIndicator {
+                                data: vec![100.0, 105.0, 103.0, 110.0, 115.0, 112.0, 120.0],
+                                width: "100px".to_string(),
+                                show_percentage: true,
+                            }
+                        }
+                        div { style: "display: flex; align-items: center; gap: 12px;",
+                            span { "Active Users:" }
+                            TrendIndicator {
+                                data: vec![1000.0, 950.0, 900.0, 880.0, 850.0],
+                                width: "100px".to_string(),
+                                show_percentage: true,
+                            }
+                        }
+                    }
+                }
+            }
+            
+            Section { title: "Chart Types Reference",
+                p { "Available chart components:" }
+                ul {
+                    li { "BarChart - Vertical, horizontal, stacked, and grouped bar charts" }
+                    li { "LineChart - Lines with smooth/step variants, area fills" }
+                    li { "PieChart - Standard pie charts" }
+                    li { "DonutChart - Hollow-center pie charts" }
+                    li { "GaugeChart - Semi-circular gauge charts" }
+                    li { "Sparkline - Mini inline charts" }
+                    li { "TrendIndicator - Sparkline with trend arrow" }
+                }
+            }
+            
+            Section { title: "Tooltip Configuration",
+                p { "All chart components support tooltips for better data exploration:" }
+                ul {
+                    li { "ChartTooltip::default() - Shows label and formatted value" }
+                    li { "ChartTooltip::with_formatter(f) - Custom tooltip content" }
+                    li { "ChartTooltip::disabled() - Hide tooltips" }
+                    li { "show_series_name - Include series name in tooltip (default: true)" }
+                    li { "show_value - Include value in tooltip (default: true)" }
+                    li { "value_format - Custom value formatter function" }
+                }
+                CodeBlock { code: "use dioxus_ui_system::organisms::charts::ChartTooltip;
+
+// Default tooltip
+ChartTooltip::default()
+
+// Custom formatter
+ChartTooltip::with_formatter(|point, series| {{
+    format!(\"{{}}: ${{:.2}}\", point.label, point.value)
+}})
+
+// Disable tooltips
+ChartTooltip::disabled()
+
+// Advanced configuration
+ChartTooltip {{
+    enabled: true,
+    show_series_name: true,
+    show_value: true,
+    value_format: Some(format_currency),
+    ..Default::default()
+}}".to_string() }
+            }
+        }
+    }
+}
+
 // Shared Components
 
 #[component]
@@ -528,5 +916,15 @@ fn Section(title: String, children: Element) -> Element {
 fn ExampleBox(children: Element) -> Element {
     rsx! {
         Card { variant: CardVariant::Default, padding: Some("24px".to_string()), {children} }
+    }
+}
+
+#[component]
+fn CodeBlock(code: String) -> Element {
+    rsx! {
+        pre {
+            style: "background: rgb(15,23,42); color: rgb(226,232,240); padding: 16px; border-radius: 8px; font-size: 14px; overflow-x: auto;",
+            code { "{code}" }
+        }
     }
 }

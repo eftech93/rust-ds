@@ -10,12 +10,10 @@
 //! dx serve --platform web
 //! ```
 
-mod docs;
-
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
 use example_shared::{ComponentShowcase, LayoutShowcase};
-use docs::DocsPage;
+
 
 fn main() {
     dioxus::logger::init(tracing::Level::INFO).unwrap();
@@ -62,6 +60,7 @@ fn AppWithNav() -> Element {
                     },
                 ],
                 actions: rsx! {
+                    ThemeSelector {}
                     ThemeToggle {}
                 },
             }
@@ -91,7 +90,12 @@ fn AppWithNav() -> Element {
                     if current_page() == "showcase" {
                         ShowcaseView {}
                     } else {
-                        DocsPage {}
+                        // Documentation view placeholder
+                        div {
+                            style: "padding: 48px; text-align: center;",
+                            h2 { "Documentation" }
+                            p { "See the docs-app crate for full documentation." }
+                        }
                     }
                 }
             }
