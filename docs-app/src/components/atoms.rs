@@ -15,6 +15,7 @@ pub fn AtomsPage() -> Element {
             Section { title: "Overview",
                 p { "Atoms are the fundamental building blocks of the design system. They include:" }
                 ul {
+                    li { "Box - Foundational layout primitive" }
                     li { "Button - Interactive action elements" }
                     li { "Input - Text input fields" }
                     li { "Label - Text labels and typography" }
@@ -31,6 +32,102 @@ pub fn AtomsPage() -> Element {
             Section { title: "Usage",
                 p { "Import atoms from the prelude:" }
                 CodeBlock { code: "use dioxus_ui_system::prelude::*;".to_string() }
+            }
+        }
+    }
+}
+
+/// Box documentation page
+#[component]
+pub fn BoxPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "Box",
+            description: "A foundational layout primitive that provides consistent spacing, borders, backgrounds, and flexbox utilities.",
+            
+            Section { title: "Basic Usage",
+                ExampleBox {
+                    div { style: "display: flex; flex-direction: column; gap: 16px;",
+                        Box { padding: SpacingSize::Md, background: BackgroundColor::Card, border_radius: RadiusSize::Md, border: BorderWidth::Thin,
+                            "This is a Box with card background, medium padding, and rounded corners."
+                        }
+                        Box { padding: SpacingSize::Lg, background: BackgroundColor::Primary, border_radius: RadiusSize::Lg,
+                            span { style: "color: white;", "Primary background with large padding" }
+                        }
+                    }
+                }
+                CodeBlock { code: "Box {{
+    padding: SpacingSize::Md,
+    background: BackgroundColor::Card,
+    border_radius: RadiusSize::Md,
+    border: BorderWidth::Thin,
+    \"Your content here\"
+}}".to_string() }
+            }
+            
+            Section { title: "Flexbox Layout",
+                ExampleBox {
+                    Box { display: BoxDisplay::Flex, gap: SpacingSize::Md, padding: SpacingSize::Md, background: BackgroundColor::Muted, border_radius: RadiusSize::Md,
+                        Box { padding: SpacingSize::Sm, background: BackgroundColor::Primary, "Flex Item 1" }
+                        Box { padding: SpacingSize::Sm, background: BackgroundColor::Secondary, "Flex Item 2" }
+                        Box { padding: SpacingSize::Sm, background: BackgroundColor::Accent, "Flex Item 3" }
+                    }
+                }
+                CodeBlock { code: "Box {{
+    display: BoxDisplay::Flex,
+    gap: SpacingSize::Md,
+    padding: SpacingSize::Md,
+    // ... children
+}}".to_string() }
+            }
+            
+            Section { title: "Convenience Components",
+                p { "Use VStack, HStack, and Center for common layouts:" }
+                ExampleBox {
+                    div { style: "display: flex; flex-direction: column; gap: 16px;",
+                        VStack { gap: SpacingSize::Sm, padding: SpacingSize::Md, background: BackgroundColor::Card,
+                            span { "VStack Item 1" }
+                            span { "VStack Item 2" }
+                            span { "VStack Item 3" }
+                        }
+                        HStack { gap: SpacingSize::Sm, padding: SpacingSize::Md, background: BackgroundColor::Card,
+                            span { "HStack 1" }
+                            span { "HStack 2" }
+                            span { "HStack 3" }
+                        }
+                        Center { padding: SpacingSize::Xl, background: BackgroundColor::Muted,
+                            "Centered Content"
+                        }
+                    }
+                }
+            }
+            
+            Section { title: "Spacing Options",
+                ExampleBox {
+                    div { style: "display: flex; flex-direction: column; gap: 8px;",
+                        Box { padding: SpacingSize::None, background: BackgroundColor::Card, border: BorderWidth::Thin, "No padding" }
+                        Box { padding: SpacingSize::Xs, background: BackgroundColor::Card, border: BorderWidth::Thin, "Extra small padding" }
+                        Box { padding: SpacingSize::Sm, background: BackgroundColor::Card, border: BorderWidth::Thin, "Small padding" }
+                        Box { padding: SpacingSize::Md, background: BackgroundColor::Card, border: BorderWidth::Thin, "Medium padding" }
+                        Box { padding: SpacingSize::Lg, background: BackgroundColor::Card, border: BorderWidth::Thin, "Large padding" }
+                        Box { padding: SpacingSize::Xl, background: BackgroundColor::Card, border: BorderWidth::Thin, "Extra large padding" }
+                    }
+                }
+            }
+            
+            Section { title: "Background Colors",
+                ExampleBox {
+                    div { style: "display: flex; flex-wrap: wrap; gap: 8px;",
+                        Box { padding: SpacingSize::Md, background: BackgroundColor::Primary, span { style: "color: white;", "Primary" } }
+                        Box { padding: SpacingSize::Md, background: BackgroundColor::Secondary, "Secondary" }
+                        Box { padding: SpacingSize::Md, background: BackgroundColor::Accent, "Accent" }
+                        Box { padding: SpacingSize::Md, background: BackgroundColor::Muted, "Muted" }
+                        Box { padding: SpacingSize::Md, background: BackgroundColor::Card, border: BorderWidth::Thin, "Card" }
+                        Box { padding: SpacingSize::Md, background: BackgroundColor::Destructive, span { style: "color: white;", "Destructive" } }
+                        Box { padding: SpacingSize::Md, background: BackgroundColor::Success, span { style: "color: white;", "Success" } }
+                        Box { padding: SpacingSize::Md, background: BackgroundColor::Warning, "Warning" }
+                    }
+                }
             }
         }
     }

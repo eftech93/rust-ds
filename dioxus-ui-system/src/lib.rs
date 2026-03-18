@@ -64,6 +64,9 @@ pub mod prelude {
         Switch, SwitchProps, SwitchSize,
         Select, SelectProps, SelectOption, MultiSelect, MultiSelectProps,
         TextArea, TextAreaProps, AutoResizeTextArea, AutoResizeTextAreaProps,
+        Box, BoxProps, BoxDisplay, FlexDirection, FlexWrap, JustifyContent, AlignItems,
+        SpacingSize, RadiusSize, ShadowSize, BackgroundColor, BorderWidth, Overflow, Position,
+        VStack, HStack, Center,
     };
     
     // Molecules
@@ -91,6 +94,18 @@ pub mod prelude {
         Tabs, TabsProps, TabItem, TabsVariant, TabPanel, TabPanelProps, VerticalTabs, VerticalTabsProps,
         Accordion, AccordionProps, AccordionItem, AccordionItem2, AccordionItem2Props,
         Layout, LayoutProps, LayoutType, LayoutNavItem,
+    };
+    
+    // Charts
+    pub use crate::organisms::charts::{
+        BarChart, BarChartProps, BarChartVariant,
+        LineChart, LineChartProps, LineChartVariant,
+        PieChart, PieChartProps, PieChartVariant, DonutChart, GaugeChart,
+        Sparkline, SparklineProps, SparklineVariant, TrendIndicator,
+        ChartDataPoint, ChartSeries, ChartMargin, ChartAxis, 
+        LegendPosition, ChartTooltip, ChartAnimation, AnimationEasing,
+        calculate_nice_ticks, format_compact_number, format_currency, format_percentage,
+        palettes, utils,
     };
 }
 

@@ -10,6 +10,7 @@ pub mod accordion;
 pub mod layout;
 pub mod cards;
 pub mod stepper;
+pub mod charts;
 
 // Re-export all organism components
 pub use header::{Header, HeaderProps, NavItem, HeaderNavLink, MobileMenuToggle, UserMenu, UserMenuProps, UserMenuItem};

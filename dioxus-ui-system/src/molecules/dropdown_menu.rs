@@ -1,10 +1,12 @@
 //! Dropdown Menu molecule component
 //!
 //! Displays a menu to the user—such as a set of actions or functions—triggered by a button.
+//! Uses fixed positioning with portal-like behavior to escape parent overflow clipping.
 
 use dioxus::prelude::*;
 use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::atoms::{Icon, IconSize, IconColor};
 
 /// Dropdown menu item
 #[derive(Clone, PartialEq)]
@@ -23,7 +25,7 @@ pub struct DropdownMenuItem {
 
 impl DropdownMenuItem {
     /// Create a new dropdown menu item
-    pub fn new(label: impl Into<String>, value: impl Into<String>) -> Self {
+    pub fn new(value: impl Into<String>, label: impl Into<String>) -> Self {
         Self {
             label: label.into(),
             value: value.into(),
@@ -40,8 +42,8 @@ impl DropdownMenuItem {
     }
     
     /// Set disabled state
-    pub fn disabled(mut self, disabled: bool) -> Self {
-        self.disabled = disabled;
+    pub fn disabled(mut self) -> Self {
+        self.disabled = true;
         self
     }
     
@@ -82,33 +84,62 @@ pub enum DropdownAlign {
 }
 
 /// Dropdown menu component
+///
+/// Uses a portal-like approach with fixed positioning to avoid being clipped by parent containers.
+/// The menu is rendered with position:fixed at calculated coordinates based on the trigger's position.
 #[component]
 pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
     let _theme = use_theme();
     let mut is_open = use_signal(|| false);
+    let mut menu_position = use_signal(|| (0i32, 0i32));
     
-    let position = match props.align {
-        DropdownAlign::Start => "left: 0;",
-        DropdownAlign::End => "right: 0;",
-        DropdownAlign::Center => "left: 50%; transform: translateX(-50%);",
-    };
-    
-    let menu_style = use_style(|t| {
+    let menu_base_style = use_style(|t| {
         Style::new()
-            .absolute()
-            .top("calc(100% + 4px)")
-            .min_w_px(160)
-            .max_w_px(280)
             .rounded(&t.radius, "md")
             .border(1, &t.colors.border)
             .bg(&t.colors.popover)
             .shadow(&t.shadows.lg)
             .flex()
             .flex_col()
-            .p(&t.spacing, "xs")
-            .z_index(50)
+            .gap(&t.spacing, "2")
+            .py(&t.spacing, "xs")
+            .z_index(9999)
             .build()
     });
+    
+    // Store alignment for use in click handler
+    let align = props.align.clone();
+    
+    let handle_trigger_click = move |event: Event<MouseData>| {
+        if !is_open() {
+            // Get the click coordinates in viewport space
+            let coords = event.data().page_coordinates();
+            let click_x = coords.x as i32;
+            let click_y = coords.y as i32;
+            
+            // The menu width (used for alignment calculations)
+            let menu_width = 180;
+            
+            // Calculate menu position based on alignment
+            // We position relative to the click, with some offset to show below the trigger
+            let (menu_x, menu_y) = match align {
+                DropdownAlign::Start => (click_x - 20, click_y + 20), // Click is somewhere in trigger, offset left
+                DropdownAlign::End => (click_x - menu_width + 20, click_y + 20), // Offset right
+                DropdownAlign::Center => (click_x - menu_width / 2, click_y + 20), // Center on click
+            };
+            
+            // Ensure menu stays within viewport (with some padding)
+            let padding = 8;
+            let final_x = menu_x.max(padding);
+            let final_y = menu_y.max(padding);
+            
+            menu_position.set((final_x, final_y));
+        }
+        is_open.toggle();
+    };
+    
+    let (menu_x, menu_y) = menu_position();
+    let position_style = format!("position: fixed; left: {}px; top: {}px; width: 180px;", menu_x, menu_y);
     
     rsx! {
         div {
@@ -116,24 +147,27 @@ pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
             
             // Trigger
             div {
-                onclick: move |_| is_open.toggle(),
+                onclick: handle_trigger_click,
                 {props.trigger}
             }
             
-            // Menu
+            // Overlay to close on outside click
             if is_open() {
-                // Overlay to close on outside click
                 div {
-                    style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 40;",
+                    style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9998;",
                     onclick: move |_| is_open.set(false),
                 }
-                
+            }
+            
+            // Menu - rendered with fixed positioning to escape clipping
+            if is_open() {
                 div {
-                    style: "{menu_style} {position} {props.style.clone().unwrap_or_default()}",
+                    style: "{menu_base_style} {position_style} {props.style.clone().unwrap_or_default()}",
                     onclick: move |e| e.stop_propagation(),
                     
                     for item in props.items.clone() {
                         DropdownMenuItemView {
+                            key: "{item.value}",
                             item: item.clone(),
                             on_select: props.on_select.clone(),
                             on_close: move || is_open.set(false),
@@ -163,92 +197,52 @@ fn DropdownMenuItemView(props: DropdownMenuItemViewProps) -> Element {
             .flex()
             .items_center()
             .justify_between()
+            .gap(&t.spacing, "sm")
             .px(&t.spacing, "sm")
             .py(&t.spacing, "sm")
             .rounded(&t.radius, "sm")
             .text(&t.typography, "sm")
             .cursor(if props.item.disabled { "not-allowed" } else { "pointer" })
-            .transition("all 100ms ease");
+            .opacity(if props.item.disabled { 0.5 } else { 1.0 });
         
         if is_hovered() && !props.item.disabled {
-            base.bg(&t.colors.accent)
-                .text_color(&t.colors.accent_foreground)
+            base.bg(&t.colors.accent).build()
         } else {
-            base
-        }.build()
+            base.build()
+        }
     });
     
-    let handle_click = move |_| {
-        if !props.item.disabled {
-            props.on_select.call(props.item.value.clone());
-            props.on_close.call(());
-        }
-    };
+    let value = props.item.value.clone();
+    let on_select = props.on_select.clone();
+    let on_close = props.on_close.clone();
     
     rsx! {
-        button {
-            style: "{item_style} background: none; border: none; text-align: left; color: inherit;",
-            disabled: props.item.disabled,
-            onclick: handle_click,
-            onmouseenter: move |_| if !props.item.disabled { is_hovered.set(true) },
+        div {
+            style: "{item_style}",
+            onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
+            onclick: move |_| {
+                if !props.item.disabled {
+                    on_select.call(value.clone());
+                    on_close.call(());
+                }
+            },
             
+            // Label and icon
             div {
                 style: "display: flex; align-items: center; gap: 8px;",
-                
-                if let Some(icon) = props.item.icon.clone() {
-                    DropdownIcon { name: icon }
+                if let Some(icon) = &props.item.icon {
+                    Icon { name: icon.clone(), size: IconSize::Small, color: IconColor::Muted }
                 }
-                
-                span {
-                    style: if props.item.disabled { "opacity: 0.5;" } else { "" },
-                    "{props.item.label}"
-                }
+                span { "{props.item.label}" }
             }
             
-            if let Some(shortcut) = props.item.shortcut.clone() {
+            // Shortcut
+            if let Some(shortcut) = &props.item.shortcut {
                 span {
-                    style: "font-size: 11px; color: #94a3b8; margin-left: 24px;",
+                    style: "font-size: 12px; color: rgb(148,163,184); margin-left: 24px;",
                     "{shortcut}"
                 }
-            }
-        }
-    }
-}
-
-#[derive(Props, Clone, PartialEq)]
-struct DropdownIconProps {
-    name: String,
-}
-
-#[component]
-fn DropdownIcon(props: DropdownIconProps) -> Element {
-    rsx! {
-        svg {
-            view_box: "0 0 24 24",
-            fill: "none",
-            stroke: "currentColor",
-            stroke_width: "2",
-            stroke_linecap: "round",
-            stroke_linejoin: "round",
-            style: "width: 16px; height: 16px;",
-            
-            match props.name.as_str() {
-                "edit" => rsx! {
-                    path { d: "M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" }
-                    path { d: "M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" }
-                },
-                "copy" => rsx! {
-                    rect { x: "9", y: "9", width: "13", height: "13", rx: "2", ry: "2" }
-                    path { d: "M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" }
-                },
-                "trash" => rsx! {
-                    polyline { points: "3 6 5 6 21 6" }
-                    path { d: "M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" }
-                },
-                _ => rsx! {
-                    circle { cx: "12", cy: "12", r: "10" }
-                },
             }
         }
     }
