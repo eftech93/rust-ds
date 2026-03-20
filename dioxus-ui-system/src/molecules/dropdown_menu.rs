@@ -101,7 +101,6 @@ pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
             .shadow(&t.shadows.lg)
             .flex()
             .flex_col()
-            .gap(&t.spacing, "2")
             .py(&t.spacing, "xs")
             .z_index(9999)
             .build()
@@ -140,6 +139,7 @@ pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
     
     let (menu_x, menu_y) = menu_position();
     let position_style = format!("position: fixed; left: {}px; top: {}px; width: 180px;", menu_x, menu_y);
+    let custom_style = props.style.clone().unwrap_or_default();
     
     rsx! {
         div {
@@ -162,7 +162,7 @@ pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
             // Menu - rendered with fixed positioning to escape clipping
             if is_open() {
                 div {
-                    style: "{menu_base_style} {position_style} {props.style.clone().unwrap_or_default()}",
+                    style: "{menu_base_style} {position_style} {custom_style}",
                     onclick: move |e| e.stop_propagation(),
                     
                     for item in props.items.clone() {

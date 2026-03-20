@@ -218,7 +218,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
     let onchange_clone = props.onchange.clone();
     let max_selections = props.max_selections;
     
-    let mut remove_selected = move |value: String| {
+    let remove_selected = move |value: String| {
         let onchange = onchange_clone.clone();
         selected.with_mut(|s| {
             s.retain(|v| v != &value);

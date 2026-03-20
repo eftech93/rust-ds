@@ -2,7 +2,7 @@
 
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
-use dioxus_ui_system::atoms::{StepIndicator, StepState};
+use dioxus_ui_system::atoms::{StepIndicator, StepState, Box, VStack, HStack};
 
 /// Atoms overview page
 #[component]
@@ -47,7 +47,7 @@ pub fn BoxPage() -> Element {
             
             Section { title: "Basic Usage",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 16px;",
+                    VStack { gap: SpacingSize::Md,
                         Box { padding: SpacingSize::Md, background: BackgroundColor::Card, border_radius: RadiusSize::Md, border: BorderWidth::Thin,
                             "This is a Box with card background, medium padding, and rounded corners."
                         }
@@ -84,7 +84,7 @@ pub fn BoxPage() -> Element {
             Section { title: "Convenience Components",
                 p { "Use VStack, HStack, and Center for common layouts:" }
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 16px;",
+                    VStack { gap: SpacingSize::Md,
                         VStack { gap: SpacingSize::Sm, padding: SpacingSize::Md, background: BackgroundColor::Card,
                             span { "VStack Item 1" }
                             span { "VStack Item 2" }
@@ -104,7 +104,7 @@ pub fn BoxPage() -> Element {
             
             Section { title: "Spacing Options",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 8px;",
+                    VStack { gap: SpacingSize::Sm,
                         Box { padding: SpacingSize::None, background: BackgroundColor::Card, border: BorderWidth::Thin, "No padding" }
                         Box { padding: SpacingSize::Xs, background: BackgroundColor::Card, border: BorderWidth::Thin, "Extra small padding" }
                         Box { padding: SpacingSize::Sm, background: BackgroundColor::Card, border: BorderWidth::Thin, "Small padding" }
@@ -143,7 +143,7 @@ pub fn ButtonPage() -> Element {
             
             Section { title: "Variants",
                 ExampleBox {
-                    div { style: "display: flex; flex-wrap: wrap; gap: 12px;",
+                    HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap;",
                         Button { variant: ButtonVariant::Primary, "Primary" }
                         Button { variant: ButtonVariant::Secondary, "Secondary" }
                         Button { variant: ButtonVariant::Ghost, "Ghost" }
@@ -156,7 +156,7 @@ pub fn ButtonPage() -> Element {
             
             Section { title: "Sizes",
                 ExampleBox {
-                    div { style: "display: flex; flex-wrap: wrap; gap: 12px; align-items: center;",
+                    HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap; align-items: center;",
                         Button { size: ButtonSize::Sm, "Small" }
                         Button { size: ButtonSize::Md, "Medium" }
                         Button { size: ButtonSize::Lg, "Large" }
@@ -188,7 +188,7 @@ pub fn InputPage() -> Element {
             
             Section { title: "Basic Usage",
                 ExampleBox {
-                    div { style: "max-width: 400px;",
+                    Box { style: "max-width: 400px;",
                         InputGroup {
                             label: "Email",
                             value: "user@example.com".to_string(),
@@ -217,7 +217,7 @@ pub fn LabelPage() -> Element {
             
             Section { title: "Headings",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 16px;",
+                    VStack { gap: SpacingSize::Md,
                         Heading { level: HeadingLevel::H1, "Heading 1" }
                         Heading { level: HeadingLevel::H2, "Heading 2" }
                         Heading { level: HeadingLevel::H3, "Heading 3" }
@@ -228,7 +228,7 @@ pub fn LabelPage() -> Element {
             
             Section { title: "Text Sizes",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 12px;",
+                    VStack { gap: SpacingSize::Sm,
                         Label { size: TextSize::ExtraSmall, "Extra Small" }
                         Label { size: TextSize::Small, "Small" }
                         Label { size: TextSize::Base, "Base" }
@@ -250,7 +250,7 @@ pub fn IconPage() -> Element {
             description: "Built-in icon library with 30+ icons.",
             
             Section { title: "Available Icons",
-                div { style: "display: flex; flex-wrap: wrap; gap: 16px;",
+                HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap;",
                     IconItem { name: "home".to_string() }
                     IconItem { name: "user".to_string() }
                     IconItem { name: "settings".to_string() }
@@ -272,7 +272,7 @@ pub fn IconPage() -> Element {
 #[component]
 fn IconItem(name: String) -> Element {
     rsx! {
-        div { style: "display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px; background: rgb(248,250,252); border-radius: 8px; min-width: 80px;",
+        VStack { gap: SpacingSize::Xs, style: "align-items: center; padding: 12px; background: rgb(248,250,252); border-radius: 8px; min-width: 80px;",
             Icon { name: name.clone(), size: IconSize::Large, color: IconColor::Primary }
             span { style: "font-size: 12px; color: rgb(100,116,139);", "{name}" }
         }
@@ -315,7 +315,7 @@ pub fn RadioPage() -> Element {
             
             Section { title: "Basic",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 8px;",
+                    VStack { gap: SpacingSize::Sm,
                         Radio {
                             name: "radio".to_string(),
                             value: "option1".to_string(),
@@ -370,7 +370,7 @@ pub fn SelectPage() -> Element {
             
             Section { title: "Basic",
                 ExampleBox {
-                    div { style: "max-width: 300px;",
+                    Box { style: "max-width: 300px;",
                         Select {
                             value: "option1".to_string(),
                             options: vec![
@@ -397,7 +397,7 @@ pub fn TextAreaPage() -> Element {
             
             Section { title: "Basic",
                 ExampleBox {
-                    div { style: "max-width: 400px;",
+                    Box { style: "max-width: 400px;",
                         Label { "Description" }
                         TextArea {
                             value: "Enter your description here...".to_string(),
@@ -421,16 +421,16 @@ pub fn StepPage() -> Element {
             
             Section { title: "States",
                 ExampleBox {
-                    div { style: "display: flex; gap: 32px;",
-                        div { style: "display: flex; flex-direction: column; align-items: center; gap: 8px;",
+                    HStack { gap: SpacingSize::Xl,
+                        VStack { gap: SpacingSize::Sm, style: "align-items: center;",
                             StepIndicator { step: 1, state: StepState::Completed }
                             span { style: "font-size: 12px;", "Completed" }
                         }
-                        div { style: "display: flex; flex-direction: column; align-items: center; gap: 8px;",
+                        VStack { gap: SpacingSize::Sm, style: "align-items: center;",
                             StepIndicator { step: 2, state: StepState::Active }
                             span { style: "font-size: 12px;", "Active" }
                         }
-                        div { style: "display: flex; flex-direction: column; align-items: center; gap: 8px;",
+                        VStack { gap: SpacingSize::Sm, style: "align-items: center;",
                             StepIndicator { step: 3, state: StepState::Pending }
                             span { style: "font-size: 12px;", "Pending" }
                         }
@@ -446,10 +446,10 @@ pub fn StepPage() -> Element {
 #[component]
 fn DocPage(title: String, description: String, children: Element) -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 32px;",
+        VStack {
+            style: "gap: 32px;",
             
-            div {
+            Box {
                 h1 { style: "margin: 0 0 12px 0; font-size: 32px; font-weight: 800;", "{title}" }
                 p { style: "margin: 0; font-size: 16px; color: rgb(100,116,139); line-height: 1.6;", "{description}" }
             }
@@ -464,7 +464,7 @@ fn Section(title: String, children: Element) -> Element {
     rsx! {
         section {
             h2 { style: "margin: 0 0 16px 0; font-size: 24px; font-weight: 700;", "{title}" }
-            div { style: "display: flex; flex-direction: column; gap: 16px;", {children} }
+            VStack { gap: SpacingSize::Md, {children} }
         }
     }
 }

@@ -1,0 +1,26 @@
+# Dioxus configuration file
+# https://dioxuslabs.com/learn/0.7/reference/dioxus-config
+
+[application]
+name = "dioxus-ui-system"
+default_platform = "web"
+out_dir = "dist"
+asset_dir = "assets"
+
+[web.app]
+title = "Dioxus UI System"
+base_path = "/"
+
+[web.wasm_opt]
+# Disable wasm-opt to avoid DWARF debug info issues
+# You can re-enable it with "z" (aggressive) or "s" (size) or "4" (default) once the issue is fixed
+enabled = false
+# Alternatively, you can set the optimization level without disabling:
+# level = "4"
+
+# Or try to strip debug symbols before wasm-opt processes them
+# strip_debug = true
+
+[bundle]
+identifier = "com.example.dioxus-ui"
+icon = ["assets/icon.png"]

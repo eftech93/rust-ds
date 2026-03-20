@@ -6,6 +6,7 @@ use dioxus::prelude::*;
 use crate::theme::use_theme;
 use crate::organisms::charts::common::*;
 use crate::theme::tokens::Color;
+use crate::atoms::Box;
 
 /// Sparkline variant
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -69,8 +70,9 @@ pub fn Sparkline(props: SparklineProps) -> Element {
     
     if props.data.is_empty() {
         return rsx! {
-            div {
-                style: "width: {props.width}; height: {props.height};",
+            Box {
+                width: Some(props.width.clone()),
+                height: Some(props.height.clone()),
             }
         };
     }
@@ -204,8 +206,11 @@ pub fn Sparkline(props: SparklineProps) -> Element {
     };
     
     rsx! {
-        div {
-            style: "{container_style}",
+        Box {
+            width: Some(props.width.clone()),
+            height: Some(props.height.clone()),
+            display: crate::atoms::BoxDisplay::InlineBlock,
+            style: Some(container_style),
             onclick: move |_| {
                 if let Some(handler) = &onclick {
                     handler.call(());

@@ -3,8 +3,11 @@
 //! A comprehensive documentation site with multi-page navigation,
 //! component examples, and theme building guides.
 
+#![allow(unused_braces)]
+
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
+use dioxus_ui_system::atoms::{Box, VStack, HStack};
 
 mod components;
 mod guides;
@@ -137,8 +140,8 @@ pub enum Route {
 #[component]
 fn DocsLayout() -> Element {
     rsx! {
-        div {
-            style: "font-family: 'Inter', system-ui, -apple-system, sans-serif; min-height: 100vh; display: flex; flex-direction: column;",
+        VStack {
+            style: "font-family: 'Inter', system-ui, -apple-system, sans-serif; min-height: 100vh;",
             
             // Header
             Header {
@@ -150,14 +153,14 @@ fn DocsLayout() -> Element {
             }
             
             // Main content area with sidebar
-            div {
-                style: "display: flex; flex: 1;",
+            HStack {
+                style: "flex: 1;",
                 
                 // Sidebar Navigation
                 Sidebar {}
                 
                 // Content area
-                div {
+                Box {
                     style: "flex: 1; padding: 32px; max-width: 900px; margin: 0 auto;",
                     Outlet::<Route> {}
                 }
@@ -180,8 +183,8 @@ fn Sidebar() -> Element {
                 "Navigation"
             }
             
-            nav {
-                style: "display: flex; flex-direction: column; gap: 4px;",
+            VStack {
+                style: "gap: 4px;",
                 
                 // Getting Started
                 NavSection { title: "Getting Started", items: vec![
@@ -257,7 +260,7 @@ fn Sidebar() -> Element {
 #[component]
 fn NavSection(title: String, items: Vec<(&'static str, Route)>, current_route: Route) -> Element {
     rsx! {
-        div {
+        Box {
             style: "margin-bottom: 16px;",
             
             h3 {
@@ -265,8 +268,8 @@ fn NavSection(title: String, items: Vec<(&'static str, Route)>, current_route: R
                 "{title}"
             }
             
-            div {
-                style: "display: flex; flex-direction: column; gap: 2px;",
+            VStack {
+                style: "gap: 2px;",
                 
                 for (label, route) in items {
                     Link {
@@ -289,16 +292,16 @@ fn NavSection(title: String, items: Vec<(&'static str, Route)>, current_route: R
 #[component]
 fn Home() -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 32px;",
+        VStack {
+            style: "gap: 32px;",
             
-            div {
+            Box {
                 h1 { style: "margin: 0 0 16px 0; font-size: 40px; font-weight: 800;", "Dioxus UI" }
                 p { style: "margin: 0; font-size: 18px; color: rgb(100,116,139); line-height: 1.6;", 
                     "A pure Rust design system for building beautiful, type-safe user interfaces with Dioxus." }
             }
             
-            div {
+            Box {
                 style: "display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;",
                 
                 DocCard { icon: "⚛️", title: "60+ Components", description: "Atoms, molecules, and organisms following Atomic Design principles." }
@@ -307,7 +310,7 @@ fn Home() -> Element {
                 DocCard { icon: "🔒", title: "Type-Safe", description: "No CSS files - all styles are compile-time checked Rust code." }
             }
             
-            div {
+            Box {
                 style: "padding: 24px; background: rgb(241,245,249); border-radius: 12px;",
                 
                 h2 { style: "font-size: 20px; font-weight: 700; margin-bottom: 16px;", "Quick Example" }
@@ -326,10 +329,10 @@ fn Home() -> Element {
 #[component]
 fn DocCard(icon: String, title: String, description: String) -> Element {
     rsx! {
-        div {
+        Box {
             style: "padding: 20px; background: white; border: 1px solid rgb(226,232,240); border-radius: 12px;",
             
-            div { style: "font-size: 28px; margin-bottom: 12px;", "{icon}" }
+            Box { style: "font-size: 28px; margin-bottom: 12px;", "{icon}" }
             h3 { style: "margin: 0 0 8px 0; font-size: 16px; font-weight: 600;", "{title}" }
             p { style: "margin: 0; font-size: 14px; color: rgb(100,116,139); line-height: 1.5;", "{description}" }
         }

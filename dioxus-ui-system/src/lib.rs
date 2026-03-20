@@ -90,7 +90,7 @@ pub mod prelude {
     pub use crate::organisms::{
         Header, HeaderProps, NavItem, HeaderNavLink, MobileMenuToggle,
         UserMenu, UserMenuProps, UserMenuItem,
-        DataTable, DataTableProps, TableColumn, ColumnAlign, Pagination, PaginationProps,
+        DataTable, DataTableProps, TableColumn, ColumnAlign, Pagination, PaginationProps, TableFilter, FilterOption,
         Tabs, TabsProps, TabItem, TabsVariant, TabPanel, TabPanelProps, VerticalTabs, VerticalTabsProps,
         Accordion, AccordionProps, AccordionItem, AccordionItem2, AccordionItem2Props,
         Layout, LayoutProps, LayoutType, LayoutNavItem,

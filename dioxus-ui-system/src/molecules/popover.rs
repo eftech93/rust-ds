@@ -5,6 +5,7 @@
 use dioxus::prelude::*;
 use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::atoms::{Box, VStack, HStack, JustifyContent, AlignItems, SpacingSize};
 
 /// Popover properties
 #[derive(Props, Clone, PartialEq)]
@@ -103,6 +104,8 @@ pub fn Popover(props: PopoverProps) -> Element {
         }
     };
     
+    let custom_style = props.style.clone().unwrap_or_default();
+    
     rsx! {
         div {
             style: "position: relative; display: inline-block;",
@@ -127,8 +130,8 @@ pub fn Popover(props: PopoverProps) -> Element {
                 }
                 
                 div {
-                    style: "{popover_style} {position_style} {props.style.clone().unwrap_or_default()}",
-                    onclick: move |e| e.stop_propagation(),
+                    style: "{popover_style} {position_style} {custom_style}",
+                    onclick: move |e: Event<MouseData>| e.stop_propagation(),
                     
                     PopoverContent { children: props.children.clone() }
                 }
@@ -153,7 +156,7 @@ fn PopoverContent(props: PopoverContentProps) -> Element {
     });
     
     rsx! {
-        div {
+        Box {
             style: "{content_style}",
             {props.children}
         }
@@ -183,11 +186,13 @@ pub fn PopoverHeader(props: PopoverHeaderProps) -> Element {
     });
     
     rsx! {
-        div {
+        VStack {
             style: "{header_style}",
+            gap: SpacingSize::Xs,
+            align: AlignItems::Stretch,
             
             h4 {
-                style: "margin: 0 0 4px 0; font-size: 16px; font-weight: 600;",
+                style: "margin: 0; font-size: 16px; font-weight: 600;",
                 "{props.title}"
             }
             
@@ -217,15 +222,15 @@ pub fn PopoverFooter(props: PopoverFooterProps) -> Element {
             .pt(&t.spacing, "md")
             .mt(&t.spacing, "md")
             .border_top(1, &t.colors.border)
-            .flex()
-            .justify_end()
-            .gap(&t.spacing, "sm")
             .build()
     });
     
     rsx! {
-        div {
+        HStack {
             style: "{footer_style}",
+            justify: JustifyContent::End,
+            align: AlignItems::Center,
+            gap: SpacingSize::Sm,
             {props.children}
         }
     }

@@ -30,6 +30,7 @@ pub enum BoxDisplay {
 }
 
 impl BoxDisplay {
+    #[allow(dead_code)]
     fn as_str(&self) -> &'static str {
         match self {
             BoxDisplay::Block => "block",
@@ -217,12 +218,12 @@ impl RadiusSize {
 /// Shadow sizes
 #[derive(Default, Clone, PartialEq, Debug)]
 pub enum ShadowSize {
-    /// No shadow
+    /// No shadow (default)
+    #[default]
     None,
     /// Small shadow
     Sm,
-    /// Medium shadow (default)
-    #[default]
+    /// Medium shadow
     Md,
     /// Large shadow
     Lg,

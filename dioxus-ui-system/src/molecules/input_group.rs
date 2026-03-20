@@ -3,7 +3,7 @@
 //! Combines Label, Input, and helper text/error messages into a cohesive form field.
 
 use dioxus::prelude::*;
-use crate::atoms::{Input, InputType, Label, TextSize, TextColor};
+use crate::atoms::{Input, InputType, Label, TextSize, TextColor, VStack, AlignItems, SpacingSize};
 use crate::theme::use_style;
 use crate::styles::Style;
 
@@ -76,28 +76,17 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
     let required = props.required;
     let disabled = props.disabled;
     
-    let container_style = use_style(|t| {
+    let container_style = use_style(|_t| {
         Style::new()
-            .flex()
-            .flex_col()
-            .gap(&t.spacing, "xs")
             .w_full()
             .build()
     });
     
     let input_wrapper_style = use_style(|_| {
         Style::new()
-            .flex()
-            .items_center()
             .relative()
             .build()
     });
-    
-    let final_style = if let Some(custom) = &props.style {
-        format!("{} {}", container_style(), custom)
-    } else {
-        container_style()
-    };
     
     let label_element = if required {
         rsx! {
@@ -142,38 +131,46 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
         None
     };
     
+    let custom_style = props.style.clone().unwrap_or_default();
+    
     rsx! {
         div {
-            style: "{final_style}",
-            {label_element}
+            style: "{container_style} {custom_style}",
             
-            div {
-                style: "{input_wrapper_style}",
+            VStack {
+                gap: SpacingSize::Xs,
+                align: AlignItems::Stretch,
                 
-                if props.leading_icon.is_some() {
-                    div {
-                        style: "position: absolute; left: 12px; z-index: 1;",
-                        {props.leading_icon.unwrap()}
+                {label_element}
+                
+                div {
+                    style: "{input_wrapper_style} display: flex; align-items: center;",
+                    
+                    if props.leading_icon.is_some() {
+                        div {
+                            style: "position: absolute; left: 12px; z-index: 1;",
+                            {props.leading_icon.unwrap()}
+                        }
+                    }
+                    
+                    Input {
+                        value: value,
+                        placeholder: placeholder,
+                        input_type: input_type,
+                        disabled: disabled,
+                        onchange: props.onchange.clone(),
+                    }
+                    
+                    if props.trailing_icon.is_some() {
+                        div {
+                            style: "position: absolute; right: 12px; z-index: 1;",
+                            {props.trailing_icon.unwrap()}
+                        }
                     }
                 }
                 
-                Input {
-                    value: value,
-                    placeholder: placeholder,
-                    input_type: input_type,
-                    disabled: disabled,
-                    onchange: props.onchange.clone(),
-                }
-                
-                if props.trailing_icon.is_some() {
-                    div {
-                        style: "position: absolute; right: 12px; z-index: 1;",
-                        {props.trailing_icon.unwrap()}
-                    }
-                }
+                {helper_text}
             }
-            
-            {helper_text}
         }
     }
 }

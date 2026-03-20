@@ -8,8 +8,10 @@ pub mod layout_showcase;
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
 use dioxus_ui_system::organisms::*;
-use dioxus_ui_system::atoms::{StepState, StepSize};
+use dioxus_ui_system::atoms::{StepState, StepSize, TextWeight};
+use dioxus_ui_system::atoms::{Box, VStack, HStack, SpacingSize, AlignItems, JustifyContent};
 use dioxus_ui_system::molecules::{StepItem, HorizontalStepper, VerticalStepper};
+use dioxus_ui_system::organisms::{TableColumn, ColumnAlign, TableFilter, FilterOption};
 pub use layout_showcase::{LayoutShowcase, LayoutShowcaseInner};
 
 /// Main showcase component that displays all UI components (includes ThemeProvider)
@@ -26,7 +28,7 @@ pub fn ComponentShowcase() -> Element {
 #[component]
 pub fn ComponentShowcaseInner() -> Element {
     rsx! {
-        div {
+        Box {
             style: "min-height: 100vh; padding: 32px; max-width: 1400px; margin: 0 auto;",
             
             // Header
@@ -41,6 +43,7 @@ pub fn ComponentShowcaseInner() -> Element {
                 BadgeShowcase {}
                 CardShowcase {}
                 CardsOrganismsShowcase {}
+                DataTableShowcase {}
                 StepperShowcase {}
                 IconShowcase {}
                 TypographyShowcase {}
@@ -81,8 +84,10 @@ fn ShowcaseHeader() -> Element {
                 "A pure Rust design system for Dioxus with 60+ components"
             }
             
-            div {
-                style: "margin-top: 16px; display: flex; justify-content: center; gap: 8px;",
+            HStack {
+                justify: JustifyContent::Center,
+                gap: SpacingSize::Sm,
+                style: "margin-top: 16px;",
                 Badge {
                     variant: BadgeVariant::Success,
                     icon: Some("check".to_string()),
@@ -107,12 +112,13 @@ fn ButtonShowcase() -> Element {
                 subtitle: Some("Interactive button variants and sizes".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     // Variants
-                    div {
-                        style: "display: flex; flex-wrap: wrap; gap: 8px;",
+                    HStack {
+                        style: "flex-wrap: wrap;",
+                        gap: SpacingSize::Sm,
                         Button { variant: ButtonVariant::Primary, "Primary" }
                         Button { variant: ButtonVariant::Secondary, "Secondary" }
                         Button { variant: ButtonVariant::Ghost, "Ghost" }
@@ -121,16 +127,19 @@ fn ButtonShowcase() -> Element {
                     }
                     
                     // Sizes
-                    div {
-                        style: "display: flex; flex-wrap: wrap; gap: 8px; align-items: center;",
+                    HStack {
+                        align: AlignItems::Center,
+                        style: "flex-wrap: wrap;",
+                        gap: SpacingSize::Sm,
                         Button { size: ButtonSize::Sm, "Small" }
                         Button { size: ButtonSize::Md, "Medium" }
                         Button { size: ButtonSize::Lg, "Large" }
                     }
                     
                     // States
-                    div {
-                        style: "display: flex; flex-wrap: wrap; gap: 8px;",
+                    HStack {
+                        style: "flex-wrap: wrap;",
+                        gap: SpacingSize::Sm,
                         Button { disabled: true, "Disabled" }
                         Button { 
                             variant: ButtonVariant::Primary,
@@ -158,8 +167,8 @@ fn InputShowcase() -> Element {
                 subtitle: Some("Input fields with validation".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     InputGroup {
                         label: "Email Address",
@@ -209,12 +218,13 @@ fn BadgeShowcase() -> Element {
                 subtitle: Some("Status indicators and labels".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     // Variants
-                    div {
-                        style: "display: flex; flex-wrap: wrap; gap: 8px;",
+                    HStack {
+                        style: "flex-wrap: wrap;",
+                        gap: SpacingSize::Sm,
                         Badge { "Default" }
                         Badge { variant: BadgeVariant::Secondary, "Secondary" }
                         Badge { variant: BadgeVariant::Success, icon: Some("check".to_string()), "Success" }
@@ -225,8 +235,9 @@ fn BadgeShowcase() -> Element {
                     }
                     
                     // Status badges
-                    div {
-                        style: "display: flex; flex-wrap: wrap; gap: 8px;",
+                    HStack {
+                        style: "flex-wrap: wrap;",
+                        gap: SpacingSize::Sm,
                         StatusBadge { status: "Active".to_string(), status_type: StatusType::Success }
                         StatusBadge { status: "Pending".to_string(), status_type: StatusType::Warning }
                         StatusBadge { status: "Failed".to_string(), status_type: StatusType::Error }
@@ -248,8 +259,8 @@ fn CardShowcase() -> Element {
                 subtitle: Some("Different card styles and layouts".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     Card {
                         variant: CardVariant::Default,
@@ -292,8 +303,8 @@ fn CardsOrganismsShowcase() -> Element {
                 subtitle: Some("10+ pre-built card patterns".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 20px;",
+                VStack {
+                    gap: SpacingSize::Lg,
                     
                     // Action Card
                     ActionCard {
@@ -386,8 +397,9 @@ fn CardsOrganismsShowcase() -> Element {
                             }
                         },
                         expanded_content: rsx! {
-                            div {
-                                style: "display: flex; flex-direction: column; gap: 12px; padding-top: 12px;",
+                            VStack {
+                                gap: SpacingSize::Md,
+                                style: "padding-top: 12px;",
                                 
                                 Label { "API Key" }
                                 InputGroup {
@@ -519,12 +531,12 @@ fn StepperShowcase() -> Element {
                 subtitle: Some("Multi-step progress indicators".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 32px;",
+                VStack {
+                    gap: SpacingSize::Xl,
                     
                     // Horizontal Stepper
-                    div {
-                        style: "display: flex; flex-direction: column; gap: 8px;",
+                    VStack {
+                        gap: SpacingSize::Sm,
                         
                         Label { size: TextSize::Small, color: TextColor::Muted, "Horizontal Stepper" }
                         
@@ -539,8 +551,9 @@ fn StepperShowcase() -> Element {
                     }
                     
                     // Step Navigation
-                    div {
-                        style: "display: flex; justify-content: center; gap: 8px;",
+                    HStack {
+                        justify: JustifyContent::Center,
+                        gap: SpacingSize::Sm,
                         
                         Button {
                             variant: ButtonVariant::Secondary,
@@ -562,8 +575,8 @@ fn StepperShowcase() -> Element {
                     Separator {}
                     
                     // Vertical Stepper
-                    div {
-                        style: "display: flex; flex-direction: column; gap: 8px;",
+                    VStack {
+                        gap: SpacingSize::Sm,
                         
                         Label { size: TextSize::Small, color: TextColor::Muted, "Vertical Stepper" }
                         
@@ -586,8 +599,8 @@ fn StepperShowcase() -> Element {
                     Separator {}
                     
                     // Compact Stepper
-                    div {
-                        style: "display: flex; flex-direction: column; gap: 8px;",
+                    VStack {
+                        gap: SpacingSize::Sm,
                         
                         Label { size: TextSize::Small, color: TextColor::Muted, "Compact Stepper" }
                         
@@ -601,8 +614,8 @@ fn StepperShowcase() -> Element {
                     Separator {}
                     
                     // Wizard
-                    div {
-                        style: "display: flex; flex-direction: column; gap: 8px;",
+                    VStack {
+                        gap: SpacingSize::Sm,
                         
                         Label { size: TextSize::Small, color: TextColor::Muted, "Wizard with Content" }
                         
@@ -613,13 +626,13 @@ fn StepperShowcase() -> Element {
                             on_finish: EventHandler::new(move |_| println!("Wizard completed!")),
                             title: Some("Setup Wizard".to_string()),
                             
-                            div {
+                            Box {
                                 style: "padding: 16px; background: #f8fafc; border-radius: 8px;",
                                 
                                 match wizard_step() {
                                     0 => rsx! {
-                                        div {
-                                            style: "display: flex; flex-direction: column; gap: 12px;",
+                                        VStack {
+                                            gap: SpacingSize::Md,
                                             Label { "Step 1: Account Setup" }
                                             p { style: "margin: 0; color: #64748b;", "Please enter your account details." }
                                             InputGroup {
@@ -631,8 +644,8 @@ fn StepperShowcase() -> Element {
                                         }
                                     },
                                     1 => rsx! {
-                                        div {
-                                            style: "display: flex; flex-direction: column; gap: 12px;",
+                                        VStack {
+                                            gap: SpacingSize::Md,
                                             Label { "Step 2: Profile" }
                                             p { style: "margin: 0; color: #64748b;", "Tell us about yourself." }
                                             InputGroup {
@@ -643,8 +656,8 @@ fn StepperShowcase() -> Element {
                                         }
                                     },
                                     2 => rsx! {
-                                        div {
-                                            style: "display: flex; flex-direction: column; gap: 12px;",
+                                        VStack {
+                                            gap: SpacingSize::Md,
                                             Label { "Step 3: Preferences" }
                                             p { style: "margin: 0; color: #64748b;", "Choose your preferences." }
                                             Checkbox {
@@ -693,16 +706,20 @@ fn IconShowcase() -> Element {
                 subtitle: Some("Built-in icon library with 30+ icons".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     // Icon grid
-                    div {
-                        style: "display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;",
+                    HStack {
+                        style: "flex-wrap: wrap;",
+                        justify: JustifyContent::Center,
+                        gap: SpacingSize::Md,
                         
                         for (name, color) in icons {
-                            div {
-                                style: "display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px;",
+                            VStack {
+                                align: AlignItems::Center,
+                                gap: SpacingSize::Xs,
+                                style: "padding: 8px;",
                                 Icon {
                                     name: name.to_string(),
                                     size: IconSize::Large,
@@ -718,8 +735,11 @@ fn IconShowcase() -> Element {
                     }
                     
                     // Size comparison
-                    div {
-                        style: "display: flex; align-items: center; gap: 16px; justify-content: center; margin-top: 16px;",
+                    HStack {
+                        align: AlignItems::Center,
+                        justify: JustifyContent::Center,
+                        gap: SpacingSize::Md,
+                        style: "margin-top: 16px;",
                         Icon { name: "star".to_string(), size: IconSize::ExtraSmall, color: IconColor::Warning }
                         Icon { name: "star".to_string(), size: IconSize::Small, color: IconColor::Warning }
                         Icon { name: "star".to_string(), size: IconSize::Medium, color: IconColor::Warning }
@@ -742,8 +762,8 @@ fn TypographyShowcase() -> Element {
                 subtitle: Some("Text styles and formatting".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     Heading { level: HeadingLevel::H1, "Heading 1" }
                     Heading { level: HeadingLevel::H2, "Heading 2" }
@@ -803,8 +823,8 @@ fn NewFormControlsShowcase() -> Element {
                 subtitle: Some("Checkbox, Radio, Switch, Select, TextArea".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     // Checkbox
                     Checkbox {
@@ -814,8 +834,8 @@ fn NewFormControlsShowcase() -> Element {
                     }
                     
                     // Radio
-                    div {
-                        style: "display: flex; flex-direction: column; gap: 8px;",
+                    VStack {
+                        gap: SpacingSize::Sm,
                         
                         Label { "Select an option:" }
                         
@@ -889,8 +909,8 @@ fn AlertShowcase() -> Element {
                 subtitle: Some("Status messages and notifications".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 12px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     Alert {
                         variant: AlertVariant::Default,
@@ -934,12 +954,14 @@ fn AvatarShowcase() -> Element {
                 subtitle: Some("User profile images with fallbacks".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     // Different sizes
-                    div {
-                        style: "display: flex; align-items: center; gap: 16px; flex-wrap: wrap;",
+                    HStack {
+                        align: AlignItems::Center,
+                        style: "flex-wrap: wrap;",
+                        gap: SpacingSize::Md,
                         
                         Avatar {
                             size: AvatarSize::Xs,
@@ -991,8 +1013,9 @@ fn AvatarShowcase() -> Element {
                     Separator {}
                     
                     // With image
-                    div {
-                        style: "display: flex; align-items: center; gap: 16px;",
+                    HStack {
+                        align: AlignItems::Center,
+                        gap: SpacingSize::Md,
                         
                         Label { "With initials fallback:" }
                         Avatar {
@@ -1024,8 +1047,8 @@ fn DialogShowcase() -> Element {
                 subtitle: Some("Modal windows and alerts".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 12px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     Button {
                         variant: ButtonVariant::Primary,
@@ -1099,8 +1122,8 @@ fn TabsShowcase() -> Element {
                 subtitle: Some("Tabbed content navigation".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     Tabs {
                         tabs: tabs,
@@ -1164,8 +1187,8 @@ fn SkeletonShowcase() -> Element {
                 subtitle: Some("Loading placeholders".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     Switch {
                         checked: loading(),
@@ -1174,18 +1197,20 @@ fn SkeletonShowcase() -> Element {
                     }
                     
                     if loading() {
-                        div {
-                            style: "display: flex; flex-direction: column; gap: 12px;",
+                        VStack {
+                            gap: SpacingSize::Md,
                             
-                            div {
-                                style: "display: flex; align-items: center; gap: 12px;",
+                            HStack {
+                                align: AlignItems::Center,
+                                gap: SpacingSize::Md,
                                 SkeletonCircle { 
                                     size: "48".to_string(), 
                                     animate: true,
                                     style: None,
                                 }
-                                div {
-                                    style: "flex: 1; display: flex; flex-direction: column; gap: 8px;",
+                                VStack {
+                                    style: "flex: 1;",
+                                    gap: SpacingSize::Sm,
                                     Skeleton { 
                                         width: Some("150px".to_string()),
                                         height: None,
@@ -1213,8 +1238,9 @@ fn SkeletonShowcase() -> Element {
                             }
                         }
                     } else {
-                        div {
-                            style: "display: flex; align-items: center; gap: 12px;",
+                        HStack {
+                            align: AlignItems::Center,
+                            gap: SpacingSize::Md,
                             
                             Avatar {
                                 size: AvatarSize::Lg,
@@ -1248,8 +1274,10 @@ fn TooltipPopoverShowcase() -> Element {
                 subtitle: Some("Contextual information displays".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-wrap: wrap; gap: 16px; align-items: center;",
+                HStack {
+                    style: "flex-wrap: wrap;",
+                    align: AlignItems::Center,
+                    gap: SpacingSize::Md,
                     
                     SimpleTooltip {
                         text: "This is a tooltip".to_string(),
@@ -1307,8 +1335,8 @@ fn DropdownMenuShowcase() -> Element {
                 subtitle: Some("Contextual action menus".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     DropdownMenu {
                         trigger: rsx! {
@@ -1344,7 +1372,7 @@ fn InteractiveDemo() -> Element {
                 subtitle: Some("State management with signals".to_string()),
             }
             CardContent {
-                div {
+                Box {
                     style: "text-align: center;",
                     
                     Heading {
@@ -1358,8 +1386,10 @@ fn InteractiveDemo() -> Element {
                         "{message}"
                     }
                     
-                    div {
-                        style: "display: flex; justify-content: center; gap: 8px; margin-top: 16px;",
+                    HStack {
+                        justify: JustifyContent::Center,
+                        gap: SpacingSize::Sm,
+                        style: "margin-top: 16px;",
                         
                         Button {
                             variant: ButtonVariant::Secondary,
@@ -1429,8 +1459,8 @@ fn ChartShowcase() -> Element {
                 subtitle: Some("Hover over chart elements to see tooltips".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 24px;",
+                VStack {
+                    gap: SpacingSize::Lg,
                     
                     // Bar chart with tooltips
                     div {
@@ -1446,8 +1476,8 @@ fn ChartShowcase() -> Element {
                     }
                     
                     // Pie chart with tooltips
-                    div {
-                        style: "display: flex; justify-content: center;",
+                    HStack {
+                        justify: JustifyContent::Center,
                         DonutChart {
                             data: pie_data.clone(),
                             width: "200px".to_string(),
@@ -1470,6 +1500,175 @@ fn ChartShowcase() -> Element {
     }
 }
 
+/// DataTable showcase with search and filters
+#[component]
+fn DataTableShowcase() -> Element {
+    use std::collections::HashMap;
+    
+    #[derive(Clone, PartialEq)]
+    struct Product {
+        id: String,
+        name: String,
+        category: String,
+        price: f64,
+        stock: i32,
+        status: String,
+    }
+    
+    let all_products = vec![
+        Product { id: "1".to_string(), name: "Wireless Headphones".to_string(), category: "Electronics".to_string(), price: 99.99, stock: 45, status: "In Stock".to_string() },
+        Product { id: "2".to_string(), name: "Running Shoes".to_string(), category: "Sports".to_string(), price: 129.99, stock: 12, status: "Low Stock".to_string() },
+        Product { id: "3".to_string(), name: "Coffee Maker".to_string(), category: "Home".to_string(), price: 79.99, stock: 0, status: "Out of Stock".to_string() },
+        Product { id: "4".to_string(), name: "Laptop Stand".to_string(), category: "Electronics".to_string(), price: 49.99, stock: 78, status: "In Stock".to_string() },
+        Product { id: "5".to_string(), name: "Yoga Mat".to_string(), category: "Sports".to_string(), price: 29.99, stock: 34, status: "In Stock".to_string() },
+        Product { id: "6".to_string(), name: "Desk Lamp".to_string(), category: "Home".to_string(), price: 39.99, stock: 5, status: "Low Stock".to_string() },
+        Product { id: "7".to_string(), name: "Bluetooth Speaker".to_string(), category: "Electronics".to_string(), price: 59.99, stock: 23, status: "In Stock".to_string() },
+        Product { id: "8".to_string(), name: "Water Bottle".to_string(), category: "Sports".to_string(), price: 19.99, stock: 0, status: "Out of Stock".to_string() },
+    ];
+    
+    #[derive(Clone, PartialEq)]
+    struct ProductRef(Product);
+    
+    fn render_price(product: &ProductRef) -> Element {
+        let price = product.0.price;
+        rsx! {
+            Label {
+                weight: TextWeight::Semibold,
+                "{price:.2}"
+            }
+        }
+    }
+    
+    fn render_status(product: &ProductRef) -> Element {
+        let (bg, color) = match product.0.status.as_str() {
+            "In Stock" => ("rgb(220,252,231)", "rgb(22,163,74)"),
+            "Low Stock" => ("rgb(254,249,195)", "rgb(161,98,7)"),
+            _ => ("rgb(254,226,226)", "rgb(220,38,38)"),
+        };
+        rsx! {
+            span {
+                style: "padding: 4px 10px; background: {bg}; color: {color}; border-radius: 9999px; font-size: 12px; font-weight: 500;",
+                "{product.0.status}"
+            }
+        }
+    }
+    
+    let columns = vec![
+        TableColumn {
+            key: "name".to_string(),
+            header: "Product".to_string(),
+            width: Some("180px".to_string()),
+            align: ColumnAlign::Left,
+            sortable: true,
+            render: None,
+        },
+        TableColumn {
+            key: "category".to_string(),
+            header: "Category".to_string(),
+            width: Some("120px".to_string()),
+            align: ColumnAlign::Left,
+            sortable: true,
+            render: None,
+        },
+        TableColumn {
+            key: "price".to_string(),
+            header: "Price".to_string(),
+            width: Some("100px".to_string()),
+            align: ColumnAlign::Right,
+            sortable: true,
+            render: Some(|p: &ProductRef| render_price(p)),
+        },
+        TableColumn {
+            key: "stock".to_string(),
+            header: "Stock".to_string(),
+            width: Some("80px".to_string()),
+            align: ColumnAlign::Center,
+            sortable: true,
+            render: None,
+        },
+        TableColumn {
+            key: "status".to_string(),
+            header: "Status".to_string(),
+            width: Some("120px".to_string()),
+            align: ColumnAlign::Center,
+            sortable: false,
+            render: Some(|p: &ProductRef| render_status(p)),
+        },
+    ];
+    
+    let filters = vec![
+        TableFilter {
+            key: "category".to_string(),
+            label: "All Categories".to_string(),
+            options: vec![
+                FilterOption { label: "Electronics".to_string(), value: "Electronics".to_string() },
+                FilterOption { label: "Sports".to_string(), value: "Sports".to_string() },
+                FilterOption { label: "Home".to_string(), value: "Home".to_string() },
+            ],
+        },
+        TableFilter {
+            key: "status".to_string(),
+            label: "All Status".to_string(),
+            options: vec![
+                FilterOption { label: "In Stock".to_string(), value: "In Stock".to_string() },
+                FilterOption { label: "Low Stock".to_string(), value: "Low Stock".to_string() },
+                FilterOption { label: "Out of Stock".to_string(), value: "Out of Stock".to_string() },
+            ],
+        },
+    ];
+    
+    // State for search and filters
+    let mut search_query = use_signal(|| "".to_string());
+    let mut active_filters = use_signal(|| HashMap::<String, String>::new());
+    
+    // Filter the data
+    let filtered_products: Vec<ProductRef> = all_products.clone().into_iter()
+        .map(ProductRef)
+        .filter(|p| {
+            let search_lower = search_query().to_lowercase();
+            let matches_search = search_lower.is_empty() || 
+                p.0.name.to_lowercase().contains(&search_lower) ||
+                p.0.category.to_lowercase().contains(&search_lower);
+            
+            let matches_category = active_filters().get("category").map_or(true, |v| v == &p.0.category);
+            let matches_status = active_filters().get("status").map_or(true, |v| v == &p.0.status);
+            
+            matches_search && matches_category && matches_status
+        }).collect();
+    
+    rsx! {
+        Card {
+            CardHeader {
+                title: "DataTable with Search & Filters",
+                subtitle: Some("Filter by category, status, or search by name".to_string()),
+            }
+            CardContent {
+                DataTable {
+                    data: filtered_products,
+                    columns: columns,
+                    key_extractor: |p: &ProductRef| p.0.id.clone(),
+                    empty_message: "No products match your criteria",
+                    loading: false,
+                    search_query: Some(search_query()),
+                    on_search_change: Some(EventHandler::new(move |q: String| search_query.set(q))),
+                    search_placeholder: "Search products...",
+                    filters: filters,
+                    active_filters: active_filters(),
+                    on_filter_change: Some(EventHandler::new(move |(key, value): (String, String)| {
+                        let mut new_filters = active_filters();
+                        if value.is_empty() {
+                            new_filters.remove(&key);
+                        } else {
+                            new_filters.insert(key, value);
+                        }
+                        active_filters.set(new_filters);
+                    })),
+                }
+            }
+        }
+    }
+}
+
 /// Theme showcase section
 #[component]
 fn ThemeShowcase() -> Element {
@@ -1480,8 +1679,9 @@ fn ThemeShowcase() -> Element {
                 subtitle: Some("7 preset themes: Light, Dark, Rose, Blue, Green, Violet, Orange".to_string()),
             }
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px; align-items: center;",
+                VStack {
+                    align: AlignItems::Center,
+                    gap: SpacingSize::Md,
                     
                     Label {
                         size: TextSize::Small,

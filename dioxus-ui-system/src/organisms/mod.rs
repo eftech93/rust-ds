@@ -14,7 +14,7 @@ pub mod charts;
 
 // Re-export all organism components
 pub use header::{Header, HeaderProps, NavItem, HeaderNavLink, MobileMenuToggle, UserMenu, UserMenuProps, UserMenuItem};
-pub use data_table::{DataTable, DataTableProps, TableColumn, ColumnAlign, Pagination, PaginationProps};
+pub use data_table::{DataTable, DataTableProps, TableColumn, ColumnAlign, Pagination, PaginationProps, TableFilter, FilterOption, DataTableFilter};
 pub use tabs::{Tabs, TabsProps, TabItem, TabsVariant, TabPanel, TabPanelProps, VerticalTabs, VerticalTabsProps};
 pub use accordion::{Accordion, AccordionProps, AccordionItem, AccordionItem2, AccordionItem2Props};
 pub use layout::{Layout, LayoutProps, LayoutType, LayoutNavItem};

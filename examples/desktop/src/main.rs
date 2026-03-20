@@ -25,6 +25,7 @@
 
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
+use dioxus_ui_system::atoms::{Box, VStack, HStack, SpacingSize};
 use example_shared::{AppHeader, ComponentShowcaseInner, LayoutShowcaseInner};
 
 fn main() {
@@ -54,8 +55,9 @@ fn App() -> Element {
     
     rsx! {
         ThemeProvider {
-            div {
-                style: "font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; display: flex; flex-direction: column;",
+            VStack {
+                style: "font-family: system-ui, -apple-system, sans-serif; min-height: 100vh;",
+                height: Some("100vh".to_string()),
                 
                 // Desktop app header with window controls
                 AppHeader {}
@@ -64,8 +66,9 @@ fn App() -> Element {
                 DesktopBanner {}
                 
                 // View switcher
-                div {
-                    style: "background: #f1f5f9; border-bottom: 1px solid #e2e8f0; padding: 12px 24px; display: flex; gap: 8px;",
+                HStack {
+                    style: "background: #f1f5f9; border-bottom: 1px solid #e2e8f0; padding: 12px 24px;",
+                    gap: SpacingSize::Sm,
                     
                     ViewButton {
                         label: "Component Showcase",
@@ -81,7 +84,7 @@ fn App() -> Element {
                 }
                 
                 // Main content
-                div {
+                Box {
                     style: "flex: 1; overflow-y: auto;",
                     
                     if current_view() == "components" {
