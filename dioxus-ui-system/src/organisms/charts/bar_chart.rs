@@ -2,10 +2,13 @@
 //!
 //! A flexible bar chart for comparing categorical data.
 
+#![allow(unpredictable_function_pointer_comparisons)]
+
 use dioxus::prelude::*;
 use crate::theme::use_theme;
 use crate::organisms::charts::common::*;
 use crate::theme::tokens::Color;
+use crate::atoms::Box;
 
 /// Bar chart variant
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -107,8 +110,12 @@ pub fn BarChart(props: BarChartProps) -> Element {
     
     if all_series.is_empty() || all_series[0].data.is_empty() {
         return rsx! {
-            div {
-                style: "width: {props.width}; height: {props.height}; display: flex; align-items: center; justify-content: center;",
+            Box {
+                width: Some(props.width.clone()),
+                height: Some(props.height.clone()),
+                display: crate::atoms::BoxDisplay::Flex,
+                align_items: crate::atoms::AlignItems::Center,
+                justify_content: crate::atoms::JustifyContent::Center,
                 "No data"
             }
         };
@@ -300,8 +307,10 @@ pub fn BarChart(props: BarChartProps) -> Element {
     let tooltip_border = tokens.colors.border.to_rgba();
     
     rsx! {
-        div {
-            style: "{container_style}",
+        Box {
+            width: Some(props.width.clone()),
+            height: Some(props.height.clone()),
+            style: Some(container_style),
             
             // Tooltip
             if tooltip.enabled {
@@ -461,8 +470,8 @@ fn BarPath(props: BarPathProps) -> Element {
     let tooltip_content = props.tooltip_content.clone();
     
     // Calculate center of bar for tooltip position
-    let center_x = (props.bar_x + props.bar_w / 2.0) as i32;
-    let center_y = props.bar_y as i32;
+    let _center_x = (props.bar_x + props.bar_w / 2.0) as i32;
+    let _center_y = props.bar_y as i32;
     
     rsx! {
         path {

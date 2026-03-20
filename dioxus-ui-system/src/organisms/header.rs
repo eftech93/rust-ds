@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
-use crate::atoms::{Button, ButtonVariant, Icon, IconSize, IconColor, Heading, HeadingLevel};
+use crate::atoms::{Button, ButtonVariant, Icon, IconSize, IconColor, Heading, HeadingLevel, HStack};
 
 /// Navigation item
 #[derive(Clone, PartialEq)]
@@ -113,8 +113,9 @@ pub fn Header(props: HeaderProps) -> Element {
         brand_el
     } else if let Some(title) = &props.brand_title {
         rsx! {
-            div {
-                style: "display: flex; align-items: center; gap: 8px;",
+            HStack {
+                align: crate::atoms::AlignItems::Center,
+                gap: crate::atoms::SpacingSize::Sm,
                 Heading {
                     level: HeadingLevel::H4,
                     "{title}"
@@ -155,16 +156,18 @@ pub fn Header(props: HeaderProps) -> Element {
             style: "{final_style}",
             
             // Left section: Brand + Nav
-            div {
-                style: "display: flex; align-items: center; gap: 32px;",
+            HStack {
+                align: crate::atoms::AlignItems::Center,
+                gap: crate::atoms::SpacingSize::Xl,
                 {brand}
                 {nav}
             }
             
             // Right section: Actions
             if props.actions.is_some() {
-                div {
-                    style: "display: flex; align-items: center; gap: 8px;",
+                HStack {
+                    align: crate::atoms::AlignItems::Center,
+                    gap: crate::atoms::SpacingSize::Sm,
                     {props.actions.unwrap()}
                 }
             }

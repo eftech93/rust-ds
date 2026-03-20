@@ -11,5 +11,20 @@ members = [
 resolver = "2"
 
 [workspace.dependencies]
-dioxus = { version = "0.6", features = ["router"] }
+dioxus = { version = "0.7", features = ["router"] }
 serde = { version = "1.0", features = ["derive"] }
+
+# Profile for release builds - strip debug info to avoid wasm-opt DWARF issues
+[profile.release]
+# Strip debug symbols to prevent wasm-opt DWARF errors
+strip = "debuginfo"
+# Or use strip = "symbols" for even smaller builds
+lto = true
+opt-level = "z"
+
+# Profile for WASM builds specifically
+[profile.wasm-release]
+inherits = "release"
+strip = "symbols"
+opt-level = "z"
+lto = true

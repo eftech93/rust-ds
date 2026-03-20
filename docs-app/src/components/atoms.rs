@@ -2,7 +2,13 @@
 
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
-use dioxus_ui_system::atoms::{StepIndicator, StepState};
+use dioxus_ui_system::atoms::{StepIndicator, StepState, Box, VStack, HStack, 
+    Heading, HeadingLevel, Divider, DividerOrientation, Skeleton, SkeletonShape,
+    SkeletonText,
+    Progress, ProgressVariant, ProgressSize, Spinner, SpinnerVariant, SpinnerSize, Rating, Slider, SliderMark,
+    DatePicker, Tag, TagVariant, TagGroup, TagData
+};
+
 
 /// Atoms overview page
 #[component]
@@ -47,7 +53,7 @@ pub fn BoxPage() -> Element {
             
             Section { title: "Basic Usage",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 16px;",
+                    VStack { gap: SpacingSize::Md,
                         Box { padding: SpacingSize::Md, background: BackgroundColor::Card, border_radius: RadiusSize::Md, border: BorderWidth::Thin,
                             "This is a Box with card background, medium padding, and rounded corners."
                         }
@@ -84,7 +90,7 @@ pub fn BoxPage() -> Element {
             Section { title: "Convenience Components",
                 p { "Use VStack, HStack, and Center for common layouts:" }
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 16px;",
+                    VStack { gap: SpacingSize::Md,
                         VStack { gap: SpacingSize::Sm, padding: SpacingSize::Md, background: BackgroundColor::Card,
                             span { "VStack Item 1" }
                             span { "VStack Item 2" }
@@ -104,7 +110,7 @@ pub fn BoxPage() -> Element {
             
             Section { title: "Spacing Options",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 8px;",
+                    VStack { gap: SpacingSize::Sm,
                         Box { padding: SpacingSize::None, background: BackgroundColor::Card, border: BorderWidth::Thin, "No padding" }
                         Box { padding: SpacingSize::Xs, background: BackgroundColor::Card, border: BorderWidth::Thin, "Extra small padding" }
                         Box { padding: SpacingSize::Sm, background: BackgroundColor::Card, border: BorderWidth::Thin, "Small padding" }
@@ -143,7 +149,7 @@ pub fn ButtonPage() -> Element {
             
             Section { title: "Variants",
                 ExampleBox {
-                    div { style: "display: flex; flex-wrap: wrap; gap: 12px;",
+                    HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap;",
                         Button { variant: ButtonVariant::Primary, "Primary" }
                         Button { variant: ButtonVariant::Secondary, "Secondary" }
                         Button { variant: ButtonVariant::Ghost, "Ghost" }
@@ -156,7 +162,7 @@ pub fn ButtonPage() -> Element {
             
             Section { title: "Sizes",
                 ExampleBox {
-                    div { style: "display: flex; flex-wrap: wrap; gap: 12px; align-items: center;",
+                    HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap; align-items: center;",
                         Button { size: ButtonSize::Sm, "Small" }
                         Button { size: ButtonSize::Md, "Medium" }
                         Button { size: ButtonSize::Lg, "Large" }
@@ -188,7 +194,7 @@ pub fn InputPage() -> Element {
             
             Section { title: "Basic Usage",
                 ExampleBox {
-                    div { style: "max-width: 400px;",
+                    Box { style: "max-width: 400px;",
                         InputGroup {
                             label: "Email",
                             value: "user@example.com".to_string(),
@@ -217,7 +223,7 @@ pub fn LabelPage() -> Element {
             
             Section { title: "Headings",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 16px;",
+                    VStack { gap: SpacingSize::Md,
                         Heading { level: HeadingLevel::H1, "Heading 1" }
                         Heading { level: HeadingLevel::H2, "Heading 2" }
                         Heading { level: HeadingLevel::H3, "Heading 3" }
@@ -228,7 +234,7 @@ pub fn LabelPage() -> Element {
             
             Section { title: "Text Sizes",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 12px;",
+                    VStack { gap: SpacingSize::Sm,
                         Label { size: TextSize::ExtraSmall, "Extra Small" }
                         Label { size: TextSize::Small, "Small" }
                         Label { size: TextSize::Base, "Base" }
@@ -250,7 +256,7 @@ pub fn IconPage() -> Element {
             description: "Built-in icon library with 30+ icons.",
             
             Section { title: "Available Icons",
-                div { style: "display: flex; flex-wrap: wrap; gap: 16px;",
+                HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap;",
                     IconItem { name: "home".to_string() }
                     IconItem { name: "user".to_string() }
                     IconItem { name: "settings".to_string() }
@@ -272,7 +278,7 @@ pub fn IconPage() -> Element {
 #[component]
 fn IconItem(name: String) -> Element {
     rsx! {
-        div { style: "display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 12px; background: rgb(248,250,252); border-radius: 8px; min-width: 80px;",
+        VStack { gap: SpacingSize::Xs, style: "align-items: center; padding: 12px; background: rgb(248,250,252); border-radius: 8px; min-width: 80px;",
             Icon { name: name.clone(), size: IconSize::Large, color: IconColor::Primary }
             span { style: "font-size: 12px; color: rgb(100,116,139);", "{name}" }
         }
@@ -315,7 +321,7 @@ pub fn RadioPage() -> Element {
             
             Section { title: "Basic",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 8px;",
+                    VStack { gap: SpacingSize::Sm,
                         Radio {
                             name: "radio".to_string(),
                             value: "option1".to_string(),
@@ -370,7 +376,7 @@ pub fn SelectPage() -> Element {
             
             Section { title: "Basic",
                 ExampleBox {
-                    div { style: "max-width: 300px;",
+                    Box { style: "max-width: 300px;",
                         Select {
                             value: "option1".to_string(),
                             options: vec![
@@ -397,7 +403,7 @@ pub fn TextAreaPage() -> Element {
             
             Section { title: "Basic",
                 ExampleBox {
-                    div { style: "max-width: 400px;",
+                    Box { style: "max-width: 400px;",
                         Label { "Description" }
                         TextArea {
                             value: "Enter your description here...".to_string(),
@@ -421,16 +427,16 @@ pub fn StepPage() -> Element {
             
             Section { title: "States",
                 ExampleBox {
-                    div { style: "display: flex; gap: 32px;",
-                        div { style: "display: flex; flex-direction: column; align-items: center; gap: 8px;",
+                    HStack { gap: SpacingSize::Xl,
+                        VStack { gap: SpacingSize::Sm, style: "align-items: center;",
                             StepIndicator { step: 1, state: StepState::Completed }
                             span { style: "font-size: 12px;", "Completed" }
                         }
-                        div { style: "display: flex; flex-direction: column; align-items: center; gap: 8px;",
+                        VStack { gap: SpacingSize::Sm, style: "align-items: center;",
                             StepIndicator { step: 2, state: StepState::Active }
                             span { style: "font-size: 12px;", "Active" }
                         }
-                        div { style: "display: flex; flex-direction: column; align-items: center; gap: 8px;",
+                        VStack { gap: SpacingSize::Sm, style: "align-items: center;",
                             StepIndicator { step: 3, state: StepState::Pending }
                             span { style: "font-size: 12px;", "Pending" }
                         }
@@ -446,10 +452,10 @@ pub fn StepPage() -> Element {
 #[component]
 fn DocPage(title: String, description: String, children: Element) -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 32px;",
+        VStack {
+            style: "gap: 32px;",
             
-            div {
+            Box {
                 h1 { style: "margin: 0 0 12px 0; font-size: 32px; font-weight: 800;", "{title}" }
                 p { style: "margin: 0; font-size: 16px; color: rgb(100,116,139); line-height: 1.6;", "{description}" }
             }
@@ -464,7 +470,7 @@ fn Section(title: String, children: Element) -> Element {
     rsx! {
         section {
             h2 { style: "margin: 0 0 16px 0; font-size: 24px; font-weight: 700;", "{title}" }
-            div { style: "display: flex; flex-direction: column; gap: 16px;", {children} }
+            VStack { gap: SpacingSize::Md, {children} }
         }
     }
 }
@@ -512,6 +518,329 @@ fn PropsTable(props: PropsTableProps) -> Element {
                         td { style: "padding: 12px; border-bottom: 1px solid rgb(241,245,249); font-family: monospace; font-size: 13px;", "{name}" }
                         td { style: "padding: 12px; border-bottom: 1px solid rgb(241,245,249); font-family: monospace; font-size: 13px; color: rgb(100,116,139);", "{typ}" }
                         td { style: "padding: 12px; border-bottom: 1px solid rgb(241,245,249);", "{desc}" }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Heading documentation page
+#[component]
+pub fn HeadingPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "Heading",
+            description: "Typography headings for content hierarchy (H1-H6).",
+            
+            Section { title: "Heading Levels",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md,
+                        Heading { level: HeadingLevel::H1, "Heading 1" }
+                        Heading { level: HeadingLevel::H2, "Heading 2" }
+                        Heading { level: HeadingLevel::H3, "Heading 3" }
+                        Heading { level: HeadingLevel::H4, "Heading 4" }
+                        Heading { level: HeadingLevel::H5, "Heading 5" }
+                        Heading { level: HeadingLevel::H6, "Heading 6" }
+                    }
+                }
+            }
+            
+            Section { title: "Usage",
+                CodeBlock { code: "Heading {{\n    level: HeadingLevel::H1,\n    \"Page Title\"\n}}".to_string() }
+            }
+        }
+    }
+}
+
+/// Divider documentation page
+#[component]
+pub fn DividerPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "Divider",
+            description: "Visual separators for content organization.",
+            
+            Section { title: "Horizontal Divider",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md,
+                        span { "Content above" }
+                        Divider {}
+                        span { "Content below" }
+                    }
+                }
+            }
+            
+            Section { title: "With Label",
+                ExampleBox {
+                    Divider { label: Some("OR".to_string()), orientation: DividerOrientation::Horizontal, variant: DividerVariant::Solid }
+                }
+            }
+            
+            Section { title: "Vertical",
+                ExampleBox {
+                    HStack { gap: SpacingSize::Md, style: "height: 40px;",
+                        span { "Left" }
+                        Divider { orientation: DividerOrientation::Vertical, variant: DividerVariant::Solid }
+                        span { "Right" }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Progress documentation page
+#[component]
+pub fn ProgressPage() -> Element {
+    let mut value = use_signal(|| 65.0);
+    
+    rsx! {
+        DocPage {
+            title: "Progress",
+            description: "Linear and circular progress indicators.",
+            
+            Section { title: "Linear Progress",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md,
+                        Progress { value: Some(value()), max: 100.0, show_label: true, variant: ProgressVariant::Linear, size: ProgressSize::Md }
+                        Button { onclick: move |_| value.set((value() + 10.0) % 100.0), "Increase" }
+                    }
+                }
+            }
+            
+            Section { title: "Circular Progress",
+                ExampleBox {
+                    HStack { gap: SpacingSize::Lg,
+                        Progress { value: Some(75.0), variant: ProgressVariant::Circular, show_label: true, size: ProgressSize::Md }
+                        Progress { value: Some(30.0), variant: ProgressVariant::Circular, size: ProgressSize::Lg, show_label: true }
+                    }
+                }
+            }
+            
+            Section { title: "Indeterminate",
+                ExampleBox {
+                    Progress { value: None, indeterminate: true, variant: ProgressVariant::Linear, size: ProgressSize::Md }
+                }
+            }
+        }
+    }
+}
+
+/// Spinner documentation page
+#[component]
+pub fn SpinnerPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "Spinner",
+            description: "Loading spinners and indicators.",
+            
+            Section { title: "Variants",
+                ExampleBox {
+                    HStack { gap: SpacingSize::Lg, style: "align-items: center;",
+                        Spinner { variant: SpinnerVariant::Circular, size: SpinnerSize::Lg }
+                        Spinner { variant: SpinnerVariant::Dots, size: SpinnerSize::Lg }
+                        Spinner { variant: SpinnerVariant::Pulse, size: SpinnerSize::Lg }
+                        Spinner { variant: SpinnerVariant::Bars, size: SpinnerSize::Lg }
+                    }
+                }
+            }
+            
+            Section { title: "Sizes",
+                ExampleBox {
+                    HStack { gap: SpacingSize::Md, style: "align-items: center;",
+                        Spinner { variant: SpinnerVariant::Circular, size: SpinnerSize::Xs }
+                        Spinner { variant: SpinnerVariant::Circular, size: SpinnerSize::Sm }
+                        Spinner { variant: SpinnerVariant::Circular, size: SpinnerSize::Md }
+                        Spinner { variant: SpinnerVariant::Circular, size: SpinnerSize::Lg }
+                        Spinner { variant: SpinnerVariant::Circular, size: SpinnerSize::Xl }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Skeleton Atom documentation page
+#[component]
+pub fn SkeletonAtomPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "Skeleton",
+            description: "Loading placeholders that mimic content structure.",
+            
+            Section { title: "Basic Skeleton",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md,
+                        Skeleton { shape: SkeletonShape::Text, width: Some("200px".to_string()), height: None, animated: true }
+                        Skeleton { shape: SkeletonShape::Text, width: Some("150px".to_string()), height: None, animated: true }
+                        Skeleton { shape: SkeletonShape::Text, width: Some("100px".to_string()), height: None, animated: true }
+                    }
+                }
+            }
+            
+            Section { title: "Shapes",
+                ExampleBox {
+                    HStack { gap: SpacingSize::Md,
+                        Skeleton { shape: SkeletonShape::Rectangle, width: Some("100px".to_string()), height: Some("60px".to_string()), animated: true }
+                        Skeleton { shape: SkeletonShape::Circle, width: Some("60px".to_string()), height: Some("60px".to_string()), animated: true }
+                        Skeleton { shape: SkeletonShape::Rounded, width: Some("100px".to_string()), height: Some("60px".to_string()), animated: true }
+                    }
+                }
+            }
+            
+            Section { title: "Text Lines",
+                ExampleBox {
+                    SkeletonText { lines: 4, line_height: 1.5, last_line_width: 80, animated: true }
+                }
+            }
+        }
+    }
+}
+
+/// Rating documentation page
+#[component]
+pub fn RatingPage() -> Element {
+    let mut rating = use_signal(|| 3.5);
+    
+    rsx! {
+        DocPage {
+            title: "Rating",
+            description: "Star rating display and input.",
+            
+            Section { title: "Display Rating",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md,
+                        Rating { value: 5.0, show_value: true, max: 5, size: 20, interactive: false }
+                        Rating { value: 3.5, show_value: true, max: 5, size: 20, interactive: false }
+                        Rating { value: 2.0, show_value: true, max: 5, size: 20, interactive: false }
+                    }
+                }
+            }
+            
+            Section { title: "Interactive",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md,
+                        Rating { value: rating(), interactive: true, on_change: Some(EventHandler::new(move |v: f32| rating.set(v))), max: 5, size: 24 }
+                        span { "Current: {rating}" }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// DatePicker documentation page
+#[component]
+pub fn DatePickerPage() -> Element {
+    let mut date = use_signal(|| None::<String>);
+    
+    rsx! {
+        DocPage {
+            title: "DatePicker",
+            description: "Date and date range selection input.",
+            
+            Section { title: "Basic Date Picker",
+                ExampleBox {
+                    DatePicker {
+                        value: date(),
+                        on_change: Some(EventHandler::new(move |d: String| date.set(Some(d)))),
+                        label: Some("Select Date".to_string())
+                    }
+                }
+            }
+            
+            Section { title: "With Constraints",
+                ExampleBox {
+                    DatePicker {
+                        label: Some("Select Date".to_string()),
+                        min: Some("2024-01-01".to_string()),
+                        max: Some("2024-12-31".to_string())
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Slider documentation page
+#[component]
+pub fn SliderPage() -> Element {
+    let mut value = use_signal(|| 50.0);
+    
+    rsx! {
+        DocPage {
+            title: "Slider",
+            description: "Range slider input for selecting numeric values.",
+            
+            Section { title: "Basic Slider",
+                ExampleBox {
+                    Slider {
+                        value: value(),
+                        on_change: EventHandler::new(move |v: f64| value.set(v)),
+                        label: Some("Volume".to_string())
+                    }
+                }
+            }
+            
+            Section { title: "With Marks",
+                ExampleBox {
+                    Slider {
+                        value: 50.0,
+                        on_change: EventHandler::new(move |_v: f64| {}),
+                        marks: vec![
+                            SliderMark { value: 0.0, label: Some("0%".to_string()) },
+                            SliderMark { value: 50.0, label: Some("50%".to_string()) },
+                            SliderMark { value: 100.0, label: Some("100%".to_string()) },
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Tag documentation page
+#[component]
+pub fn TagPage() -> Element {
+    let mut selected_tags = use_signal(|| vec!["rust".to_string()]);
+    
+    rsx! {
+        DocPage {
+            title: "Tag",
+            description: "Categorization, filtering, and selection tags.",
+            
+            Section { title: "Tag Variants",
+                ExampleBox {
+                    HStack { gap: SpacingSize::Sm, style: "flex-wrap: wrap;",
+                        Tag { variant: TagVariant::Default, children: rsx! { "Default" } }
+                        Tag { variant: TagVariant::Primary, children: rsx! { "Primary" } }
+                        Tag { variant: TagVariant::Success, children: rsx! { "Success" } }
+                        Tag { variant: TagVariant::Warning, children: rsx! { "Warning" } }
+                        Tag { variant: TagVariant::Error, children: rsx! { "Error" } }
+                    }
+                }
+            }
+            
+            Section { title: "Selectable Tags",
+                ExampleBox {
+                    TagGroup {
+                        tags: vec![
+                            TagData::new("rust", "Rust"),
+                            TagData::new("go", "Go"),
+                            TagData::new("typescript", "TypeScript"),
+                        ],
+                        selected: selected_tags(),
+                        on_change: EventHandler::new(move |v: Vec<String>| selected_tags.set(v))
+                    }
+                }
+            }
+            
+            Section { title: "Removable Tags",
+                ExampleBox {
+                    HStack { gap: SpacingSize::Sm, style: "flex-wrap: wrap;",
+                        Tag { removable: true, on_remove: Some(EventHandler::new(move |_| {})), children: rsx! { "Removable" } }
+                        Tag { variant: TagVariant::Primary, removable: true, on_remove: Some(EventHandler::new(move |_| {})), children: rsx! { "Tag" } }
                     }
                 }
             }

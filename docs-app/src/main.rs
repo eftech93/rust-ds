@@ -3,8 +3,11 @@
 //! A comprehensive documentation site with multi-page navigation,
 //! component examples, and theme building guides.
 
+#![allow(unused_braces)]
+
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
+use dioxus_ui_system::atoms::{Box, VStack, HStack};
 
 mod components;
 mod guides;
@@ -61,6 +64,24 @@ pub enum Route {
     TextAreaPage {},
     #[route("/atoms/step")]
     StepPage {},
+    #[route("/atoms/heading")]
+    HeadingPage {},
+    #[route("/atoms/divider")]
+    DividerPage {},
+    #[route("/atoms/progress")]
+    ProgressPage {},
+    #[route("/atoms/spinner")]
+    SpinnerPage {},
+    #[route("/atoms/skeleton")]
+    SkeletonAtomPage {},
+    #[route("/atoms/rating")]
+    RatingPage {},
+    #[route("/atoms/datepicker")]
+    DatePickerPage {},
+    #[route("/atoms/slider")]
+    SliderPage {},
+    #[route("/atoms/tag")]
+    TagPage {},
     
     // Molecules
     #[route("/molecules")]
@@ -87,6 +108,16 @@ pub enum Route {
     SkeletonPage {},
     #[route("/molecules/stepper")]
     StepperPage {},
+    #[route("/molecules/toast")]
+    ToastPage {},
+    #[route("/molecules/combobox")]
+    ComboboxPage {},
+    #[route("/molecules/media-object")]
+    MediaObjectPage {},
+    #[route("/molecules/pagination")]
+    PaginationPage {},
+    #[route("/molecules/list-item")]
+    ListItemPage {},
     
     // Organisms
     #[route("/organisms")]
@@ -107,6 +138,16 @@ pub enum Route {
     StepperWizardPage {},
     #[route("/organisms/charts")]
     ChartsPage {},
+    #[route("/organisms/footer")]
+    FooterPage {},
+    #[route("/organisms/notification-center")]
+    NotificationCenterPage {},
+    #[route("/organisms/hero")]
+    HeroPage {},
+    #[route("/organisms/file-upload")]
+    FileUploadPage {},
+    #[route("/organisms/confirmation-dialog")]
+    ConfirmationDialogPage {},
     
     // Themes
     #[route("/themes")]
@@ -137,8 +178,8 @@ pub enum Route {
 #[component]
 fn DocsLayout() -> Element {
     rsx! {
-        div {
-            style: "font-family: 'Inter', system-ui, -apple-system, sans-serif; min-height: 100vh; display: flex; flex-direction: column;",
+        VStack {
+            style: "font-family: 'Inter', system-ui, -apple-system, sans-serif; min-height: 100vh;",
             
             // Header
             Header {
@@ -150,14 +191,14 @@ fn DocsLayout() -> Element {
             }
             
             // Main content area with sidebar
-            div {
-                style: "display: flex; flex: 1;",
+            HStack {
+                style: "flex: 1;",
                 
                 // Sidebar Navigation
                 Sidebar {}
                 
                 // Content area
-                div {
+                Box {
                     style: "flex: 1; padding: 32px; max-width: 900px; margin: 0 auto;",
                     Outlet::<Route> {}
                 }
@@ -180,8 +221,8 @@ fn Sidebar() -> Element {
                 "Navigation"
             }
             
-            nav {
-                style: "display: flex; flex-direction: column; gap: 4px;",
+            VStack {
+                style: "gap: 4px;",
                 
                 // Getting Started
                 NavSection { title: "Getting Started", items: vec![
@@ -203,6 +244,15 @@ fn Sidebar() -> Element {
                     ("Select", Route::SelectPage {}),
                     ("TextArea", Route::TextAreaPage {}),
                     ("Step", Route::StepPage {}),
+                    ("Heading", Route::HeadingPage {}),
+                    ("Divider", Route::DividerPage {}),
+                    ("Progress", Route::ProgressPage {}),
+                    ("Spinner", Route::SpinnerPage {}),
+                    ("Skeleton", Route::SkeletonAtomPage {}),
+                    ("Rating", Route::RatingPage {}),
+                    ("DatePicker", Route::DatePickerPage {}),
+                    ("Slider", Route::SliderPage {}),
+                    ("Tag", Route::TagPage {}),
                 ], current_route: current_route.clone() }
                 
                 // Molecules
@@ -218,6 +268,11 @@ fn Sidebar() -> Element {
                     ("Separator", Route::SeparatorPage {}),
                     ("Skeleton", Route::SkeletonPage {}),
                     ("Stepper", Route::StepperPage {}),
+                    ("Toast", Route::ToastPage {}),
+                    ("Combobox", Route::ComboboxPage {}),
+                    ("Media Object", Route::MediaObjectPage {}),
+                    ("Pagination", Route::PaginationPage {}),
+                    ("List Item", Route::ListItemPage {}),
                 ], current_route: current_route.clone() }
                 
                 // Organisms
@@ -231,6 +286,11 @@ fn Sidebar() -> Element {
                     ("DataTable", Route::DataTablePage {}),
                     ("Stepper Wizard", Route::StepperWizardPage {}),
                     ("Charts", Route::ChartsPage {}),
+                    ("Footer", Route::FooterPage {}),
+                    ("Notification Center", Route::NotificationCenterPage {}),
+                    ("Hero", Route::HeroPage {}),
+                    ("File Upload", Route::FileUploadPage {}),
+                    ("Confirmation Dialog", Route::ConfirmationDialogPage {}),
                 ], current_route: current_route.clone() }
                 
                 // Themes
@@ -257,7 +317,7 @@ fn Sidebar() -> Element {
 #[component]
 fn NavSection(title: String, items: Vec<(&'static str, Route)>, current_route: Route) -> Element {
     rsx! {
-        div {
+        Box {
             style: "margin-bottom: 16px;",
             
             h3 {
@@ -265,8 +325,8 @@ fn NavSection(title: String, items: Vec<(&'static str, Route)>, current_route: R
                 "{title}"
             }
             
-            div {
-                style: "display: flex; flex-direction: column; gap: 2px;",
+            VStack {
+                style: "gap: 2px;",
                 
                 for (label, route) in items {
                     Link {
@@ -289,16 +349,16 @@ fn NavSection(title: String, items: Vec<(&'static str, Route)>, current_route: R
 #[component]
 fn Home() -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 32px;",
+        VStack {
+            style: "gap: 32px;",
             
-            div {
+            Box {
                 h1 { style: "margin: 0 0 16px 0; font-size: 40px; font-weight: 800;", "Dioxus UI" }
                 p { style: "margin: 0; font-size: 18px; color: rgb(100,116,139); line-height: 1.6;", 
                     "A pure Rust design system for building beautiful, type-safe user interfaces with Dioxus." }
             }
             
-            div {
+            Box {
                 style: "display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;",
                 
                 DocCard { icon: "⚛️", title: "60+ Components", description: "Atoms, molecules, and organisms following Atomic Design principles." }
@@ -307,7 +367,7 @@ fn Home() -> Element {
                 DocCard { icon: "🔒", title: "Type-Safe", description: "No CSS files - all styles are compile-time checked Rust code." }
             }
             
-            div {
+            Box {
                 style: "padding: 24px; background: rgb(241,245,249); border-radius: 12px;",
                 
                 h2 { style: "font-size: 20px; font-weight: 700; margin-bottom: 16px;", "Quick Example" }
@@ -326,10 +386,10 @@ fn Home() -> Element {
 #[component]
 fn DocCard(icon: String, title: String, description: String) -> Element {
     rsx! {
-        div {
+        Box {
             style: "padding: 20px; background: white; border: 1px solid rgb(226,232,240); border-radius: 12px;",
             
-            div { style: "font-size: 28px; margin-bottom: 12px;", "{icon}" }
+            Box { style: "font-size: 28px; margin-bottom: 12px;", "{icon}" }
             h3 { style: "margin: 0 0 8px 0; font-size: 16px; font-weight: 600;", "{title}" }
             p { style: "margin: 0; font-size: 14px; color: rgb(100,116,139); line-height: 1.5;", "{description}" }
         }
@@ -364,6 +424,24 @@ fn SelectPage() -> Element { components::atoms::SelectPage() }
 fn TextAreaPage() -> Element { components::atoms::TextAreaPage() }
 #[component]
 fn StepPage() -> Element { components::atoms::StepPage() }
+#[component]
+fn HeadingPage() -> Element { components::atoms::HeadingPage() }
+#[component]
+fn DividerPage() -> Element { components::atoms::DividerPage() }
+#[component]
+fn ProgressPage() -> Element { components::atoms::ProgressPage() }
+#[component]
+fn SpinnerPage() -> Element { components::atoms::SpinnerPage() }
+#[component]
+fn SkeletonAtomPage() -> Element { components::atoms::SkeletonAtomPage() }
+#[component]
+fn RatingPage() -> Element { components::atoms::RatingPage() }
+#[component]
+fn DatePickerPage() -> Element { components::atoms::DatePickerPage() }
+#[component]
+fn SliderPage() -> Element { components::atoms::SliderPage() }
+#[component]
+fn TagPage() -> Element { components::atoms::TagPage() }
 
 // Molecules
 #[component]
@@ -390,6 +468,16 @@ fn SeparatorPage() -> Element { components::molecules::SeparatorPage() }
 fn SkeletonPage() -> Element { components::molecules::SkeletonMoleculePage() }
 #[component]
 fn StepperPage() -> Element { components::molecules::StepperPage() }
+#[component]
+fn ToastPage() -> Element { components::molecules::ToastPage() }
+#[component]
+fn ComboboxPage() -> Element { components::molecules::ComboboxPage() }
+#[component]
+fn MediaObjectPage() -> Element { components::molecules::MediaObjectPage() }
+#[component]
+fn PaginationPage() -> Element { components::molecules::PaginationPage() }
+#[component]
+fn ListItemPage() -> Element { components::molecules::ListItemPage() }
 
 // Organisms
 #[component]
@@ -410,6 +498,16 @@ fn DataTablePage() -> Element { components::organisms::DataTablePage() }
 fn StepperWizardPage() -> Element { components::organisms::StepperWizardPage() }
 #[component]
 fn ChartsPage() -> Element { components::organisms::ChartsPage() }
+#[component]
+fn FooterPage() -> Element { components::organisms::FooterPage() }
+#[component]
+fn NotificationCenterPage() -> Element { components::organisms::NotificationCenterPage() }
+#[component]
+fn HeroPage() -> Element { components::organisms::HeroPage() }
+#[component]
+fn FileUploadPage() -> Element { components::organisms::FileUploadPage() }
+#[component]
+fn ConfirmationDialogPage() -> Element { components::organisms::ConfirmationDialogPage() }
 
 // Themes
 #[component]

@@ -5,6 +5,7 @@
 use dioxus::prelude::*;
 use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::atoms::{Box, HStack, AlignItems};
 
 /// Avatar sizes
 #[derive(Clone, PartialEq)]
@@ -96,7 +97,7 @@ pub fn Avatar(props: AvatarProps) -> Element {
     let src_clone = props.src.clone();
     
     rsx! {
-        div {
+        Box {
             style: "{avatar_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
             
@@ -193,12 +194,10 @@ pub fn AvatarGroup(props: AvatarGroupProps) -> Element {
     let _overlap = _size_px / 4;
     
     rsx! {
-        div {
-            style: "display: flex; align-items: center;",
+        HStack {
+            align: AlignItems::Center,
             
-            div {
-                style: "display: flex;",
-                
+            HStack {
                 // Note: In a real implementation, we'd use context to manage the overlapping
                 // For now, this is a simplified version
                 {props.children}

@@ -3,6 +3,9 @@
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
 use dioxus_ui_system::organisms::*;
+use dioxus_ui_system::organisms::FooterVariant;
+use dioxus_ui_system::molecules::ToastVariant;
+use dioxus_ui_system::atoms::{Box, VStack, HStack};
 
 #[component]
 pub fn OrganismsPage() -> Element {
@@ -37,7 +40,7 @@ pub fn HeaderPage() -> Element {
             
             Section { title: "Example",
                 ExampleBox {
-                    div { style: "border: 1px solid rgb(226,232,240); border-radius: 8px; overflow: hidden;",
+                    Box { style: "border: 1px solid rgb(226,232,240); border-radius: 8px; overflow: hidden;",
                         Header {
                             brand_title: "MyApp",
                             nav_items: vec![
@@ -64,13 +67,13 @@ pub fn LayoutPage() -> Element {
             
             Section { title: "Layout Types",
                 ExampleBox {
-                    div { style: "display: flex; gap: 8px; margin-bottom: 16px;",
+                    HStack { gap: SpacingSize::Sm, style: "margin-bottom: 16px;",
                         Button { variant: if layout_type() == LayoutType::Sidebar { ButtonVariant::Primary } else { ButtonVariant::Secondary }, onclick: move |_| layout_type.set(LayoutType::Sidebar), "Sidebar" }
                         Button { variant: if layout_type() == LayoutType::TopNav { ButtonVariant::Primary } else { ButtonVariant::Secondary }, onclick: move |_| layout_type.set(LayoutType::TopNav), "TopNav" }
                     }
                     
-                    div { style: "height: 300px; border: 1px solid rgb(226,232,240); border-radius: 8px; overflow: hidden;",
-                        div { style: "transform: scale(0.5); transform-origin: top left; width: 200%; height: 200%;",
+                    Box { style: "height: 300px; border: 1px solid rgb(226,232,240); border-radius: 8px; overflow: hidden;",
+                        Box { style: "transform: scale(0.5); transform-origin: top left; width: 200%; height: 200%;",
                             Layout {
                                 layout_type: layout_type(),
                                 nav_items: vec![
@@ -80,7 +83,7 @@ pub fn LayoutPage() -> Element {
                                 brand: Some(rsx! { "MyApp" }),
                                 title: Some("Dashboard".to_string()),
                                 collapsible: true,
-                                div { style: "padding: 24px;", Heading { level: HeadingLevel::H2, "Content Area" } }
+                                Box { style: "padding: 24px;", Heading { level: HeadingLevel::H2, "Content Area" } }
                             }
                         }
                     }
@@ -191,7 +194,7 @@ pub fn CardsPage() -> Element {
             
             Section { title: "Stat Card",
                 ExampleBox {
-                    div { style: "max-width: 300px;",
+                    Box { style: "max-width: 300px;",
                         StatCard {
                             label: "Revenue",
                             value: "$48.2K",
@@ -206,7 +209,7 @@ pub fn CardsPage() -> Element {
             
             Section { title: "Pricing Card",
                 ExampleBox {
-                    div { style: "max-width: 300px;",
+                    Box { style: "max-width: 300px;",
                         PricingCard {
                             plan: "Pro".to_string(),
                             price: "$29".to_string(),
@@ -226,7 +229,8 @@ pub fn CardsPage() -> Element {
 
 #[component]
 pub fn DataTablePage() -> Element {
-    use dioxus_ui_system::organisms::{DataTable, TableColumn, ColumnAlign, Pagination};
+    use dioxus_ui_system::organisms::{DataTable, TableColumn, ColumnAlign, TablePagination, TableFilter, FilterOption};
+    use std::collections::HashMap;
     
     #[derive(Clone, PartialEq)]
     struct User {
@@ -235,6 +239,7 @@ pub fn DataTablePage() -> Element {
         email: String,
         role: String,
         status: String,
+        department: String,
     }
     
     fn render_status(user: &User) -> Element {
@@ -247,12 +252,15 @@ pub fn DataTablePage() -> Element {
         }
     }
     
-    let users = vec![
-        User { id: "1".to_string(), name: "Alice Johnson".to_string(), email: "alice@example.com".to_string(), role: "Admin".to_string(), status: "Active".to_string() },
-        User { id: "2".to_string(), name: "Bob Smith".to_string(), email: "bob@example.com".to_string(), role: "User".to_string(), status: "Active".to_string() },
-        User { id: "3".to_string(), name: "Carol White".to_string(), email: "carol@example.com".to_string(), role: "Editor".to_string(), status: "Inactive".to_string() },
-        User { id: "4".to_string(), name: "David Brown".to_string(), email: "david@example.com".to_string(), role: "User".to_string(), status: "Active".to_string() },
-        User { id: "5".to_string(), name: "Emma Davis".to_string(), email: "emma@example.com".to_string(), role: "Admin".to_string(), status: "Active".to_string() },
+    let all_users = vec![
+        User { id: "1".to_string(), name: "Alice Johnson".to_string(), email: "alice@example.com".to_string(), role: "Admin".to_string(), status: "Active".to_string(), department: "Engineering".to_string() },
+        User { id: "2".to_string(), name: "Bob Smith".to_string(), email: "bob@example.com".to_string(), role: "User".to_string(), status: "Active".to_string(), department: "Marketing".to_string() },
+        User { id: "3".to_string(), name: "Carol White".to_string(), email: "carol@example.com".to_string(), role: "Editor".to_string(), status: "Inactive".to_string(), department: "Design".to_string() },
+        User { id: "4".to_string(), name: "David Brown".to_string(), email: "david@example.com".to_string(), role: "User".to_string(), status: "Active".to_string(), department: "Engineering".to_string() },
+        User { id: "5".to_string(), name: "Emma Davis".to_string(), email: "emma@example.com".to_string(), role: "Admin".to_string(), status: "Active".to_string(), department: "Sales".to_string() },
+        User { id: "6".to_string(), name: "Frank Wilson".to_string(), email: "frank@example.com".to_string(), role: "User".to_string(), status: "Inactive".to_string(), department: "Marketing".to_string() },
+        User { id: "7".to_string(), name: "Grace Lee".to_string(), email: "grace@example.com".to_string(), role: "Editor".to_string(), status: "Active".to_string(), department: "Design".to_string() },
+        User { id: "8".to_string(), name: "Henry Taylor".to_string(), email: "henry@example.com".to_string(), role: "User".to_string(), status: "Active".to_string(), department: "Engineering".to_string() },
     ];
     
     let columns = vec![
@@ -281,6 +289,14 @@ pub fn DataTablePage() -> Element {
             render: None,
         },
         TableColumn {
+            key: "department".to_string(),
+            header: "Department".to_string(),
+            width: None,
+            align: ColumnAlign::Left,
+            sortable: true,
+            render: None,
+        },
+        TableColumn {
             key: "status".to_string(),
             header: "Status".to_string(),
             width: Some("100px".to_string()),
@@ -290,34 +306,173 @@ pub fn DataTablePage() -> Element {
         },
     ];
     
+    // Filter definitions
+    let filters = vec![
+        TableFilter {
+            key: "role".to_string(),
+            label: "All Roles".to_string(),
+            options: vec![
+                FilterOption { label: "Admin".to_string(), value: "Admin".to_string() },
+                FilterOption { label: "User".to_string(), value: "User".to_string() },
+                FilterOption { label: "Editor".to_string(), value: "Editor".to_string() },
+            ],
+        },
+        TableFilter {
+            key: "status".to_string(),
+            label: "All Status".to_string(),
+            options: vec![
+                FilterOption { label: "Active".to_string(), value: "Active".to_string() },
+                FilterOption { label: "Inactive".to_string(), value: "Inactive".to_string() },
+            ],
+        },
+        TableFilter {
+            key: "department".to_string(),
+            label: "All Departments".to_string(),
+            options: vec![
+                FilterOption { label: "Engineering".to_string(), value: "Engineering".to_string() },
+                FilterOption { label: "Marketing".to_string(), value: "Marketing".to_string() },
+                FilterOption { label: "Design".to_string(), value: "Design".to_string() },
+                FilterOption { label: "Sales".to_string(), value: "Sales".to_string() },
+            ],
+        },
+    ];
+    
+    // State for search and filters
+    let mut search_query = use_signal(|| "".to_string());
+    let mut active_filters = use_signal(|| HashMap::<String, String>::new());
+    
+    // Filter the data based on search query and active filters
+    let filtered_users: Vec<User> = all_users.clone().into_iter().filter(|user| {
+        // Text search
+        let search_lower = search_query().to_lowercase();
+        let matches_search = search_lower.is_empty() || 
+            user.name.to_lowercase().contains(&search_lower) ||
+            user.email.to_lowercase().contains(&search_lower) ||
+            user.role.to_lowercase().contains(&search_lower) ||
+            user.department.to_lowercase().contains(&search_lower);
+        
+        // Custom filters
+        let matches_role = active_filters().get("role").map_or(true, |v| v == &user.role);
+        let matches_status = active_filters().get("status").map_or(true, |v| v == &user.status);
+        let matches_dept = active_filters().get("department").map_or(true, |v| v == &user.department);
+        
+        matches_search && matches_role && matches_status && matches_dept
+    }).collect();
+    
     rsx! {
         DocPage {
             title: "DataTable",
-            description: "Data display component with sorting and pagination.",
+            description: "Data display component with sorting, pagination, search, and custom filters.",
             
             Section { title: "Basic Table",
                 ExampleBox {
                     DataTable {
-                        data: users.clone(),
+                        data: all_users.clone(),
                         columns: columns.clone(),
                         key_extractor: |u: &User| u.id.clone(),
                         empty_message: "No users found",
                         loading: false,
+                        show_search: false,
+                        show_filters: false,
+                    }
+                }
+            }
+            
+            Section { title: "With Search & Filters",
+                p { "Search across all fields and filter by role, status, and department:" }
+                ExampleBox {
+                    DataTable {
+                        data: filtered_users.clone(),
+                        columns: columns.clone(),
+                        key_extractor: |u: &User| u.id.clone(),
+                        empty_message: "No users match your criteria",
+                        loading: false,
+                        search_query: Some(search_query()),
+                        on_search_change: Some(EventHandler::new(move |q: String| search_query.set(q))),
+                        search_placeholder: "Search users...",
+                        filters: filters.clone(),
+                        active_filters: active_filters(),
+                        on_filter_change: Some(EventHandler::new(move |(key, value): (String, String)| {
+                            let mut new_filters = active_filters();
+                            if value.is_empty() {
+                                new_filters.remove(&key);
+                            } else {
+                                new_filters.insert(key, value);
+                            }
+                            active_filters.set(new_filters);
+                        })),
+                    }
+                }
+                CodeBlock { code: "// Search and filter state
+let mut search_query = use_signal(|| \"\".to_string());
+let mut active_filters = use_signal(|| HashMap::<String, String>::new());
+
+// Filter definitions
+let filters = vec![
+    TableFilter {
+        key: \"role\".to_string(),
+        label: \"All Roles\".to_string(),
+        options: vec![
+            FilterOption { label: \"Admin\".to_string(), value: \"Admin\".to_string() },
+            FilterOption { label: \"User\".to_string(), value: \"User\".to_string() },
+        ],
+    },
+];
+
+// Filtered data
+let filtered_users: Vec<User> = all_users.into_iter().filter(|user| {
+    let search_lower = search_query().to_lowercase();
+    let matches_search = search_lower.is_empty() || 
+        user.name.to_lowercase().contains(&search_lower);
+    let matches_role = active_filters().get(\"role\").map_or(true, |v| v == &user.role);
+    matches_search && matches_role
+}).collect();
+
+// Render
+DataTable {{
+    data: filtered_users,
+    columns: columns,
+    key_extractor: |u: &User| u.id.clone(),
+    search_query: Some(search_query()),
+    on_search_change: Some(EventHandler::new(move |q| search_query.set(q))),
+    filters: filters,
+    active_filters: active_filters(),
+    on_filter_change: Some(EventHandler::new(move |(k, v)| {{
+        // Handle filter change
+    }})),
+}}".to_string() }
+            }
+            
+            Section { title: "Search Only",
+                p { "Table with text search only:" }
+                ExampleBox {
+                    DataTable {
+                        data: filtered_users.clone(),
+                        columns: columns.clone(),
+                        key_extractor: |u: &User| u.id.clone(),
+                        empty_message: "No users found",
+                        loading: false,
+                        search_query: Some(search_query()),
+                        on_search_change: Some(EventHandler::new(move |q: String| search_query.set(q))),
+                        search_placeholder: "Search by name, email...",
+                        show_filters: false,
                     }
                 }
             }
             
             Section { title: "With Pagination",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 0; border: 1px solid rgb(226,232,240); border-radius: 8px; overflow: hidden;",
+                    VStack { style: "border: 1px solid rgb(226,232,240); border-radius: 8px; overflow: hidden;",
                         DataTable {
-                            data: users.clone(),
+                            data: all_users.clone(),
                             columns: columns.clone(),
                             key_extractor: |u: &User| u.id.clone(),
                             empty_message: "No users found",
                             loading: false,
+                            show_search: false,
+                            show_filters: false,
                         }
-                        Pagination {
+                        TablePagination {
                             current_page: 0,
                             total_pages: 5,
                             on_page_change: move |_| {},
@@ -330,7 +485,7 @@ pub fn DataTablePage() -> Element {
             Section { title: "Selectable Rows",
                 ExampleBox {
                     DataTable {
-                        data: users.clone(),
+                        data: all_users.clone(),
                         columns: columns.clone(),
                         key_extractor: |u: &User| u.id.clone(),
                         selectable: true,
@@ -338,6 +493,8 @@ pub fn DataTablePage() -> Element {
                         on_selection_change: move |_| {},
                         empty_message: "No users found",
                         loading: false,
+                        show_search: false,
+                        show_filters: false,
                     }
                 }
             }
@@ -350,6 +507,8 @@ pub fn DataTablePage() -> Element {
                         key_extractor: |u: &User| u.id.clone(),
                         empty_message: "Loading data...",
                         loading: true,
+                        show_search: false,
+                        show_filters: false,
                     }
                 }
             }
@@ -390,7 +549,7 @@ pub fn StepperWizardPage() -> Element {
             
             Section { title: "Basic Wizard",
                 ExampleBox {
-                    div { style: "border: 1px solid rgb(226,232,240); border-radius: 12px; overflow: hidden;",
+                    Box { style: "border: 1px solid rgb(226,232,240); border-radius: 12px; overflow: hidden;",
                         Wizard {
                             steps: wizard_steps.clone(),
                             active_step: 0,
@@ -398,20 +557,20 @@ pub fn StepperWizardPage() -> Element {
                             on_finish: move |_| {},
                             
                             // Step 1: Personal Info
-                            div { style: "padding: 24px;",
+                            Box { style: "padding: 24px;",
                                 h3 { style: "margin: 0 0 16px 0;", "Personal Information" }
-                                div { style: "display: flex; flex-direction: column; gap: 16px;",
-                                    div { style: "display: flex; gap: 12px;",
-                                        div { style: "flex: 1;",
+                                VStack { gap: SpacingSize::Md,
+                                    HStack { gap: SpacingSize::Sm,
+                                        Box { style: "flex: 1;",
                                             Label { "First Name" }
                                             Input { value: "Alice".to_string(), onchange: move |_| {} }
                                         }
-                                        div { style: "flex: 1;",
+                                        Box { style: "flex: 1;",
                                             Label { "Last Name" }
                                             Input { value: "Johnson".to_string(), onchange: move |_| {} }
                                         }
                                     }
-                                    div {
+                                    Box {
                                         Label { "Email" }
                                         Input { value: "alice@example.com".to_string(), onchange: move |_| {} }
                                     }
@@ -419,14 +578,14 @@ pub fn StepperWizardPage() -> Element {
                             }
                             
                             // Step 2: Account
-                            div { style: "padding: 24px;",
+                            Box { style: "padding: 24px;",
                                 h3 { style: "margin: 0 0 16px 0;", "Account Setup" }
-                                div { style: "display: flex; flex-direction: column; gap: 16px;",
-                                    div {
+                                VStack { gap: SpacingSize::Md,
+                                    Box {
                                         Label { "Username" }
                                         Input { value: "alice_j".to_string(), onchange: move |_| {} }
                                     }
-                                    div {
+                                    Box {
                                         Label { "Password" }
                                         Input { input_type: InputType::Password, value: "".to_string(), onchange: move |_| {} }
                                     }
@@ -434,18 +593,18 @@ pub fn StepperWizardPage() -> Element {
                             }
                             
                             // Step 3: Preferences
-                            div { style: "padding: 24px;",
+                            Box { style: "padding: 24px;",
                                 h3 { style: "margin: 0 0 16px 0;", "Preferences" }
-                                div { style: "display: flex; flex-direction: column; gap: 12px;",
-                                    div { style: "display: flex; align-items: center; gap: 8px;",
+                                VStack { gap: SpacingSize::Sm,
+                                    HStack { gap: SpacingSize::Sm, style: "align-items: center;",
                                         input { r#type: "checkbox", checked: "true" }
                                         Label { "Receive email notifications" }
                                     }
-                                    div { style: "display: flex; align-items: center; gap: 8px;",
+                                    HStack { gap: SpacingSize::Sm, style: "align-items: center;",
                                         input { r#type: "checkbox" }
                                         Label { "Enable two-factor authentication" }
                                     }
-                                    div { style: "display: flex; align-items: center; gap: 8px;",
+                                    HStack { gap: SpacingSize::Sm, style: "align-items: center;",
                                         input { r#type: "checkbox", checked: "true" }
                                         Label { "Subscribe to newsletter" }
                                     }
@@ -453,7 +612,7 @@ pub fn StepperWizardPage() -> Element {
                             }
                             
                             // Step 4: Review
-                            div { style: "padding: 24px;",
+                            Box { style: "padding: 24px;",
                                 h3 { style: "margin: 0 0 16px 0;", "Review Your Information" }
                                 StepSummary {
                                     steps: summary_steps,
@@ -468,7 +627,7 @@ pub fn StepperWizardPage() -> Element {
             
             Section { title: "Compact Stepper",
                 ExampleBox {
-                    div { style: "padding: 16px;",
+                    Box { style: "padding: 16px;",
                         CompactStepper {
                             steps: compact_steps,
                             active_step: 1,
@@ -480,14 +639,14 @@ pub fn StepperWizardPage() -> Element {
             
             Section { title: "Validation States",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 8px;",
+                    VStack { gap: SpacingSize::Sm,
                         p { "Steps can have validation states:" }
                         ul {
                             li { "Valid - Step is complete and valid" }
                             li { "Invalid - Step has errors that need to be fixed" }
                             li { "Pending - Step is not yet started" }
                         }
-                        div { style: "margin-top: 16px; padding: 16px; background: rgb(241,245,249); border-radius: 8px;",
+                        Box { style: "margin-top: 16px; padding: 16px; background: rgb(241,245,249); border-radius: 8px;",
                             code { "WizardStep::new(\"Name\").valid(true)" }
                         }
                     }
@@ -672,7 +831,7 @@ LineChart {{
             
             Section { title: "Pie Chart",
                 ExampleBox {
-                    div { style: "display: flex; justify-content: center;",
+                    Box { style: "display: flex; justify-content: center;",
                         PieChart {
                             title: Some("Traffic Sources".to_string()),
                             data: pie_data.clone(),
@@ -702,7 +861,7 @@ LineChart {{
             Section { title: "Pie Chart with Custom Tooltips",
                 p { "Hover over slices to see custom formatted values:" }
                 ExampleBox {
-                    div { style: "display: flex; justify-content: center;",
+                    Box { style: "display: flex; justify-content: center;",
                         PieChart {
                             title: Some("Market Share".to_string()),
                             data: vec![
@@ -739,7 +898,7 @@ LineChart {{
             
             Section { title: "Donut Chart",
                 ExampleBox {
-                    div { style: "display: flex; justify-content: center;",
+                    Box { style: "display: flex; justify-content: center;",
                         DonutChart {
                             data: pie_data.clone(),
                             width: "300px".to_string(),
@@ -753,7 +912,7 @@ LineChart {{
             
             Section { title: "Gauge Chart",
                 ExampleBox {
-                    div { style: "display: flex; justify-content: center;",
+                    Box { style: "display: flex; justify-content: center;",
                         GaugeChart {
                             data: vec![
                                 ChartDataPoint::new("Completed", 75.0),
@@ -769,8 +928,8 @@ LineChart {{
             
             Section { title: "Sparkline",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 16px;",
-                        div { style: "display: flex; align-items: center; gap: 12px;",
+                    VStack { gap: SpacingSize::Md,
+                        HStack { gap: SpacingSize::Sm, style: "align-items: center;",
                             span { "Revenue:" }
                             Sparkline {
                                 data: sparkline_data.clone(),
@@ -780,7 +939,7 @@ LineChart {{
                                 show_last_point: true,
                             }
                         }
-                        div { style: "display: flex; align-items: center; gap: 12px;",
+                        HStack { gap: SpacingSize::Sm, style: "align-items: center;",
                             span { "Users:" }
                             Sparkline {
                                 data: vec![50.0, 45.0, 55.0, 48.0, 60.0, 58.0, 65.0],
@@ -791,7 +950,7 @@ LineChart {{
                                 show_last_point: true,
                             }
                         }
-                        div { style: "display: flex; align-items: center; gap: 12px;",
+                        HStack { gap: SpacingSize::Sm, style: "align-items: center;",
                             span { "Sales:" }
                             Sparkline {
                                 data: vec![30.0, 35.0, 32.0, 40.0, 38.0, 45.0, 42.0],
@@ -814,8 +973,8 @@ LineChart {{
             
             Section { title: "Trend Indicator",
                 ExampleBox {
-                    div { style: "display: flex; flex-direction: column; gap: 16px;",
-                        div { style: "display: flex; align-items: center; gap: 12px;",
+                    VStack { gap: SpacingSize::Md,
+                        HStack { gap: SpacingSize::Sm, style: "align-items: center;",
                             span { "Stock Price:" }
                             TrendIndicator {
                                 data: vec![100.0, 105.0, 103.0, 110.0, 115.0, 112.0, 120.0],
@@ -823,7 +982,7 @@ LineChart {{
                                 show_percentage: true,
                             }
                         }
-                        div { style: "display: flex; align-items: center; gap: 12px;",
+                        HStack { gap: SpacingSize::Sm, style: "align-items: center;",
                             span { "Active Users:" }
                             TrendIndicator {
                                 data: vec![1000.0, 950.0, 900.0, 880.0, 850.0],
@@ -889,10 +1048,10 @@ ChartTooltip {{
 #[component]
 fn DocPage(title: String, description: String, children: Element) -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 32px;",
+        VStack {
+            style: "gap: 32px;",
             
-            div {
+            Box {
                 h1 { style: "margin: 0 0 12px 0; font-size: 32px; font-weight: 800;", "{title}" }
                 p { style: "margin: 0; font-size: 16px; color: rgb(100,116,139); line-height: 1.6;", "{description}" }
             }
@@ -907,7 +1066,7 @@ fn Section(title: String, children: Element) -> Element {
     rsx! {
         section {
             h2 { style: "margin: 0 0 16px 0; font-size: 24px; font-weight: 700;", "{title}" }
-            div { style: "display: flex; flex-direction: column; gap: 16px;", {children} }
+            VStack { gap: SpacingSize::Md, {children} }
         }
     }
 }
@@ -925,6 +1084,233 @@ fn CodeBlock(code: String) -> Element {
         pre {
             style: "background: rgb(15,23,42); color: rgb(226,232,240); padding: 16px; border-radius: 8px; font-size: 14px; overflow-x: auto;",
             code { "{code}" }
+        }
+    }
+}
+
+/// Footer documentation page
+#[component]
+pub fn FooterPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "Footer",
+            description: "Page footer with links, branding, and legal information.",
+            
+            Section { title: "Default Footer",
+                ExampleBox {
+                    Footer {
+                        brand: Some(rsx! { span { style: "font-size: 20px; font-weight: 700;", "Brand" } }),
+                        description: Some("A modern design system for Dioxus.".to_string()),
+                        link_groups: vec![
+                            FooterLinkGroup::new("Product").with_links(vec![
+                                FooterLink::new("Features", "#"),
+                                FooterLink::new("Pricing", "#"),
+                                FooterLink::new("Docs", "#"),
+                            ]),
+                            FooterLinkGroup::new("Company").with_links(vec![
+                                FooterLink::new("About", "#"),
+                                FooterLink::new("Blog", "#"),
+                                FooterLink::new("Careers", "#"),
+                            ]),
+                        ],
+                        copyright: Some("© 2024 Company Inc.".to_string()),
+                        variant: FooterVariant::Default
+                    }
+                }
+            }
+            
+            Section { title: "Simple Footer",
+                ExampleBox {
+                    SimpleFooter {
+                        brand: Some(rsx! { span { style: "font-weight: 600;", "Logo" } }),
+                        links: vec![
+                            FooterLink::new("Privacy", "#"),
+                            FooterLink::new("Terms", "#"),
+                        ],
+                        copyright: "© 2024".to_string()
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Notification Center documentation page
+#[component]
+pub fn NotificationCenterPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "Notification Center",
+            description: "Centralized alert management with categorization.",
+            
+            Section { title: "Notification Center",
+                ExampleBox {
+                    NotificationCenter {
+                        notifications: vec![
+                            Notification::new("1", "New Message", "You have a new message from John").with_variant(ToastVariant::Info),
+                            Notification::new("2", "Success!", "Your changes have been saved.").with_variant(ToastVariant::Success),
+                        ],
+                        unread_count: 2
+                    }
+                }
+            }
+            
+            Section { title: "Banner Alert",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md,
+                        BannerAlert { message: "This is an info banner".to_string(), variant: ToastVariant::Info, dismissible: true }
+                        BannerAlert { message: "Success! Operation completed.".to_string(), variant: ToastVariant::Success, dismissible: true }
+                        BannerAlert { message: "Warning: Check your settings.".to_string(), variant: ToastVariant::Warning, dismissible: true }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Hero documentation page
+#[component]
+pub fn HeroPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "Hero",
+            description: "Prominent page header with CTA for landing pages.",
+            
+            Section { title: "Basic Hero",
+                ExampleBox {
+                    Hero {
+                        title: "Build faster with Dioxus UI".to_string(),
+                        subtitle: Some("A comprehensive design system with 100+ components for building modern web applications.".to_string()),
+                        primary_cta: Some(HeroCta::new("Get Started").with_href("#")),
+                        secondary_cta: Some(HeroCta::new("Learn More").with_href("#")),
+                        align: HeroAlign::Center, size: HeroSize::Lg
+                    }
+                }
+            }
+            
+            Section { title: "With Features",
+                ExampleBox {
+                    Hero {
+                        title: "Everything you need".to_string(),
+                        subtitle: Some("Build better products with our comprehensive toolkit.".to_string()),
+                        features: vec![
+                            "100+ Components".to_string(),
+                            "Type Safe".to_string(),
+                            "Customizable".to_string(),
+                        ],
+                        primary_cta: Some(HeroCta::new("Get Started")),
+                        align: HeroAlign::Center, size: HeroSize::Lg
+                    }
+                }
+            }
+            
+            Section { title: "Social Proof",
+                ExampleBox {
+                    SocialProofBar {
+                        text: "Trusted by 10,000+ developers".to_string(),
+                        items: vec![
+                            rsx! { div { style: "width: 32px; height: 32px; background: #3b82f6; border-radius: 50%;", "" } },
+                            rsx! { div { style: "width: 32px; height: 32px; background: #22c55e; border-radius: 50%;", "" } },
+                            rsx! { div { style: "width: 32px; height: 32px; background: #f59e0b; border-radius: 50%;", "" } },
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// File Upload documentation page
+#[component]
+pub fn FileUploadPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "File Upload",
+            description: "Drag-and-drop file upload with progress and preview.",
+            
+            Section { title: "Basic File Upload",
+                ExampleBox {
+                    FileUpload {
+                        on_upload: EventHandler::new(move |_files: Vec<UploadedFile>| {}),
+                        label: Some("Upload Documents".to_string()),
+                        helper_text: Some("PDF, PNG, JPG up to 10MB".to_string()),
+                        accept: Some(".pdf,.png,.jpg".to_string()),
+                        multiple: false, max_files: 1, loading: false, disabled: false
+                    }
+                }
+            }
+            
+            Section { title: "Multiple Files",
+                ExampleBox {
+                    FileUpload {
+                        on_upload: EventHandler::new(move |_files: Vec<UploadedFile>| {}),
+                        multiple: true,
+                        max_files: 5,
+                        label: Some("Upload Images".to_string()),
+                        loading: false, disabled: false
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Confirmation Dialog documentation page
+#[component]
+pub fn ConfirmationDialogPage() -> Element {
+    let mut show_delete = use_signal(|| false);
+    let mut show_unsaved = use_signal(|| false);
+    let mut show_signout = use_signal(|| false);
+    
+    rsx! {
+        DocPage {
+            title: "Confirmation Dialog",
+            description: "Critical decision dialogs with clear action labeling.",
+            
+            Section { title: "Delete Confirmation",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md, style: "align-items: flex-start;",
+                        Button { variant: ButtonVariant::Destructive, onclick: move |_| show_delete.set(true), "Delete Item" }
+                        
+                        DeleteConfirmDialog {
+                            open: show_delete(),
+                            on_close: move |_| show_delete.set(false),
+                            item_name: "My Document".to_string(),
+                            on_confirm: EventHandler::new(move |_| show_delete.set(false)),
+                            loading: false
+                        }
+                    }
+                }
+            }
+            
+            Section { title: "Unsaved Changes",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md, style: "align-items: flex-start;",
+                        Button { onclick: move |_| show_unsaved.set(true), "Show Unsaved Dialog" }
+                        
+                        UnsavedChangesDialog {
+                            open: show_unsaved(),
+                            on_close: move |_| show_unsaved.set(false),
+                            on_save: EventHandler::new(move |_| show_unsaved.set(false)),
+                            on_discard: EventHandler::new(move |_| show_unsaved.set(false)),
+                        }
+                    }
+                }
+            }
+            
+            Section { title: "Sign Out",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md, style: "align-items: flex-start;",
+                        Button { onclick: move |_| show_signout.set(true), "Sign Out" }
+                        
+                        SignOutDialog {
+                            open: show_signout(),
+                            on_close: move |_| show_signout.set(false),
+                            on_confirm: EventHandler::new(move |_| show_signout.set(false)),
+                        }
+                    }
+                }
+            }
         }
     }
 }

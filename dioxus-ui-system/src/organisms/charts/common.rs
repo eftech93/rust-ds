@@ -1,5 +1,7 @@
 //! Common types and utilities for chart components
 
+#![allow(unpredictable_function_pointer_comparisons)]
+
 use crate::theme::tokens::Color;
 
 /// A single data point for charts

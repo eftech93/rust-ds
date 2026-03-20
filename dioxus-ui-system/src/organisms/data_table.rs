@@ -1,11 +1,28 @@
 //! Data Table organism component
 //!
-//! A comprehensive table component with sorting, selection, and pagination.
+//! A comprehensive table component with sorting, selection, pagination, and filtering.
+
+#![allow(unpredictable_function_pointer_comparisons)]
 
 use dioxus::prelude::*;
 use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
 use crate::atoms::{Label, TextSize, TextColor, Button, ButtonVariant, ButtonSize, Icon, IconSize, IconColor};
+
+/// Filter option for custom filters
+#[derive(Clone, PartialEq)]
+pub struct FilterOption {
+    pub label: String,
+    pub value: String,
+}
+
+/// Filter definition for custom filters
+#[derive(Clone, PartialEq)]
+pub struct TableFilter {
+    pub key: String,
+    pub label: String,
+    pub options: Vec<FilterOption>,
+}
 
 /// Table column definition
 #[derive(Clone, PartialEq)]
@@ -67,6 +84,30 @@ pub struct DataTableProps<T: Clone + PartialEq + 'static> {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Search placeholder text
+    #[props(default = "Search...")]
+    pub search_placeholder: &'static str,
+    /// Search query for filtering
+    #[props(default)]
+    pub search_query: Option<String>,
+    /// Search change handler
+    #[props(default)]
+    pub on_search_change: Option<EventHandler<String>>,
+    /// Custom filter definitions
+    #[props(default)]
+    pub filters: Vec<TableFilter>,
+    /// Active filter values
+    #[props(default)]
+    pub active_filters: std::collections::HashMap<String, String>,
+    /// Filter change handler
+    #[props(default)]
+    pub on_filter_change: Option<EventHandler<(String, String)>>,
+    /// Show search input
+    #[props(default = true)]
+    pub show_search: bool,
+    /// Show filter controls
+    #[props(default = true)]
+    pub show_filters: bool,
 }
 
 /// Data Table organism component
@@ -137,7 +178,39 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
             .build()
     });
     
-    // Loading state
+    let toolbar_style = use_style(|t| {
+        Style::new()
+            .flex()
+            .items_center()
+            .justify_between()
+            .px(&t.spacing, "md")
+            .py(&t.spacing, "sm")
+            .border_bottom(1, &t.colors.border)
+            .bg(&t.colors.background)
+            .gap(&t.spacing, "sm")
+            .build()
+    });
+    
+    let search_container_style = use_style(|t| {
+        Style::new()
+            .flex()
+            .items_center()
+            .gap(&t.spacing, "sm")
+            .build()
+    });
+    
+    let filters_container_style = use_style(|t| {
+        Style::new()
+            .flex()
+            .items_center()
+            .gap(&t.spacing, "sm")
+            .build()
+    });
+    
+    let show_toolbar = (props.show_search && props.on_search_change.is_some()) || 
+                       (props.show_filters && !props.filters.is_empty() && props.on_filter_change.is_some());
+    
+    // Loading state (without toolbar)
     if props.loading {
         return rsx! {
             div {
@@ -154,7 +227,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
         };
     }
     
-    // Empty state
+    // Empty state (without toolbar)
     if props.data.is_empty() {
         return rsx! {
             div {
@@ -175,10 +248,68 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
     let data = props.data.clone();
     let selectable = props.selectable;
     let selected_keys = props.selected_keys.clone();
+    let search_query = props.search_query.clone().unwrap_or_default();
     
     rsx! {
         div {
             style: "{final_style}",
+            
+            if show_toolbar {
+                div {
+                    style: "{toolbar_style}",
+                    
+                    if props.show_search && props.on_search_change.is_some() {
+                        div {
+                            style: "{search_container_style} flex: 1;",
+                            Icon {
+                                name: "search".to_string(),
+                                size: IconSize::Small,
+                                color: IconColor::Muted,
+                            }
+                            input {
+                                r#type: "text",
+                                placeholder: "{props.search_placeholder}",
+                                value: "{search_query}",
+                                style: "flex: 1; min-width: 200px; padding: 8px 12px; border: 1px solid rgb(226,232,240); border-radius: 6px; font-size: 14px; outline: none; &:focus {{ border-color: rgb(59,130,246); }}",
+                                oninput: move |e| {
+                                    if let Some(handler) = &props.on_search_change {
+                                        handler.call(e.value());
+                                    }
+                                },
+                            }
+                            if !search_query.is_empty() {
+                                Button {
+                                    variant: ButtonVariant::Ghost,
+                                    size: ButtonSize::Sm,
+                                    onclick: move |_| {
+                                        if let Some(handler) = &props.on_search_change {
+                                            handler.call("".to_string());
+                                        }
+                                    },
+                                    Icon {
+                                        name: "x".to_string(),
+                                        size: IconSize::Small,
+                                        color: IconColor::Muted,
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    if props.show_filters && !props.filters.is_empty() && props.on_filter_change.is_some() {
+                        div {
+                            style: "{filters_container_style}",
+                            for filter in props.filters.clone() {
+                                DataTableFilter {
+                                    filter: filter.clone(),
+                                    active_value: props.active_filters.get(&filter.key).cloned().unwrap_or_default(),
+                                    on_change: props.on_filter_change.clone(),
+                                }
+                            }
+                        }
+                    }
+                }
+            }
             
             table {
                 style: "{table_style}",
@@ -203,6 +334,48 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
                             on_click: props.on_row_click.clone(),
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+/// Filter dropdown component
+#[derive(Props, Clone, PartialEq)]
+pub struct DataTableFilterProps {
+    pub filter: TableFilter,
+    pub active_value: String,
+    pub on_change: Option<EventHandler<(String, String)>>,
+}
+
+#[component]
+pub fn DataTableFilter(props: DataTableFilterProps) -> Element {
+    let filter = props.filter.clone();
+    let active_value = props.active_value.clone();
+    let has_value = !active_value.is_empty();
+    
+    rsx! {
+        select {
+            style: if has_value { 
+                "padding: 8px 12px; border: 1px solid rgb(59,130,246); border-radius: 6px; font-size: 14px; background: white; cursor: pointer; outline: none; color: rgb(15,23,42);"
+            } else {
+                "padding: 8px 12px; border: 1px solid rgb(226,232,240); border-radius: 6px; font-size: 14px; background: white; cursor: pointer; outline: none; color: rgb(100,116,139);"
+            },
+            onchange: move |e| {
+                if let Some(handler) = &props.on_change {
+                    handler.call((filter.key.clone(), e.value()));
+                }
+            },
+            option {
+                value: "",
+                selected: active_value.is_empty(),
+                "{filter.label}"
+            }
+            for option in filter.options {
+                option {
+                    value: "{option.value}",
+                    selected: active_value == option.value,
+                    "{option.label}"
                 }
             }
         }

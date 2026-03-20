@@ -4,9 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-dioxus = { version = "0.6", features = ["web", "router"] }
+dioxus = { version = "0.7", features = ["web", "router"] }
 dioxus-ui-system = { path = "../dioxus-ui-system" }
 tracing = "0.1"
+web-sys = { version = "0.3", features = ["Window", "Storage", "Navigator", "Clipboard"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 
 [features]
 default = ["web"]

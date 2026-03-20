@@ -11,10 +11,15 @@ pub mod layout;
 pub mod cards;
 pub mod stepper;
 pub mod charts;
+pub mod footer;
+pub mod notification_center;
+pub mod hero;
+pub mod file_upload;
+pub mod confirmation_dialog;
 
 // Re-export all organism components
 pub use header::{Header, HeaderProps, NavItem, HeaderNavLink, MobileMenuToggle, UserMenu, UserMenuProps, UserMenuItem};
-pub use data_table::{DataTable, DataTableProps, TableColumn, ColumnAlign, Pagination, PaginationProps};
+pub use data_table::{DataTable, DataTableProps, TableColumn, ColumnAlign, Pagination as TablePagination, PaginationProps as TablePaginationProps, TableFilter, FilterOption, DataTableFilter};
 pub use tabs::{Tabs, TabsProps, TabItem, TabsVariant, TabPanel, TabPanelProps, VerticalTabs, VerticalTabsProps};
 pub use accordion::{Accordion, AccordionProps, AccordionItem, AccordionItem2, AccordionItem2Props};
 pub use layout::{Layout, LayoutProps, LayoutType, LayoutNavItem};
@@ -37,3 +42,8 @@ pub use stepper::{
     StepSummary, StepSummaryProps, StepSummaryItem,
     CompactStepper, CompactStepperProps,
 };
+pub use footer::{Footer, FooterProps, FooterVariant, FooterLinkGroup, FooterLink, SimpleFooter, SimpleFooterProps};
+pub use notification_center::{NotificationCenter, NotificationCenterProps, Notification, BannerAlert, BannerAlertProps};
+pub use hero::{Hero, HeroProps, HeroAlign, HeroSize, HeroCta, HeroWithImage, HeroWithImageProps, ImagePosition, SocialProofBar, SocialProofBarProps};
+pub use file_upload::{FileUpload, FileUploadProps, UploadedFile};
+pub use confirmation_dialog::{ConfirmationDialog, ConfirmationDialogProps, ConfirmVariant, DeleteConfirmDialog, DeleteConfirmDialogProps, UnsavedChangesDialog, UnsavedChangesDialogProps, SignOutDialog, SignOutDialogProps};

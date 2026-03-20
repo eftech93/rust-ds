@@ -5,6 +5,7 @@
 use dioxus::prelude::*;
 use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::atoms::Box;
 
 /// Alert variants
 #[derive(Default, Clone, PartialEq)]
@@ -97,8 +98,6 @@ pub fn Alert(props: AlertProps) -> Element {
             .border(1, border_color)
             .bg(bg_color)
             .p(&t.spacing, "md")
-            .flex()
-            .gap(&t.spacing, "md")
             .build()
     });
     
@@ -127,12 +126,14 @@ pub fn Alert(props: AlertProps) -> Element {
     };
     
     let icon_name = props.icon.as_deref().or(default_icon);
+    let custom_style = props.style.clone().unwrap_or_default();
+    let custom_class = props.class.clone().unwrap_or_default();
     
     rsx! {
         div {
             role: "alert",
-            style: "{alert_style} {props.style.clone().unwrap_or_default()}",
-            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{alert_style} {custom_style} display: flex; align-items: flex-start; gap: 12px;",
+            class: "{custom_class}",
             
             if let Some(icon) = icon_name {
                 AlertIcon { name: icon.to_string(), style: icon_style() }
@@ -148,7 +149,7 @@ pub fn Alert(props: AlertProps) -> Element {
                     }
                 }
                 
-                div {
+                Box {
                     style: "font-size: 14px; line-height: 1.5;",
                     {props.children}
                 }

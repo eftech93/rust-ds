@@ -67,6 +67,15 @@ pub mod prelude {
         Box, BoxProps, BoxDisplay, FlexDirection, FlexWrap, JustifyContent, AlignItems,
         SpacingSize, RadiusSize, ShadowSize, BackgroundColor, BorderWidth, Overflow, Position,
         VStack, HStack, Center,
+        // New atoms
+        Divider, DividerProps, DividerOrientation, DividerVariant,
+        Progress, ProgressProps, ProgressVariant, ProgressSize,
+        Spinner, SpinnerProps, SpinnerVariant, SpinnerSize,
+        Skeleton, SkeletonProps, SkeletonShape, SkeletonAnimation, SkeletonText as AtomSkeletonText, SkeletonTextProps as AtomSkeletonTextProps, SkeletonCard as AtomSkeletonCard, SkeletonCardProps as AtomSkeletonCardProps,
+        Rating, RatingProps,
+        DatePicker, DatePickerProps,
+        Slider, SliderProps, SliderMark,
+        Tag, TagProps, TagVariant, TagSize, InputTag, InputTagProps, TagGroup, TagData,
     };
     
     // Molecules
@@ -82,15 +91,21 @@ pub mod prelude {
         DropdownMenu, DropdownMenuProps, DropdownMenuItem, DropdownAlign, DropdownMenuSeparator, DropdownMenuLabel, DropdownMenuLabelProps,
         Popover, PopoverProps, PopoverPlacement, PopoverHeader, PopoverHeaderProps, PopoverFooter, PopoverFooterProps,
         Separator, SeparatorProps, SeparatorOrientation,
-        Skeleton, SkeletonProps, SkeletonCircle, SkeletonCircleProps, SkeletonText, SkeletonTextProps, SkeletonCard, SkeletonCardProps,
+        SkeletonMolecule, SkeletonMoleculeProps, SkeletonCircle, SkeletonCircleProps, SkeletonText, SkeletonTextProps, SkeletonCard, SkeletonCardProps,
         Tooltip, TooltipProps, TooltipPlacement, SimpleTooltip, SimpleTooltipProps,
+        // New molecules
+        Toast, ToastProps, ToastVariant, ToastManager, use_toast, ToastProvider, ToastProviderProps,
+        Combobox, ComboboxProps, ComboboxOption, MultiCombobox, MultiComboboxProps,
+        MediaObject, MediaObjectProps, MediaContent, MediaContentProps, Comment, CommentProps,
+        Pagination, PaginationProps, PaginationSize, PageSizeSelector, PageSizeSelectorProps, PaginationInfo, PaginationInfoProps,
+        ListItem, ListItemProps, ListItemVariant, ListGroup, ListGroupProps, ActionListItem, ActionListItemProps, ExpandableListItem, ExpandableListItemProps,
     };
     
     // Organisms
     pub use crate::organisms::{
         Header, HeaderProps, NavItem, HeaderNavLink, MobileMenuToggle,
         UserMenu, UserMenuProps, UserMenuItem,
-        DataTable, DataTableProps, TableColumn, ColumnAlign, Pagination, PaginationProps,
+        DataTable, DataTableProps, TableColumn, ColumnAlign, TablePagination, TablePaginationProps, TableFilter, FilterOption,
         Tabs, TabsProps, TabItem, TabsVariant, TabPanel, TabPanelProps, VerticalTabs, VerticalTabsProps,
         Accordion, AccordionProps, AccordionItem, AccordionItem2, AccordionItem2Props,
         Layout, LayoutProps, LayoutType, LayoutNavItem,

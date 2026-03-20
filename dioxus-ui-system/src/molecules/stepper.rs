@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 
-use crate::atoms::{StepIndicator, StepConnector, StepLabel, StepState, StepSize};
+use crate::atoms::{StepIndicator, StepConnector, StepLabel, StepState, StepSize, Box, VStack, HStack, JustifyContent, AlignItems, SpacingSize};
 
 /// Step item data structure
 #[derive(Clone, PartialEq, Debug)]
@@ -176,7 +176,7 @@ pub fn StepItemComponent(props: StepItemProps) -> Element {
                     }
                     
                     // Label column
-                    div {
+                    Box {
                         style: "padding-top: 6px;",
                         {label}
                     }
@@ -248,22 +248,27 @@ pub struct VerticalStepperProps {
 #[component]
 pub fn VerticalStepper(props: VerticalStepperProps) -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 0;",
-            role: "tablist",
-            aria_label: Some("Progress steps"),
-            aria_orientation: "vertical",
+        VStack {
+            gap: SpacingSize::None,
+            align: AlignItems::Stretch,
             
-            for (index, step) in props.steps.iter().enumerate() {
-                StepItemComponent {
-                    key: "{index}",
-                    index: index,
-                    step: step.clone(),
-                    size: props.size.clone(),
-                    show_connector: index < props.steps.len() - 1,
-                    connector_completed: index < props.active_step,
-                    horizontal: false,
-                    on_click: props.on_step_click.clone(),
+            div {
+                style: "display: flex; flex-direction: column; gap: 0;",
+                role: "tablist",
+                aria_label: Some("Progress steps"),
+                aria_orientation: "vertical",
+                
+                for (index, step) in props.steps.iter().enumerate() {
+                    StepItemComponent {
+                        key: "{index}",
+                        index: index,
+                        step: step.clone(),
+                        size: props.size.clone(),
+                        show_connector: index < props.steps.len() - 1,
+                        connector_completed: index < props.active_step,
+                        horizontal: false,
+                        on_click: props.on_step_click.clone(),
+                    }
                 }
             }
         }
@@ -358,23 +363,17 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
     let is_last = props.current_step >= props.total_steps - 1;
     
     let justify_content = match props.align {
-        StepperActionsAlign::End => "flex-end",
-        StepperActionsAlign::Center => "center",
-        StepperActionsAlign::SpaceBetween => "space-between",
+        StepperActionsAlign::End => JustifyContent::End,
+        StepperActionsAlign::Center => JustifyContent::Center,
+        StepperActionsAlign::SpaceBetween => JustifyContent::SpaceBetween,
     };
     
     rsx! {
-        div {
-            style: "
-                display: flex; 
-                justify-content: {justify_content}; 
-                align-items: center; 
-                gap: 12px; 
-                margin-top: 24px;
-                padding-top: 24px;
-                border-top: 1px solid #e2e8f0;
-            ",
-            justify_content: justify_content,
+        HStack {
+            style: "margin-top: 24px; padding-top: 24px; border-top: 1px solid #e2e8f0;",
+            justify: justify_content,
+            align: AlignItems::Center,
+            gap: SpacingSize::Md,
             
             // Back button (or spacer for alignment)
             if !is_first {
@@ -387,7 +386,7 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
                     }
                 }
             } else if props.align == StepperActionsAlign::SpaceBetween {
-                div {}
+                Box {}
             }
             
             // Skip button (optional)
