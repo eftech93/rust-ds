@@ -2,7 +2,11 @@
 
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
-use dioxus_ui_system::molecules::{DialogFooter, DialogFooterAlign};
+use dioxus_ui_system::molecules::{DialogFooter, DialogFooterAlign, 
+    use_toast, Combobox, ComboboxOption, MediaObject, MediaContent, Comment,
+    Pagination, PaginationInfo, ListItem, ListItemVariant, ListGroup, ActionListItem,
+    SkeletonMolecule as Skeleton, SkeletonCircle
+};
 use dioxus_ui_system::atoms::{Box, VStack, HStack};
 
 #[component]
@@ -527,6 +531,209 @@ fn CodeBlock(code: String) -> Element {
         pre {
             style: "background: rgb(15,23,42); color: rgb(226,232,240); padding: 16px; border-radius: 8px; font-size: 14px; overflow-x: auto;",
             code { "{code}" }
+        }
+    }
+}
+
+/// Toast documentation page
+#[component]
+pub fn ToastPage() -> Element {
+    let mut toast = use_toast();
+    
+    rsx! {
+        DocPage {
+            title: "Toast",
+            description: "Transient, non-blocking feedback notifications.",
+            
+            Section { title: "Toast Variants",
+                ExampleBox {
+                    HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap;",
+                        Button { variant: ButtonVariant::Primary, onclick: move |_| toast.show_success("Success!"), "Success Toast" }
+                        Button { variant: ButtonVariant::Secondary, onclick: move |_| toast.show_error("Error occurred"), "Error Toast" }
+                        Button { variant: ButtonVariant::Ghost, onclick: move |_| toast.show_warning("Warning message"), "Warning Toast" }
+                    }
+                }
+            }
+            
+            Section { title: "Usage",
+                p { "Use the use_toast hook to show notifications:" }
+                CodeBlock { code: "let mut toast = use_toast();\ntoast.show_success(\"Operation completed!\");".to_string() }
+            }
+        }
+    }
+}
+
+/// Combobox documentation page
+#[component]
+pub fn ComboboxPage() -> Element {
+    let mut selected = use_signal(|| None::<String>);
+    
+    let options = vec![
+        ComboboxOption::new("rust", "Rust"),
+        ComboboxOption::new("go", "Go"),
+        ComboboxOption::new("typescript", "TypeScript"),
+        ComboboxOption::new("python", "Python"),
+    ];
+    
+    rsx! {
+        DocPage {
+            title: "Combobox",
+            description: "Autocomplete input with dropdown suggestions.",
+            
+            Section { title: "Basic Combobox",
+                ExampleBox {
+                    Combobox {
+                        options: options.clone(),
+                        value: selected(),
+                        on_change: EventHandler::new(move |v: String| selected.set(Some(v))),
+                        label: Some("Select Language".to_string()),
+                        placeholder: Some("Search languages...".to_string())
+                    }
+                }
+            }
+            
+            Section { title: "Creatable",
+                p { "Allow users to create new options:" }
+                ExampleBox {
+                    Combobox {
+                        options: options.clone(),
+                        creatable: true,
+                        placeholder: Some("Select or create...".to_string()),
+                        on_change: EventHandler::new(move |_v: String| {}),
+                        value: None
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Media Object documentation page
+#[component]
+pub fn MediaObjectPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "Media Object",
+            description: "Image + text content with flexible alignment.",
+            
+            Section { title: "Basic Media Object",
+                ExampleBox {
+                    MediaObject {
+                        media: rsx! {
+                            div { style: "width: 64px; height: 64px; background: #3b82f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px;", "📷" }
+                        },
+                        children: rsx! {
+                            MediaContent {
+                                title: Some("Media Title".to_string()),
+                                description: Some("This is a description of the media content. It can contain multiple lines of text.".to_string()),
+                                meta: Some("2 hours ago".to_string()),
+                                title_level: 4
+                            }
+                        }
+                    }
+                }
+            }
+            
+            Section { title: "Comment",
+                ExampleBox {
+                    Comment {
+                        author: "Jane Doe".to_string(),
+                        content: "This is a great component library! Love the design.".to_string(),
+                        timestamp: "2 hours ago".to_string(),
+                        like_count: 5,
+                        liked: false
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Pagination documentation page
+#[component]
+pub fn PaginationPage() -> Element {
+    let mut page = use_signal(|| 1);
+    
+    rsx! {
+        DocPage {
+            title: "Pagination",
+            description: "Page navigation for lists and tables.",
+            
+            Section { title: "Basic Pagination",
+                ExampleBox {
+                    Pagination {
+                        total_pages: 10,
+                        current_page: page(),
+                        on_change: EventHandler::new(move |p: u32| page.set(p)),
+                        sibling_count: 1,
+                        show_first_last: true,
+                        show_prev_next: true,
+                        simple: false
+                    }
+                }
+            }
+            
+            Section { title: "Simple Mode",
+                ExampleBox {
+                    Pagination {
+                        total_pages: 5,
+                        current_page: 2,
+                        simple: true,
+                        sibling_count: 1,
+                        show_first_last: true,
+                        show_prev_next: true,
+                        on_change: EventHandler::new(move |_p: u32| {})
+                    }
+                }
+            }
+            
+            Section { title: "With Info",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md,
+                        PaginationInfo { current_page: 1, page_size: 10, total_items: 87 }
+                        Pagination { total_pages: 9, current_page: 1, on_change: EventHandler::new(move |_p: u32| {}), sibling_count: 1, show_first_last: true, show_prev_next: true, simple: false }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// List Item documentation page
+#[component]
+pub fn ListItemPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "List Item",
+            description: "List row items with various configurations.",
+            
+            Section { title: "Basic List Item",
+                ExampleBox {
+                    ListGroup { title: Some("Items".to_string()),
+                        ListItem { title: "First Item".to_string(), description: Some("Description text".to_string()), variant: ListItemVariant::Default, dense: false, divider: true, hoverable: true }
+                        ListItem { title: "Second Item".to_string(), description: Some("Another description".to_string()), variant: ListItemVariant::Selected, dense: false, divider: true, hoverable: true }
+                        ListItem { title: "Third Item".to_string(), trailing: Some(rsx! { span { "→" } }), variant: ListItemVariant::Default, dense: false, divider: true, hoverable: true }
+                    }
+                }
+            }
+            
+            Section { title: "With Leading Icon",
+                ExampleBox {
+                    ListItem {
+                        title: "Settings".to_string(),
+                        leading: Some(rsx! { span { "⚙️" } }),
+                        trailing: Some(rsx! { span { "→" } }),
+                        variant: ListItemVariant::Default, dense: false, divider: true, hoverable: true
+                    }
+                }
+            }
+            
+            Section { title: "Action List Items",
+                ExampleBox {
+                    ActionListItem { label: "Edit".to_string(), icon: Some("✏️".to_string()), on_click: EventHandler::new(move |_| {}), description: None, shortcut: None, destructive: false, disabled: false }
+                    ActionListItem { label: "Delete".to_string(), icon: Some("🗑️".to_string()), destructive: true, on_click: EventHandler::new(move |_| {}), description: None, shortcut: None, disabled: false }
+                }
+            }
         }
     }
 }

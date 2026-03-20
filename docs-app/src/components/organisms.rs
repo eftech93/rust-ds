@@ -3,6 +3,8 @@
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
 use dioxus_ui_system::organisms::*;
+use dioxus_ui_system::organisms::FooterVariant;
+use dioxus_ui_system::molecules::ToastVariant;
 use dioxus_ui_system::atoms::{Box, VStack, HStack};
 
 #[component]
@@ -227,7 +229,7 @@ pub fn CardsPage() -> Element {
 
 #[component]
 pub fn DataTablePage() -> Element {
-    use dioxus_ui_system::organisms::{DataTable, TableColumn, ColumnAlign, Pagination, TableFilter, FilterOption};
+    use dioxus_ui_system::organisms::{DataTable, TableColumn, ColumnAlign, TablePagination, TableFilter, FilterOption};
     use std::collections::HashMap;
     
     #[derive(Clone, PartialEq)]
@@ -470,7 +472,7 @@ DataTable {{
                             show_search: false,
                             show_filters: false,
                         }
-                        Pagination {
+                        TablePagination {
                             current_page: 0,
                             total_pages: 5,
                             on_page_change: move |_| {},
@@ -1082,6 +1084,233 @@ fn CodeBlock(code: String) -> Element {
         pre {
             style: "background: rgb(15,23,42); color: rgb(226,232,240); padding: 16px; border-radius: 8px; font-size: 14px; overflow-x: auto;",
             code { "{code}" }
+        }
+    }
+}
+
+/// Footer documentation page
+#[component]
+pub fn FooterPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "Footer",
+            description: "Page footer with links, branding, and legal information.",
+            
+            Section { title: "Default Footer",
+                ExampleBox {
+                    Footer {
+                        brand: Some(rsx! { span { style: "font-size: 20px; font-weight: 700;", "Brand" } }),
+                        description: Some("A modern design system for Dioxus.".to_string()),
+                        link_groups: vec![
+                            FooterLinkGroup::new("Product").with_links(vec![
+                                FooterLink::new("Features", "#"),
+                                FooterLink::new("Pricing", "#"),
+                                FooterLink::new("Docs", "#"),
+                            ]),
+                            FooterLinkGroup::new("Company").with_links(vec![
+                                FooterLink::new("About", "#"),
+                                FooterLink::new("Blog", "#"),
+                                FooterLink::new("Careers", "#"),
+                            ]),
+                        ],
+                        copyright: Some("© 2024 Company Inc.".to_string()),
+                        variant: FooterVariant::Default
+                    }
+                }
+            }
+            
+            Section { title: "Simple Footer",
+                ExampleBox {
+                    SimpleFooter {
+                        brand: Some(rsx! { span { style: "font-weight: 600;", "Logo" } }),
+                        links: vec![
+                            FooterLink::new("Privacy", "#"),
+                            FooterLink::new("Terms", "#"),
+                        ],
+                        copyright: "© 2024".to_string()
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Notification Center documentation page
+#[component]
+pub fn NotificationCenterPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "Notification Center",
+            description: "Centralized alert management with categorization.",
+            
+            Section { title: "Notification Center",
+                ExampleBox {
+                    NotificationCenter {
+                        notifications: vec![
+                            Notification::new("1", "New Message", "You have a new message from John").with_variant(ToastVariant::Info),
+                            Notification::new("2", "Success!", "Your changes have been saved.").with_variant(ToastVariant::Success),
+                        ],
+                        unread_count: 2
+                    }
+                }
+            }
+            
+            Section { title: "Banner Alert",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md,
+                        BannerAlert { message: "This is an info banner".to_string(), variant: ToastVariant::Info, dismissible: true }
+                        BannerAlert { message: "Success! Operation completed.".to_string(), variant: ToastVariant::Success, dismissible: true }
+                        BannerAlert { message: "Warning: Check your settings.".to_string(), variant: ToastVariant::Warning, dismissible: true }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Hero documentation page
+#[component]
+pub fn HeroPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "Hero",
+            description: "Prominent page header with CTA for landing pages.",
+            
+            Section { title: "Basic Hero",
+                ExampleBox {
+                    Hero {
+                        title: "Build faster with Dioxus UI".to_string(),
+                        subtitle: Some("A comprehensive design system with 100+ components for building modern web applications.".to_string()),
+                        primary_cta: Some(HeroCta::new("Get Started").with_href("#")),
+                        secondary_cta: Some(HeroCta::new("Learn More").with_href("#")),
+                        align: HeroAlign::Center, size: HeroSize::Lg
+                    }
+                }
+            }
+            
+            Section { title: "With Features",
+                ExampleBox {
+                    Hero {
+                        title: "Everything you need".to_string(),
+                        subtitle: Some("Build better products with our comprehensive toolkit.".to_string()),
+                        features: vec![
+                            "100+ Components".to_string(),
+                            "Type Safe".to_string(),
+                            "Customizable".to_string(),
+                        ],
+                        primary_cta: Some(HeroCta::new("Get Started")),
+                        align: HeroAlign::Center, size: HeroSize::Lg
+                    }
+                }
+            }
+            
+            Section { title: "Social Proof",
+                ExampleBox {
+                    SocialProofBar {
+                        text: "Trusted by 10,000+ developers".to_string(),
+                        items: vec![
+                            rsx! { div { style: "width: 32px; height: 32px; background: #3b82f6; border-radius: 50%;", "" } },
+                            rsx! { div { style: "width: 32px; height: 32px; background: #22c55e; border-radius: 50%;", "" } },
+                            rsx! { div { style: "width: 32px; height: 32px; background: #f59e0b; border-radius: 50%;", "" } },
+                        ]
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// File Upload documentation page
+#[component]
+pub fn FileUploadPage() -> Element {
+    rsx! {
+        DocPage {
+            title: "File Upload",
+            description: "Drag-and-drop file upload with progress and preview.",
+            
+            Section { title: "Basic File Upload",
+                ExampleBox {
+                    FileUpload {
+                        on_upload: EventHandler::new(move |_files: Vec<UploadedFile>| {}),
+                        label: Some("Upload Documents".to_string()),
+                        helper_text: Some("PDF, PNG, JPG up to 10MB".to_string()),
+                        accept: Some(".pdf,.png,.jpg".to_string()),
+                        multiple: false, max_files: 1, loading: false, disabled: false
+                    }
+                }
+            }
+            
+            Section { title: "Multiple Files",
+                ExampleBox {
+                    FileUpload {
+                        on_upload: EventHandler::new(move |_files: Vec<UploadedFile>| {}),
+                        multiple: true,
+                        max_files: 5,
+                        label: Some("Upload Images".to_string()),
+                        loading: false, disabled: false
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Confirmation Dialog documentation page
+#[component]
+pub fn ConfirmationDialogPage() -> Element {
+    let mut show_delete = use_signal(|| false);
+    let mut show_unsaved = use_signal(|| false);
+    let mut show_signout = use_signal(|| false);
+    
+    rsx! {
+        DocPage {
+            title: "Confirmation Dialog",
+            description: "Critical decision dialogs with clear action labeling.",
+            
+            Section { title: "Delete Confirmation",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md, style: "align-items: flex-start;",
+                        Button { variant: ButtonVariant::Destructive, onclick: move |_| show_delete.set(true), "Delete Item" }
+                        
+                        DeleteConfirmDialog {
+                            open: show_delete(),
+                            on_close: move |_| show_delete.set(false),
+                            item_name: "My Document".to_string(),
+                            on_confirm: EventHandler::new(move |_| show_delete.set(false)),
+                            loading: false
+                        }
+                    }
+                }
+            }
+            
+            Section { title: "Unsaved Changes",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md, style: "align-items: flex-start;",
+                        Button { onclick: move |_| show_unsaved.set(true), "Show Unsaved Dialog" }
+                        
+                        UnsavedChangesDialog {
+                            open: show_unsaved(),
+                            on_close: move |_| show_unsaved.set(false),
+                            on_save: EventHandler::new(move |_| show_unsaved.set(false)),
+                            on_discard: EventHandler::new(move |_| show_unsaved.set(false)),
+                        }
+                    }
+                }
+            }
+            
+            Section { title: "Sign Out",
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md, style: "align-items: flex-start;",
+                        Button { onclick: move |_| show_signout.set(true), "Sign Out" }
+                        
+                        SignOutDialog {
+                            open: show_signout(),
+                            on_close: move |_| show_signout.set(false),
+                            on_confirm: EventHandler::new(move |_| show_signout.set(false)),
+                        }
+                    }
+                }
+            }
         }
     }
 }

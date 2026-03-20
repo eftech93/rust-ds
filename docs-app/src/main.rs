@@ -64,6 +64,24 @@ pub enum Route {
     TextAreaPage {},
     #[route("/atoms/step")]
     StepPage {},
+    #[route("/atoms/heading")]
+    HeadingPage {},
+    #[route("/atoms/divider")]
+    DividerPage {},
+    #[route("/atoms/progress")]
+    ProgressPage {},
+    #[route("/atoms/spinner")]
+    SpinnerPage {},
+    #[route("/atoms/skeleton")]
+    SkeletonAtomPage {},
+    #[route("/atoms/rating")]
+    RatingPage {},
+    #[route("/atoms/datepicker")]
+    DatePickerPage {},
+    #[route("/atoms/slider")]
+    SliderPage {},
+    #[route("/atoms/tag")]
+    TagPage {},
     
     // Molecules
     #[route("/molecules")]
@@ -90,6 +108,16 @@ pub enum Route {
     SkeletonPage {},
     #[route("/molecules/stepper")]
     StepperPage {},
+    #[route("/molecules/toast")]
+    ToastPage {},
+    #[route("/molecules/combobox")]
+    ComboboxPage {},
+    #[route("/molecules/media-object")]
+    MediaObjectPage {},
+    #[route("/molecules/pagination")]
+    PaginationPage {},
+    #[route("/molecules/list-item")]
+    ListItemPage {},
     
     // Organisms
     #[route("/organisms")]
@@ -110,6 +138,16 @@ pub enum Route {
     StepperWizardPage {},
     #[route("/organisms/charts")]
     ChartsPage {},
+    #[route("/organisms/footer")]
+    FooterPage {},
+    #[route("/organisms/notification-center")]
+    NotificationCenterPage {},
+    #[route("/organisms/hero")]
+    HeroPage {},
+    #[route("/organisms/file-upload")]
+    FileUploadPage {},
+    #[route("/organisms/confirmation-dialog")]
+    ConfirmationDialogPage {},
     
     // Themes
     #[route("/themes")]
@@ -206,6 +244,15 @@ fn Sidebar() -> Element {
                     ("Select", Route::SelectPage {}),
                     ("TextArea", Route::TextAreaPage {}),
                     ("Step", Route::StepPage {}),
+                    ("Heading", Route::HeadingPage {}),
+                    ("Divider", Route::DividerPage {}),
+                    ("Progress", Route::ProgressPage {}),
+                    ("Spinner", Route::SpinnerPage {}),
+                    ("Skeleton", Route::SkeletonAtomPage {}),
+                    ("Rating", Route::RatingPage {}),
+                    ("DatePicker", Route::DatePickerPage {}),
+                    ("Slider", Route::SliderPage {}),
+                    ("Tag", Route::TagPage {}),
                 ], current_route: current_route.clone() }
                 
                 // Molecules
@@ -221,6 +268,11 @@ fn Sidebar() -> Element {
                     ("Separator", Route::SeparatorPage {}),
                     ("Skeleton", Route::SkeletonPage {}),
                     ("Stepper", Route::StepperPage {}),
+                    ("Toast", Route::ToastPage {}),
+                    ("Combobox", Route::ComboboxPage {}),
+                    ("Media Object", Route::MediaObjectPage {}),
+                    ("Pagination", Route::PaginationPage {}),
+                    ("List Item", Route::ListItemPage {}),
                 ], current_route: current_route.clone() }
                 
                 // Organisms
@@ -234,6 +286,11 @@ fn Sidebar() -> Element {
                     ("DataTable", Route::DataTablePage {}),
                     ("Stepper Wizard", Route::StepperWizardPage {}),
                     ("Charts", Route::ChartsPage {}),
+                    ("Footer", Route::FooterPage {}),
+                    ("Notification Center", Route::NotificationCenterPage {}),
+                    ("Hero", Route::HeroPage {}),
+                    ("File Upload", Route::FileUploadPage {}),
+                    ("Confirmation Dialog", Route::ConfirmationDialogPage {}),
                 ], current_route: current_route.clone() }
                 
                 // Themes
@@ -367,6 +424,24 @@ fn SelectPage() -> Element { components::atoms::SelectPage() }
 fn TextAreaPage() -> Element { components::atoms::TextAreaPage() }
 #[component]
 fn StepPage() -> Element { components::atoms::StepPage() }
+#[component]
+fn HeadingPage() -> Element { components::atoms::HeadingPage() }
+#[component]
+fn DividerPage() -> Element { components::atoms::DividerPage() }
+#[component]
+fn ProgressPage() -> Element { components::atoms::ProgressPage() }
+#[component]
+fn SpinnerPage() -> Element { components::atoms::SpinnerPage() }
+#[component]
+fn SkeletonAtomPage() -> Element { components::atoms::SkeletonAtomPage() }
+#[component]
+fn RatingPage() -> Element { components::atoms::RatingPage() }
+#[component]
+fn DatePickerPage() -> Element { components::atoms::DatePickerPage() }
+#[component]
+fn SliderPage() -> Element { components::atoms::SliderPage() }
+#[component]
+fn TagPage() -> Element { components::atoms::TagPage() }
 
 // Molecules
 #[component]
@@ -393,6 +468,16 @@ fn SeparatorPage() -> Element { components::molecules::SeparatorPage() }
 fn SkeletonPage() -> Element { components::molecules::SkeletonMoleculePage() }
 #[component]
 fn StepperPage() -> Element { components::molecules::StepperPage() }
+#[component]
+fn ToastPage() -> Element { components::molecules::ToastPage() }
+#[component]
+fn ComboboxPage() -> Element { components::molecules::ComboboxPage() }
+#[component]
+fn MediaObjectPage() -> Element { components::molecules::MediaObjectPage() }
+#[component]
+fn PaginationPage() -> Element { components::molecules::PaginationPage() }
+#[component]
+fn ListItemPage() -> Element { components::molecules::ListItemPage() }
 
 // Organisms
 #[component]
@@ -413,6 +498,16 @@ fn DataTablePage() -> Element { components::organisms::DataTablePage() }
 fn StepperWizardPage() -> Element { components::organisms::StepperWizardPage() }
 #[component]
 fn ChartsPage() -> Element { components::organisms::ChartsPage() }
+#[component]
+fn FooterPage() -> Element { components::organisms::FooterPage() }
+#[component]
+fn NotificationCenterPage() -> Element { components::organisms::NotificationCenterPage() }
+#[component]
+fn HeroPage() -> Element { components::organisms::HeroPage() }
+#[component]
+fn FileUploadPage() -> Element { components::organisms::FileUploadPage() }
+#[component]
+fn ConfirmationDialogPage() -> Element { components::organisms::ConfirmationDialogPage() }
 
 // Themes
 #[component]

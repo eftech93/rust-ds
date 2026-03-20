@@ -1214,17 +1214,21 @@ fn SkeletonShowcase() -> Element {
                                     Skeleton { 
                                         width: Some("150px".to_string()),
                                         height: None,
-                                        animate: true,
-                                        rounded: None,
-                                        style: None,
+                                        animated: true,
+                                        shape: SkeletonShape::Rectangle,
+                                        animation: SkeletonAnimation::Pulse,
+                                        color: None,
+                                        highlight_color: None,
                                         class: None,
                                     }
                                     Skeleton { 
                                         width: Some("100px".to_string()),
                                         height: None,
-                                        animate: true,
-                                        rounded: None,
-                                        style: None,
+                                        animated: true,
+                                        shape: SkeletonShape::Rectangle,
+                                        animation: SkeletonAnimation::Pulse,
+                                        color: None,
+                                        highlight_color: None,
                                         class: None,
                                     }
                                 }
