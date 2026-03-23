@@ -77,7 +77,10 @@ pub fn Heading(props: HeadingProps) -> Element {
     
     let font_size = props.size.unwrap_or_else(|| props.level.default_size());
     let color = props.color.unwrap_or_else(|| {
-        theme.tokens.read().colors.foreground.to_rgba()
+        // Safe fallback for when theme isn't initialized yet (SSR/hydration)
+        theme.tokens.try_read()
+            .map(|t| t.colors.foreground.to_rgba())
+            .unwrap_or("#111827".to_string())
     });
     
     let align_css = props.align.as_ref()
@@ -151,7 +154,10 @@ pub fn Paragraph(props: ParagraphProps) -> Element {
     let theme = use_theme();
     
     let color = props.color.unwrap_or_else(|| {
-        theme.tokens.read().colors.foreground.to_rgba()
+        // Safe fallback for when theme isn't initialized yet (SSR/hydration)
+        theme.tokens.try_read()
+            .map(|t| t.colors.foreground.to_rgba())
+            .unwrap_or("#111827".to_string())
     });
     
     let align_css = props.align.as_ref()
@@ -212,9 +218,15 @@ pub fn Caption(props: CaptionProps) -> Element {
     let theme = use_theme();
     
     let color = match props.color {
-        CaptionColor::Muted => theme.tokens.read().colors.muted.to_rgba(),
-        CaptionColor::Secondary => theme.tokens.read().colors.secondary.to_rgba(),
-        CaptionColor::Error => theme.tokens.read().colors.destructive.to_rgba(),
+        CaptionColor::Muted => theme.tokens.try_read()
+            .map(|t| t.colors.muted.to_rgba())
+            .unwrap_or("#6b7280".to_string()),
+        CaptionColor::Secondary => theme.tokens.try_read()
+            .map(|t| t.colors.secondary.to_rgba())
+            .unwrap_or("#4b5563".to_string()),
+        CaptionColor::Error => theme.tokens.try_read()
+            .map(|t| t.colors.destructive.to_rgba())
+            .unwrap_or("#dc2626".to_string()),
         CaptionColor::Success => "#16a34a".to_string(),
         CaptionColor::Custom(c) => c,
     };
@@ -255,11 +267,15 @@ pub fn Blockquote(props: BlockquoteProps) -> Element {
     let theme = use_theme();
     
     let border_color = props.border_color.unwrap_or_else(|| {
-        theme.tokens.read().colors.primary.to_rgba()
+        theme.tokens.try_read()
+            .map(|t| t.colors.primary.to_rgba())
+            .unwrap_or("#3b82f6".to_string())
     });
     
     let background = props.background.unwrap_or_else(|| {
-        theme.tokens.read().colors.muted.to_rgba()
+        theme.tokens.try_read()
+            .map(|t| t.colors.muted.to_rgba())
+            .unwrap_or("#f3f4f6".to_string())
     });
     
     let class_css = props.class.as_ref()
