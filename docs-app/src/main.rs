@@ -194,14 +194,37 @@ fn DocsLayout() -> Element {
 #[component]
 fn Sidebar() -> Element {
     let current_route = use_route::<Route>();
+    let theme = use_theme();
+    
+    // Reactive CSS variables that update when theme changes
+    let sidebar_style = use_memo(move || {
+        let t = theme.tokens.read();
+        format!(
+            "width: 260px; min-width: 260px; height: 100vh; position: fixed; left: 0; top: 0; overflow-y: auto; padding: 24px 16px; box-sizing: border-box; background: {}; border-right: 1px solid {}; --sb-text: {}; --sb-primary: {}; --sb-muted: {};",
+            t.colors.background.to_rgba(),
+            t.colors.border.to_rgba(),
+            t.colors.foreground.to_rgba(),
+            t.colors.primary.to_rgba(),
+            t.colors.muted.to_rgba(),
+        )
+    });
     
     rsx! {
+        // Static CSS rules - variables come from parent inline style
+        style {{ r#"
+            .nav-link { display: block; padding: 6px 12px; margin: 2px 0; border-radius: 6px; font-size: 14px; text-decoration: none; color: var(--sb-text); transition: background 0.15s ease; }
+            .nav-link:hover { background: color-mix(in srgb, var(--sb-primary) 15%, transparent); }
+            .nav-link.active { background: var(--sb-primary); color: #ffffff; font-weight: 500; }
+            .nav-link.active:hover { opacity: 0.9; }
+        "# }}
+        
         aside {
-            style: "width: 260px; min-width: 260px; background: #fff; border-right: 1px solid #e5e7eb; height: 100vh; position: fixed; left: 0; top: 0; overflow-y: auto; padding: 24px 16px; box-sizing: border-box;",
+            style: "{sidebar_style}",
+            style: "width: 260px; min-width: 260px; height: 100vh; position: fixed; left: 0; top: 0; overflow-y: auto; padding: 24px 16px; box-sizing: border-box;",
             
             Link {
                 to: Route::Home {},
-                style: "display: block; font-size: 20px; font-weight: 700; color: #000; text-decoration: none; margin-bottom: 32px; padding: 0 8px;",
+                style: "display: block; font-size: 20px; font-weight: 700; color: var(--sb-text); text-decoration: none; margin-bottom: 32px; padding: 0 8px;",
                 "Dioxus UI"
             }
             
@@ -307,12 +330,20 @@ fn NavSection(title: String, current_route: Route, items: Vec<(&'static str, Rou
                 onclick: move |_| expanded.set(!expanded()),
                 
                 h3 {
-                    style: if is_active_section { "margin: 0; font-size: 12px; font-weight: 600; color: #000; text-transform: uppercase; letter-spacing: 0.05em;" } else { "margin: 0; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;" },
+                    style: if is_active_section { 
+                        "margin: 0; font-size: 12px; font-weight: 600; color: var(--sb-text); text-transform: uppercase; letter-spacing: 0.05em;" 
+                    } else { 
+                        "margin: 0; font-size: 12px; font-weight: 600; color: var(--sb-muted); text-transform: uppercase; letter-spacing: 0.05em;" 
+                    },
                     "{title}"
                 }
                 
                 span {
-                    style: if expanded() { "font-size: 10px; color: #9ca3af; transition: transform 0.2s;" } else { "font-size: 10px; color: #9ca3af; transition: transform 0.2s; transform: rotate(-90deg);" },
+                    style: if expanded() { 
+                        "font-size: 10px; color: var(--sb-muted); transition: transform 0.2s;" 
+                    } else { 
+                        "font-size: 10px; color: var(--sb-muted); transition: transform 0.2s; transform: rotate(-90deg);" 
+                    },
                     "▼"
                 }
             }
@@ -325,7 +356,6 @@ fn NavSection(title: String, current_route: Route, items: Vec<(&'static str, Rou
                         NavLink {
                             label: label.to_string(),
                             route: route.clone(),
-                            is_active: current_route == route,
                         }
                     }
                 }
@@ -334,17 +364,15 @@ fn NavSection(title: String, current_route: Route, items: Vec<(&'static str, Rou
     }
 }
 
-/// Individual navigation link
+/// Individual navigation link using Link's active_class prop
 #[component]
-fn NavLink(label: String, route: Route, is_active: bool) -> Element {
+fn NavLink(label: String, route: Route) -> Element {
     rsx! {
         Link {
+            key: "{label}",
             to: route,
-            style: if is_active { 
-                "display: block; padding: 6px 12px; margin: 2px 0; border-radius: 6px; background: #1f2937; color: #fff; font-size: 14px; font-weight: 500; text-decoration: none;"
-            } else { 
-                "display: block; padding: 6px 12px; margin: 2px 0; border-radius: 6px; color: #4b5563; font-size: 14px; text-decoration: none;"
-            },
+            class: "nav-link",
+            active_class: "active",
             "{label}"
         }
     }
