@@ -242,6 +242,7 @@ pub fn LabelPage() -> Element {
                         Label { size: TextSize::ExtraLarge, "Extra Large" }
                     }
                 }
+                CodeBlock { code: "Label {{ size: TextSize::Large, \"Large Text\" }}".to_string() }
             }
         }
     }
@@ -338,6 +339,13 @@ pub fn RadioPage() -> Element {
                         }
                     }
                 }
+                CodeBlock { code: "Radio {{
+    name: \"group\".to_string(),
+    value: \"option1\".to_string(),
+    checked: selected() == \"option1\",
+    label: Some(\"Option 1\".to_string()),
+    onchange: move |_| selected.set(\"option1\".to_string()),
+}}".to_string() }
             }
         }
     }
@@ -361,6 +369,11 @@ pub fn SwitchPage() -> Element {
                         onchange: move |v| on.set(v),
                     }
                 }
+                CodeBlock { code: "Switch {{
+    checked: enabled(),
+    label: Some(\"Enable notifications\".to_string()),
+    onchange: move |v| enabled.set(v),
+}}".to_string() }
             }
         }
     }
@@ -388,6 +401,14 @@ pub fn SelectPage() -> Element {
                         }
                     }
                 }
+                CodeBlock { code: "Select {{
+    value: selected(),
+    options: vec![
+        SelectOption::new(\"option1\", \"Option 1\"),
+        SelectOption::new(\"option2\", \"Option 2\"),
+    ],
+    onchange: move |v| selected.set(v),
+}}".to_string() }
             }
         }
     }
@@ -412,6 +433,12 @@ pub fn TextAreaPage() -> Element {
                         }
                     }
                 }
+                CodeBlock { code: "TextArea {{
+    value: description(),
+    rows: 4,
+    placeholder: Some(\"Enter description...\".to_string()),
+    onchange: move |v| description.set(v),
+}}".to_string() }
             }
         }
     }
@@ -442,6 +469,10 @@ pub fn StepPage() -> Element {
                         }
                     }
                 }
+                CodeBlock { code: "StepIndicator {{
+    step: 1,
+    state: StepState::Completed,
+}}".to_string() }
             }
         }
     }
@@ -585,6 +616,11 @@ pub fn DividerPage() -> Element {
                         span { "Right" }
                     }
                 }
+                CodeBlock { code: "Divider {{
+    label: Some(\"OR\".to_string()),
+    orientation: DividerOrientation::Horizontal,
+    variant: DividerVariant::Solid,
+}}".to_string() }
             }
         }
     }
@@ -622,6 +658,13 @@ pub fn ProgressPage() -> Element {
                 ExampleBox {
                     Progress { value: None, indeterminate: true, variant: ProgressVariant::Linear, size: ProgressSize::Md }
                 }
+                CodeBlock { code: "Progress {{
+    value: Some(75.0),
+    max: 100.0,
+    show_label: true,
+    variant: ProgressVariant::Linear,
+    size: ProgressSize::Md,
+}}".to_string() }
             }
         }
     }
@@ -656,6 +699,10 @@ pub fn SpinnerPage() -> Element {
                         Spinner { variant: SpinnerVariant::Circular, size: SpinnerSize::Xl }
                     }
                 }
+                CodeBlock { code: "Spinner {{
+    variant: SpinnerVariant::Circular,
+    size: SpinnerSize::Lg,
+}}".to_string() }
             }
         }
     }
@@ -693,6 +740,11 @@ pub fn SkeletonAtomPage() -> Element {
                 ExampleBox {
                     SkeletonText { lines: 4, line_height: 1.5, last_line_width: 80, animated: true }
                 }
+                CodeBlock { code: "Skeleton {{
+    shape: SkeletonShape::Text,
+    width: Some(\"200px\".to_string()),
+    animated: true,
+}}".to_string() }
             }
         }
     }
@@ -725,6 +777,13 @@ pub fn RatingPage() -> Element {
                         span { "Current: {rating}" }
                     }
                 }
+                CodeBlock { code: "Rating {{
+    value: rating(),
+    interactive: true,
+    on_change: Some(EventHandler::new(move |v| rating.set(v))),
+    max: 5,
+    size: 24,
+}}".to_string() }
             }
         }
     }
@@ -741,7 +800,8 @@ pub fn DatePickerPage() -> Element {
             description: "Date and date range selection input.",
             
             Section { title: "Basic Date Picker",
-                ExampleBox {
+                div {
+                    style: "padding: 24px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; min-height: 300px;",
                     DatePicker {
                         value: date(),
                         on_change: Some(EventHandler::new(move |d: String| date.set(Some(d)))),
@@ -751,13 +811,21 @@ pub fn DatePickerPage() -> Element {
             }
             
             Section { title: "With Constraints",
-                ExampleBox {
+                div {
+                    style: "padding: 24px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; min-height: 300px;",
                     DatePicker {
                         label: Some("Select Date".to_string()),
                         min: Some("2024-01-01".to_string()),
                         max: Some("2024-12-31".to_string())
                     }
                 }
+                CodeBlock { code: "DatePicker {{
+    value: date(),
+    on_change: Some(EventHandler::new(move |d| date.set(Some(d)))),
+    label: Some(\"Select Date\".to_string()),
+    min: Some(\"2024-01-01\".to_string()),
+    max: Some(\"2024-12-31\".to_string()),
+}}".to_string() }
             }
         }
     }
@@ -795,6 +863,16 @@ pub fn SliderPage() -> Element {
                         ]
                     }
                 }
+                CodeBlock { code: "Slider {{
+    value: value(),
+    on_change: EventHandler::new(move |v| value.set(v)),
+    label: Some(\"Volume\".to_string()),
+    marks: vec![
+        SliderMark {{ value: 0.0, label: Some(\"0%\".to_string()) }},
+        SliderMark {{ value: 50.0, label: Some(\"50%\".to_string()) }},
+        SliderMark {{ value: 100.0, label: Some(\"100%\".to_string()) }},
+    ],
+}}".to_string() }
             }
         }
     }
@@ -837,6 +915,20 @@ pub fn TagPage() -> Element {
             }
             
             Section { title: "Removable Tags",
+                ExampleBox {
+                    HStack { gap: SpacingSize::Sm, style: "flex-wrap: wrap;",
+                        Tag { removable: true, on_remove: Some(EventHandler::new(move |_| {})), children: rsx! { "Removable" } }
+                    }
+                }
+                CodeBlock { code: "Tag {{
+    variant: TagVariant::Primary,
+    removable: true,
+    on_remove: Some(EventHandler::new(move |_| {{}})),
+    children: rsx! {{ \"Tag Label\" }}
+}}".to_string() }
+            }
+            
+            Section { title: "Tag Group",
                 ExampleBox {
                     HStack { gap: SpacingSize::Sm, style: "flex-wrap: wrap;",
                         Tag { removable: true, on_remove: Some(EventHandler::new(move |_| {})), children: rsx! { "Removable" } }

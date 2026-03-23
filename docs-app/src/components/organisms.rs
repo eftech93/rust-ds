@@ -51,6 +51,18 @@ pub fn HeaderPage() -> Element {
                         }
                     }
                 }
+                CodeBlock { code: "Header {{
+    brand_title: \"MyApp\",
+    nav_items: vec![
+        NavItem {{
+            label: \"Home\".to_string(),
+            href: \"/\".to_string(),
+            icon: Some(\"home\".to_string()),
+            active: true,
+        }},
+    ],
+    actions: rsx! {{ Button {{ \"Sign In\" }} }},
+}}".to_string() }
             }
         }
     }
@@ -88,6 +100,16 @@ pub fn LayoutPage() -> Element {
                         }
                     }
                 }
+                CodeBlock { code: "Layout {{
+    layout_type: LayoutType::Sidebar,
+    nav_items: vec![
+        LayoutNavItem::new(\"home\", \"Home\", \"/\").with_icon(\"home\"),
+    ],
+    brand: Some(rsx! {{ \"MyApp\" }}),
+    title: Some(\"Dashboard\".to_string()),
+    collapsible: true,
+    // Content goes here
+}}".to_string() }
             }
         }
     }
@@ -125,6 +147,25 @@ pub fn TabsPage() -> Element {
                         }
                     }
                 }
+                CodeBlock { code: "let tabs = vec![
+    TabItem::new(\"account\", \"Account\").with_icon(\"user\"),
+    TabItem::new(\"password\", \"Password\"),
+];
+
+let mut active = use_signal(|| \"account\".to_string());
+
+Tabs {{
+    tabs: tabs,
+    active_tab: active(),
+    on_change: move |id| active.set(id),
+    TabPanel {{
+        if active() == \"account\" {{
+            \"Account settings content\"
+        }} else {{
+            \"Other content\"
+        }}
+    }}
+}}".to_string() }
             }
         }
     }
@@ -154,6 +195,22 @@ pub fn AccordionPage() -> Element {
                         multiple: true,
                     }
                 }
+                CodeBlock { code: "let items = vec![
+    AccordionItem::new(
+        \"item1\",
+        \"Question 1?\",
+        \"Answer to question 1.\"
+    ),
+];
+
+let mut expanded = use_signal(|| vec![\"item1\".to_string()]);
+
+Accordion {{
+    items: items,
+    expanded: expanded(),
+    on_change: move |ids| expanded.set(ids),
+    multiple: true,
+}}".to_string() }
             }
         }
     }
@@ -222,6 +279,13 @@ pub fn CardsPage() -> Element {
                         }
                     }
                 }
+                CodeBlock { code: "ActionCard {{
+    title: \"Deploy Project\",
+    description: \"Your project is ready to deploy.\",
+    action_label: \"Deploy Now\",
+    on_action: move |_| {{}},
+    icon: Some(\"rocket\".to_string()),
+}}".to_string() }
             }
         }
     }
@@ -635,6 +699,18 @@ pub fn StepperWizardPage() -> Element {
                         }
                     }
                 }
+                CodeBlock { code: "let steps = vec![
+    WizardStep::new(\"Step 1\").with_description(\"Description\"),
+    WizardStep::new(\"Step 2\").with_description(\"Description\"),
+];
+
+Wizard {{
+    steps: steps,
+    active_step: 0,
+    on_step_change: move |step| {{}},
+    on_finish: move |_| {{}},
+    // Step content goes here
+}}".to_string() }
             }
             
             Section { title: "Validation States",
@@ -1130,6 +1206,16 @@ pub fn FooterPage() -> Element {
                         copyright: "© 2024".to_string()
                     }
                 }
+                CodeBlock { code: "Footer {{
+    brand: Some(rsx! {{ span {{ \"Brand\" }} }}),
+    description: Some(\"Description text\".to_string()),
+    link_groups: vec![
+        FooterLinkGroup::new(\"Product\").with_links(vec![
+            FooterLink::new(\"Features\", \"/features\"),
+        ]),
+    ],
+    copyright: Some(\"© 2024\".to_string()),
+}}".to_string() }
             }
         }
     }
@@ -1163,6 +1249,13 @@ pub fn NotificationCenterPage() -> Element {
                         BannerAlert { message: "Warning: Check your settings.".to_string(), variant: ToastVariant::Warning, dismissible: true }
                     }
                 }
+                CodeBlock { code: "NotificationCenter {{
+    notifications: vec![
+        Notification::new(\"1\", \"Title\", \"Message\")
+            .with_variant(ToastVariant::Info),
+    ],
+    unread_count: 1,
+}}".to_string() }
             }
         }
     }
@@ -1215,6 +1308,14 @@ pub fn HeroPage() -> Element {
                         ]
                     }
                 }
+                CodeBlock { code: "Hero {{
+    title: \"Build faster\".to_string(),
+    subtitle: Some(\"Description here\".to_string()),
+    primary_cta: Some(HeroCta::new(\"Get Started\").with_href(\"#\")),
+    secondary_cta: Some(HeroCta::new(\"Learn More\").with_href(\"#\")),
+    align: HeroAlign::Center,
+    size: HeroSize::Lg,
+}}".to_string() }
             }
         }
     }
@@ -1250,6 +1351,16 @@ pub fn FileUploadPage() -> Element {
                         loading: false, disabled: false
                     }
                 }
+                CodeBlock { code: "FileUpload {{
+    on_upload: EventHandler::new(move |files| {{
+        // Handle uploaded files
+    }}),
+    label: Some(\"Upload Documents\".to_string()),
+    helper_text: Some(\"PDF, PNG, JPG up to 10MB\".to_string()),
+    accept: Some(\".pdf,.png,.jpg\".to_string()),
+    multiple: true,
+    max_files: 5,
+}}".to_string() }
             }
         }
     }
@@ -1310,6 +1421,18 @@ pub fn ConfirmationDialogPage() -> Element {
                         }
                     }
                 }
+                CodeBlock { code: "let mut show_delete = use_signal(|| false);
+
+DeleteConfirmDialog {{
+    open: show_delete(),
+    on_close: move |_| show_delete.set(false),
+    item_name: \"My Document\".to_string(),
+    on_confirm: EventHandler::new(move |_| {{
+        // Handle delete
+        show_delete.set(false);
+    }}),
+    loading: false,
+}}".to_string() }
             }
         }
     }

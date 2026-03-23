@@ -62,6 +62,18 @@ pub fn CardPage() -> Element {
                     }
                 }
             }
+            
+            Section { title: "Usage",
+                CodeBlock { code: "Card {{
+    variant: CardVariant::Default,
+    padding: Some(\"16px\".to_string()),
+    CardHeader {{
+        title: \"Card Title\",
+        subtitle: Some(\"Subtitle\".to_string()),
+    }}
+    CardContent {{ \"Content here\" }}
+}}".to_string() }
+            }
         }
     }
 }
@@ -83,6 +95,11 @@ pub fn BadgePage() -> Element {
                         Badge { variant: BadgeVariant::Destructive, "Error" }
                     }
                 }
+                CodeBlock { code: "Badge {{
+    variant: BadgeVariant::Success,
+    icon: Some(\"check\".to_string()),
+    \"Success\"
+}}".to_string() }
             }
         }
     }
@@ -103,6 +120,12 @@ pub fn AlertPage() -> Element {
                         Alert { variant: AlertVariant::Warning, title: Some("Warning".to_string()), icon: Some("alert-triangle".to_string()), "Please review your settings." }
                     }
                 }
+                CodeBlock { code: "Alert {{
+    variant: AlertVariant::Success,
+    title: Some(\"Success\".to_string()),
+    icon: Some(\"check-circle\".to_string()),
+    \"Operation completed!\"
+}}".to_string() }
             }
         }
     }
@@ -125,6 +148,12 @@ pub fn AvatarPage() -> Element {
                         Avatar { size: AvatarSize::Xl, name: Some("XL".to_string()), src: None, alt: "".to_string(), fallback: None, style: None, class: None }
                     }
                 }
+                CodeBlock { code: "Avatar {{
+    size: AvatarSize::Md,
+    name: Some(\"JD\".to_string()),
+    src: Some(\"avatar.png\".to_string()),
+    alt: \"User avatar\".to_string(),
+}}".to_string() }
             }
         }
     }
@@ -158,6 +187,20 @@ pub fn DialogPage() -> Element {
                         }
                     }
                 }
+                CodeBlock { code: "let mut open = use_signal(|| false);
+
+Dialog {{
+    open: open(),
+    on_close: move |_| open.set(false),
+    title: Some(\"Dialog Title\".to_string()),
+    description: Some(\"Description\".to_string()),
+    // Content here
+    DialogFooter {{
+        align: DialogFooterAlign::End,
+        Button {{ onclick: move |_| open.set(false), \"Cancel\" }}
+        Button {{ variant: ButtonVariant::Primary, onclick: move |_| open.set(false), \"Confirm\" }}
+    }}
+}}".to_string() }
             }
         }
     }
@@ -351,6 +394,7 @@ pub fn SeparatorPage() -> Element {
                         span { "Content below" }
                     }
                 }
+                CodeBlock { code: "Separator {{}}".to_string() }
             }
         }
     }
@@ -376,6 +420,11 @@ pub fn SkeletonMoleculePage() -> Element {
                         SkeletonText { lines: 3, animate: true, last_line_width: 60, style: None }
                     }
                 }
+                CodeBlock { code: "Skeleton {{
+    width: Some(\"150px\".to_string()),
+    height: None,
+    animate: true,
+}}".to_string() }
             }
         }
     }
@@ -469,6 +518,15 @@ pub fn StepperPage() -> Element {
                         }
                     }
                 }
+                CodeBlock { code: "let steps = vec![
+    StepItem::new(\"Step 1\").with_description(\"Description\"),
+    StepItem::new(\"Step 2\").with_icon(\"⚙️\"),
+];
+
+HorizontalStepper {{
+    steps: steps,
+    active_step: 1,
+}}".to_string() }
             }
         }
     }
@@ -603,6 +661,18 @@ pub fn ComboboxPage() -> Element {
                         value: None
                     }
                 }
+                CodeBlock { code: "let options = vec![
+    ComboboxOption::new(\"rust\", \"Rust\"),
+    ComboboxOption::new(\"go\", \"Go\"),
+];
+
+Combobox {{
+    options: options,
+    value: selected(),
+    on_change: EventHandler::new(move |v| selected.set(Some(v))),
+    label: Some(\"Select Language\".to_string()),
+    placeholder: Some(\"Search...\".to_string()),
+}}".to_string() }
             }
         }
     }
@@ -644,6 +714,13 @@ pub fn MediaObjectPage() -> Element {
                         liked: false
                     }
                 }
+                CodeBlock { code: "Comment {{
+    author: \"Jane Doe\".to_string(),
+    content: \"Comment text here\".to_string(),
+    timestamp: \"2 hours ago\".to_string(),
+    like_count: 5,
+    liked: false,
+}}".to_string() }
             }
         }
     }
@@ -694,6 +771,16 @@ pub fn PaginationPage() -> Element {
                         Pagination { total_pages: 9, current_page: 1, on_change: EventHandler::new(move |_p: u32| {}), sibling_count: 1, show_first_last: true, show_prev_next: true, simple: false }
                     }
                 }
+                CodeBlock { code: "let mut page = use_signal(|| 1);
+
+Pagination {{
+    total_pages: 10,
+    current_page: page(),
+    on_change: EventHandler::new(move |p| page.set(p)),
+    sibling_count: 1,
+    show_first_last: true,
+    show_prev_next: true,
+}}".to_string() }
             }
         }
     }
@@ -733,6 +820,14 @@ pub fn ListItemPage() -> Element {
                     ActionListItem { label: "Edit".to_string(), icon: Some("✏️".to_string()), on_click: EventHandler::new(move |_| {}), description: None, shortcut: None, destructive: false, disabled: false }
                     ActionListItem { label: "Delete".to_string(), icon: Some("🗑️".to_string()), destructive: true, on_click: EventHandler::new(move |_| {}), description: None, shortcut: None, disabled: false }
                 }
+                CodeBlock { code: "ListItem {{
+    title: \"Item Title\".to_string(),
+    description: Some(\"Description text\".to_string()),
+    leading: Some(rsx! {{ span {{ \"📁\" }} }}),
+    trailing: Some(rsx! {{ span {{ \"→\" }} }}),
+    variant: ListItemVariant::Default,
+    hoverable: true,
+}}".to_string() }
             }
         }
     }

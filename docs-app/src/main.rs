@@ -7,7 +7,6 @@
 
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
-use dioxus_ui_system::atoms::{Box, VStack, HStack};
 
 mod components;
 mod guides;
@@ -174,175 +173,183 @@ pub enum Route {
     LayoutsPage {},
 }
 
-/// Docs layout with sidebar navigation
+/// Docs layout with custom sidebar using Dioxus Router
 #[component]
 fn DocsLayout() -> Element {
     rsx! {
-        VStack {
-            style: "font-family: 'Inter', system-ui, -apple-system, sans-serif; min-height: 100vh;",
+        div {
+            style: "display: flex; min-height: 100vh;",
             
-            // Header
-            Header {
-                brand_title: "Dioxus UI Docs",
-                nav_items: vec![],
-                actions: rsx! {
-                    ThemeToggle {}
-                },
-            }
+            Sidebar {}
             
-            // Main content area with sidebar
-            HStack {
-                style: "flex: 1;",
-                
-                // Sidebar Navigation
-                Sidebar {}
-                
-                // Content area
-                Box {
-                    style: "flex: 1; padding: 32px; max-width: 900px; margin: 0 auto;",
-                    Outlet::<Route> {}
-                }
+            div {
+                style: "flex: 1; margin-left: 260px; padding: 32px; max-width: 900px;",
+                Outlet::<Route> {}
             }
         }
     }
 }
 
-/// Sidebar navigation component
+/// Sidebar navigation component with collapsible sections
 #[component]
 fn Sidebar() -> Element {
     let current_route = use_route::<Route>();
     
     rsx! {
         aside {
-            style: "width: 260px; background: rgb(248,250,252); border-right: 1px solid rgb(226,232,240); padding: 24px 16px; overflow-y: auto; position: sticky; top: 64px; height: calc(100vh - 64px);",
+            style: "width: 260px; min-width: 260px; background: #fff; border-right: 1px solid #e5e7eb; height: 100vh; position: fixed; left: 0; top: 0; overflow-y: auto; padding: 24px 16px; box-sizing: border-box;",
             
-            h2 {
-                style: "margin: 0 0 24px 0; font-size: 14px; font-weight: 700; color: rgb(148,163,184); text-transform: uppercase; letter-spacing: 0.05em;",
-                "Navigation"
+            Link {
+                to: Route::Home {},
+                style: "display: block; font-size: 20px; font-weight: 700; color: #000; text-decoration: none; margin-bottom: 32px; padding: 0 8px;",
+                "Dioxus UI"
             }
             
-            VStack {
-                style: "gap: 4px;",
-                
-                // Getting Started
-                NavSection { title: "Getting Started", items: vec![
-                    ("Home", Route::Home {}),
-                    ("Quick Start", Route::QuickStartPage {}),
-                ], current_route: current_route.clone() }
-                
-                // Atoms
-                NavSection { title: "Atoms", items: vec![
-                    ("Overview", Route::AtomsPage {}),
-                    ("Box", Route::BoxPage {}),
-                    ("Button", Route::ButtonPage {}),
-                    ("Input", Route::InputPage {}),
-                    ("Label", Route::LabelPage {}),
-                    ("Icon", Route::IconPage {}),
-                    ("Checkbox", Route::CheckboxPage {}),
-                    ("Radio", Route::RadioPage {}),
-                    ("Switch", Route::SwitchPage {}),
-                    ("Select", Route::SelectPage {}),
-                    ("TextArea", Route::TextAreaPage {}),
-                    ("Step", Route::StepPage {}),
-                    ("Heading", Route::HeadingPage {}),
-                    ("Divider", Route::DividerPage {}),
-                    ("Progress", Route::ProgressPage {}),
-                    ("Spinner", Route::SpinnerPage {}),
-                    ("Skeleton", Route::SkeletonAtomPage {}),
-                    ("Rating", Route::RatingPage {}),
-                    ("DatePicker", Route::DatePickerPage {}),
-                    ("Slider", Route::SliderPage {}),
-                    ("Tag", Route::TagPage {}),
-                ], current_route: current_route.clone() }
-                
-                // Molecules
-                NavSection { title: "Molecules", items: vec![
-                    ("Overview", Route::MoleculesPage {}),
-                    ("Card", Route::CardPage {}),
-                    ("Badge", Route::BadgePage {}),
-                    ("Alert", Route::AlertPage {}),
-                    ("Avatar", Route::AvatarPage {}),
-                    ("Dialog", Route::DialogPage {}),
-                    ("Dropdown", Route::DropdownPage {}),
-                    ("Tooltip", Route::TooltipPage {}),
-                    ("Separator", Route::SeparatorPage {}),
-                    ("Skeleton", Route::SkeletonPage {}),
-                    ("Stepper", Route::StepperPage {}),
-                    ("Toast", Route::ToastPage {}),
-                    ("Combobox", Route::ComboboxPage {}),
-                    ("Media Object", Route::MediaObjectPage {}),
-                    ("Pagination", Route::PaginationPage {}),
-                    ("List Item", Route::ListItemPage {}),
-                ], current_route: current_route.clone() }
-                
-                // Organisms
-                NavSection { title: "Organisms", items: vec![
-                    ("Overview", Route::OrganismsPage {}),
-                    ("Header", Route::HeaderPage {}),
-                    ("Layout", Route::LayoutPage {}),
-                    ("Tabs", Route::TabsPage {}),
-                    ("Accordion", Route::AccordionPage {}),
-                    ("Cards", Route::CardsPage {}),
-                    ("DataTable", Route::DataTablePage {}),
-                    ("Stepper Wizard", Route::StepperWizardPage {}),
-                    ("Charts", Route::ChartsPage {}),
-                    ("Footer", Route::FooterPage {}),
-                    ("Notification Center", Route::NotificationCenterPage {}),
-                    ("Hero", Route::HeroPage {}),
-                    ("File Upload", Route::FileUploadPage {}),
-                    ("Confirmation Dialog", Route::ConfirmationDialogPage {}),
-                ], current_route: current_route.clone() }
-                
-                // Themes
-                NavSection { title: "Themes", items: vec![
-                    ("Overview", Route::ThemesPage {}),
-                    ("Design Tokens", Route::ThemeTokensPage {}),
-                    ("Custom Themes", Route::CustomThemePage {}),
-                    ("Preset Themes", Route::PresetThemesPage {}),
-                ], current_route: current_route.clone() }
-                
-                // Guides
-                NavSection { title: "Guides", items: vec![
-                    ("All Guides", Route::GuidesPage {}),
-                    ("Styling", Route::StylingPage {}),
-                    ("Forms", Route::FormsPage {}),
-                    ("Layouts", Route::LayoutsPage {}),
-                ], current_route: current_route.clone() }
-            }
+            // Getting Started
+            NavSection { title: "Getting Started", current_route: current_route.clone(), items: vec![
+                ("Home", Route::Home {}),
+                ("Quick Start", Route::QuickStartPage {}),
+            ]}
+            
+            // Atoms
+            NavSection { title: "Atoms", current_route: current_route.clone(), items: vec![
+                ("Overview", Route::AtomsPage {}),
+                ("Box", Route::BoxPage {}),
+                ("Button", Route::ButtonPage {}),
+                ("Checkbox", Route::CheckboxPage {}),
+                ("DatePicker", Route::DatePickerPage {}),
+                ("Divider", Route::DividerPage {}),
+                ("Heading", Route::HeadingPage {}),
+                ("Icon", Route::IconPage {}),
+                ("Input", Route::InputPage {}),
+                ("Label", Route::LabelPage {}),
+                ("Progress", Route::ProgressPage {}),
+                ("Radio", Route::RadioPage {}),
+                ("Rating", Route::RatingPage {}),
+                ("Select", Route::SelectPage {}),
+                ("Skeleton", Route::SkeletonAtomPage {}),
+                ("Slider", Route::SliderPage {}),
+                ("Spinner", Route::SpinnerPage {}),
+                ("Step", Route::StepPage {}),
+                ("Switch", Route::SwitchPage {}),
+                ("Tag", Route::TagPage {}),
+                ("TextArea", Route::TextAreaPage {}),
+            ]}
+            
+            // Molecules
+            NavSection { title: "Molecules", current_route: current_route.clone(), items: vec![
+                ("Overview", Route::MoleculesPage {}),
+                ("Alert", Route::AlertPage {}),
+                ("Avatar", Route::AvatarPage {}),
+                ("Badge", Route::BadgePage {}),
+                ("Card", Route::CardPage {}),
+                ("Combobox", Route::ComboboxPage {}),
+                ("Dialog", Route::DialogPage {}),
+                ("Dropdown", Route::DropdownPage {}),
+                ("List Item", Route::ListItemPage {}),
+                ("Media Object", Route::MediaObjectPage {}),
+                ("Pagination", Route::PaginationPage {}),
+                ("Separator", Route::SeparatorPage {}),
+                ("Skeleton", Route::SkeletonPage {}),
+                ("Stepper", Route::StepperPage {}),
+                ("Toast", Route::ToastPage {}),
+                ("Tooltip", Route::TooltipPage {}),
+            ]}
+            
+            // Organisms
+            NavSection { title: "Organisms", current_route: current_route.clone(), items: vec![
+                ("Overview", Route::OrganismsPage {}),
+                ("Accordion", Route::AccordionPage {}),
+                ("Cards", Route::CardsPage {}),
+                ("Charts", Route::ChartsPage {}),
+                ("Confirmation Dialog", Route::ConfirmationDialogPage {}),
+                ("DataTable", Route::DataTablePage {}),
+                ("File Upload", Route::FileUploadPage {}),
+                ("Footer", Route::FooterPage {}),
+                ("Header", Route::HeaderPage {}),
+                ("Hero", Route::HeroPage {}),
+                ("Layout", Route::LayoutPage {}),
+                ("Notification Center", Route::NotificationCenterPage {}),
+                ("Stepper Wizard", Route::StepperWizardPage {}),
+                ("Tabs", Route::TabsPage {}),
+            ]}
+            
+            // Themes & Guides
+            NavSection { title: "Themes", current_route: current_route.clone(), items: vec![
+                ("Overview", Route::ThemesPage {}),
+                ("Design Tokens", Route::ThemeTokensPage {}),
+                ("Custom Themes", Route::CustomThemePage {}),
+                ("Preset Themes", Route::PresetThemesPage {}),
+            ]}
+            
+            NavSection { title: "Guides", current_route: current_route.clone(), items: vec![
+                ("Overview", Route::GuidesPage {}),
+                ("Styling", Route::StylingPage {}),
+                ("Forms", Route::FormsPage {}),
+                ("Layouts", Route::LayoutsPage {}),
+            ]}
         }
     }
 }
 
-/// Navigation section in sidebar
+/// Navigation section with collapsible items
 #[component]
-fn NavSection(title: String, items: Vec<(&'static str, Route)>, current_route: Route) -> Element {
+fn NavSection(title: String, current_route: Route, items: Vec<(&'static str, Route)>) -> Element {
+    let mut expanded = use_signal(|| true);
+    let is_active_section = items.iter().any(|(_, r)| *r == current_route);
+    
     rsx! {
-        Box {
+        div {
             style: "margin-bottom: 16px;",
             
-            h3 {
-                style: "margin: 0 0 8px 0; font-size: 12px; font-weight: 600; color: rgb(100,116,139); padding-left: 12px;",
-                "{title}"
+            div {
+                style: "display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; border-radius: 6px; transition: background 0.15s;",
+                onclick: move |_| expanded.set(!expanded()),
+                
+                h3 {
+                    style: if is_active_section { "margin: 0; font-size: 12px; font-weight: 600; color: #000; text-transform: uppercase; letter-spacing: 0.05em;" } else { "margin: 0; font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em;" },
+                    "{title}"
+                }
+                
+                span {
+                    style: if expanded() { "font-size: 10px; color: #9ca3af; transition: transform 0.2s;" } else { "font-size: 10px; color: #9ca3af; transition: transform 0.2s; transform: rotate(-90deg);" },
+                    "▼"
+                }
             }
             
-            VStack {
-                style: "gap: 2px;",
-                
-                for (label, route) in items {
-                    Link {
-                        to: route.clone(),
-                        style: if current_route == route { 
-                            "padding: 6px 12px; border-radius: 6px; background: rgb(15,23,42); color: white; font-size: 14px; text-decoration: none; display: block;"
-                        } else { 
-                            "padding: 6px 12px; border-radius: 6px; color: rgb(71,85,105); font-size: 14px; text-decoration: none; display: block; &:hover {{ background: rgb(226,232,240); }}"
-                        },
-                        "{label}"
+            if expanded() {
+                div {
+                    style: "margin-top: 4px;",
+                    
+                    for (label, route) in items {
+                        NavLink {
+                            label: label.to_string(),
+                            route: route.clone(),
+                            is_active: current_route == route,
+                        }
                     }
                 }
             }
         }
     }
 }
+
+/// Individual navigation link
+#[component]
+fn NavLink(label: String, route: Route, is_active: bool) -> Element {
+    rsx! {
+        Link {
+            to: route,
+            style: if is_active { 
+                "display: block; padding: 6px 12px; margin: 2px 0; border-radius: 6px; background: #1f2937; color: #fff; font-size: 14px; font-weight: 500; text-decoration: none;"
+            } else { 
+                "display: block; padding: 6px 12px; margin: 2px 0; border-radius: 6px; color: #4b5563; font-size: 14px; text-decoration: none;"
+            },
+            "{label}"
+        }
+    }
+}
+
 
 // Page Components
 
