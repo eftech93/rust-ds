@@ -75,13 +75,45 @@ where
     use_memo(move || f(&theme.tokens.read()))
 }
 
+#[cfg(all(feature = "web", target_arch = "wasm32"))]
+const THEME_STORAGE_KEY: &str = "dioxus-ui-theme";
+
+/// Load theme from localStorage (web only)
+#[cfg(all(feature = "web", target_arch = "wasm32"))]
+fn load_theme_from_storage() -> Option<ThemeTokens> {
+    web_sys::window()
+        .and_then(|w| w.local_storage().ok())
+        .flatten()
+        .and_then(|storage| storage.get_item(THEME_STORAGE_KEY).ok())
+        .flatten()
+        .and_then(|name| ThemeTokens::by_name(&name))
+}
+
+/// Save theme to localStorage (web only)
+#[cfg(all(feature = "web", target_arch = "wasm32"))]
+fn save_theme_to_storage(theme_name: &str) {
+    if let Some(storage) = web_sys::window().and_then(|w| w.local_storage().ok()).flatten() {
+        let _ = storage.set_item(THEME_STORAGE_KEY, theme_name);
+    }
+}
+
+#[cfg(not(all(feature = "web", target_arch = "wasm32")))]
+fn load_theme_from_storage() -> Option<ThemeTokens> {
+    None
+}
+
+#[cfg(not(all(feature = "web", target_arch = "wasm32")))]
+fn save_theme_to_storage(_theme_name: &str) {}
+
 /// Theme provider component
 ///
 /// Wraps children with theme context. Must be placed near the root of your app.
+/// Optionally persists theme selection to localStorage on web.
 ///
 /// # Properties
 /// * `children` - Child elements to render
-/// * `initial_theme` - Optional initial theme (defaults to light theme)
+/// * `initial_theme` - Optional initial theme (defaults to light theme, or loaded from localStorage if persistence enabled)
+/// * `persist_theme` - Whether to save/load theme from localStorage (default: false)
 ///
 /// # Example
 /// ```rust,ignore
@@ -89,6 +121,12 @@ where
 ///
 /// fn App() -> Element {
 ///     rsx! {
+///         // With persistence
+///         ThemeProvider { persist_theme: true,
+///             Home {}
+///         }
+///         
+///         // Without persistence (default)
 ///         ThemeProvider {
 ///             Home {}
 ///         }
@@ -100,11 +138,31 @@ pub fn ThemeProvider(
     children: Element,
     #[props(default)]
     initial_theme: Option<ThemeTokens>,
+    #[props(default = false)]
+    persist_theme: bool,
 ) -> Element {
-    let initial = initial_theme.unwrap_or_else(ThemeTokens::light);
+    // Determine initial theme: explicit prop > localStorage (if enabled) > default light
+    let initial = if persist_theme {
+        initial_theme
+            .or_else(load_theme_from_storage)
+            .unwrap_or_else(ThemeTokens::light)
+    } else {
+        initial_theme.unwrap_or_else(ThemeTokens::light)
+    };
+    
     let mut tokens = use_signal(|| initial);
+    let persist = use_signal(|| persist_theme);
 
     let set_theme = Callback::new(move |new_theme: ThemeTokens| {
+        // Save theme name to localStorage only if persistence is enabled
+        if persist() {
+            let theme_name = match &new_theme.mode {
+                super::tokens::ThemeMode::Light => "light",
+                super::tokens::ThemeMode::Dark => "dark",
+                super::tokens::ThemeMode::Brand(name) => name.as_str(),
+            };
+            save_theme_to_storage(theme_name);
+        }
         tokens.set(new_theme);
     });
 
@@ -115,12 +173,24 @@ pub fn ThemeProvider(
                 super::tokens::ThemeMode::Dark => ThemeTokens::light(),
                 super::tokens::ThemeMode::Brand(_) => ThemeTokens::light(),
             };
+            // Save to localStorage only if persistence is enabled
+            if persist() {
+                let theme_name = match &new_theme.mode {
+                    super::tokens::ThemeMode::Light => "light",
+                    super::tokens::ThemeMode::Dark => "dark",
+                    super::tokens::ThemeMode::Brand(name) => name.as_str(),
+                };
+                save_theme_to_storage(theme_name);
+            }
             *current = new_theme;
         });
     });
 
     let set_theme_by_name = Callback::new(move |name: String| {
         if let Some(new_theme) = ThemeTokens::by_name(&name) {
+            if persist() {
+                save_theme_to_storage(&name);
+            }
             tokens.set(new_theme);
         }
     });

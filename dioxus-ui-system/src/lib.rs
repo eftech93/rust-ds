@@ -34,6 +34,7 @@
 
 pub mod theme;
 pub mod styles;
+pub mod config;
 pub mod atoms;
 pub mod molecules;
 pub mod organisms;
@@ -41,6 +42,9 @@ pub mod organisms;
 /// Prelude module for convenient imports
 pub mod prelude {
     //! Convenient re-exports for common types
+    
+    // Config
+    pub use crate::config::{Config, ConfigBuilder, ComponentConfig, global_config, set_global_config};
     
     // Theme
     pub use crate::theme::{
@@ -99,6 +103,16 @@ pub mod prelude {
         MediaObject, MediaObjectProps, MediaContent, MediaContentProps, Comment, CommentProps,
         Pagination, PaginationProps, PaginationSize, PageSizeSelector, PageSizeSelectorProps, PaginationInfo, PaginationInfoProps,
         ListItem, ListItemProps, ListItemVariant, ListGroup, ListGroupProps, ActionListItem, ActionListItemProps, ExpandableListItem, ExpandableListItemProps,
+        // Command palette
+        Command, CommandProps, CommandInput, CommandInputProps, CommandList, CommandListProps, CommandGroup, CommandGroupProps, CommandItem, CommandItemProps, CommandSeparator, CommandEmpty, CommandEmptyProps, CommandShortcut, CommandShortcutProps, CommandLoading,
+        // Sheet
+        Sheet, SheetProps, SheetSide, SheetFooter, SheetFooterProps, SheetFooterAlign,
+        // OTP Input
+        OtpInput, OtpInputProps,
+        // Time Picker
+        TimePicker, TimePickerProps, TimeInput, TimeInputProps,
+        // Context Menu
+        ContextMenu, ContextMenuProps, ContextMenuTrigger, ContextMenuTriggerProps, ContextMenuContent, ContextMenuContentProps, ContextMenuItem, ContextMenuItemProps, ContextMenuSeparator, ContextMenuLabel, ContextMenuLabelProps, ContextMenuCheckboxItem, ContextMenuCheckboxItemProps, ContextMenuSub, ContextMenuSubProps, ContextMenuSubTrigger, ContextMenuSubTriggerProps,
     };
     
     // Organisms
@@ -109,6 +123,11 @@ pub mod prelude {
         Tabs, TabsProps, TabItem, TabsVariant, TabPanel, TabPanelProps, VerticalTabs, VerticalTabsProps,
         Accordion, AccordionProps, AccordionItem, AccordionItem2, AccordionItem2Props,
         Layout, LayoutProps, LayoutType, LayoutNavItem,
+        Calendar, CalendarProps, CalendarMode,
+        RichTextEditor, RichTextEditorProps, RichTextFeatures,
+        SimpleRichText, SimpleRichTextProps,
+        MinimalRichText, MinimalRichTextProps,
+        FullRichText, FullRichTextProps,
     };
     
     // Charts
@@ -127,3 +146,4 @@ pub mod prelude {
 // Re-export at crate root for convenience
 pub use theme::*;
 pub use styles::*;
+pub use config::*;

@@ -6,6 +6,7 @@ use dioxus_ui_system::organisms::*;
 use dioxus_ui_system::organisms::FooterVariant;
 use dioxus_ui_system::molecules::ToastVariant;
 use dioxus_ui_system::atoms::{Box, VStack, HStack};
+use crate::docs_ui::{DocPage, Section, ExampleBox, CodeBlock};
 
 #[component]
 pub fn OrganismsPage() -> Element {
@@ -25,6 +26,15 @@ pub fn OrganismsPage() -> Element {
                     li { "DataTable - Data display" }
                     li { "Stepper Wizard - Multi-step forms" }
                     li { "Charts - Data visualization (Bar, Line, Pie, Sparkline)" }
+                    li { "Calendar - Full calendar view (New!)" }
+                    li { "DateRangePicker - Date range selection (New!)" }
+                    li { "Carousel - Image/content slider (New!)" }
+                    li { "Tree - Hierarchical tree view (New!)" }
+                    li { "Timeline - Vertical timeline (New!)" }
+                    li { "Menubar - Application menu bar (New!)" }
+                    li { "ResizablePanels - Split-pane layout (New!)" }
+                    li { "Kanban - Drag-and-drop task board (New!)" }
+                    li { "ImageUploader - Image upload with preview (New!)" }
                 }
             }
         }
@@ -1115,51 +1125,6 @@ ChartTooltip {{
     ..Default::default()
 }}".to_string() }
             }
-        }
-    }
-}
-
-// Shared Components
-
-#[component]
-fn DocPage(title: String, description: String, children: Element) -> Element {
-    rsx! {
-        VStack {
-            style: "gap: 32px;",
-            
-            Box {
-                h1 { style: "margin: 0 0 12px 0; font-size: 32px; font-weight: 800;", "{title}" }
-                p { style: "margin: 0; font-size: 16px; color: rgb(100,116,139); line-height: 1.6;", "{description}" }
-            }
-            
-            {children}
-        }
-    }
-}
-
-#[component]
-fn Section(title: String, children: Element) -> Element {
-    rsx! {
-        section {
-            h2 { style: "margin: 0 0 16px 0; font-size: 24px; font-weight: 700;", "{title}" }
-            VStack { gap: SpacingSize::Md, {children} }
-        }
-    }
-}
-
-#[component]
-fn ExampleBox(children: Element) -> Element {
-    rsx! {
-        Card { variant: CardVariant::Default, padding: Some("24px".to_string()), {children} }
-    }
-}
-
-#[component]
-fn CodeBlock(code: String) -> Element {
-    rsx! {
-        pre {
-            style: "background: rgb(15,23,42); color: rgb(226,232,240); padding: 16px; border-radius: 8px; font-size: 14px; overflow-x: auto;",
-            code { "{code}" }
         }
     }
 }

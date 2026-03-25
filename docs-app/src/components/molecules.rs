@@ -8,6 +8,7 @@ use dioxus_ui_system::molecules::{DialogFooter, DialogFooterAlign,
     SkeletonMolecule as Skeleton, SkeletonCircle
 };
 use dioxus_ui_system::atoms::{Box, VStack, HStack};
+use crate::docs_ui::{DocPage, Section, ExampleBox, CodeBlock};
 
 #[component]
 pub fn MoleculesPage() -> Element {
@@ -29,6 +30,17 @@ pub fn MoleculesPage() -> Element {
                     li { "Separator - Visual dividers" }
                     li { "Skeleton - Loading placeholders" }
                     li { "Stepper - Progress indicators" }
+                    li { "Command - Command palette (New!)" }
+                    li { "Sheet - Side panels/drawers (New!)" }
+                    li { "MultiSelect - Multiple selection (New!)" }
+                    li { "OtpInput - OTP code input (New!)" }
+                    li { "TimePicker - Time selection (New!)" }
+                    li { "ContextMenu - Right-click menu (New!)" }
+                    li { "HoverCard - Hover preview cards (New!)" }
+                    li { "Sonner - Modern toast notifications (New!)" }
+                    li { "QRCode - QR code display (New!)" }
+                    li { "Collapsible - Expand/collapse content (New!)" }
+                    li { "ToggleGroup - Group of toggles (New!)" }
                 }
             }
         }
@@ -548,50 +560,7 @@ pub fn PopoverPage() -> Element {
     }
 }
 
-// Shared Components
 
-#[component]
-fn DocPage(title: String, description: String, children: Element) -> Element {
-    rsx! {
-        VStack {
-            style: "gap: 32px;",
-            
-            Box {
-                h1 { style: "margin: 0 0 12px 0; font-size: 32px; font-weight: 800;", "{title}" }
-                p { style: "margin: 0; font-size: 16px; color: rgb(100,116,139); line-height: 1.6;", "{description}" }
-            }
-            
-            {children}
-        }
-    }
-}
-
-#[component]
-fn Section(title: String, children: Element) -> Element {
-    rsx! {
-        section {
-            h2 { style: "margin: 0 0 16px 0; font-size: 24px; font-weight: 700;", "{title}" }
-            VStack { gap: SpacingSize::Md, {children} }
-        }
-    }
-}
-
-#[component]
-fn ExampleBox(children: Element) -> Element {
-    rsx! {
-        Card { variant: CardVariant::Default, padding: Some("24px".to_string()), {children} }
-    }
-}
-
-#[component]
-fn CodeBlock(code: String) -> Element {
-    rsx! {
-        pre {
-            style: "background: rgb(15,23,42); color: rgb(226,232,240); padding: 16px; border-radius: 8px; font-size: 14px; overflow-x: auto;",
-            code { "{code}" }
-        }
-    }
-}
 
 /// Toast documentation page
 #[component]

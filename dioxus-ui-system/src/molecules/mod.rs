@@ -22,6 +22,18 @@ pub mod combobox;
 pub mod media_object;
 pub mod pagination;
 pub mod list_item;
+pub mod command;
+pub mod sheet;
+pub mod multi_select;
+pub mod otp_input;
+pub mod time_picker;
+pub mod context_menu;
+pub mod hover_card;
+pub mod sonner;
+pub mod qr_code;
+pub mod collapsible;
+pub mod scroll_area;
+pub mod toggle_group;
 
 // Re-export all molecule components
 pub use input_group::InputGroup;
@@ -42,3 +54,15 @@ pub use combobox::{Combobox, ComboboxProps, ComboboxOption, MultiCombobox, Multi
 pub use media_object::{MediaObject, MediaObjectProps, MediaAlign, MediaContent, MediaContentProps, Comment, CommentProps};
 pub use pagination::{Pagination, PaginationProps, PaginationSize, PageSizeSelector, PageSizeSelectorProps, PaginationInfo, PaginationInfoProps};
 pub use list_item::{ListItem, ListItemProps, ListItemVariant, ListGroup, ListGroupProps, ActionListItem, ActionListItemProps, ExpandableListItem, ExpandableListItemProps};
+pub use command::{Command, CommandProps, CommandInput, CommandInputProps, CommandList, CommandListProps, CommandGroup, CommandGroupProps, CommandItem, CommandItemProps, CommandSeparator, CommandEmpty, CommandEmptyProps, CommandShortcut, CommandShortcutProps, CommandLoading};
+pub use sheet::{Sheet, SheetProps, SheetSide, SheetFooter, SheetFooterProps, SheetFooterAlign};
+pub use multi_select::{MultiSelect, MultiSelectProps};
+pub use otp_input::{OtpInput, OtpInputProps};
+pub use time_picker::{TimePicker, TimePickerProps, TimeInput, TimeInputProps};
+pub use context_menu::{ContextMenu, ContextMenuProps, ContextMenuTrigger, ContextMenuTriggerProps, ContextMenuContent, ContextMenuContentProps, ContextMenuItem, ContextMenuItemProps, ContextMenuSeparator, ContextMenuLabel, ContextMenuLabelProps, ContextMenuCheckboxItem, ContextMenuCheckboxItemProps, ContextMenuSub, ContextMenuSubProps, ContextMenuSubTrigger, ContextMenuSubTriggerProps};
+pub use hover_card::{HoverCard, HoverCardProps, Side as HoverCardSide, Align as HoverCardAlign, HoverCardHeader, HoverCardHeaderProps, HoverCardContent, HoverCardContentProps, HoverCardFooter, HoverCardFooterProps, HoverCardAvatar, HoverCardAvatarProps, HoverCardUserInfo, HoverCardUserInfoProps};
+pub use sonner::{Sonner, SonnerProps, ToastPosition, SonnerVariant, Toast, ToastAction, use_sonner, UseSonner};
+pub use qr_code::{QrCode, QrCodeProps, QrCodeLevel, QrCodeSvg, QrCodeSvgProps};
+pub use collapsible::{Collapsible, CollapsibleProps, SimpleCollapsible, SimpleCollapsibleProps, CollapsibleGroup, CollapsibleGroupProps};
+pub use scroll_area::{ScrollArea, ScrollAreaProps, ScrollOrientation, ScrollViewport, ScrollViewportProps, HorizontalScroll, HorizontalScrollProps, VerticalScroll, VerticalScrollProps};
+pub use toggle_group::{ToggleGroup, ToggleGroupProps, ToggleGroupType, ToggleItem, ToggleItemProps, IconToggleGroup, IconToggleItem};

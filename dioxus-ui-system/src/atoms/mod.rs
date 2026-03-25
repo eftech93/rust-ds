@@ -7,6 +7,7 @@
 
 pub mod button;
 pub mod input;
+pub mod password_input;
 pub mod label;
 pub mod icon;
 pub mod checkbox;
@@ -25,10 +26,14 @@ pub mod rating;
 pub mod date_picker;
 pub mod slider;
 pub mod tag;
+pub mod toggle;
+pub mod number_input;
+pub mod aspect_ratio;
 
 // Re-export all atom components
 pub use button::{Button, ButtonProps, ButtonVariant, ButtonSize, ButtonType, IconButton};
 pub use input::{Input, InputProps, InputType};
+pub use password_input::{PasswordInput, PasswordInputProps, PasswordStrength};
 pub use label::{Label, LabelProps, TextSize, TextWeight, TextColor, LabelElement, MutedText};
 pub use icon::{Icon, IconProps, IconSize, IconColor, IconButton as IconBtn};
 pub use checkbox::{Checkbox, CheckboxProps};
@@ -51,3 +56,6 @@ pub use rating::{Rating, RatingProps, RatingInput, RatingInputProps, ReviewSumma
 pub use date_picker::{DatePicker, DatePickerProps, DatePickerSize};
 pub use slider::{Slider, SliderProps, SliderSize, SliderMark, RangeSlider, RangeSliderProps};
 pub use tag::{Tag, TagProps, TagVariant, TagSize, TagGroup, TagGroupProps, TagData, InputTag, InputTagProps};
+pub use toggle::{Toggle, ToggleProps, ToggleVariant, ToggleSize};
+pub use number_input::{NumberInput, NumberInputProps};
+pub use aspect_ratio::{AspectRatio, AspectRatioProps, AspectRatios};

@@ -9,6 +9,7 @@ use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
 
 mod components;
+mod docs_ui;
 mod guides;
 mod themes;
 
@@ -81,6 +82,14 @@ pub enum Route {
     SliderPage {},
     #[route("/atoms/tag")]
     TagPage {},
+    #[route("/atoms/toggle")]
+    TogglePage {},
+    #[route("/atoms/number-input")]
+    NumberInputPage {},
+    #[route("/atoms/aspect-ratio")]
+    AspectRatioPage {},
+    #[route("/atoms/password-input")]
+    PasswordInputPage {},
     
     // Molecules
     #[route("/molecules")]
@@ -117,6 +126,28 @@ pub enum Route {
     PaginationPage {},
     #[route("/molecules/list-item")]
     ListItemPage {},
+    #[route("/molecules/command")]
+    CommandPage {},
+    #[route("/molecules/sheet")]
+    SheetPage {},
+    #[route("/molecules/multi-select")]
+    MultiSelectPage {},
+    #[route("/molecules/otp-input")]
+    OtpInputPage {},
+    #[route("/molecules/time-picker")]
+    TimePickerPage {},
+    #[route("/molecules/context-menu")]
+    ContextMenuPage {},
+    #[route("/molecules/hover-card")]
+    HoverCardPage {},
+    #[route("/molecules/sonner")]
+    SonnerPage {},
+    #[route("/molecules/qr-code")]
+    QrCodePage {},
+    #[route("/molecules/collapsible")]
+    CollapsiblePage {},
+    #[route("/molecules/toggle-group")]
+    ToggleGroupPage {},
     
     // Organisms
     #[route("/organisms")]
@@ -147,6 +178,24 @@ pub enum Route {
     FileUploadPage {},
     #[route("/organisms/confirmation-dialog")]
     ConfirmationDialogPage {},
+    #[route("/organisms/calendar")]
+    CalendarPage {},
+    #[route("/organisms/date-range-picker")]
+    DateRangePickerPage {},
+    #[route("/organisms/carousel")]
+    CarouselPage {},
+    #[route("/organisms/tree")]
+    TreePage {},
+    #[route("/organisms/timeline")]
+    TimelinePage {},
+    #[route("/organisms/menubar")]
+    MenubarPage {},
+    #[route("/organisms/resizable")]
+    ResizablePage {},
+    #[route("/organisms/kanban")]
+    KanbanPage {},
+    #[route("/organisms/image-uploader")]
+    ImageUploaderPage {},
     
     // Themes
     #[route("/themes")]
@@ -237,6 +286,7 @@ fn Sidebar() -> Element {
             // Atoms
             NavSection { title: "Atoms", current_route: current_route.clone(), items: vec![
                 ("Overview", Route::AtomsPage {}),
+                ("AspectRatio", Route::AspectRatioPage {}),
                 ("Box", Route::BoxPage {}),
                 ("Button", Route::ButtonPage {}),
                 ("Checkbox", Route::CheckboxPage {}),
@@ -246,6 +296,8 @@ fn Sidebar() -> Element {
                 ("Icon", Route::IconPage {}),
                 ("Input", Route::InputPage {}),
                 ("Label", Route::LabelPage {}),
+                ("NumberInput", Route::NumberInputPage {}),
+                ("PasswordInput", Route::PasswordInputPage {}),
                 ("Progress", Route::ProgressPage {}),
                 ("Radio", Route::RadioPage {}),
                 ("Rating", Route::RatingPage {}),
@@ -257,6 +309,7 @@ fn Sidebar() -> Element {
                 ("Switch", Route::SwitchPage {}),
                 ("Tag", Route::TagPage {}),
                 ("TextArea", Route::TextAreaPage {}),
+                ("Toggle", Route::TogglePage {}),
             ]}
             
             // Molecules
@@ -266,16 +319,27 @@ fn Sidebar() -> Element {
                 ("Avatar", Route::AvatarPage {}),
                 ("Badge", Route::BadgePage {}),
                 ("Card", Route::CardPage {}),
+                ("Collapsible", Route::CollapsiblePage {}),
                 ("Combobox", Route::ComboboxPage {}),
+                ("Command", Route::CommandPage {}),
+                ("ContextMenu", Route::ContextMenuPage {}),
                 ("Dialog", Route::DialogPage {}),
                 ("Dropdown", Route::DropdownPage {}),
+                ("HoverCard", Route::HoverCardPage {}),
                 ("List Item", Route::ListItemPage {}),
                 ("Media Object", Route::MediaObjectPage {}),
+                ("MultiSelect", Route::MultiSelectPage {}),
+                ("OTP Input", Route::OtpInputPage {}),
                 ("Pagination", Route::PaginationPage {}),
+                ("QR Code", Route::QrCodePage {}),
                 ("Separator", Route::SeparatorPage {}),
+                ("Sheet", Route::SheetPage {}),
                 ("Skeleton", Route::SkeletonPage {}),
+                ("Sonner", Route::SonnerPage {}),
                 ("Stepper", Route::StepperPage {}),
+                ("TimePicker", Route::TimePickerPage {}),
                 ("Toast", Route::ToastPage {}),
+                ("ToggleGroup", Route::ToggleGroupPage {}),
                 ("Tooltip", Route::TooltipPage {}),
             ]}
             
@@ -283,18 +347,27 @@ fn Sidebar() -> Element {
             NavSection { title: "Organisms", current_route: current_route.clone(), items: vec![
                 ("Overview", Route::OrganismsPage {}),
                 ("Accordion", Route::AccordionPage {}),
+                ("Calendar", Route::CalendarPage {}),
                 ("Cards", Route::CardsPage {}),
+                ("Carousel", Route::CarouselPage {}),
                 ("Charts", Route::ChartsPage {}),
                 ("Confirmation Dialog", Route::ConfirmationDialogPage {}),
                 ("DataTable", Route::DataTablePage {}),
+                ("DateRangePicker", Route::DateRangePickerPage {}),
                 ("File Upload", Route::FileUploadPage {}),
                 ("Footer", Route::FooterPage {}),
                 ("Header", Route::HeaderPage {}),
                 ("Hero", Route::HeroPage {}),
+                ("ImageUploader", Route::ImageUploaderPage {}),
+                ("Kanban", Route::KanbanPage {}),
                 ("Layout", Route::LayoutPage {}),
+                ("Menubar", Route::MenubarPage {}),
                 ("Notification Center", Route::NotificationCenterPage {}),
+                ("Resizable", Route::ResizablePage {}),
                 ("Stepper Wizard", Route::StepperWizardPage {}),
                 ("Tabs", Route::TabsPage {}),
+                ("Timeline", Route::TimelinePage {}),
+                ("Tree", Route::TreePage {}),
             ]}
             
             // Themes & Guides
@@ -396,7 +469,7 @@ fn Home() -> Element {
             Box {
                 style: "display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;",
                 
-                DocCard { icon: "⚛️", title: "60+ Components", description: "Atoms, molecules, and organisms following Atomic Design principles." }
+                DocCard { icon: "⚛️", title: "85+ Components", description: "Atoms, molecules, and organisms following Atomic Design principles." }
                 DocCard { icon: "🎨", title: "7 Theme Presets", description: "Light, dark, and brand themes with full customization." }
                 DocCard { icon: "📱", title: "Cross-Platform", description: "Works on Web, Desktop, and Mobile." }
                 DocCard { icon: "🔒", title: "Type-Safe", description: "No CSS files - all styles are compile-time checked Rust code." }
@@ -543,6 +616,60 @@ fn HeroPage() -> Element { components::organisms::HeroPage() }
 fn FileUploadPage() -> Element { components::organisms::FileUploadPage() }
 #[component]
 fn ConfirmationDialogPage() -> Element { components::organisms::ConfirmationDialogPage() }
+
+// New Atoms (Phase 1-4)
+#[component]
+fn TogglePage() -> Element { components::atoms_new::TogglePage() }
+#[component]
+fn NumberInputPage() -> Element { components::atoms_new::NumberInputPage() }
+#[component]
+fn AspectRatioPage() -> Element { components::atoms_new::AspectRatioPage() }
+#[component]
+fn PasswordInputPage() -> Element { components::atoms_new::PasswordInputPage() }
+
+// New Molecules (Phase 1-4)
+#[component]
+fn CommandPage() -> Element { components::molecules_new::CommandPage() }
+#[component]
+fn SheetPage() -> Element { components::molecules_new::SheetPage() }
+#[component]
+fn MultiSelectPage() -> Element { components::molecules_new::MultiSelectPage() }
+#[component]
+fn OtpInputPage() -> Element { components::molecules_new::OtpInputPage() }
+#[component]
+fn TimePickerPage() -> Element { components::molecules_new::TimePickerPage() }
+#[component]
+fn ContextMenuPage() -> Element { components::molecules_new::ContextMenuPage() }
+#[component]
+fn HoverCardPage() -> Element { components::molecules_new::HoverCardPage() }
+#[component]
+fn SonnerPage() -> Element { components::molecules_new::SonnerPage() }
+#[component]
+fn QrCodePage() -> Element { components::molecules_new::QrCodePage() }
+#[component]
+fn CollapsiblePage() -> Element { components::molecules_new::CollapsiblePage() }
+#[component]
+fn ToggleGroupPage() -> Element { components::molecules_new::ToggleGroupPage() }
+
+// New Organisms (Phase 1-4)
+#[component]
+fn CalendarPage() -> Element { components::organisms_new::CalendarPage() }
+#[component]
+fn DateRangePickerPage() -> Element { components::organisms_new::DateRangePickerPage() }
+#[component]
+fn CarouselPage() -> Element { components::organisms_new::CarouselPage() }
+#[component]
+fn TreePage() -> Element { components::organisms_new::TreePage() }
+#[component]
+fn TimelinePage() -> Element { components::organisms_new::TimelinePage() }
+#[component]
+fn MenubarPage() -> Element { components::organisms_new::MenubarPage() }
+#[component]
+fn ResizablePage() -> Element { components::organisms_new::ResizablePage() }
+#[component]
+fn KanbanPage() -> Element { components::organisms_new::KanbanPage() }
+#[component]
+fn ImageUploaderPage() -> Element { components::organisms_new::ImageUploaderPage() }
 
 // Themes
 #[component]

@@ -8,6 +8,7 @@ use dioxus_ui_system::atoms::{StepIndicator, StepState, Box, VStack, HStack,
     Progress, ProgressVariant, ProgressSize, Spinner, SpinnerVariant, SpinnerSize, Rating, Slider, SliderMark,
     DatePicker, Tag, TagVariant, TagGroup, TagData
 };
+use crate::docs_ui::{DocPage, Section, ExampleBox, CodeBlock, PropsTable};
 
 
 /// Atoms overview page
@@ -32,6 +33,10 @@ pub fn AtomsPage() -> Element {
                     li { "Select - Dropdown selection" }
                     li { "TextArea - Multi-line text input" }
                     li { "Step - Step indicator for steppers" }
+                    li { "Toggle - Two-state button (New!)" }
+                    li { "NumberInput - Input with +/- buttons (New!)" }
+                    li { "AspectRatio - Maintains consistent ratio (New!)" }
+                    li { "PasswordInput - Password with show/hide toggle (New!)" }
                 }
             }
             
@@ -478,83 +483,7 @@ pub fn StepPage() -> Element {
     }
 }
 
-// Shared Components
 
-#[component]
-fn DocPage(title: String, description: String, children: Element) -> Element {
-    rsx! {
-        VStack {
-            style: "gap: 32px;",
-            
-            Box {
-                h1 { style: "margin: 0 0 12px 0; font-size: 32px; font-weight: 800;", "{title}" }
-                p { style: "margin: 0; font-size: 16px; color: rgb(100,116,139); line-height: 1.6;", "{description}" }
-            }
-            
-            {children}
-        }
-    }
-}
-
-#[component]
-fn Section(title: String, children: Element) -> Element {
-    rsx! {
-        section {
-            h2 { style: "margin: 0 0 16px 0; font-size: 24px; font-weight: 700;", "{title}" }
-            VStack { gap: SpacingSize::Md, {children} }
-        }
-    }
-}
-
-#[component]
-fn ExampleBox(children: Element) -> Element {
-    rsx! {
-        Card { variant: CardVariant::Default, padding: Some("24px".to_string()), {children} }
-    }
-}
-
-#[component]
-fn CodeBlock(code: String) -> Element {
-    rsx! {
-        pre {
-            style: "background: rgb(15,23,42); color: rgb(226,232,240); padding: 16px; border-radius: 8px; font-size: 14px; overflow-x: auto;",
-            code { "{code}" }
-        }
-    }
-}
-
-#[derive(Props, Clone, PartialEq)]
-struct PropsTableProps {
-    props: Vec<(&'static str, &'static str, &'static str)>,
-}
-
-#[component]
-fn PropsTable(props: PropsTableProps) -> Element {
-    rsx! {
-        table {
-            style: "width: 100%; border-collapse: collapse; font-size: 14px;",
-            
-            thead {
-                tr {
-                    style: "background: rgb(248,250,252);",
-                    th { style: "text-align: left; padding: 12px; border-bottom: 1px solid rgb(226,232,240); font-weight: 600;", "Prop" }
-                    th { style: "text-align: left; padding: 12px; border-bottom: 1px solid rgb(226,232,240); font-weight: 600;", "Type" }
-                    th { style: "text-align: left; padding: 12px; border-bottom: 1px solid rgb(226,232,240); font-weight: 600;", "Description" }
-                }
-            }
-            
-            tbody {
-                for (name, typ, desc) in props.props.iter() {
-                    tr {
-                        td { style: "padding: 12px; border-bottom: 1px solid rgb(241,245,249); font-family: monospace; font-size: 13px;", "{name}" }
-                        td { style: "padding: 12px; border-bottom: 1px solid rgb(241,245,249); font-family: monospace; font-size: 13px; color: rgb(100,116,139);", "{typ}" }
-                        td { style: "padding: 12px; border-bottom: 1px solid rgb(241,245,249);", "{desc}" }
-                    }
-                }
-            }
-        }
-    }
-}
 
 /// Heading documentation page
 #[component]
