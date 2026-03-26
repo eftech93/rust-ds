@@ -9,7 +9,7 @@ out_dir = "docs"
 title = "Dioxus UI Documentation"
 # For local dev: comment out base_path
 # For GitHub Pages: uncomment and set to your repo name
-# base_path = "/rust-ds/"
+base_path = "/rust-ds/"
 
 [web.watcher]
 reload_html = true
