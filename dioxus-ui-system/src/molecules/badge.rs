@@ -91,9 +91,6 @@ pub fn Badge(props: BadgeProps) -> Element {
     
     let style = use_style(move |t| {
         let base = Style::new()
-            .inline_flex()
-            .items_center()
-            .justify_center()
             .rounded(&t.radius, "full")
             .font_weight(600)
             .transition("all 150ms ease")
@@ -198,8 +195,8 @@ pub fn Badge(props: BadgeProps) -> Element {
     let onclick_handler = props.onclick.clone();
     
     rsx! {
-        span {
-            style: "{final_style}",
+        div {
+            style: "{final_style} display: inline-flex; align-items: center; gap: 4px;",
             class: "{class}",
             onmouseenter: move |_| if has_onclick { is_hovered.set(true) },
             onmouseleave: move |_| is_hovered.set(false),
@@ -210,17 +207,14 @@ pub fn Badge(props: BadgeProps) -> Element {
             },
             
             if has_icon {
-                span {
-                    style: "margin-right: 4px; display: inline-flex;",
-                    Icon {
-                        name: icon_element.unwrap(),
-                        size: match size {
-                            BadgeSize::Sm => IconSize::ExtraSmall,
-                            BadgeSize::Md => IconSize::Small,
-                            BadgeSize::Lg => IconSize::Medium,
-                        },
-                        color: IconColor::Current,
-                    }
+                Icon {
+                    name: icon_element.unwrap(),
+                    size: match size {
+                        BadgeSize::Sm => IconSize::ExtraSmall,
+                        BadgeSize::Md => IconSize::Small,
+                        BadgeSize::Lg => IconSize::Medium,
+                    },
+                    color: IconColor::Current,
                 }
             }
             

@@ -2,10 +2,13 @@
 //!
 //! Circular charts for showing part-to-whole relationships.
 
+#![allow(unpredictable_function_pointer_comparisons)]
+
 use dioxus::prelude::*;
 use crate::theme::use_theme;
 use crate::organisms::charts::common::*;
 use crate::theme::tokens::Color;
+use crate::atoms::Box;
 
 /// Pie chart variant
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -88,8 +91,12 @@ pub fn PieChart(props: PieChartProps) -> Element {
     
     if props.data.is_empty() {
         return rsx! {
-            div {
-                style: "width: {props.width}; height: {props.height}; display: flex; align-items: center; justify-content: center;",
+            Box {
+                width: Some(props.width.clone()),
+                height: Some(props.height.clone()),
+                display: crate::atoms::BoxDisplay::Flex,
+                align_items: crate::atoms::AlignItems::Center,
+                justify_content: crate::atoms::JustifyContent::Center,
                 "No data"
             }
         };
@@ -100,8 +107,12 @@ pub fn PieChart(props: PieChartProps) -> Element {
     
     if total == 0.0 {
         return rsx! {
-            div {
-                style: "width: {props.width}; height: {props.height}; display: flex; align-items: center; justify-content: center;",
+            Box {
+                width: Some(props.width.clone()),
+                height: Some(props.height.clone()),
+                display: crate::atoms::BoxDisplay::Flex,
+                align_items: crate::atoms::AlignItems::Center,
+                justify_content: crate::atoms::JustifyContent::Center,
                 "No valid data"
             }
         };
@@ -267,8 +278,13 @@ pub fn PieChart(props: PieChartProps) -> Element {
     let tooltip_border = tokens.colors.border.to_rgba();
     
     rsx! {
-        div {
-            style: "{container_style}; flex-direction: {flex_direction};",
+        Box {
+            width: Some(props.width.clone()),
+            height: Some(props.height.clone()),
+            display: crate::atoms::BoxDisplay::Flex,
+            align_items: crate::atoms::AlignItems::Center,
+            justify_content: crate::atoms::JustifyContent::Center,
+            style: Some(format!("{container_style}; flex-direction: {flex_direction};")),
             
             // Tooltip
             if tooltip.enabled {

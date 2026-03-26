@@ -12,6 +12,8 @@
 
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
+use dioxus_ui_system::theme::ThemeProvider;
+use dioxus_ui_system::atoms::{Box, VStack, HStack, SpacingSize, AlignItems, JustifyContent};
 use example_shared::{ComponentShowcase, LayoutShowcase};
 
 
@@ -28,9 +30,11 @@ fn App() -> Element {
             href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
         }
         
-        div {
-            style: "font-family: 'Inter', system-ui, -apple-system, sans-serif;",
-            AppWithNav {}
+        ThemeProvider {
+            Box {
+                style: "font-family: 'Inter', system-ui, -apple-system, sans-serif;",
+                AppWithNav {}
+            }
         }
     }
 }
@@ -66,9 +70,12 @@ fn AppWithNav() -> Element {
             }
             
             // Main content
-            div {
-                div {
-                    style: "background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 12px 24px; display: flex; align-items: center; justify-content: center; gap: 16px;",
+            VStack {
+                HStack {
+                    style: "background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%); color: white; padding: 12px 24px;",
+                    align: AlignItems::Center,
+                    justify: JustifyContent::Center,
+                    gap: SpacingSize::Md,
                     
                     NavTab {
                         label: "🎨 Component Showcase",

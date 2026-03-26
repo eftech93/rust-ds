@@ -1,0 +1,13 @@
+# Cargo configuration for WASM builds
+
+[profile.dev]
+# Strip debug info in dev builds to avoid wasm-opt issues
+# You can comment this out if you need debug symbols for development
+strip = "debuginfo"
+
+[profile.dev.package."*"]
+strip = "debuginfo"
+
+# WASM target settings
+[target.wasm32-unknown-unknown]
+runner = "wasm-bindgen-test-runner"

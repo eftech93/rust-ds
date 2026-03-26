@@ -5,6 +5,7 @@
 use dioxus::prelude::*;
 use crate::theme::use_style;
 use crate::styles::Style;
+use crate::atoms::{VStack, HStack, JustifyContent, AlignItems, SpacingSize};
 
 /// Card variants
 #[derive(Default, Clone, PartialEq)]
@@ -45,6 +46,9 @@ pub struct CardProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Whether to hide overflow (default: true)
+    #[props(default = true)]
+    pub overflow_hidden: bool,
 }
 
 /// Card molecule component
@@ -72,13 +76,19 @@ pub fn Card(props: CardProps) -> Element {
     let mut is_hovered = use_signal(|| false);
     let mut is_pressed = use_signal(|| false);
     
+    let overflow_hidden = props.overflow_hidden;
     let style = use_style(move |t| {
         let base = Style::new()
             .rounded(&t.radius, "lg")
             .bg(&t.colors.card)
             .text_color(&t.colors.card_foreground)
-            .overflow_hidden()
             .transition("all 150ms ease");
+        
+        let base = if overflow_hidden {
+            base.overflow_hidden()
+        } else {
+            base
+        };
             
         // Full width
         let base = if full_width {
@@ -191,8 +201,6 @@ pub struct CardHeaderProps {
 pub fn CardHeader(props: CardHeaderProps) -> Element {
     let style = use_style(|t| {
         Style::new()
-            .flex()
-            .flex_col()
             .p(&t.spacing, "lg")
             .gap(&t.spacing, "xs")
             .build()
@@ -212,10 +220,11 @@ pub fn CardHeader(props: CardHeaderProps) -> Element {
         let action_element = props.action.clone();
         
         rsx! {
-            div {
-                style: "display: flex; justify-content: space-between; align-items: flex-start;",
-                div {
-                    style: "display: flex; flex-direction: column; gap: 4px;",
+            HStack {
+                justify: JustifyContent::SpaceBetween,
+                align: AlignItems::Start,
+                VStack {
+                    gap: SpacingSize::Xs,
                     crate::atoms::Heading {
                         level: crate::atoms::HeadingLevel::H4,
                         "{title}"
@@ -230,7 +239,7 @@ pub fn CardHeader(props: CardHeaderProps) -> Element {
     };
     
     rsx! {
-        div { style: "{style}", {content} }
+        VStack { style: "{style}", {content} }
     }
 }
 
@@ -250,9 +259,7 @@ pub fn CardContent(props: CardContentProps) -> Element {
     let style = use_style(|t| {
         Style::new()
             .p(&t.spacing, "lg")
-            .pt_px(0) // Remove top padding if following header
-            .flex()
-            .flex_col()
+            .pt_px(0)
             .gap(&t.spacing, "md")
             .build()
     });
@@ -264,7 +271,7 @@ pub fn CardContent(props: CardContentProps) -> Element {
     };
     
     rsx! {
-        div { style: "{final_style}", {props.children} }
+        VStack { style: "{final_style}", {props.children} }
     }
 }
 
@@ -292,16 +299,14 @@ pub enum CardFooterJustify {
 #[component]
 pub fn CardFooter(props: CardFooterProps) -> Element {
     let justify = match props.justify {
-        CardFooterJustify::Start => "flex-start",
-        CardFooterJustify::Center => "center",
-        CardFooterJustify::End => "flex-end",
-        CardFooterJustify::Between => "space-between",
+        CardFooterJustify::Start => JustifyContent::Start,
+        CardFooterJustify::Center => JustifyContent::Center,
+        CardFooterJustify::End => JustifyContent::End,
+        CardFooterJustify::Between => JustifyContent::SpaceBetween,
     };
     
     let style = use_style(|t| {
         Style::new()
-            .flex()
-            .items_center()
             .p(&t.spacing, "lg")
             .pt_px(0)
             .gap(&t.spacing, "sm")
@@ -309,8 +314,10 @@ pub fn CardFooter(props: CardFooterProps) -> Element {
     });
     
     rsx! {
-        div {
-            style: "{style} justify-content: {justify};",
+        HStack {
+            style: "{style}",
+            justify: justify,
+            align: AlignItems::Center,
             {props.children}
         }
     }

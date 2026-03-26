@@ -2,20 +2,21 @@
 
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
+use dioxus_ui_system::atoms::{Box, VStack, HStack};
 
 #[component]
 pub fn GuidesPage() -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 32px;",
+        VStack {
+            style: "gap: 32px;",
             
-            div {
+            Box {
                 h1 { style: "margin: 0 0 12px 0; font-size: 32px; font-weight: 800;", "Guides" }
                 p { style: "margin: 0; font-size: 16px; color: rgb(100,116,139);", 
                     "Learn how to build applications with Dioxus UI." }
             }
             
-            div { style: "display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;",
+            Box { style: "display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;",
                 GuideCard { title: "Quick Start", description: "Get up and running in minutes", route: "/guides/quickstart" }
                 GuideCard { title: "Styling", description: "Learn different styling approaches", route: "/guides/styling" }
                 GuideCard { title: "Forms", description: "Building forms with validation", route: "/guides/forms" }
@@ -40,8 +41,8 @@ fn GuideCard(title: String, description: String, route: String) -> Element {
 #[component]
 pub fn QuickStartPage() -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 32px;",
+        VStack {
+            style: "gap: 32px;",
             
             h1 { style: "margin: 0; font-size: 32px; font-weight: 800;", "Quick Start" }
             
@@ -63,8 +64,8 @@ pub fn QuickStartPage() -> Element {
 #[component]
 pub fn StylingPage() -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 32px;",
+        VStack {
+            style: "gap: 32px;",
             
             h1 { style: "margin: 0; font-size: 32px; font-weight: 800;", "Styling Guide" }
             
@@ -88,8 +89,8 @@ pub fn FormsPage() -> Element {
     let mut submitted = use_signal(|| false);
     
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 32px;",
+        VStack {
+            style: "gap: 32px;",
             
             h1 { style: "margin: 0; font-size: 32px; font-weight: 800;", "Building Forms" }
             
@@ -97,7 +98,7 @@ pub fn FormsPage() -> Element {
                 p { "Complete form with validation:" }
                 
                 Card { variant: CardVariant::Default, padding: Some("24px".to_string()),
-                    div { style: "display: flex; flex-direction: column; gap: 16px; max-width: 400px;",
+                    VStack { gap: SpacingSize::Md, style: "max-width: 400px;",
                         if submitted() {
                             Alert { variant: AlertVariant::Success, title: Some("Success".to_string()), "Form submitted!" }
                         }
@@ -133,8 +134,8 @@ pub fn FormsPage() -> Element {
 #[component]
 pub fn LayoutsPage() -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 32px;",
+        VStack {
+            style: "gap: 32px;",
             
             h1 { style: "margin: 0; font-size: 32px; font-weight: 800;", "Page Layouts" }
             
@@ -149,18 +150,18 @@ pub fn LayoutsPage() -> Element {
 #[component]
 fn Section(number: u32, title: String, children: Element) -> Element {
     rsx! {
-        div {
-            style: "display: flex; gap: 16px;",
+        HStack {
+            style: "gap: 16px;",
             
-            div {
+            Box {
                 style: "width: 32px; height: 32px; border-radius: 50%; background: rgb(15,23,42); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0;",
                 "{number}"
             }
             
-            div {
+            Box {
                 style: "flex: 1;",
                 h2 { style: "margin: 0 0 12px 0; font-size: 20px; font-weight: 600;", "{title}" }
-                div { style: "display: flex; flex-direction: column; gap: 12px;", {children} }
+                VStack { gap: SpacingSize::Sm, {children} }
             }
         }
     }

@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
-use crate::atoms::{Button, ButtonVariant};
+use crate::atoms::{Button, ButtonVariant, Box};
 
 /// Dialog properties
 #[derive(Props, Clone, PartialEq)]
@@ -77,13 +77,15 @@ pub fn Dialog(props: DialogProps) -> Element {
         }
     };
     
+    let custom_content_style = props.content_style.clone().unwrap_or_default();
+    
     rsx! {
         div {
             style: "{overlay_style}",
             onclick: handle_overlay_click,
             
             div {
-                style: "{content_style} {props.content_style.clone().unwrap_or_default()}",
+                style: "{content_style} {custom_content_style}",
                 onclick: move |e| e.stop_propagation(),
                 
                 // Header
@@ -101,7 +103,7 @@ pub fn Dialog(props: DialogProps) -> Element {
                 }
                 
                 // Content
-                div {
+                Box {
                     style: "padding: 0 24px 24px 24px; overflow-y: auto;",
                     {props.children}
                 }

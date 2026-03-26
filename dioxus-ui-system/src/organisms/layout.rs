@@ -5,7 +5,7 @@
 use dioxus::prelude::*;
 use crate::theme::use_style;
 use crate::styles::Style;
-use crate::atoms::{Button, ButtonVariant, Icon, IconSize, IconColor};
+use crate::atoms::{Button, ButtonVariant, Icon, IconSize, IconColor, Box, VStack, HStack};
 
 /// Layout type variants
 #[derive(Clone, PartialEq, Default)]
@@ -169,7 +169,7 @@ fn SidebarLayoutRenderer(props: SidebarLayoutProps) -> Element {
     let mut is_collapsed = use_signal(|| props.sidebar_collapsed);
     let sidebar_width = if is_collapsed() { 80 } else { props.sidebar_width };
 
-    let layout_style = use_style(|_t| {
+    let _layout_style = use_style(|_t| {
         "display: flex; height: 100vh;".to_string()
     });
 
@@ -185,19 +185,25 @@ fn SidebarLayoutRenderer(props: SidebarLayoutProps) -> Element {
         props.header_height
     );
 
-    let content_style = "flex: 1; padding: 24px; overflow: auto;";
+    let _content_style = "flex: 1; padding: 24px; overflow: auto;";
 
     rsx! {
-        div {
-            style: "{layout_style} {props.class.clone().unwrap_or_default()}",
+        Box {
+            display: crate::atoms::BoxDisplay::Flex,
+            height: Some("100vh".to_string()),
+            class: props.class.clone(),
             
             // Sidebar
             aside {
                 style: "{sidebar_style}",
                 
                 // Brand
-                div {
-                    style: "{header_style}",
+                HStack {
+                    align: crate::atoms::AlignItems::Center,
+                    justify: crate::atoms::JustifyContent::SpaceBetween,
+                    height: Some(format!("{}px", props.header_height)),
+                    padding: crate::atoms::SpacingSize::Lg,
+                    style: Some(format!("border-bottom: 1px solid #e2e8f0; padding-left: 24px; padding-right: 24px; height: {}px;", props.header_height)),
                     
                     if let Some(brand) = props.brand.clone() {
                         div {
@@ -249,16 +255,20 @@ fn SidebarLayoutRenderer(props: SidebarLayoutProps) -> Element {
                     }
                     
                     if let Some(actions) = props.actions.clone() {
-                        div {
-                            style: "display: flex; align-items: center; gap: 8px;",
+                        HStack {
+                            align: crate::atoms::AlignItems::Center,
+                            gap: crate::atoms::SpacingSize::Sm,
                             {actions}
                         }
                     }
                 }
                 
                 // Content
-                div {
-                    style: "{content_style}",
+                Box {
+                    width: Some("100%".to_string()),
+                    padding: crate::atoms::SpacingSize::Lg,
+                    overflow: crate::atoms::Overflow::Auto,
+                    style: Some("flex: 1;".to_string()),
                     {props.children}
                 }
             }
@@ -288,15 +298,18 @@ fn TopNavLayoutRenderer(props: TopNavLayoutProps) -> Element {
     let content_style = format!("flex: 1; padding: 24px; overflow: auto; min-height: calc(100vh - {}px);", props.header_height);
 
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; min-height: 100vh; {props.class.clone().unwrap_or_default()}",
+        VStack {
+            height: Some("100vh".to_string()),
+            class: props.class.clone(),
+            style: Some("min-height: 100vh;".to_string()),
             
             // Header with navigation
             header {
                 style: "{header_style}",
                 
-                div {
-                    style: "display: flex; align-items: center; gap: 24px;",
+                HStack {
+                    align: crate::atoms::AlignItems::Center,
+                    gap: crate::atoms::SpacingSize::Lg,
                     
                     if let Some(brand) = props.brand.clone() {
                         {brand}
@@ -312,8 +325,9 @@ fn TopNavLayoutRenderer(props: TopNavLayoutProps) -> Element {
                 }
                 
                 if let Some(actions) = props.actions.clone() {
-                    div {
-                        style: "display: flex; align-items: center; gap: 8px;",
+                    HStack {
+                        align: crate::atoms::AlignItems::Center,
+                        gap: crate::atoms::SpacingSize::Sm,
                         {actions}
                     }
                 }
@@ -355,7 +369,7 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
         props.header_height
     );
 
-    let drawer_overlay_style = "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 40;";
+    let _drawer_overlay_style = "position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 40;";
 
     let drawer_style = format!(
         "position: fixed; top: 0; left: 0; height: 100vh; width: {}px; background: white; border-right: 1px solid #e2e8f0; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); z-index: 50; display: flex; flex-direction: column;",
@@ -363,15 +377,18 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
     );
 
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; min-height: 100vh; {props.class.clone().unwrap_or_default()}",
+        VStack {
+            height: Some("100vh".to_string()),
+            class: props.class.clone(),
+            style: Some("min-height: 100vh;".to_string()),
             
             // Header
             header {
                 style: "{header_style}",
                 
-                div {
-                    style: "display: flex; align-items: center; gap: 16px;",
+                HStack {
+                    align: crate::atoms::AlignItems::Center,
+                    gap: crate::atoms::SpacingSize::Md,
                     
                     Button {
                         variant: ButtonVariant::Ghost,
@@ -397,8 +414,9 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
                 }
                 
                 if let Some(actions) = props.actions.clone() {
-                    div {
-                        style: "display: flex; align-items: center; gap: 8px;",
+                    HStack {
+                        align: crate::atoms::AlignItems::Center,
+                        gap: crate::atoms::SpacingSize::Sm,
                         {actions}
                     }
                 }
@@ -412,8 +430,13 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
             
             // Drawer overlay
             if drawer_open() {
-                div {
-                    style: "{drawer_overlay_style}",
+                Box {
+                    position: crate::atoms::Position::Fixed,
+                    top: Some("0".to_string()),
+                    left: Some("0".to_string()),
+                    width: Some("100%".to_string()),
+                    height: Some("100%".to_string()),
+                    style: Some("background: rgba(0,0,0,0.5); z-index: 40;".to_string()),
                     onclick: move |_| drawer_open.set(false),
                 }
                 
@@ -423,12 +446,16 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
                     onclick: move |e| e.stop_propagation(),
                     
                     // Drawer header
-                    div {
-                        style: "{header_style}",
+                    HStack {
+                        align: crate::atoms::AlignItems::Center,
+                        justify: crate::atoms::JustifyContent::SpaceBetween,
+                        height: Some(format!("{}px", props.header_height)),
+                        padding: crate::atoms::SpacingSize::Lg,
+                        style: Some("border-bottom: 1px solid #e2e8f0;".to_string()),
                         
                         if let Some(brand) = props.brand.clone() {
-                            div {
-                                style: "flex: 1;",
+                            Box {
+                                width: Some("100%".to_string()),
                                 {brand}
                             }
                         }
@@ -476,8 +503,10 @@ fn FullWidthLayoutRenderer(props: FullWidthLayoutProps) -> Element {
     });
 
     rsx! {
-        div {
-            style: "width: 100%; min-height: 100vh; {props.class.clone().unwrap_or_default()}",
+        Box {
+            width: Some("100%".to_string()),
+            min_height: Some("100vh".to_string()),
+            class: props.class.clone(),
             {props.children}
         }
     }

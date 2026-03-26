@@ -3,13 +3,13 @@
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
 use dioxus_ui_system::organisms::*;
-use dioxus_ui_system::atoms::StepSize;
+use dioxus_ui_system::atoms::{StepSize, Box, VStack, HStack, SpacingSize, AlignItems, JustifyContent};
 use dioxus_ui_system::molecules::{StepItem, HorizontalStepper};
 
 fn main() {
     dioxus::logger::init(tracing::Level::INFO).unwrap();
     println!("Starting Mobile Example");
-    dioxus::mobile::launch(App);
+    dioxus::launch(App);
 }
 
 /// App entry - provides ThemeProvider
@@ -30,7 +30,7 @@ fn MobileApp() -> Element {
     let bg_color = use_style(|t| t.colors.background.to_rgba());
     
     rsx! {
-        div {
+        Box {
             style: "font-family: system-ui, -apple-system, sans-serif; min-height: 100vh; background: {bg_color}; transition: background 200ms ease;",
             
             // Status bar area
@@ -39,8 +39,10 @@ fn MobileApp() -> Element {
             }
             
             // Navigation bar
-            div {
-                style: "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px; padding-top: 12px; display: flex; align-items: center; justify-content: space-between;",
+            HStack {
+                style: "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 16px; padding-top: 12px;",
+                align: AlignItems::Center,
+                justify: JustifyContent::SpaceBetween,
                 
                 if current_page() == Page::Welcome {
                     div { style: "width: 60px;", "" }
@@ -60,8 +62,9 @@ fn MobileApp() -> Element {
                 }
                 
                 // Theme Toggle
-                div {
-                    style: "width: 60px; display: flex; justify-content: flex-end;",
+                HStack {
+                    style: "width: 60px;",
+                    justify: JustifyContent::End,
                     
                     MobileThemeToggle {}
                 }
@@ -147,8 +150,11 @@ struct WelcomePageProps {
 #[component]
 fn WelcomePage(props: WelcomePageProps) -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 70vh; gap: 24px;",
+        VStack {
+            align: AlignItems::Center,
+            justify: JustifyContent::Center,
+            gap: SpacingSize::Lg,
+            style: "min-height: 70vh;",
             
             // Logo/Icon
             div {
@@ -226,8 +232,9 @@ fn WelcomePage(props: WelcomePageProps) -> Element {
             }
             
             // Action Buttons
-            div {
-                style: "margin-top: 32px; width: 100%; max-width: 300px; display: flex; flex-direction: column; gap: 12px;",
+            VStack {
+                style: "margin-top: 32px; width: 100%; max-width: 300px;",
+                gap: SpacingSize::Md,
                 
                 Button {
                     variant: ButtonVariant::Primary,
@@ -235,8 +242,10 @@ fn WelcomePage(props: WelcomePageProps) -> Element {
                     full_width: true,
                     onclick: move |_| props.on_get_started.call(()),
                     
-                    div {
-                        style: "display: flex; align-items: center; justify-content: center; gap: 8px;",
+                    HStack {
+                        align: AlignItems::Center,
+                        justify: JustifyContent::Center,
+                        gap: SpacingSize::Sm,
                         
                         Icon {
                             name: "box".to_string(),
@@ -305,8 +314,9 @@ fn LayoutsPage(props: LayoutsPageProps) -> Element {
     
     // Brand element
     let brand = rsx! {
-        div {
-            style: "display: flex; align-items: center; gap: 8px;",
+        HStack {
+            align: AlignItems::Center,
+            gap: SpacingSize::Sm,
             Icon {
                 name: "star".to_string(),
                 size: IconSize::Medium,
@@ -325,12 +335,15 @@ fn LayoutsPage(props: LayoutsPageProps) -> Element {
     };
     
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 16px; padding-bottom: 100px;",
+        VStack {
+            gap: SpacingSize::Md,
+            style: "padding-bottom: 100px;",
             
             // Header with back button
-            div {
-                style: "display: flex; align-items: center; gap: 12px; margin-bottom: 8px;",
+            HStack {
+                align: AlignItems::Center,
+                gap: SpacingSize::Md,
+                style: "margin-bottom: 8px;",
                 
                 Button {
                     variant: ButtonVariant::Ghost,
@@ -343,7 +356,7 @@ fn LayoutsPage(props: LayoutsPageProps) -> Element {
                     }
                 }
                 
-                div {
+                Box {
                     style: "flex: 1; text-align: center; padding-right: 48px;",
                     
                     Heading {
@@ -395,11 +408,11 @@ fn LayoutsPage(props: LayoutsPageProps) -> Element {
             
             // Live Layout Preview
             ComponentSection { title: "Live Preview",
-                div {
+                Box {
                     style: "border: 2px solid #e2e8f0; border-radius: 12px; overflow: hidden; height: 400px; position: relative;",
                     
                     // Scale down the layout to fit in the preview
-                    div {
+                    Box {
                         style: "transform: scale(0.5); transform-origin: top left; width: 200%; height: 200%;",
                         
                         Layout {
@@ -414,7 +427,7 @@ fn LayoutsPage(props: LayoutsPageProps) -> Element {
                             header_height: 56,
                             
                             // Sample content
-                            div {
+                            Box {
                                 style: "padding: 16px;",
                                 
                                 Heading {
@@ -429,8 +442,9 @@ fn LayoutsPage(props: LayoutsPageProps) -> Element {
                                     " layout looks with content."
                                 }
                                 
-                                div {
-                                    style: "margin-top: 16px; display: flex; gap: 8px; flex-wrap: wrap;",
+                                HStack {
+                                    style: "margin-top: 16px; flex-wrap: wrap;",
+                                    gap: SpacingSize::Sm,
                                     
                                     Card {
                                         variant: CardVariant::Default,
@@ -465,8 +479,8 @@ fn LayoutsPage(props: LayoutsPageProps) -> Element {
             
             // Theme Info
             ComponentSection { title: "Available Themes",
-                div {
-                    style: "display: flex; flex-direction: column; gap: 8px;",
+                VStack {
+                    gap: SpacingSize::Sm,
                     
                     ThemeRow { name: "Light", color: "#ffffff" }
                     ThemeRow { name: "Dark", color: "#0f172a" }
@@ -550,8 +564,9 @@ fn LayoutCard(props: LayoutCardProps) -> Element {
             variant: CardVariant::Default,
             padding: Some("16px".to_string()),
             
-            div {
-                style: "display: flex; align-items: flex-start; gap: 12px;",
+            HStack {
+                align: AlignItems::Start,
+                gap: SpacingSize::Md,
                 
                 div {
                     style: "width: 40px; height: 40px; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;",
@@ -589,8 +604,10 @@ struct ThemeRowProps {
 #[component]
 fn ThemeRow(props: ThemeRowProps) -> Element {
     rsx! {
-        div {
-            style: "display: flex; align-items: center; gap: 12px; padding: 8px 0;",
+        HStack {
+            align: AlignItems::Center,
+            gap: SpacingSize::Md,
+            style: "padding: 8px 0;",
             
             div {
                 style: "width: 24px; height: 24px; border-radius: 6px; background: {props.color}; border: 1px solid #e2e8f0;",
@@ -612,12 +629,15 @@ struct ComponentsPageProps {
 #[component]
 fn ComponentsPage(props: ComponentsPageProps) -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 16px; padding-bottom: 100px;",
+        VStack {
+            gap: SpacingSize::Md,
+            style: "padding-bottom: 100px;",
             
             // Header with back button
-            div {
-                style: "display: flex; align-items: center; gap: 12px; margin-bottom: 8px;",
+            HStack {
+                align: AlignItems::Center,
+                gap: SpacingSize::Md,
+                style: "margin-bottom: 8px;",
                 
                 Button {
                     variant: ButtonVariant::Ghost,
@@ -630,7 +650,7 @@ fn ComponentsPage(props: ComponentsPageProps) -> Element {
                     }
                 }
                 
-                div {
+                Box {
                     style: "flex: 1; text-align: center; padding-right: 48px;",
                     
                     Heading {
@@ -647,16 +667,16 @@ fn ComponentsPage(props: ComponentsPageProps) -> Element {
             
             // Button Showcase
             ComponentSection { title: "Buttons", 
-                div {
-                    style: "display: flex; flex-direction: column; gap: 12px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     Button { variant: ButtonVariant::Primary, full_width: true, "Primary Button" }
                     Button { variant: ButtonVariant::Secondary, full_width: true, "Secondary Button" }
                     Button { variant: ButtonVariant::Ghost, full_width: true, "Ghost Button" }
                     Button { variant: ButtonVariant::Destructive, full_width: true, "Destructive" }
                     
-                    div {
-                        style: "display: flex; gap: 8px;",
+                    HStack {
+                        gap: SpacingSize::Sm,
                         Button { size: ButtonSize::Sm, "Small" }
                         Button { size: ButtonSize::Md, "Medium" }
                         Button { size: ButtonSize::Lg, "Large" }
@@ -685,8 +705,8 @@ fn ComponentsPage(props: ComponentsPageProps) -> Element {
             
             // Card Showcase
             ComponentSection { title: "Cards",
-                div {
-                    style: "display: flex; flex-direction: column; gap: 12px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     Card {
                         variant: CardVariant::Default,
@@ -704,8 +724,8 @@ fn ComponentsPage(props: ComponentsPageProps) -> Element {
             
             // Card Organisms Showcase
             ComponentSection { title: "Card Organisms",
-                div {
-                    style: "display: flex; flex-direction: column; gap: 16px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     // Action Card
                     ActionCard {
@@ -770,8 +790,9 @@ fn ComponentsPage(props: ComponentsPageProps) -> Element {
                             }
                         },
                         expanded_content: rsx! {
-                            div {
-                                style: "display: flex; flex-direction: column; gap: 12px; padding-top: 12px;",
+                            VStack {
+                                gap: SpacingSize::Md,
+                                style: "padding-top: 12px;",
                                 
                                 Checkbox {
                                     checked: true,
@@ -809,8 +830,10 @@ fn ComponentsPage(props: ComponentsPageProps) -> Element {
             
             // Icons Showcase
             ComponentSection { title: "Icons",
-                div {
-                    style: "display: flex; flex-wrap: wrap; gap: 16px; justify-content: center;",
+                HStack {
+                    style: "flex-wrap: wrap;",
+                    justify: JustifyContent::Center,
+                    gap: SpacingSize::Md,
                     
                     Icon { name: "home".to_string(), size: IconSize::Large, color: IconColor::Primary }
                     Icon { name: "user".to_string(), size: IconSize::Large, color: IconColor::Secondary }
@@ -823,8 +846,8 @@ fn ComponentsPage(props: ComponentsPageProps) -> Element {
             
             // Typography Showcase
             ComponentSection { title: "Typography",
-                div {
-                    style: "display: flex; flex-direction: column; gap: 12px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     Heading { level: HeadingLevel::H3, "Heading 3" }
                     Heading { level: HeadingLevel::H4, "Heading 4" }
@@ -844,8 +867,8 @@ fn ComponentsPage(props: ComponentsPageProps) -> Element {
             
             // Alert Showcase
             ComponentSection { title: "Alerts",
-                div {
-                    style: "display: flex; flex-direction: column; gap: 12px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     Alert {
                         variant: AlertVariant::Default,
@@ -871,8 +894,10 @@ fn ComponentsPage(props: ComponentsPageProps) -> Element {
             
             // Avatar Showcase
             ComponentSection { title: "Avatars",
-                div {
-                    style: "display: flex; align-items: center; gap: 16px; justify-content: center;",
+                HStack {
+                    align: AlignItems::Center,
+                    justify: JustifyContent::Center,
+                    gap: SpacingSize::Md,
                     
                     Avatar {
                         size: AvatarSize::Xs,
@@ -922,8 +947,8 @@ fn MobileStepperShowcase() -> Element {
     ];
     
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 16px;",
+        VStack {
+            gap: SpacingSize::Md,
             
             // Horizontal Stepper
             HorizontalStepper {
@@ -933,8 +958,10 @@ fn MobileStepperShowcase() -> Element {
             }
             
             // Navigation
-            div {
-                style: "display: flex; justify-content: center; gap: 8px; margin-top: 8px;",
+            HStack {
+                justify: JustifyContent::Center,
+                gap: SpacingSize::Sm,
+                style: "margin-top: 8px;",
                 
                 Button {
                     variant: ButtonVariant::Secondary,
@@ -989,8 +1016,8 @@ fn NewFormControlsShowcase() -> Element {
     ];
     
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 16px;",
+        VStack {
+            gap: SpacingSize::Md,
             
             // Checkbox
             Checkbox {
@@ -1046,6 +1073,7 @@ fn ComponentSection(title: String, children: Element) -> Element {
     }
 }
 
+
 /// Input showcase with state
 #[component]
 fn InputShowcase() -> Element {
@@ -1053,8 +1081,8 @@ fn InputShowcase() -> Element {
     let mut password = use_signal(|| String::new());
     
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 16px;",
+        VStack {
+            gap: SpacingSize::Md,
             
             InputGroup {
                 label: "Email",
@@ -1095,7 +1123,7 @@ fn CounterDemo() -> Element {
     let mut count = use_signal(|| 0);
     
     rsx! {
-        div {
+        Box {
             style: "text-align: center; padding: 16px;",
             
             Heading {
@@ -1103,8 +1131,10 @@ fn CounterDemo() -> Element {
                 "{count}"
             }
             
-            div {
-                style: "display: flex; gap: 12px; justify-content: center; margin-top: 16px;",
+            HStack {
+                justify: JustifyContent::Center,
+                gap: SpacingSize::Md,
+                style: "margin-top: 16px;",
                 
                 Button {
                     variant: ButtonVariant::Secondary,

@@ -4,6 +4,7 @@
 
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
+use dioxus_ui_system::atoms::{Box, VStack, HStack, SpacingSize, AlignItems};
 
 /// Layout showcase with layout switcher
 #[component]
@@ -35,8 +36,9 @@ pub fn LayoutShowcaseInner() -> Element {
     
     // Brand element
     let brand = rsx! {
-        div {
-            style: "display: flex; align-items: center; gap: 8px;",
+        HStack {
+            align: AlignItems::Center,
+            gap: SpacingSize::Sm,
             Icon {
                 name: "star".to_string(),
                 size: IconSize::Large,
@@ -51,8 +53,9 @@ pub fn LayoutShowcaseInner() -> Element {
     
     // Actions (theme selector + layout switcher)
     let actions = rsx! {
-        div {
-            style: "display: flex; align-items: center; gap: 12px;",
+        HStack {
+            align: AlignItems::Center,
+            gap: SpacingSize::Md,
             
             // Layout Switcher
             LayoutSwitcher {
@@ -67,7 +70,7 @@ pub fn LayoutShowcaseInner() -> Element {
     
     // Main content for the current page
     let main_content = rsx! {
-        div {
+        Box {
             style: "max-width: 1200px;",
             
             Heading {
@@ -97,7 +100,7 @@ pub fn LayoutShowcaseInner() -> Element {
                 
                 FeatureCard {
                     icon: "box",
-                    title: "50+ Components",
+                    title: "100+ Components",
                     description: "Atoms, Molecules, and Organisms following Atomic Design principles."
                 }
                 
@@ -283,8 +286,8 @@ fn FeatureCard(props: FeatureCardProps) -> Element {
     rsx! {
         Card {
             CardContent {
-                div {
-                    style: "display: flex; flex-direction: column; gap: 12px;",
+                VStack {
+                    gap: SpacingSize::Md,
                     
                     div {
                         style: "width: 40px; height: 40px; border-radius: 8px; background: #f1f5f9; display: flex; align-items: center; justify-content: center;",

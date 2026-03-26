@@ -5,6 +5,7 @@
 use dioxus::prelude::*;
 use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::atoms::{HStack, AlignItems, SpacingSize};
 
 /// Breadcrumb item
 #[derive(Clone, PartialEq)]
@@ -64,32 +65,25 @@ pub struct BreadcrumbProps {
 pub fn Breadcrumb(props: BreadcrumbProps) -> Element {
     let _theme = use_theme();
     
-    let breadcrumb_style = use_style(|t| {
-        Style::new()
-            .flex()
-            .flex_wrap()
-            .items_center()
-            .gap(&t.spacing, "sm")
-            .text(&t.typography, "sm")
-            .build()
-    });
-    
     let separator = props.separator.unwrap_or_else(|| "›".to_string());
     let items_count = props.items.len();
     
     rsx! {
         nav {
             aria_label: "breadcrumb",
-            style: "{breadcrumb_style} {props.style.clone().unwrap_or_default()}",
+            style: props.style.clone().unwrap_or_default(),
             class: "{props.class.clone().unwrap_or_default()}",
             
-            ol {
-                style: "display: flex; flex-wrap: wrap; align-items: center; gap: 8px; list-style: none; margin: 0; padding: 0;",
+            HStack {
+                style: "flex-wrap: wrap; list-style: none; margin: 0; padding: 0;",
+                gap: SpacingSize::Sm,
+                align: AlignItems::Center,
                 
                 for (index, item) in props.items.iter().enumerate() {
-                    li {
+                    HStack {
                         key: "{item.label}",
-                        style: "display: flex; align-items: center; gap: 8px;",
+                        gap: SpacingSize::Sm,
+                        align: AlignItems::Center,
                         
                         if index > 0 {
                             span {

@@ -2,10 +2,13 @@
 //!
 //! A flexible line chart for showing trends over time or categories.
 
+#![allow(unpredictable_function_pointer_comparisons)]
+
 use dioxus::prelude::*;
 use crate::theme::use_theme;
 use crate::organisms::charts::common::*;
 use crate::theme::tokens::Color;
+use crate::atoms::Box;
 
 /// Line chart variant
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -112,8 +115,12 @@ pub fn LineChart(props: LineChartProps) -> Element {
     
     if all_series.is_empty() || all_series[0].data.is_empty() {
         return rsx! {
-            div {
-                style: "width: {props.width}; height: {props.height}; display: flex; align-items: center; justify-content: center;",
+            Box {
+                width: Some(props.width.clone()),
+                height: Some(props.height.clone()),
+                display: crate::atoms::BoxDisplay::Flex,
+                align_items: crate::atoms::AlignItems::Center,
+                justify_content: crate::atoms::JustifyContent::Center,
                 "No data"
             }
         };
@@ -308,8 +315,10 @@ pub fn LineChart(props: LineChartProps) -> Element {
     let tooltip_border = tokens.colors.border.to_rgba();
     
     rsx! {
-        div {
-            style: "{container_style}",
+        Box {
+            width: Some(props.width.clone()),
+            height: Some(props.height.clone()),
+            style: Some(container_style),
             
             // Tooltip
             if tooltip.enabled {

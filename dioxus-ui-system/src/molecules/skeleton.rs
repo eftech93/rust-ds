@@ -5,6 +5,7 @@
 use dioxus::prelude::*;
 use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::atoms::{Box, VStack, HStack, AlignItems, SpacingSize};
 
 /// Skeleton properties
 #[derive(Props, Clone, PartialEq)]
@@ -51,7 +52,7 @@ pub fn Skeleton(props: SkeletonProps) -> Element {
     };
     
     rsx! {
-        div {
+        Box {
             style: "{skeleton_style} width: {width}; height: {height}; border-radius: {rounded}; {animation} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
         }
@@ -91,7 +92,7 @@ pub fn SkeletonCircle(props: SkeletonCircleProps) -> Element {
     };
     
     rsx! {
-        div {
+        Box {
             style: "{skeleton_style} width: {props.size}px; height: {props.size}px; {animation} {props.style.clone().unwrap_or_default()}",
         }
     }
@@ -119,17 +120,11 @@ pub struct SkeletonTextProps {
 pub fn SkeletonText(props: SkeletonTextProps) -> Element {
     let _theme = use_theme();
     
-    let container_style = use_style(|t| {
-        Style::new()
-            .flex()
-            .flex_col()
-            .gap(&t.spacing, "sm")
-            .build()
-    });
-    
     rsx! {
-        div {
-            style: "{container_style} {props.style.clone().unwrap_or_default()}",
+        VStack {
+            style: props.style.clone().unwrap_or_default(),
+            gap: SpacingSize::Sm,
+            align: AlignItems::Stretch,
             
             for i in 0..props.lines {
                 Skeleton {
@@ -175,26 +170,28 @@ pub fn SkeletonCard(props: SkeletonCardProps) -> Element {
             .rounded(&t.radius, "lg")
             .border(1, &t.colors.border)
             .p(&t.spacing, "lg")
-            .flex()
-            .flex_col()
-            .gap(&t.spacing, "md")
             .build()
     });
     
+    let custom_style = props.style.clone().unwrap_or_default();
+    
     rsx! {
-        div {
-            style: "{card_style} {props.style.clone().unwrap_or_default()}",
+        VStack {
+            style: "{card_style} {custom_style}",
+            gap: SpacingSize::Md,
+            align: AlignItems::Stretch,
             
             if props.show_avatar {
-                div {
-                    style: "display: flex; align-items: center; gap: 12px;",
+                HStack {
+                    gap: SpacingSize::Md,
+                    align: AlignItems::Center,
                     
                     SkeletonCircle {
                         size: "48".to_string(),
                         animate: props.animate,
                     }
                     
-                    div {
+                    Box {
                         style: "flex: 1;",
                         Skeleton {
                             width: Some("120px".to_string()),

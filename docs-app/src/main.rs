@@ -3,10 +3,13 @@
 //! A comprehensive documentation site with multi-page navigation,
 //! component examples, and theme building guides.
 
+#![allow(unused_braces)]
+
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
 
 mod components;
+mod docs_ui;
 mod guides;
 mod themes;
 
@@ -61,6 +64,32 @@ pub enum Route {
     TextAreaPage {},
     #[route("/atoms/step")]
     StepPage {},
+    #[route("/atoms/heading")]
+    HeadingPage {},
+    #[route("/atoms/divider")]
+    DividerPage {},
+    #[route("/atoms/progress")]
+    ProgressPage {},
+    #[route("/atoms/spinner")]
+    SpinnerPage {},
+    #[route("/atoms/skeleton")]
+    SkeletonAtomPage {},
+    #[route("/atoms/rating")]
+    RatingPage {},
+    #[route("/atoms/datepicker")]
+    DatePickerPage {},
+    #[route("/atoms/slider")]
+    SliderPage {},
+    #[route("/atoms/tag")]
+    TagPage {},
+    #[route("/atoms/toggle")]
+    TogglePage {},
+    #[route("/atoms/number-input")]
+    NumberInputPage {},
+    #[route("/atoms/aspect-ratio")]
+    AspectRatioPage {},
+    #[route("/atoms/password-input")]
+    PasswordInputPage {},
     
     // Molecules
     #[route("/molecules")]
@@ -87,6 +116,38 @@ pub enum Route {
     SkeletonPage {},
     #[route("/molecules/stepper")]
     StepperPage {},
+    #[route("/molecules/toast")]
+    ToastPage {},
+    #[route("/molecules/combobox")]
+    ComboboxPage {},
+    #[route("/molecules/media-object")]
+    MediaObjectPage {},
+    #[route("/molecules/pagination")]
+    PaginationPage {},
+    #[route("/molecules/list-item")]
+    ListItemPage {},
+    #[route("/molecules/command")]
+    CommandPage {},
+    #[route("/molecules/sheet")]
+    SheetPage {},
+    #[route("/molecules/multi-select")]
+    MultiSelectPage {},
+    #[route("/molecules/otp-input")]
+    OtpInputPage {},
+    #[route("/molecules/time-picker")]
+    TimePickerPage {},
+    #[route("/molecules/context-menu")]
+    ContextMenuPage {},
+    #[route("/molecules/hover-card")]
+    HoverCardPage {},
+    #[route("/molecules/sonner")]
+    SonnerPage {},
+    #[route("/molecules/qr-code")]
+    QrCodePage {},
+    #[route("/molecules/collapsible")]
+    CollapsiblePage {},
+    #[route("/molecules/toggle-group")]
+    ToggleGroupPage {},
     
     // Organisms
     #[route("/organisms")]
@@ -107,6 +168,34 @@ pub enum Route {
     StepperWizardPage {},
     #[route("/organisms/charts")]
     ChartsPage {},
+    #[route("/organisms/footer")]
+    FooterPage {},
+    #[route("/organisms/notification-center")]
+    NotificationCenterPage {},
+    #[route("/organisms/hero")]
+    HeroPage {},
+    #[route("/organisms/file-upload")]
+    FileUploadPage {},
+    #[route("/organisms/confirmation-dialog")]
+    ConfirmationDialogPage {},
+    #[route("/organisms/calendar")]
+    CalendarPage {},
+    #[route("/organisms/date-range-picker")]
+    DateRangePickerPage {},
+    #[route("/organisms/carousel")]
+    CarouselPage {},
+    #[route("/organisms/tree")]
+    TreePage {},
+    #[route("/organisms/timeline")]
+    TimelinePage {},
+    #[route("/organisms/menubar")]
+    MenubarPage {},
+    #[route("/organisms/resizable")]
+    ResizablePage {},
+    #[route("/organisms/kanban")]
+    KanbanPage {},
+    #[route("/organisms/image-uploader")]
+    ImageUploaderPage {},
     
     // Themes
     #[route("/themes")]
@@ -133,150 +222,214 @@ pub enum Route {
     LayoutsPage {},
 }
 
-/// Docs layout with sidebar navigation
+/// Docs layout with custom sidebar using Dioxus Router
 #[component]
 fn DocsLayout() -> Element {
     rsx! {
         div {
-            style: "font-family: 'Inter', system-ui, -apple-system, sans-serif; min-height: 100vh; display: flex; flex-direction: column;",
+            style: "display: flex; min-height: 100vh;",
             
-            // Header
-            Header {
-                brand_title: "Dioxus UI Docs",
-                nav_items: vec![],
-                actions: rsx! {
-                    ThemeToggle {}
-                },
-            }
+            Sidebar {}
             
-            // Main content area with sidebar
             div {
-                style: "display: flex; flex: 1;",
-                
-                // Sidebar Navigation
-                Sidebar {}
-                
-                // Content area
-                div {
-                    style: "flex: 1; padding: 32px; max-width: 900px; margin: 0 auto;",
-                    Outlet::<Route> {}
-                }
+                style: "flex: 1; margin-left: 260px; padding: 32px; max-width: 900px;",
+                Outlet::<Route> {}
             }
         }
     }
 }
 
-/// Sidebar navigation component
+/// Sidebar navigation component with collapsible sections
 #[component]
 fn Sidebar() -> Element {
     let current_route = use_route::<Route>();
+    let theme = use_theme();
+    
+    // Reactive CSS variables that update when theme changes
+    let sidebar_style = use_memo(move || {
+        let t = theme.tokens.read();
+        format!(
+            "width: 260px; min-width: 260px; height: 100vh; position: fixed; left: 0; top: 0; overflow-y: auto; padding: 24px 16px; box-sizing: border-box; background: {}; border-right: 1px solid {}; --sb-text: {}; --sb-primary: {}; --sb-muted: {};",
+            t.colors.background.to_rgba(),
+            t.colors.border.to_rgba(),
+            t.colors.foreground.to_rgba(),
+            t.colors.primary.to_rgba(),
+            t.colors.muted.to_rgba(),
+        )
+    });
     
     rsx! {
+        // Static CSS rules - variables come from parent inline style
+        style {{ r#"
+            .nav-link { display: block; padding: 6px 12px; margin: 2px 0; border-radius: 6px; font-size: 14px; text-decoration: none; color: var(--sb-text); transition: background 0.15s ease; }
+            .nav-link:hover { background: color-mix(in srgb, var(--sb-primary) 15%, transparent); }
+            .nav-link.active { background: var(--sb-primary); color: #ffffff; font-weight: 500; }
+            .nav-link.active:hover { opacity: 0.9; }
+        "# }}
+        
         aside {
-            style: "width: 260px; background: rgb(248,250,252); border-right: 1px solid rgb(226,232,240); padding: 24px 16px; overflow-y: auto; position: sticky; top: 64px; height: calc(100vh - 64px);",
+            style: "{sidebar_style}",
+            style: "width: 260px; min-width: 260px; height: 100vh; position: fixed; left: 0; top: 0; overflow-y: auto; padding: 24px 16px; box-sizing: border-box;",
             
-            h2 {
-                style: "margin: 0 0 24px 0; font-size: 14px; font-weight: 700; color: rgb(148,163,184); text-transform: uppercase; letter-spacing: 0.05em;",
-                "Navigation"
+            Link {
+                to: Route::Home {},
+                style: "display: block; font-size: 20px; font-weight: 700; color: var(--sb-text); text-decoration: none; margin-bottom: 32px; padding: 0 8px;",
+                "Dioxus UI"
             }
             
-            nav {
-                style: "display: flex; flex-direction: column; gap: 4px;",
-                
-                // Getting Started
-                NavSection { title: "Getting Started", items: vec![
-                    ("Home", Route::Home {}),
-                    ("Quick Start", Route::QuickStartPage {}),
-                ], current_route: current_route.clone() }
-                
-                // Atoms
-                NavSection { title: "Atoms", items: vec![
-                    ("Overview", Route::AtomsPage {}),
-                    ("Box", Route::BoxPage {}),
-                    ("Button", Route::ButtonPage {}),
-                    ("Input", Route::InputPage {}),
-                    ("Label", Route::LabelPage {}),
-                    ("Icon", Route::IconPage {}),
-                    ("Checkbox", Route::CheckboxPage {}),
-                    ("Radio", Route::RadioPage {}),
-                    ("Switch", Route::SwitchPage {}),
-                    ("Select", Route::SelectPage {}),
-                    ("TextArea", Route::TextAreaPage {}),
-                    ("Step", Route::StepPage {}),
-                ], current_route: current_route.clone() }
-                
-                // Molecules
-                NavSection { title: "Molecules", items: vec![
-                    ("Overview", Route::MoleculesPage {}),
-                    ("Card", Route::CardPage {}),
-                    ("Badge", Route::BadgePage {}),
-                    ("Alert", Route::AlertPage {}),
-                    ("Avatar", Route::AvatarPage {}),
-                    ("Dialog", Route::DialogPage {}),
-                    ("Dropdown", Route::DropdownPage {}),
-                    ("Tooltip", Route::TooltipPage {}),
-                    ("Separator", Route::SeparatorPage {}),
-                    ("Skeleton", Route::SkeletonPage {}),
-                    ("Stepper", Route::StepperPage {}),
-                ], current_route: current_route.clone() }
-                
-                // Organisms
-                NavSection { title: "Organisms", items: vec![
-                    ("Overview", Route::OrganismsPage {}),
-                    ("Header", Route::HeaderPage {}),
-                    ("Layout", Route::LayoutPage {}),
-                    ("Tabs", Route::TabsPage {}),
-                    ("Accordion", Route::AccordionPage {}),
-                    ("Cards", Route::CardsPage {}),
-                    ("DataTable", Route::DataTablePage {}),
-                    ("Stepper Wizard", Route::StepperWizardPage {}),
-                    ("Charts", Route::ChartsPage {}),
-                ], current_route: current_route.clone() }
-                
-                // Themes
-                NavSection { title: "Themes", items: vec![
-                    ("Overview", Route::ThemesPage {}),
-                    ("Design Tokens", Route::ThemeTokensPage {}),
-                    ("Custom Themes", Route::CustomThemePage {}),
-                    ("Preset Themes", Route::PresetThemesPage {}),
-                ], current_route: current_route.clone() }
-                
-                // Guides
-                NavSection { title: "Guides", items: vec![
-                    ("All Guides", Route::GuidesPage {}),
-                    ("Styling", Route::StylingPage {}),
-                    ("Forms", Route::FormsPage {}),
-                    ("Layouts", Route::LayoutsPage {}),
-                ], current_route: current_route.clone() }
-            }
+            // Getting Started
+            NavSection { title: "Getting Started", current_route: current_route.clone(), items: vec![
+                ("Home", Route::Home {}),
+                ("Quick Start", Route::QuickStartPage {}),
+            ]}
+            
+            // Atoms
+            NavSection { title: "Atoms", current_route: current_route.clone(), items: vec![
+                ("Overview", Route::AtomsPage {}),
+                ("AspectRatio", Route::AspectRatioPage {}),
+                ("Box", Route::BoxPage {}),
+                ("Button", Route::ButtonPage {}),
+                ("Checkbox", Route::CheckboxPage {}),
+                ("DatePicker", Route::DatePickerPage {}),
+                ("Divider", Route::DividerPage {}),
+                ("Heading", Route::HeadingPage {}),
+                ("Icon", Route::IconPage {}),
+                ("Input", Route::InputPage {}),
+                ("Label", Route::LabelPage {}),
+                ("NumberInput", Route::NumberInputPage {}),
+                ("PasswordInput", Route::PasswordInputPage {}),
+                ("Progress", Route::ProgressPage {}),
+                ("Radio", Route::RadioPage {}),
+                ("Rating", Route::RatingPage {}),
+                ("Select", Route::SelectPage {}),
+                ("Skeleton", Route::SkeletonAtomPage {}),
+                ("Slider", Route::SliderPage {}),
+                ("Spinner", Route::SpinnerPage {}),
+                ("Step", Route::StepPage {}),
+                ("Switch", Route::SwitchPage {}),
+                ("Tag", Route::TagPage {}),
+                ("TextArea", Route::TextAreaPage {}),
+                ("Toggle", Route::TogglePage {}),
+            ]}
+            
+            // Molecules
+            NavSection { title: "Molecules", current_route: current_route.clone(), items: vec![
+                ("Overview", Route::MoleculesPage {}),
+                ("Alert", Route::AlertPage {}),
+                ("Avatar", Route::AvatarPage {}),
+                ("Badge", Route::BadgePage {}),
+                ("Card", Route::CardPage {}),
+                ("Collapsible", Route::CollapsiblePage {}),
+                ("Combobox", Route::ComboboxPage {}),
+                ("Command", Route::CommandPage {}),
+                ("ContextMenu", Route::ContextMenuPage {}),
+                ("Dialog", Route::DialogPage {}),
+                ("Dropdown", Route::DropdownPage {}),
+                ("HoverCard", Route::HoverCardPage {}),
+                ("List Item", Route::ListItemPage {}),
+                ("Media Object", Route::MediaObjectPage {}),
+                ("MultiSelect", Route::MultiSelectPage {}),
+                ("OTP Input", Route::OtpInputPage {}),
+                ("Pagination", Route::PaginationPage {}),
+                ("QR Code", Route::QrCodePage {}),
+                ("Separator", Route::SeparatorPage {}),
+                ("Sheet", Route::SheetPage {}),
+                ("Skeleton", Route::SkeletonPage {}),
+                ("Sonner", Route::SonnerPage {}),
+                ("Stepper", Route::StepperPage {}),
+                ("TimePicker", Route::TimePickerPage {}),
+                ("Toast", Route::ToastPage {}),
+                ("ToggleGroup", Route::ToggleGroupPage {}),
+                ("Tooltip", Route::TooltipPage {}),
+            ]}
+            
+            // Organisms
+            NavSection { title: "Organisms", current_route: current_route.clone(), items: vec![
+                ("Overview", Route::OrganismsPage {}),
+                ("Accordion", Route::AccordionPage {}),
+                ("Calendar", Route::CalendarPage {}),
+                ("Cards", Route::CardsPage {}),
+                ("Carousel", Route::CarouselPage {}),
+                ("Charts", Route::ChartsPage {}),
+                ("Confirmation Dialog", Route::ConfirmationDialogPage {}),
+                ("DataTable", Route::DataTablePage {}),
+                ("DateRangePicker", Route::DateRangePickerPage {}),
+                ("File Upload", Route::FileUploadPage {}),
+                ("Footer", Route::FooterPage {}),
+                ("Header", Route::HeaderPage {}),
+                ("Hero", Route::HeroPage {}),
+                ("ImageUploader", Route::ImageUploaderPage {}),
+                ("Kanban", Route::KanbanPage {}),
+                ("Layout", Route::LayoutPage {}),
+                ("Menubar", Route::MenubarPage {}),
+                ("Notification Center", Route::NotificationCenterPage {}),
+                ("Resizable", Route::ResizablePage {}),
+                ("Stepper Wizard", Route::StepperWizardPage {}),
+                ("Tabs", Route::TabsPage {}),
+                ("Timeline", Route::TimelinePage {}),
+                ("Tree", Route::TreePage {}),
+            ]}
+            
+            // Themes & Guides
+            NavSection { title: "Themes", current_route: current_route.clone(), items: vec![
+                ("Overview", Route::ThemesPage {}),
+                ("Design Tokens", Route::ThemeTokensPage {}),
+                ("Custom Themes", Route::CustomThemePage {}),
+                ("Preset Themes", Route::PresetThemesPage {}),
+            ]}
+            
+            NavSection { title: "Guides", current_route: current_route.clone(), items: vec![
+                ("Overview", Route::GuidesPage {}),
+                ("Styling", Route::StylingPage {}),
+                ("Forms", Route::FormsPage {}),
+                ("Layouts", Route::LayoutsPage {}),
+            ]}
         }
     }
 }
 
-/// Navigation section in sidebar
+/// Navigation section with collapsible items
 #[component]
-fn NavSection(title: String, items: Vec<(&'static str, Route)>, current_route: Route) -> Element {
+fn NavSection(title: String, current_route: Route, items: Vec<(&'static str, Route)>) -> Element {
+    let mut expanded = use_signal(|| true);
+    let is_active_section = items.iter().any(|(_, r)| *r == current_route);
+    
     rsx! {
         div {
             style: "margin-bottom: 16px;",
             
-            h3 {
-                style: "margin: 0 0 8px 0; font-size: 12px; font-weight: 600; color: rgb(100,116,139); padding-left: 12px;",
-                "{title}"
+            div {
+                style: "display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; border-radius: 6px; transition: background 0.15s;",
+                onclick: move |_| expanded.set(!expanded()),
+                
+                h3 {
+                    style: if is_active_section { 
+                        "margin: 0; font-size: 12px; font-weight: 600; color: var(--sb-text); text-transform: uppercase; letter-spacing: 0.05em;" 
+                    } else { 
+                        "margin: 0; font-size: 12px; font-weight: 600; color: var(--sb-muted); text-transform: uppercase; letter-spacing: 0.05em;" 
+                    },
+                    "{title}"
+                }
+                
+                span {
+                    style: if expanded() { 
+                        "font-size: 10px; color: var(--sb-muted); transition: transform 0.2s;" 
+                    } else { 
+                        "font-size: 10px; color: var(--sb-muted); transition: transform 0.2s; transform: rotate(-90deg);" 
+                    },
+                    "▼"
+                }
             }
             
-            div {
-                style: "display: flex; flex-direction: column; gap: 2px;",
-                
-                for (label, route) in items {
-                    Link {
-                        to: route.clone(),
-                        style: if current_route == route { 
-                            "padding: 6px 12px; border-radius: 6px; background: rgb(15,23,42); color: white; font-size: 14px; text-decoration: none; display: block;"
-                        } else { 
-                            "padding: 6px 12px; border-radius: 6px; color: rgb(71,85,105); font-size: 14px; text-decoration: none; display: block; &:hover {{ background: rgb(226,232,240); }}"
-                        },
-                        "{label}"
+            if expanded() {
+                div {
+                    style: "margin-top: 4px;",
+                    
+                    for (label, route) in items {
+                        NavLink {
+                            label: label.to_string(),
+                            route: route.clone(),
+                        }
                     }
                 }
             }
@@ -284,30 +437,45 @@ fn NavSection(title: String, items: Vec<(&'static str, Route)>, current_route: R
     }
 }
 
+/// Individual navigation link using Link's active_class prop
+#[component]
+fn NavLink(label: String, route: Route) -> Element {
+    rsx! {
+        Link {
+            key: "{label}",
+            to: route,
+            class: "nav-link",
+            active_class: "active",
+            "{label}"
+        }
+    }
+}
+
+
 // Page Components
 
 #[component]
 fn Home() -> Element {
     rsx! {
-        div {
-            style: "display: flex; flex-direction: column; gap: 32px;",
+        VStack {
+            style: "gap: 32px;",
             
-            div {
+            Box {
                 h1 { style: "margin: 0 0 16px 0; font-size: 40px; font-weight: 800;", "Dioxus UI" }
                 p { style: "margin: 0; font-size: 18px; color: rgb(100,116,139); line-height: 1.6;", 
                     "A pure Rust design system for building beautiful, type-safe user interfaces with Dioxus." }
             }
             
-            div {
+            Box {
                 style: "display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;",
                 
-                DocCard { icon: "⚛️", title: "60+ Components", description: "Atoms, molecules, and organisms following Atomic Design principles." }
+                DocCard { icon: "⚛️", title: "85+ Components", description: "Atoms, molecules, and organisms following Atomic Design principles." }
                 DocCard { icon: "🎨", title: "7 Theme Presets", description: "Light, dark, and brand themes with full customization." }
                 DocCard { icon: "📱", title: "Cross-Platform", description: "Works on Web, Desktop, and Mobile." }
                 DocCard { icon: "🔒", title: "Type-Safe", description: "No CSS files - all styles are compile-time checked Rust code." }
             }
             
-            div {
+            Box {
                 style: "padding: 24px; background: rgb(241,245,249); border-radius: 12px;",
                 
                 h2 { style: "font-size: 20px; font-weight: 700; margin-bottom: 16px;", "Quick Example" }
@@ -326,10 +494,10 @@ fn Home() -> Element {
 #[component]
 fn DocCard(icon: String, title: String, description: String) -> Element {
     rsx! {
-        div {
+        Box {
             style: "padding: 20px; background: white; border: 1px solid rgb(226,232,240); border-radius: 12px;",
             
-            div { style: "font-size: 28px; margin-bottom: 12px;", "{icon}" }
+            Box { style: "font-size: 28px; margin-bottom: 12px;", "{icon}" }
             h3 { style: "margin: 0 0 8px 0; font-size: 16px; font-weight: 600;", "{title}" }
             p { style: "margin: 0; font-size: 14px; color: rgb(100,116,139); line-height: 1.5;", "{description}" }
         }
@@ -364,6 +532,24 @@ fn SelectPage() -> Element { components::atoms::SelectPage() }
 fn TextAreaPage() -> Element { components::atoms::TextAreaPage() }
 #[component]
 fn StepPage() -> Element { components::atoms::StepPage() }
+#[component]
+fn HeadingPage() -> Element { components::atoms::HeadingPage() }
+#[component]
+fn DividerPage() -> Element { components::atoms::DividerPage() }
+#[component]
+fn ProgressPage() -> Element { components::atoms::ProgressPage() }
+#[component]
+fn SpinnerPage() -> Element { components::atoms::SpinnerPage() }
+#[component]
+fn SkeletonAtomPage() -> Element { components::atoms::SkeletonAtomPage() }
+#[component]
+fn RatingPage() -> Element { components::atoms::RatingPage() }
+#[component]
+fn DatePickerPage() -> Element { components::atoms::DatePickerPage() }
+#[component]
+fn SliderPage() -> Element { components::atoms::SliderPage() }
+#[component]
+fn TagPage() -> Element { components::atoms::TagPage() }
 
 // Molecules
 #[component]
@@ -390,6 +576,16 @@ fn SeparatorPage() -> Element { components::molecules::SeparatorPage() }
 fn SkeletonPage() -> Element { components::molecules::SkeletonMoleculePage() }
 #[component]
 fn StepperPage() -> Element { components::molecules::StepperPage() }
+#[component]
+fn ToastPage() -> Element { components::molecules::ToastPage() }
+#[component]
+fn ComboboxPage() -> Element { components::molecules::ComboboxPage() }
+#[component]
+fn MediaObjectPage() -> Element { components::molecules::MediaObjectPage() }
+#[component]
+fn PaginationPage() -> Element { components::molecules::PaginationPage() }
+#[component]
+fn ListItemPage() -> Element { components::molecules::ListItemPage() }
 
 // Organisms
 #[component]
@@ -410,6 +606,70 @@ fn DataTablePage() -> Element { components::organisms::DataTablePage() }
 fn StepperWizardPage() -> Element { components::organisms::StepperWizardPage() }
 #[component]
 fn ChartsPage() -> Element { components::organisms::ChartsPage() }
+#[component]
+fn FooterPage() -> Element { components::organisms::FooterPage() }
+#[component]
+fn NotificationCenterPage() -> Element { components::organisms::NotificationCenterPage() }
+#[component]
+fn HeroPage() -> Element { components::organisms::HeroPage() }
+#[component]
+fn FileUploadPage() -> Element { components::organisms::FileUploadPage() }
+#[component]
+fn ConfirmationDialogPage() -> Element { components::organisms::ConfirmationDialogPage() }
+
+// New Atoms (Phase 1-4)
+#[component]
+fn TogglePage() -> Element { components::atoms_new::TogglePage() }
+#[component]
+fn NumberInputPage() -> Element { components::atoms_new::NumberInputPage() }
+#[component]
+fn AspectRatioPage() -> Element { components::atoms_new::AspectRatioPage() }
+#[component]
+fn PasswordInputPage() -> Element { components::atoms_new::PasswordInputPage() }
+
+// New Molecules (Phase 1-4)
+#[component]
+fn CommandPage() -> Element { components::molecules_new::CommandPage() }
+#[component]
+fn SheetPage() -> Element { components::molecules_new::SheetPage() }
+#[component]
+fn MultiSelectPage() -> Element { components::molecules_new::MultiSelectPage() }
+#[component]
+fn OtpInputPage() -> Element { components::molecules_new::OtpInputPage() }
+#[component]
+fn TimePickerPage() -> Element { components::molecules_new::TimePickerPage() }
+#[component]
+fn ContextMenuPage() -> Element { components::molecules_new::ContextMenuPage() }
+#[component]
+fn HoverCardPage() -> Element { components::molecules_new::HoverCardPage() }
+#[component]
+fn SonnerPage() -> Element { components::molecules_new::SonnerPage() }
+#[component]
+fn QrCodePage() -> Element { components::molecules_new::QrCodePage() }
+#[component]
+fn CollapsiblePage() -> Element { components::molecules_new::CollapsiblePage() }
+#[component]
+fn ToggleGroupPage() -> Element { components::molecules_new::ToggleGroupPage() }
+
+// New Organisms (Phase 1-4)
+#[component]
+fn CalendarPage() -> Element { components::organisms_new::CalendarPage() }
+#[component]
+fn DateRangePickerPage() -> Element { components::organisms_new::DateRangePickerPage() }
+#[component]
+fn CarouselPage() -> Element { components::organisms_new::CarouselPage() }
+#[component]
+fn TreePage() -> Element { components::organisms_new::TreePage() }
+#[component]
+fn TimelinePage() -> Element { components::organisms_new::TimelinePage() }
+#[component]
+fn MenubarPage() -> Element { components::organisms_new::MenubarPage() }
+#[component]
+fn ResizablePage() -> Element { components::organisms_new::ResizablePage() }
+#[component]
+fn KanbanPage() -> Element { components::organisms_new::KanbanPage() }
+#[component]
+fn ImageUploaderPage() -> Element { components::organisms_new::ImageUploaderPage() }
 
 // Themes
 #[component]

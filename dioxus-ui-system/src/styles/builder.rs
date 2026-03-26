@@ -604,6 +604,15 @@ impl Style {
         self.border_left = Some(format!("{}px solid {}", width, color.to_rgba()));
         self
     }
+    
+    /// Set border style (dashed, dotted, etc.)
+    pub fn border_style(mut self, style: &str) -> Self {
+        // This is a simplified implementation - border_style would need proper field
+        // For now, we'll append it to the existing border or set it as custom
+        let existing = self.transform.clone().unwrap_or_default();
+        self.transform = Some(format!("{} border-style: {};", existing, style));
+        self
+    }
 
     /// Set box shadow
     pub fn shadow(mut self, shadow: &str) -> Self {
@@ -918,6 +927,43 @@ impl Style {
     /// Set min-height to 100%
     pub fn min_h_full(mut self) -> Self {
         self.min_height = Some("100%".into());
+        self
+    }
+
+    /// Set inset (top, right, bottom, left) - shorthand for absolute positioning
+    pub fn inset(mut self, value: &str) -> Self {
+        self.top = Some(value.into());
+        self.right = Some(value.into());
+        self.bottom = Some(value.into());
+        self.left = Some(value.into());
+        self
+    }
+
+    /// Set flex-grow to 1 (flex-1)
+    pub fn flex_1(mut self) -> Self {
+        let existing = self.transform.unwrap_or_default();
+        self.transform = Some(format!("{} flex: 1 1 0%;", existing));
+        self
+    }
+
+    /// Set overflow-x to auto
+    pub fn overflow_x_auto(mut self) -> Self {
+        let existing = self.transform.unwrap_or_default();
+        self.transform = Some(format!("{} overflow-x: auto;", existing));
+        self
+    }
+
+    /// Set overflow-y to auto
+    pub fn overflow_y_auto(mut self) -> Self {
+        let existing = self.transform.unwrap_or_default();
+        self.transform = Some(format!("{} overflow-y: auto;", existing));
+        self
+    }
+
+    /// Add custom/raw CSS
+    pub fn custom(mut self, css: &str) -> Self {
+        let existing = self.transform.unwrap_or_default();
+        self.transform = Some(format!("{} {}", existing, css));
         self
     }
 

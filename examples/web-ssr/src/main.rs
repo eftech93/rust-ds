@@ -15,6 +15,7 @@
 
 use axum::{response::Html, routing::get, Router};
 use dioxus::prelude::*;
+use dioxus_ui_system::atoms::{Box, HStack, SpacingSize, AlignItems, JustifyContent};
 use example_shared::{ComponentShowcaseInner, LayoutShowcaseInner};
 
 #[tokio::main]
@@ -109,21 +110,26 @@ fn App() -> Element {
     }
 }
 
+
+
 /// App with view switcher for Components and Layouts
 #[component]
 fn AppWithViewSwitcher() -> Element {
     let mut current_view = use_signal(|| "components".to_string());
     
     rsx! {
-        div {
+        Box {
             style: "font-family: 'Inter', system-ui, -apple-system, sans-serif;",
             
             // SSR Banner with View Switcher
-            div {
-                style: "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;",
+            HStack {
+                style: "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px;",
+                align: AlignItems::Center,
+                justify: JustifyContent::SpaceBetween,
                 
-                div {
-                    style: "display: flex; align-items: center; gap: 16px;",
+                HStack {
+                    align: AlignItems::Center,
+                    gap: SpacingSize::Md,
                     
                     span {
                         style: "font-weight: 600;",
@@ -131,8 +137,8 @@ fn AppWithViewSwitcher() -> Element {
                     }
                     
                     // View buttons
-                    div {
-                        style: "display: flex; gap: 8px;",
+                    HStack {
+                        gap: SpacingSize::Sm,
                         
                         ViewButton {
                             label: "Components",
@@ -148,8 +154,9 @@ fn AppWithViewSwitcher() -> Element {
                     }
                 }
                 
-                div {
-                    style: "display: flex; align-items: center; gap: 12px;",
+                HStack {
+                    align: AlignItems::Center,
+                    gap: SpacingSize::Md,
                     
                     ThemeSelector {}
                     
