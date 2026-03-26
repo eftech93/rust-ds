@@ -210,11 +210,17 @@ pub fn Combobox(props: ComboboxProps) -> Element {
                     }
                 }
                 
-                // Dropdown
+                // Dropdown - uses absolute positioning with high z-index
+                // Parent should NOT have overflow:hidden for this to work
                 if is_open() && !props.disabled {
+                    // Overlay to capture clicks outside
+                    div {
+                        style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9998;",
+                        onclick: move |_| is_open.set(false),
+                    }
                     div {
                         class: "combobox-dropdown",
-                        style: "position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: white; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 250px; overflow-y: auto; z-index: 50;",
+                        style: "position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: white; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); max-height: 250px; overflow-y: auto; z-index: 9999;",
                         
                         if filtered_options.is_empty() && !props.creatable {
                             div {

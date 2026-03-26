@@ -2,13 +2,15 @@
 
 use dioxus::prelude::*;
 use dioxus_ui_system::prelude::*;
-use dioxus_ui_system::molecules::{Command, CommandInput, CommandList, CommandGroup, CommandItem, CommandEmpty, Sheet, SheetSide, MultiSelect, OtpInput, TimePicker, ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, HoverCard, Sonner, SonnerVariant, ToastPosition, QrCode, QrCodeLevel, Collapsible, ToggleGroup, ToggleGroupType, ToggleItem};
+use dioxus_ui_system::atoms::{Box, VStack, HStack, SpacingSize};
+use dioxus_ui_system::molecules::{Command, CommandInput, CommandList, CommandGroup, CommandItem, CommandEmpty, Sheet, SheetSide, MultiSelect, OtpInput, TimePicker, ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, HoverCard, HoverCardHeader, HoverCardContent, QrCode, Collapsible, ToggleGroup, ToggleGroupType, ToggleItem, use_sonner, Sonner, ToastPosition};
 use crate::docs_ui::{DocPage, Section, ExampleBox, CodeBlock, PropsTable};
 
 /// Command documentation page
 #[component]
 pub fn CommandPage() -> Element {
     let mut value = use_signal(|| "".to_string());
+    let mut message = use_signal(|| "Select a command...".to_string());
     
     rsx! {
         DocPage {
@@ -16,9 +18,11 @@ pub fn CommandPage() -> Element {
             description: "A command palette for quick navigation and actions.",
             
             Section { title: "Basic",
+                p { "{message}" }
                 ExampleBox {
                     Box { style: "max-width: 400px; border: 1px solid #e5e7eb; border-radius: 8px;",
                         Command {
+                            on_select: move |_| message.set("Command selected!".to_string()),
                             CommandInput {
                                 placeholder: "Search commands...",
                                 value: value(),
@@ -30,17 +34,17 @@ pub fn CommandPage() -> Element {
                                     heading: "Suggestions",
                                     CommandItem {
                                         value: "calendar",
-                                        on_select: move |_| {},
+                                        on_select: move |_| message.set("Calendar selected".to_string()),
                                         "Calendar"
                                     }
                                     CommandItem {
                                         value: "search",
-                                        on_select: move |_| {},
+                                        on_select: move |_| message.set("Search selected".to_string()),
                                         "Search"
                                     }
                                     CommandItem {
                                         value: "settings",
-                                        on_select: move |_| {},
+                                        on_select: move |_| message.set("Settings selected".to_string()),
                                         "Settings"
                                     }
                                 }
@@ -48,7 +52,10 @@ pub fn CommandPage() -> Element {
                         }
                     }
                 }
-                CodeBlock { code: r#"Command {
+                CodeBlock { code: r#"let mut message = use_signal(|| "Select a command...".to_string());
+
+Command {
+    on_select: move |_| message.set("Command selected!".to_string()),
     CommandInput {
         placeholder: "Search...",
         value: value(),
@@ -57,7 +64,11 @@ pub fn CommandPage() -> Element {
     CommandList {
         CommandGroup {
             heading: "Suggestions",
-            CommandItem { value: "calendar", "Calendar" }
+            CommandItem { 
+                value: "calendar", 
+                on_select: move |_| message.set("Calendar selected".to_string()),
+                "Calendar" 
+            }
         }
     }
 }"#.to_string() }
@@ -300,19 +311,40 @@ pub fn ContextMenuPage() -> Element {
             
             Section { title: "Basic",
                 ExampleBox {
-                    Box { style: "padding: 40px; background: #f3f4f6; border-radius: 8px; text-align: center;",
-                        "Right-click here"
+                    ContextMenu {
+                        ContextMenuTrigger {
+                            Box { 
+                                style: "padding: 40px; background: #f3f4f6; border-radius: 8px; text-align: center; cursor: context-menu; user-select: none;",
+                                "Right-click here"
+                            }
+                        }
+                        ContextMenuContent {
+                            ContextMenuItem { on_click: move |_| {}, "Cut" }
+                            ContextMenuItem { on_click: move |_| {}, "Copy" }
+                            ContextMenuItem { on_click: move |_| {}, "Paste" }
+                            ContextMenuSeparator {}
+                            ContextMenuItem { 
+                                on_click: move |_| {}, 
+                                shortcut: Some("⌘D".to_string()),
+                                "Duplicate"
+                            }
+                        }
                     }
-                    // Context menu would appear on right-click
                 }
                 CodeBlock { code: r#"ContextMenu {
     ContextMenuTrigger {
         div { "Right-click me" }
     }
     ContextMenuContent {
-        ContextMenuItem { onclick: move |_| {}, "Cut" }
-        ContextMenuItem { onclick: move |_| {}, "Copy" }
-        ContextMenuItem { onclick: move |_| {}, "Paste" }
+        ContextMenuItem { on_click: move |_| {}, "Cut" }
+        ContextMenuItem { on_click: move |_| {}, "Copy" }
+        ContextMenuItem { on_click: move |_| {}, "Paste" }
+        ContextMenuSeparator {}
+        ContextMenuItem { 
+            on_click: move |_| {}, 
+            shortcut: Some("⌘D".to_string()),
+            "Duplicate"
+        }
     }
 }"#.to_string() }
             }
@@ -330,16 +362,40 @@ pub fn HoverCardPage() -> Element {
             
             Section { title: "Basic",
                 ExampleBox {
-                    Box { style: "padding: 20px;",
-                        "Hover over the "
-                        span { style: "color: #3b82f6; cursor: pointer; text-decoration: underline;", "@username" }
-                        " to see their profile"
+                    Box { style: "padding: 40px;",
+                        HoverCard {
+                            trigger: rsx! { 
+                                span { style: "color: #3b82f6; cursor: pointer; text-decoration: underline; font-weight: 500;", "@username" }
+                            },
+                            HoverCardHeader {
+                                title: "John Doe".to_string(),
+                                description: Some("Software Engineer @ Company".to_string()),
+                            }
+                            HoverCardContent {
+                                VStack { gap: SpacingSize::Sm,
+                                    p { style: "margin: 0; font-size: 14px; color: #6b7280;", 
+                                        "Passionate about building great user experiences with Rust and Dioxus."
+                                    }
+                                    HStack { gap: SpacingSize::Md,
+                                        span { style: "font-size: 12px; color: #6b7280;", "📍 San Francisco" }
+                                        span { style: "font-size: 12px; color: #6b7280;", "🔗 github.com/johndoe" }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
                 CodeBlock { code: r#"HoverCard {
-    trigger: rsx! { span { "@username" } },
-    // Card content appears on hover
-    "User profile information"
+    trigger: rsx! { 
+        span { "@username" }
+    },
+    HoverCardHeader {
+        title: "John Doe".to_string(),
+        description: Some("Software Engineer".to_string()),
+    }
+    HoverCardContent {
+        "User profile information..."
+    }
 }"#.to_string() }
             }
         }
@@ -349,6 +405,12 @@ pub fn HoverCardPage() -> Element {
 /// Sonner (Toast) documentation page
 #[component]
 pub fn SonnerPage() -> Element {
+    let mut sonner = use_sonner();
+    let toasts_sig = sonner.toasts_signal();
+    
+    // Read the signal to trigger re-renders
+    let toasts_list = toasts_sig();
+    
     rsx! {
         DocPage {
             title: "Sonner",
@@ -357,13 +419,23 @@ pub fn SonnerPage() -> Element {
             Section { title: "Basic",
                 ExampleBox {
                     HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap;",
-                        Button { onclick: move |_| {}, "Show Toast" }
-                        Button { variant: ButtonVariant::Secondary, onclick: move |_| {}, "Success" }
-                        Button { variant: ButtonVariant::Destructive, onclick: move |_| {}, "Error" }
+                        Button { 
+                            onclick: move |_| { sonner.toast("Hello World!"); }, 
+                            "Show Toast" 
+                        }
+                        Button { 
+                            variant: ButtonVariant::Secondary, 
+                            onclick: move |_| { sonner.success("Operation completed!"); }, 
+                            "Success" 
+                        }
+                        Button { 
+                            variant: ButtonVariant::Destructive, 
+                            onclick: move |_| { sonner.error("Something went wrong"); }, 
+                            "Error" 
+                        }
                     }
                 }
-                CodeBlock { code: r#"// Using the use_sonner hook
-let mut sonner = use_sonner();
+                CodeBlock { code: r#"let mut sonner = use_sonner();
 
 // Show different variants
 sonner.toast("Hello World");
@@ -379,6 +451,13 @@ Sonner {
             Section { title: "Positions",
                 p { "Sonner supports multiple positions: BottomRight, BottomCenter, BottomLeft, TopRight, TopCenter, TopLeft" }
             }
+        }
+        
+        // Sonner is rendered at the page level, outside of any containers
+        Sonner {
+            toasts: toasts_list.clone(),
+            position: ToastPosition::BottomRight,
+            on_dismiss: move |id: String| sonner.dismiss(&id),
         }
     }
 }
@@ -424,13 +503,25 @@ pub fn CollapsiblePage() -> Element {
             
             Section { title: "Basic",
                 ExampleBox {
-                    "Collapsible content example"
+                    Collapsible {
+                        trigger: rsx! { "Click to expand/collapse" },
+                        "This content is hidden by default and revealed when you click the trigger. You can put any content here including text, images, or other components."
+                    }
                 }
                 CodeBlock { code: r#"Collapsible {
     trigger: rsx! { "Click to expand" },
-    // Content shown when expanded
     "Hidden content revealed!"
 }"#.to_string() }
+            }
+            
+            Section { title: "Default Open",
+                ExampleBox {
+                    Collapsible {
+                        default_open: true,
+                        trigger: rsx! { "Initially expanded" },
+                        "This content is visible by default because default_open is set to true."
+                    }
+                }
             }
         }
     }

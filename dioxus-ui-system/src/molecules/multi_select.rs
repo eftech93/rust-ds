@@ -266,7 +266,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             .build()
     });
 
-    // Dropdown styles
+    // Dropdown styles - uses absolute positioning with high z-index
     let dropdown_style = use_style(|t| {
         Style::new()
             .absolute()
@@ -279,7 +279,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             .bg(&t.colors.popover)
             .shadow(&t.shadows.lg)
             .overflow_auto()
-            .z_index(50)
+            .z_index(9999)
             .build()
     });
 
@@ -418,8 +418,13 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                 }
             }
 
-            // Dropdown
+            // Dropdown with overlay for click-outside
             if is_open() && !props.disabled {
+                // Overlay to capture clicks outside
+                div {
+                    style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9998;",
+                    onclick: move |_| is_open.set(false),
+                }
                 div {
                     class: "multi-select-dropdown",
                     style: "{dropdown_style}",

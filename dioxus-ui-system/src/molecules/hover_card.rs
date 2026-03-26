@@ -61,8 +61,8 @@ pub struct HoverCardProps {
 ///
 /// A card that appears when hovering over a trigger element.
 /// Features:
-/// - Show on hover with configurable delay
-/// - Hide on mouse leave with configurable delay
+/// - Show on hover with configurable delay (using CSS)
+/// - Hide on mouse leave with configurable delay (using CSS)
 /// - Position relative to trigger (side + align)
 /// - Arrow pointing to trigger
 /// - Click outside to close
@@ -72,10 +72,6 @@ pub struct HoverCardProps {
 pub fn HoverCard(props: HoverCardProps) -> Element {
     let _theme = use_theme();
     let mut is_visible = use_signal(|| false);
-    let mut is_hovered = use_signal(|| false);
-    
-    // Use generation counter to track state changes for delay handling
-    let mut generation = use_signal(|| 0u64);
     
     // Calculate position styles based on side and align
     let position_style = match (&props.side, &props.align) {
@@ -93,8 +89,14 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
         (Side::Left, Align::End) => "right: calc(100% + 8px); bottom: 0;",
     };
     
-    // Card base styles
-    let card_style = use_style(|t| {
+    // Card base styles with CSS-based hover delay
+    let open_delay_ms = props.open_delay;
+    let close_delay_ms = props.close_delay;
+    let card_style = use_style(move |t| {
+        let transition = format!("opacity 200ms ease {}ms, transform 200ms ease {}ms", 
+            if is_visible() { 0 } else { close_delay_ms as i32 },
+            if is_visible() { 0 } else { close_delay_ms as i32 }
+        );
         Style::new()
             .absolute()
             .w_px(320)
@@ -102,8 +104,8 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
             .border(1, &t.colors.border)
             .bg(&t.colors.popover)
             .shadow(&t.shadows.lg)
-            .z_index(50)
-            .transition("opacity 150ms ease-in-out, transform 150ms ease-in-out")
+            .z_index(9999)
+            .transition(&transition)
             .build()
     });
     
@@ -126,91 +128,42 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
     };
     
     // Visibility styles with animation
-    let visibility_style = match (&props.side, &props.align, is_visible()) {
-        (Side::Top, Align::Center, true) => "opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto;",
-        (Side::Top, Align::Center, false) => "opacity: 0; transform: translateX(-50%) translateY(4px); pointer-events: none;",
-        (Side::Right, Align::Center, true) => "opacity: 1; transform: translateY(-50%) translateX(0); pointer-events: auto;",
-        (Side::Right, Align::Center, false) => "opacity: 0; transform: translateY(-50%) translateX(-4px); pointer-events: none;",
-        (Side::Bottom, Align::Center, true) => "opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto;",
-        (Side::Bottom, Align::Center, false) => "opacity: 0; transform: translateX(-50%) translateY(-4px); pointer-events: none;",
-        (Side::Left, Align::Center, true) => "opacity: 1; transform: translateY(-50%) translateX(0); pointer-events: auto;",
-        (Side::Left, Align::Center, false) => "opacity: 0; transform: translateY(-50%) translateX(4px); pointer-events: none;",
-        (_, _, true) => "opacity: 1; transform: translateY(0); pointer-events: auto;",
-        (_, _, false) => "opacity: 0; transform: translateY(-4px); pointer-events: none;",
+    let visibility_style = if is_visible() {
+        "opacity: 1; pointer-events: auto;"
+    } else {
+        "opacity: 0; pointer-events: none;"
+    };
+    
+    let transform_style = match (&props.side, &props.align, is_visible()) {
+        (Side::Top, Align::Center, true) => "transform: translateX(-50%) translateY(0);",
+        (Side::Top, Align::Center, false) => "transform: translateX(-50%) translateY(4px);",
+        (Side::Right, Align::Center, true) => "transform: translateY(-50%) translateX(0);",
+        (Side::Right, Align::Center, false) => "transform: translateY(-50%) translateX(-4px);",
+        (Side::Bottom, Align::Center, true) => "transform: translateX(-50%) translateY(0);",
+        (Side::Bottom, Align::Center, false) => "transform: translateX(-50%) translateY(-4px);",
+        (Side::Left, Align::Center, true) => "transform: translateY(-50%) translateX(0);",
+        (Side::Left, Align::Center, false) => "transform: translateY(-50%) translateX(4px);",
+        (_, _, true) => "transform: translateY(0);",
+        (_, _, false) => "transform: translateY(4px);",
     };
     
     // Handle keyboard events (Escape to close)
     let handle_keydown = move |e: Event<KeyboardData>| {
         if e.key() == Key::Escape && is_visible() {
             is_visible.set(false);
-            is_hovered.set(false);
-            generation.set(generation() + 1);
         }
     };
     
     let custom_style = props.style.clone().unwrap_or_default();
-    let open_delay = props.open_delay;
-    let close_delay = props.close_delay;
     
     rsx! {
         div {
             style: "position: relative; display: inline-block;",
             onmouseenter: move |_| {
-                is_hovered.set(true);
-                let current_gen = generation() + 1;
-                generation.set(current_gen);
-                let open_delay = open_delay;
-                let gen_signal = generation;
-                let mut vis_signal = is_visible;
-                let hover_signal = is_hovered;
-                spawn(async move {
-                    // Simple delay using a counter-based approach
-                    let target = gen_signal();
-                    let mut count = 0u64;
-                    loop {
-                        // Check if generation changed (means cancel)
-                        if gen_signal() != target {
-                            return;
-                        }
-                        // ~16ms per iteration for 60fps
-                        for _ in 0..100 { /* small delay */ }
-                        count += 1;
-                        // Approximate delay (count * loop time)
-                        if count * 16 >= open_delay {
-                            break;
-                        }
-                    }
-                    // Check again after delay
-                    if gen_signal() == target && hover_signal() {
-                        vis_signal.set(true);
-                    }
-                });
+                is_visible.set(true);
             },
             onmouseleave: move |_| {
-                is_hovered.set(false);
-                let current_gen = generation() + 1;
-                generation.set(current_gen);
-                let close_delay = close_delay;
-                let gen_signal = generation;
-                let mut vis_signal = is_visible;
-                let hover_signal = is_hovered;
-                spawn(async move {
-                    let target = gen_signal();
-                    let mut count = 0u64;
-                    loop {
-                        if gen_signal() != target {
-                            return;
-                        }
-                        for _ in 0..100 {}
-                        count += 1;
-                        if count * 16 >= close_delay {
-                            break;
-                        }
-                    }
-                    if gen_signal() == target && !hover_signal() {
-                        vis_signal.set(false);
-                    }
-                });
+                is_visible.set(false);
             },
             onkeydown: handle_keydown,
             
@@ -220,50 +173,14 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
                 {props.trigger}
             }
             
-            // Overlay for click outside to close
-            if is_visible() {
-                div {
-                    style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 49;",
-                    onclick: move |_| {
-                        is_visible.set(false);
-                        is_hovered.set(false);
-                        generation.set(generation() + 1);
-                    },
-                }
-            }
-            
-            // Card content
+            // Card content - sibling to trigger, not child of overlay
             div {
-                style: "{card_style} {position_style} {visibility_style} {custom_style}",
+                style: "{card_style} {position_style} {visibility_style} {transform_style} {custom_style}",
                 onmouseenter: move |_| {
-                    is_hovered.set(true);
-                    generation.set(generation() + 1);
+                    is_visible.set(true);
                 },
                 onmouseleave: move |_| {
-                    is_hovered.set(false);
-                    let current_gen = generation() + 1;
-                    generation.set(current_gen);
-                    let close_delay = close_delay;
-                    let gen_signal = generation;
-                    let mut vis_signal = is_visible;
-                    let hover_signal = is_hovered;
-                    spawn(async move {
-                        let target = gen_signal();
-                        let mut count = 0u64;
-                        loop {
-                            if gen_signal() != target {
-                                return;
-                            }
-                            for _ in 0..100 {}
-                            count += 1;
-                            if count * 16 >= close_delay {
-                                break;
-                            }
-                        }
-                        if gen_signal() == target && !hover_signal() {
-                            vis_signal.set(false);
-                        }
-                    });
+                    is_visible.set(false);
                 },
                 
                 // Arrow

@@ -68,6 +68,8 @@ struct CommandContext {
     on_select: Callback<()>,
     /// Whether the command palette is focused
     focused: Signal<bool>,
+    /// Callback when any item is selected (for closing the palette)
+    on_item_select: Callback<()>,
 }
 
 // ============================================================================
@@ -82,6 +84,9 @@ pub struct CommandProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Callback when an item is selected (can be used to close the command palette)
+    #[props(default)]
+    pub on_select: Option<EventHandler<()>>,
 }
 
 /// Command container component
@@ -95,12 +100,18 @@ pub fn Command(props: CommandProps) -> Element {
     let item_count = use_signal(|| 0usize);
     let focused = use_signal(|| false);
     
+    let on_item_select = props.on_select.clone();
     let context = CommandContext {
         value,
         highlighted_index,
         item_count,
         on_select: Callback::new(move |()| {}),
         focused,
+        on_item_select: Callback::new(move |()| {
+            if let Some(ref handler) = on_item_select {
+                handler.call(());
+            }
+        }),
     };
     
     let class_css = props.class.as_ref()
@@ -408,6 +419,7 @@ pub fn CommandItem(props: CommandItemProps) -> Element {
     let handle_click = move |_| {
         if !props.disabled {
             props.on_select.call(());
+            context.on_item_select.call(());
         }
     };
     

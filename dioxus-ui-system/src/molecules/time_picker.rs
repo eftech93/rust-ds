@@ -341,7 +341,7 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
             .border(1, &t.colors.border)
             .bg(&t.colors.popover)
             .shadow(&t.shadows.lg)
-            .z_index(50)
+            .z_index(9999)
             .p_px(12)
             .build()
     });
@@ -429,10 +429,10 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
     };
 
     rsx! {
-        // Backdrop to close on outside click
+        // Backdrop to close on outside click - high z-index to capture clicks but below dropdown
         div {
             class: "time-picker-backdrop",
-            style: "position: fixed; inset: 0; z-index: 40;",
+            style: "position: fixed; inset: 0; z-index: 9998;",
             onclick: move |_| props.on_close.call(()),
         }
 

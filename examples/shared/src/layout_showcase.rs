@@ -100,7 +100,7 @@ pub fn LayoutShowcaseInner() -> Element {
                 
                 FeatureCard {
                     icon: "box",
-                    title: "50+ Components",
+                    title: "100+ Components",
                     description: "Atoms, Molecules, and Organisms following Atomic Design principles."
                 }
                 

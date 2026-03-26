@@ -46,6 +46,9 @@ pub struct CardProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Whether to hide overflow (default: true)
+    #[props(default = true)]
+    pub overflow_hidden: bool,
 }
 
 /// Card molecule component
@@ -73,13 +76,19 @@ pub fn Card(props: CardProps) -> Element {
     let mut is_hovered = use_signal(|| false);
     let mut is_pressed = use_signal(|| false);
     
+    let overflow_hidden = props.overflow_hidden;
     let style = use_style(move |t| {
         let base = Style::new()
             .rounded(&t.radius, "lg")
             .bg(&t.colors.card)
             .text_color(&t.colors.card_foreground)
-            .overflow_hidden()
             .transition("all 150ms ease");
+        
+        let base = if overflow_hidden {
+            base.overflow_hidden()
+        } else {
+            base
+        };
             
         // Full width
         let base = if full_width {

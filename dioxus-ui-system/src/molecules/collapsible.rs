@@ -67,7 +67,12 @@ pub fn Collapsible(props: CollapsibleProps) -> Element {
     let mut internal_open = use_signal(|| props.default_open);
     
     // Determine if we're in controlled mode and get current open state
-    let is_open = props.open.unwrap_or(internal_open());
+    let is_controlled = props.open.is_some();
+    let is_open = if is_controlled {
+        props.open.unwrap_or(false)
+    } else {
+        internal_open()
+    };
     let is_disabled = props.disabled;
     
     // Generate unique IDs for accessibility

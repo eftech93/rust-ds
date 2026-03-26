@@ -120,40 +120,6 @@ pub fn Sheet(props: SheetProps) -> Element {
     let _theme = use_theme();
     let side = props.side.clone();
     let side_for_transform = props.side.clone();
-    
-    // Track animation state for smooth transitions
-    let mut is_animating = use_signal(|| false);
-    let mut is_visible = use_signal(|| props.open);
-    
-    // Handle open state changes with animation
-    use_effect(move || {
-        let open = props.open;
-        if open {
-            is_visible.set(true);
-            // Small delay to ensure DOM is ready before animating
-            spawn(async move {
-                is_animating.set(true);
-            });
-        } else {
-            is_animating.set(false);
-            // Wait for animation to complete before hiding
-            #[cfg(all(feature = "web", target_arch = "wasm32"))]
-            {
-                // Skip animation delay for WASM - just hide immediately
-                spawn(async move {
-                    if !props.open {
-                        is_visible.set(false);
-                    }
-                });
-            }
-            #[cfg(not(all(feature = "web", target_arch = "wasm32")))]
-            {
-                // For non-web targets, use a simpler approach without async sleep
-                // Just hide immediately since we can't easily delay
-                is_visible.set(false);
-            }
-        }
-    });
 
     // Handle escape key
     use_effect(move || {
@@ -183,30 +149,29 @@ pub fn Sheet(props: SheetProps) -> Element {
         }
     });
 
-    if !is_visible() && !props.open {
+    if !props.open {
         return rsx! {};
     }
 
     let overlay_style = use_style(|_| {
         Style::new()
             .fixed()
-            .top("0")
-            .left("0")
+            .inset("0")
             .w_full()
             .h_full()
             .bg(&Color::new_rgba(0, 0, 0, 0.5))
-            .z_index(100)
+            .z_index(9999)
             .build()
     });
 
-    let overlay_opacity = if is_animating() { "1" } else { "0" };
+    let overlay_opacity = if props.open { "1" } else { "0" };
     let overlay_transition = "transition: opacity 0.3s ease-out;";
 
     // Build sheet content style based on side
     let sheet_style = use_style(move |t| {
         let mut style = Style::new()
             .fixed()
-            .z_index(101)
+            .z_index(10000)
             .bg(&t.colors.background)
             .shadow(&t.shadows.xl)
             .overflow_hidden()
@@ -253,7 +218,7 @@ pub fn Sheet(props: SheetProps) -> Element {
     });
 
     // Transform for slide animation
-    let transform = if is_animating() {
+    let transform = if props.open {
         side_for_transform.open_transform()
     } else {
         side_for_transform.closed_transform()
@@ -267,29 +232,31 @@ pub fn Sheet(props: SheetProps) -> Element {
     };
 
     rsx! {
+        // Overlay - separate element at root level
         div {
             style: "{overlay_style} opacity: {overlay_opacity}; {overlay_transition}",
             onclick: handle_overlay_click,
+        }
+        
+        // Sheet content - sibling to overlay, prevents click propagation issues
+        div {
+            style: "{sheet_style} transform: {transform}; {sheet_transition}",
+            onclick: move |e| e.stop_propagation(),
             
-            div {
-                style: "{sheet_style} transform: {transform}; {sheet_transition}",
-                onclick: move |e| e.stop_propagation(),
-                
-                // Header
-                if props.title.is_some() || props.show_close_button {
-                    SheetHeader {
-                        title: props.title.clone(),
-                        description: props.description.clone(),
-                        show_close_button: props.show_close_button,
-                        on_close: props.on_open_change.clone(),
-                    }
+            // Header
+            if props.title.is_some() || props.show_close_button {
+                SheetHeader {
+                    title: props.title.clone(),
+                    description: props.description.clone(),
+                    show_close_button: props.show_close_button,
+                    on_close: props.on_open_change.clone(),
                 }
-                
-                // Content
-                Box {
-                    style: "flex: 1; overflow-y: auto; padding: 24px;",
-                    {props.children}
-                }
+            }
+            
+            // Content
+            Box {
+                style: "flex: 1; overflow-y: auto; padding: 24px;",
+                {props.children}
             }
         }
     }

@@ -336,7 +336,12 @@ impl UseSonner {
         self.toasts.write().retain(|t| t.id != id);
     }
     
-    /// Get current toasts
+    /// Get the toasts signal for reactive reading
+    pub fn toasts_signal(&self) -> Signal<Vec<Toast>> {
+        self.toasts
+    }
+    
+    /// Get current toasts (for one-time reads)
     pub fn toasts(&self) -> Vec<Toast> {
         self.toasts.read().clone()
     }

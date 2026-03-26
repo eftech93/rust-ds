@@ -146,7 +146,8 @@ pub fn CarouselPage() -> Element {
 /// Tree documentation page
 #[component]
 pub fn TreePage() -> Element {
-    let tree_data = vec![
+    // Use use_memo to prevent tree_data from being recreated on every render
+    let tree_data = use_memo(|| vec![
         TreeNodeData::new("1", "src")
             .with_child(TreeNodeData::new("1-1", "components")
                 .with_child(TreeNodeData::new("1-1-1", "button.rs"))
@@ -154,7 +155,15 @@ pub fn TreePage() -> Element {
             .with_child(TreeNodeData::new("1-2", "styles")
                 .with_child(TreeNodeData::new("1-2-1", "theme.rs"))),
         TreeNodeData::new("2", "Cargo.toml"),
-    ];
+    ]);
+    
+    // State for Basic example
+    let mut basic_expanded = use_signal(|| vec!["1".to_string()]);
+    let mut basic_selected = use_signal(|| None::<String>);
+    
+    // State for With Connector Lines example  
+    let mut lines_expanded = use_signal(|| vec!["1".to_string()]);
+    let mut lines_selected = use_signal(|| None::<String>);
     
     rsx! {
         DocPage {
@@ -165,21 +174,39 @@ pub fn TreePage() -> Element {
                 ExampleBox {
                     Box { style: "max-width: 300px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;",
                         Tree {
-                            data: tree_data.clone(),
-                            on_select: move |_| {},
-                            on_toggle_expand: move |_| {},
+                            data: tree_data(),
+                            selected_id: basic_selected(),
+                            expanded_ids: basic_expanded(),
+                            on_select: move |id| basic_selected.set(Some(id)),
+                            on_toggle_expand: move |id| {
+                                basic_expanded.with_mut(|exp| {
+                                    if exp.contains(&id) {
+                                        exp.retain(|x| x != &id);
+                                    } else {
+                                        exp.push(id);
+                                    }
+                                });
+                            },
                         }
                     }
                 }
-                CodeBlock { code: r#"let data = vec![
-    TreeNodeData::new("1", "src")
-        .with_child(TreeNodeData::new("1-1", "components")),
-    TreeNodeData::new("2", "Cargo.toml"),
-];
+                CodeBlock { code: r#"let mut expanded = use_signal(|| vec!["1".to_string()]);
+let mut selected = use_signal(|| None::<String>);
 
 Tree {
     data: data,
-    on_select: move |id| println!("Selected: {}", id),
+    selected_id: selected(),
+    expanded_ids: expanded(),
+    on_select: move |id| selected.set(Some(id)),
+    on_toggle_expand: move |id| {
+        expanded.with_mut(|exp| {
+            if exp.contains(&id) {
+                exp.retain(|x| x != &id);
+            } else {
+                exp.push(id);
+            }
+        });
+    },
 }"#.to_string() }
             }
             
@@ -187,10 +214,20 @@ Tree {
                 ExampleBox {
                     Box { style: "max-width: 300px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;",
                         Tree {
-                            data: tree_data.clone(),
+                            data: tree_data(),
                             show_lines: true,
-                            on_select: move |_| {},
-                            on_toggle_expand: move |_| {},
+                            selected_id: lines_selected(),
+                            expanded_ids: lines_expanded(),
+                            on_select: move |id| lines_selected.set(Some(id)),
+                            on_toggle_expand: move |id| {
+                                lines_expanded.with_mut(|exp| {
+                                    if exp.contains(&id) {
+                                        exp.retain(|x| x != &id);
+                                    } else {
+                                        exp.push(id);
+                                    }
+                                });
+                            },
                         }
                     }
                 }
@@ -211,36 +248,35 @@ pub fn TimelinePage() -> Element {
                 ExampleBox {
                     Timeline {
                         TimelineItem {
-                            TimelineDot {}
+                            dot: rsx! { TimelineDot {} },
                             TimelineContent {
-                                h4 { style: "margin: 0;", "Event 1" }
-                                p { style: "margin: 4px 0 0 0; color: #6b7280;", "Description of event 1" }
+                                title: Some("Event 1".to_string()),
+                                subtitle: Some("Description of event 1".to_string()),
                             }
                         }
                         TimelineItem {
-                            TimelineDot {}
+                            dot: rsx! { TimelineDot {} },
                             TimelineContent {
-                                h4 { style: "margin: 0;", "Event 2" }
-                                p { style: "margin: 4px 0 0 0; color: #6b7280;", "Description of event 2" }
+                                title: Some("Event 2".to_string()),
+                                subtitle: Some("Description of event 2".to_string()),
                             }
                         }
                         TimelineItem {
-                            TimelineDot {}
+                            dot: rsx! { TimelineDot {} },
                             TimelineContent {
-                                h4 { style: "margin: 0;", "Event 3" }
-                                p { style: "margin: 4px 0 0 0; color: #6b7280;", "Description of event 3" }
+                                title: Some("Event 3".to_string()),
+                                subtitle: Some("Description of event 3".to_string()),
                             }
                         }
                     }
                 }
                 CodeBlock { code: r#"Timeline {
     TimelineItem {
-        TimelineDot {}
-        TimelineContent { "Event 1" }
-    }
-    TimelineItem {
-        TimelineDot {}
-        TimelineContent { "Event 2" }
+        dot: rsx! { TimelineDot {} },
+        TimelineContent {
+            title: Some("Event 1".to_string()),
+            subtitle: Some("Description".to_string()),
+        }
     }
 }"#.to_string() }
             }
@@ -249,7 +285,27 @@ pub fn TimelinePage() -> Element {
                 ExampleBox {
                     Timeline {
                         position: TimelinePosition::Alternate,
-                        "Timeline with alternating left/right content"
+                        TimelineItem {
+                            dot: rsx! { TimelineDot {} },
+                            TimelineContent {
+                                title: Some("Event A".to_string()),
+                                subtitle: Some("Left side content".to_string()),
+                            }
+                        }
+                        TimelineItem {
+                            dot: rsx! { TimelineDot {} },
+                            TimelineContent {
+                                title: Some("Event B".to_string()),
+                                subtitle: Some("Right side content".to_string()),
+                            }
+                        }
+                        TimelineItem {
+                            dot: rsx! { TimelineDot {} },
+                            TimelineContent {
+                                title: Some("Event C".to_string()),
+                                subtitle: Some("Back to left".to_string()),
+                            }
+                        }
                     }
                 }
             }

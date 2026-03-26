@@ -12,6 +12,23 @@ use dioxus_ui_system::atoms::{StepState, StepSize, TextWeight};
 use dioxus_ui_system::atoms::{Box, VStack, HStack, SpacingSize, AlignItems, JustifyContent};
 use dioxus_ui_system::molecules::{StepItem, HorizontalStepper, VerticalStepper};
 use dioxus_ui_system::organisms::{TableColumn, ColumnAlign, TableFilter, FilterOption};
+use dioxus_ui_system::molecules::{
+    Command, CommandInput, CommandList, CommandGroup, CommandItem, CommandEmpty, 
+    Sheet, MultiSelect, ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, 
+    HoverCard, HoverCardHeader, HoverCardContent, Sonner, ToastPosition, use_sonner, 
+    Collapsible, ToggleGroup, ToggleGroupType, ToggleItem,
+    OtpInput, TimePicker, Combobox, ComboboxOption, Pagination, PaginationInfo,
+    QrCode, QrCodeLevel,
+    ListGroup, ListItem, ListItemVariant,
+};
+use dioxus_ui_system::organisms::{
+    Tree, TreeNodeData, SimpleCarousel, CarouselOptions, 
+    ResizablePanelGroup, ResizablePanel, ResizableHandle, Direction,
+    SimpleKanban, KanbanColumn, KanbanCard, MinimalRichText,
+    Calendar, CalendarMode, Tour, TourStep, WizardStep,
+    SimpleTimeline, TimelineEvent,
+};
+use dioxus_ui_system::atoms::{DatePicker, Slider, InputTag, Toggle, ToggleVariant, NumberInput, AspectRatio, AspectRatios, Rating};
 pub use layout_showcase::{LayoutShowcase, LayoutShowcaseInner};
 
 /// Main showcase component that displays all UI components (includes ThemeProvider)
@@ -59,6 +76,10 @@ pub fn ComponentShowcaseInner() -> Element {
                 InteractiveDemo {}
                 ChartShowcase {}
                 ThemeShowcase {}
+                NewComponentsShowcase {}
+                NewAtomsShowcase {}
+                NewMoleculesShowcase {}
+                NewOrganismsShowcase {}
             }
             
             // Footer
@@ -81,7 +102,7 @@ fn ShowcaseHeader() -> Element {
             
             MutedText {
                 size: TextSize::Large,
-                "A pure Rust design system for Dioxus with 60+ components"
+                "A pure Rust design system for Dioxus with 100+ components"
             }
             
             HStack {
@@ -91,7 +112,7 @@ fn ShowcaseHeader() -> Element {
                 Badge {
                     variant: BadgeVariant::Success,
                     icon: Some("check".to_string()),
-                    "v0.2.0"
+                    "v0.3.0"
                 }
                 Badge {
                     variant: BadgeVariant::Secondary,
@@ -1718,6 +1739,675 @@ fn ThemeShowcase() -> Element {
     }
 }
 
+/// New Atom Components Showcase
+#[component]
+fn NewAtomsShowcase() -> Element {
+    let mut rating = use_signal(|| 3.5_f32);
+    let mut slider_value = use_signal(|| 50.0);
+    let mut date = use_signal(|| "2024-01-15".to_string());
+    let mut tags = use_signal(|| vec![
+        "Rust".to_string(),
+        "Dioxus".to_string(),
+    ]);
+    let mut toggle_on = use_signal(|| false);
+    let mut number = use_signal(|| 42.0);
+    
+    rsx! {
+        Card {
+            overflow_hidden: false,
+            CardHeader {
+                title: "New Atom Components",
+                subtitle: Some("Rating, DatePicker, Slider, Tag, Toggle, NumberInput, AspectRatio".to_string()),
+            }
+            CardContent {
+                VStack {
+                    gap: SpacingSize::Lg,
+                    
+                    // Rating Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Rating (Read-only & Interactive)" }
+                        HStack {
+                            gap: SpacingSize::Md,
+                            Rating { value: 4.5, max: 5, size: 20, interactive: false }
+                            Rating { 
+                                value: rating(), 
+                                max: 5, 
+                                size: 20,
+                                interactive: true,
+                                on_change: Some(EventHandler::new(move |v: f32| rating.set(v))),
+                            }
+                        }
+                        Label { size: TextSize::ExtraSmall, color: TextColor::Muted, "Value: {rating:.1}" }
+                    }
+                    
+                    Separator {}
+                    
+                    // Slider Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Slider" }
+                        Slider {
+                            value: slider_value(),
+                            min: 0.0,
+                            max: 100.0,
+                            step: 1.0,
+                            on_change: move |v| slider_value.set(v),
+                        }
+                        Label { size: TextSize::ExtraSmall, color: TextColor::Muted, "Value: {slider_value:.0}%" }
+                    }
+                    
+                    Separator {}
+                    
+                    // DatePicker Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "DatePicker" }
+                        DatePicker {
+                            value: date(),
+                            on_change: move |v| date.set(v),
+                            placeholder: Some("Select a date...".to_string()),
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Tag Input Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Tag Input" }
+                        InputTag {
+                            tags: tags(),
+                            on_change: move |t: Vec<String>| tags.set(t),
+                            placeholder: Some("Type and press Enter...".to_string()),
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Toggle Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Toggle" }
+                        Toggle {
+                            pressed: toggle_on(),
+                            on_pressed_change: move |v| toggle_on.set(v),
+                            variant: ToggleVariant::Default,
+                            if toggle_on() { "ON" } else { "OFF" }
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // NumberInput Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "NumberInput" }
+                        NumberInput {
+                            value: number(),
+                            min: 0.0,
+                            max: 100.0,
+                            step: 1.0,
+                            on_change: move |v| number.set(v),
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // AspectRatio Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "AspectRatio (16:9)" }
+                        AspectRatio {
+                            ratio: AspectRatios::WIDESCREEN, // 16:9
+                            Box {
+                                style: "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;",
+                                        "16:9 Aspect Ratio"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// New Molecule Components Showcase
+#[component]
+fn NewMoleculesShowcase() -> Element {
+    let mut otp_value = use_signal(|| "".to_string());
+    let mut time = use_signal(|| Some("14:30".to_string()));
+    let mut combo_value = use_signal(|| "".to_string());
+    let mut page = use_signal(|| 1);
+    let page_size = use_signal(|| 10);
+    
+    let combo_options = vec![
+        ComboboxOption::new("next", "Next.js"),
+        ComboboxOption::new("react", "React"),
+        ComboboxOption::new("vue", "Vue.js"),
+        ComboboxOption::new("angular", "Angular"),
+        ComboboxOption::new("svelte", "Svelte"),
+    ];
+    
+    rsx! {
+        Card {
+            overflow_hidden: false,
+            CardHeader {
+                title: "New Molecule Components",
+                subtitle: Some("OTP Input, TimePicker, Combobox, Pagination, QRCode, ListItem".to_string()),
+            }
+            CardContent {
+                VStack {
+                    gap: SpacingSize::Lg,
+                    
+                    // OTP Input Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "OTP Input" }
+                        OtpInput {
+                            value: otp_value(),
+                            length: 6,
+                            on_change: move |v| otp_value.set(v),
+                            on_complete: move |v| println!("OTP Complete: {}", v),
+                        }
+                        Label { size: TextSize::ExtraSmall, color: TextColor::Muted, "Value: {otp_value}" }
+                    }
+                    
+                    Separator {}
+                    
+                    // TimePicker Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "TimePicker" }
+                        TimePicker {
+                            value: time(),
+                            on_change: move |v| time.set(v),
+                            use_24h: true,
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Combobox Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Combobox" }
+                        Combobox {
+                            options: combo_options,
+                            value: combo_value(),
+                            on_change: move |v| combo_value.set(v),
+                            placeholder: "Search frameworks...",
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Pagination Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Pagination" }
+                        Pagination {
+                            current_page: page(),
+                            total_pages: 10,
+                            on_change: move |p| page.set(p),
+                        }
+                        PaginationInfo {
+                            current_page: page(),
+                            page_size: page_size(),
+                            total_items: 95,
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // List Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Action List" }
+                        ListGroup {
+                            title: Some("Menu".to_string()),
+                            ListItem {
+                                variant: ListItemVariant::Default,
+                                on_click: Some(EventHandler::new(move |_| println!("Profile clicked"))),
+                                leading: Some(rsx! { Icon { name: "user".to_string(), size: IconSize::Small, color: IconColor::Muted } }),
+                                title: "Profile".to_string(),
+                            }
+                            ListItem {
+                                variant: ListItemVariant::Default,
+                                on_click: Some(EventHandler::new(move |_| println!("Settings clicked"))),
+                                leading: Some(rsx! { Icon { name: "settings".to_string(), size: IconSize::Small, color: IconColor::Muted } }),
+                                title: "Settings".to_string(),
+                            }
+                            ListItem {
+                                variant: ListItemVariant::Default,
+                                on_click: Some(EventHandler::new(move |_| println!("Logout clicked"))),
+                                leading: Some(rsx! { Icon { name: "log-out".to_string(), size: IconSize::Small, color: IconColor::Destructive } }),
+                                title: "Logout".to_string(),
+                            }
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // QRCode Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "QRCode" }
+                        HStack {
+                            gap: SpacingSize::Md,
+                            QrCode {
+                                value: "https://dioxuslabs.com".to_string(),
+                                size: 128,
+                                level: QrCodeLevel::Medium,
+                            }
+                            VStack {
+                                gap: SpacingSize::Xs,
+                                Label { size: TextSize::Small, "Scan to visit" }
+                                Label { size: TextSize::ExtraSmall, color: TextColor::Muted, "dioxuslabs.com" }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// New Organism Components Showcase
+#[component]
+fn NewOrganismsShowcase() -> Element {
+    let _carousel_index = use_signal(|| 0);
+    let mut tour_open = use_signal(|| false);
+    let mut calendar_date = use_signal(|| Some("2024-01-15".to_string()));
+    
+    let carousel_items = vec![
+        rsx! {
+            div { style: "height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 600;",
+                "Slide 1"
+            }
+        },
+        rsx! {
+            div { style: "height: 200px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 600;",
+                "Slide 2"
+            }
+        },
+        rsx! {
+            div { style: "height: 200px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 600;",
+                "Slide 3"
+            }
+        },
+    ];
+    
+    let tree_data = vec![
+        TreeNodeData::new("root1", "Documents").with_children(vec![
+            TreeNodeData::new("doc1", "Resume.pdf"),
+            TreeNodeData::new("doc2", "Cover Letter.pdf"),
+            TreeNodeData::new("folder1", "Projects").with_children(vec![
+                TreeNodeData::new("proj1", "Project Alpha"),
+                TreeNodeData::new("proj2", "Project Beta"),
+            ]),
+        ]),
+        TreeNodeData::new("root2", "Images").with_children(vec![
+            TreeNodeData::new("img1", "photo1.jpg"),
+            TreeNodeData::new("img2", "photo2.jpg"),
+        ]),
+    ];
+    
+    let timeline_events = vec![
+        TimelineEvent::new("Project Started").with_description("Initial planning and setup"),
+        TimelineEvent::new("Development").with_description("Building core features"),
+        TimelineEvent::new("Testing").with_description("QA and bug fixes"),
+        TimelineEvent::new("Launch"),
+    ];
+    
+    let kanban_columns = vec![
+        KanbanColumn::new("todo", "To Do")
+            .with_cards(vec![
+                KanbanCard::new("task1", "Design Homepage").with_tags(vec!["Design".to_string()]),
+                KanbanCard::new("task2", "Setup Database").with_tags(vec!["Backend".to_string()]),
+            ]),
+        KanbanColumn::new("inprogress", "In Progress")
+            .with_cards(vec![
+                KanbanCard::new("task3", "API Development")
+                    .with_tags(vec!["Backend".to_string(), "High".to_string()]),
+            ]),
+        KanbanColumn::new("done", "Done")
+            .with_cards(vec![
+                KanbanCard::new("task4", "Project Setup"),
+            ]),
+    ];
+    
+    let tour_steps = vec![
+        TourStep::new("step1", "Welcome", "Welcome to the Dioxus UI System tour!"),
+        TourStep::new("step2", "Components", "Explore 85+ components"),
+        TourStep::new("step3", "Themes", "Switch between 7 themes"),
+    ];
+    
+    rsx! {
+        Card {
+            overflow_hidden: false,
+            CardHeader {
+                title: "New Organism Components",
+                subtitle: Some("Resizable, Carousel, Tree, Timeline, Menubar, RichText, Kanban, Calendar".to_string()),
+            }
+            CardContent {
+                VStack {
+                    gap: SpacingSize::Lg,
+                    
+                    // Carousel Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Carousel" }
+                        SimpleCarousel {
+                            items: carousel_items,
+                            opts: CarouselOptions::new().with_autoplay_ms(3000),
+                            show_dots: true,
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Calendar Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Calendar" }
+                        Calendar {
+                            value: calendar_date(),
+                            on_change: move |date| calendar_date.set(date),
+                            mode: CalendarMode::Single,
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Tree Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Tree" }
+                        div {
+                            style: "max-height: 200px; overflow: auto;",
+                            Tree {
+                                data: tree_data,
+                                on_select: move |id| println!("Selected tree node: {}", id),
+                            }
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Timeline Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Timeline" }
+                        SimpleTimeline {
+                            events: timeline_events,
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Kanban Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Kanban Board" }
+                        div {
+                            style: "overflow-x: auto;",
+                            SimpleKanban {
+                                columns: kanban_columns,
+                                on_card_click: Some(EventHandler::new(move |card_id: String| println!("Clicked card: {}", card_id))),
+                            }
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // RichText Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Rich Text Editor" }
+                        MinimalRichText {
+                            placeholder: "Type something...",
+                            on_change: move |html| println!("HTML: {}", html),
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Resizable Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Resizable Panels" }
+                        ResizablePanelGroup {
+                            direction: Direction::Horizontal,
+                            ResizablePanel {
+                                default_size: 30.0,
+                                min_size: 20.0,
+                                Box { 
+                                    style: "padding: 16px; background: #f3f4f6; border-radius: 8px; height: 100px;",
+                                    "Sidebar (resize me)"
+                                }
+                            }
+                            ResizableHandle {}
+                            ResizablePanel {
+                                default_size: 70.0,
+                                min_size: 30.0,
+                                Box { 
+                                    style: "padding: 16px; background: #e5e7eb; border-radius: 8px; height: 100px;",
+                                    "Main Content"
+                                }
+                            }
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Tour Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Tour / Onboarding" }
+                        Button {
+                            onclick: move |_| tour_open.set(true),
+                            "Start Tour"
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Tour component
+        Tour {
+            steps: tour_steps,
+            open: tour_open(),
+            on_open_change: move |_| tour_open.set(false),
+        }
+    }
+}
+
+/// New Phase 1-4 Components Showcase
+#[component]
+fn NewComponentsShowcase() -> Element {
+    let mut sheet_open = use_signal(|| false);
+    let mut command_value = use_signal(|| "".to_string());
+    let mut selected_frameworks = use_signal(|| vec!["react".to_string()]);
+    let mut sonner = use_sonner();
+    let toasts_sig = sonner.toasts_signal();
+    let toasts_list = toasts_sig();
+    
+    let frameworks = vec![
+        SelectOption::new("react", "React"),
+        SelectOption::new("vue", "Vue"),
+        SelectOption::new("angular", "Angular"),
+        SelectOption::new("svelte", "Svelte"),
+        SelectOption::new("solid", "Solid"),
+    ];
+    
+    rsx! {
+        Card {
+            overflow_hidden: false,
+            CardHeader {
+                title: "New Components (Phase 1-4)",
+                subtitle: Some("Command, Sheet, MultiSelect, ContextMenu, HoverCard, Sonner, Collapsible, ToggleGroup".to_string()),
+            }
+            CardContent {
+                VStack {
+                    gap: SpacingSize::Lg,
+                    
+                    // Sheet Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Sheet (Side Panel)" }
+                        Button {
+                            variant: ButtonVariant::Primary,
+                            onclick: move |_| sheet_open.set(true),
+                            "Open Sheet"
+                        }
+                        Sheet {
+                            open: sheet_open(),
+                            on_open_change: move |o| sheet_open.set(o),
+                            title: "Example Sheet",
+                            description: Some("This is a sheet component that slides in from the right.".to_string()),
+                            VStack { gap: SpacingSize::Md,
+                                p { "Sheets are great for displaying secondary content without leaving the current page." }
+                                Button { onclick: move |_| sheet_open.set(false), "Close Sheet" }
+                            }
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Sonner Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Sonner (Toast Notifications)" }
+                        HStack {
+                            gap: SpacingSize::Sm,
+                            Button { onclick: move |_| { sonner.toast("Hello World!"); }, "Show Toast" }
+                            Button { variant: ButtonVariant::Secondary, onclick: move |_| { sonner.success("Success!"); }, "Success" }
+                            Button { variant: ButtonVariant::Destructive, onclick: move |_| { sonner.error("Error!"); }, "Error" }
+                        }
+                        // Sonner renders at page level in real usage
+                    }
+                    
+                    Separator {}
+                    
+                    // MultiSelect Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "MultiSelect" }
+                        MultiSelect {
+                            options: frameworks.clone(),
+                            value: selected_frameworks(),
+                            on_change: move |v| selected_frameworks.set(v),
+                            placeholder: "Select frameworks...",
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // ToggleGroup Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "ToggleGroup" }
+                        ToggleGroup {
+                            group_type: ToggleGroupType::Multiple,
+                            value: vec!["bold".to_string()],
+                            on_value_change: move |v| println!("Selected: {:?}", v),
+                            ToggleItem { value: "bold", "B" }
+                            ToggleItem { value: "italic", "I" }
+                            ToggleItem { value: "underline", "U" }
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Collapsible Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Collapsible" }
+                        Collapsible {
+                            trigger: rsx! { "Click to expand" },
+                            "This content is hidden by default and revealed when you click the trigger."
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // HoverCard Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "HoverCard" }
+                        HoverCard {
+                            trigger: rsx! { span { style: "color: #3b82f6; cursor: pointer; text-decoration: underline;", "@username" } },
+                            HoverCardHeader {
+                                title: "John Doe".to_string(),
+                                description: Some("Software Engineer @ Company".to_string()),
+                            }
+                            HoverCardContent {
+                                "Passionate about building great user experiences with Rust and Dioxus."
+                            }
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // ContextMenu Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "ContextMenu (Right-click)" }
+                        ContextMenu {
+                            ContextMenuTrigger {
+                                Box { 
+                                    style: "padding: 20px; background: #f3f4f6; border-radius: 8px; text-align: center; cursor: context-menu;",
+                                    "Right-click here"
+                                }
+                            }
+                            ContextMenuContent {
+                                ContextMenuItem { on_click: move |_| println!("Cut"), "Cut" }
+                                ContextMenuItem { on_click: move |_| println!("Copy"), "Copy" }
+                                ContextMenuItem { on_click: move |_| println!("Paste"), "Paste" }
+                            }
+                        }
+                    }
+                    
+                    Separator {}
+                    
+                    // Command Demo
+                    VStack {
+                        gap: SpacingSize::Sm,
+                        Label { size: TextSize::Small, "Command Palette" }
+                        Box { style: "max-width: 400px; border: 1px solid #e5e7eb; border-radius: 8px;",
+                            Command {
+                                on_select: move |_| println!("Command selected"),
+                                CommandInput {
+                                    placeholder: "Search commands...",
+                                    value: command_value(),
+                                    on_value_change: move |v| command_value.set(v),
+                                }
+                                CommandList {
+                                    CommandEmpty { "No results found." }
+                                    CommandGroup {
+                                        heading: "Suggestions",
+                                        CommandItem { value: "calendar", on_select: move |_| {}, "Calendar" }
+                                        CommandItem { value: "search", on_select: move |_| {}, "Search" }
+                                        CommandItem { value: "settings", on_select: move |_| {}, "Settings" }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Sonner rendered at page level
+        Sonner {
+            toasts: toasts_list.clone(),
+            position: ToastPosition::BottomRight,
+            on_dismiss: move |id: String| sonner.dismiss(&id),
+        }
+    }
+}
+
 /// Footer section
 #[component]
 fn ShowcaseFooter() -> Element {
@@ -1734,7 +2424,7 @@ fn ShowcaseFooter() -> Element {
                 Label {
                     size: TextSize::ExtraSmall,
                     color: TextColor::Muted,
-                    "60+ Cross-platform Rust UI components"
+                    "100+ Cross-platform Rust UI components"
                 }
             }
         }

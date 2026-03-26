@@ -33,7 +33,7 @@ use crate::theme::{use_theme, Color};
 use crate::styles::Style;
 
 /// Timeline position variant
-#[derive(Clone, PartialEq, Default, Debug)]
+#[derive(Clone, Copy, PartialEq, Default, Debug)]
 pub enum TimelinePosition {
     /// Content on the left side only
     Left,
@@ -46,21 +46,21 @@ pub enum TimelinePosition {
 
 /// Context to share timeline position with child items
 #[derive(Clone, Copy)]
-struct TimelineContext {
-    position: Signal<TimelinePosition>,
+pub struct TimelineContext {
+    position: TimelinePosition,
 }
 
 impl TimelineContext {
     fn new(position: TimelinePosition) -> Self {
-        Self {
-            position: use_signal(|| position),
-        }
+        Self { position }
     }
 }
 
 /// Hook to access timeline context
 fn use_timeline_context() -> TimelineContext {
-    use_context::<TimelineContext>()
+    try_use_context::<TimelineContext>().unwrap_or_else(|| TimelineContext {
+        position: TimelinePosition::default(),
+    })
 }
 
 /// Timeline container props
@@ -142,7 +142,7 @@ pub struct TimelineItemProps {
 #[component]
 pub fn TimelineItem(props: TimelineItemProps) -> Element {
     let context = use_timeline_context();
-    let position = context.position.read().clone();
+    let position = context.position.clone();
 
     let theme = use_theme();
     let border_color = theme.tokens.read().colors.border.to_rgba();
