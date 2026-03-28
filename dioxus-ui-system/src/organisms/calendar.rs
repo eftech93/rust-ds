@@ -3,9 +3,9 @@
 //! A full calendar view (like Google Calendar mini-view or shadcn Calendar).
 //! Supports single date, multiple dates, and range selection modes.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Calendar selection mode
 #[derive(Clone, PartialEq, Default, Debug)]
@@ -61,17 +61,19 @@ pub struct CalendarProps {
 /// Calendar organism component
 #[component]
 pub fn Calendar(props: CalendarProps) -> Element {
-    let theme = use_theme();
-    
+    let _theme = use_theme();
+
     // Parse controlled month or default to current month
     let today = get_today();
-    let initial_view_date = props.month.as_ref()
+    let initial_view_date = props
+        .month
+        .as_ref()
         .and_then(|m| parse_month_year(m))
         .unwrap_or_else(|| (today.year, today.month));
-    
+
     let mut view_year = use_signal(|| initial_view_date.0);
     let mut view_month = use_signal(|| initial_view_date.1);
-    
+
     // Sync with controlled month prop
     use_effect(move || {
         if let Some(month_str) = props.month.clone() {
@@ -81,22 +83,22 @@ pub fn Calendar(props: CalendarProps) -> Element {
             }
         }
     });
-    
+
     // Selection state for multiple and range modes
-    let mut selected_dates = use_signal(|| {
+    let selected_dates = use_signal(|| {
         if let Some(val) = props.value.clone() {
             vec![val]
         } else {
             Vec::new()
         }
     });
-    
+
     // Range selection state
-    let mut range_start = use_signal(|| None::<String>);
-    
+    let range_start = use_signal(|| None::<String>);
+
     let year = view_year();
     let month = view_month();
-    
+
     let days_in_month = get_days_in_month(year, month);
     let first_day_of_week = get_first_day_of_week(year, month);
     let days_in_prev_month = if month == 1 {
@@ -104,35 +106,41 @@ pub fn Calendar(props: CalendarProps) -> Element {
     } else {
         get_days_in_month(year, month - 1)
     };
-    
-    let month_name = month_name_str(month);
-    
+
+    let _month_name = month_name_str(month);
+
     // Navigate to previous month
     let mut go_to_prev_month = move || {
         let new_month = if month == 1 { 12 } else { month - 1 };
         let new_year = if month == 1 { year - 1 } else { year };
         view_month.set(new_month);
         view_year.set(new_year);
-        props.on_month_change.call(format!("{:04}-{:02}", new_year, new_month));
+        props
+            .on_month_change
+            .call(format!("{:04}-{:02}", new_year, new_month));
     };
-    
+
     // Navigate to next month
     let mut go_to_next_month = move || {
         let new_month = if month == 12 { 1 } else { month + 1 };
         let new_year = if month == 12 { year + 1 } else { year };
         view_month.set(new_month);
         view_year.set(new_year);
-        props.on_month_change.call(format!("{:04}-{:02}", new_year, new_month));
+        props
+            .on_month_change
+            .call(format!("{:04}-{:02}", new_year, new_month));
     };
-    
+
     // Go to today
     let go_to_today = move || {
         let today = get_today();
         view_month.set(today.month);
         view_year.set(today.year);
-        props.on_month_change.call(format!("{:04}-{:02}", today.year, today.month));
+        props
+            .on_month_change
+            .call(format!("{:04}-{:02}", today.year, today.month));
     };
-    
+
     // Container style
     let container_style = use_style(|t| {
         Style::new()
@@ -145,7 +153,7 @@ pub fn Calendar(props: CalendarProps) -> Element {
             .gap(&t.spacing, "sm")
             .build()
     });
-    
+
     // Header style
     let header_style = use_style(|t| {
         Style::new()
@@ -155,7 +163,7 @@ pub fn Calendar(props: CalendarProps) -> Element {
             .px(&t.spacing, "sm")
             .build()
     });
-    
+
     // Navigation button style
     let nav_button_style = use_style(move |t| {
         Style::new()
@@ -172,7 +180,7 @@ pub fn Calendar(props: CalendarProps) -> Element {
             .transition("all 150ms ease")
             .build()
     });
-    
+
     // Title style
     let title_style = use_style(|t| {
         Style::new()
@@ -181,7 +189,7 @@ pub fn Calendar(props: CalendarProps) -> Element {
             .text_color(&t.colors.foreground)
             .build()
     });
-    
+
     // Weekday header style
     let weekday_style = use_style(|t| {
         Style::new()
@@ -195,39 +203,34 @@ pub fn Calendar(props: CalendarProps) -> Element {
             .text_color(&t.colors.muted_foreground)
             .build()
     });
-    
+
     // Weekday headers grid style
-    let weekday_grid_style = use_style(|t| {
-        Style::new()
-            .grid()
-            .gap(&t.spacing, "xs")
-            .build()
-    });
-    
+    let weekday_grid_style = use_style(|t| Style::new().grid().gap(&t.spacing, "xs").build());
+
     let col_count = if props.show_week_numbers { 8 } else { 7 };
-    
+
     rsx! {
         div {
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
-            
+
             // Header with navigation
             div {
                 style: "{header_style}",
-                
+
                 // Previous month button
                 button {
                     type: "button",
                     style: "{nav_button_style}",
                     onclick: move |_| go_to_prev_month(),
                     aria_label: "Previous month",
-                    
+
                     CalendarChevron { direction: ChevronDirection::Left }
                 }
-                
+
                 // Month/Year display with dropdowns
                 div {
                     style: "display: flex; align-items: center; gap: 8px;",
-                    
+
                     // Month selector
                     select {
                         style: "{title_style} border: none; background: transparent; cursor: pointer; padding: 4px;",
@@ -238,7 +241,7 @@ pub fn Calendar(props: CalendarProps) -> Element {
                                 props.on_month_change.call(format!("{:04}-{:02}", view_year(), new_month));
                             }
                         },
-                        
+
                         for m in 1..=12 {
                             option {
                                 value: "{m}",
@@ -247,7 +250,7 @@ pub fn Calendar(props: CalendarProps) -> Element {
                             }
                         }
                     }
-                    
+
                     // Year selector
                     select {
                         style: "{title_style} border: none; background: transparent; cursor: pointer; padding: 4px;",
@@ -258,7 +261,7 @@ pub fn Calendar(props: CalendarProps) -> Element {
                                 props.on_month_change.call(format!("{:04}-{:02}", new_year, view_month()));
                             }
                         },
-                        
+
                         for y in (year - 10)..=(year + 10) {
                             option {
                                 value: "{y}",
@@ -268,29 +271,29 @@ pub fn Calendar(props: CalendarProps) -> Element {
                         }
                     }
                 }
-                
+
                 // Next month button
                 button {
                     type: "button",
                     style: "{nav_button_style}",
                     onclick: move |_| go_to_next_month(),
                     aria_label: "Next month",
-                    
+
                     CalendarChevron { direction: ChevronDirection::Right }
                 }
             }
-            
+
             // Weekday headers
             div {
                 style: "{weekday_grid_style} grid-template-columns: repeat({col_count}, 1fr); margin-bottom: 4px;",
-                
+
                 if props.show_week_numbers {
                     div {
                         style: "{weekday_style} width: 40px;",
                         "Wk"
                     }
                 }
-                
+
                 for day in ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"] {
                     div {
                         key: "{day}",
@@ -299,7 +302,7 @@ pub fn Calendar(props: CalendarProps) -> Element {
                     }
                 }
             }
-            
+
             // Days grid
             CalendarGrid {
                 year,
@@ -346,20 +349,32 @@ struct CalendarGridProps {
 
 #[component]
 fn CalendarGrid(props: CalendarGridProps) -> Element {
-    let theme = use_theme();
-    
+    let _theme = use_theme();
+
     // Parse selected date
     let selected = props.selected_value.as_ref().and_then(|v| parse_date(v));
-    
+
     // Calculate week numbers for the displayed days
     let mut days_data: Vec<DayData> = Vec::new();
-    
+
     // Previous month days (padding)
     for i in 0..props.first_day_of_week {
         let day = props.days_in_prev_month - props.first_day_of_week + i + 1;
-        let prev_month = if props.month == 1 { 12 } else { props.month - 1 };
-        let prev_year = if props.month == 1 { props.year - 1 } else { props.year };
-        let date = Date { year: prev_year, month: prev_month, day };
+        let prev_month = if props.month == 1 {
+            12
+        } else {
+            props.month - 1
+        };
+        let prev_year = if props.month == 1 {
+            props.year - 1
+        } else {
+            props.year
+        };
+        let date = Date {
+            year: prev_year,
+            month: prev_month,
+            day,
+        };
         let week_num = get_week_number(&date);
         days_data.push(DayData {
             date,
@@ -367,23 +382,39 @@ fn CalendarGrid(props: CalendarGridProps) -> Element {
             week_number: week_num,
         });
     }
-    
+
     // Current month days
     for day in 1..=props.days_in_month {
-        let date = Date { year: props.year, month: props.month, day };
+        let date = Date {
+            year: props.year,
+            month: props.month,
+            day,
+        };
         days_data.push(DayData {
             date: date.clone(),
             is_current_month: true,
             week_number: get_week_number(&date),
         });
     }
-    
+
     // Next month days (padding) to complete the grid
     let remaining_cells = (7 - (days_data.len() % 7)) % 7;
     for day in 1..=remaining_cells as u8 {
-        let next_month = if props.month == 12 { 1 } else { props.month + 1 };
-        let next_year = if props.month == 12 { props.year + 1 } else { props.year };
-        let date = Date { year: next_year, month: next_month, day };
+        let next_month = if props.month == 12 {
+            1
+        } else {
+            props.month + 1
+        };
+        let next_year = if props.month == 12 {
+            props.year + 1
+        } else {
+            props.year
+        };
+        let date = Date {
+            year: next_year,
+            month: next_month,
+            day,
+        };
         let week_num = get_week_number(&date);
         days_data.push(DayData {
             date,
@@ -391,23 +422,18 @@ fn CalendarGrid(props: CalendarGridProps) -> Element {
             week_number: week_num,
         });
     }
-    
+
     // Group by weeks for week numbers
     let weeks: Vec<&[DayData]> = days_data.chunks(7).collect();
-    
-    let grid_style = use_style(|t| {
-        Style::new()
-            .grid()
-            .gap(&t.spacing, "xs")
-            .build()
-    });
-    
+
+    let grid_style = use_style(|t| Style::new().grid().gap(&t.spacing, "xs").build());
+
     let col_count = if props.show_week_numbers { 8 } else { 7 };
-    
+
     rsx! {
         div {
             style: "{grid_style} grid-template-columns: repeat({col_count}, 1fr);",
-            
+
             for (week_idx, week) in weeks.iter().enumerate() {
                 // Week number
                 if props.show_week_numbers {
@@ -428,7 +454,7 @@ fn CalendarGrid(props: CalendarGridProps) -> Element {
                         "{week[0].week_number}"
                     }
                 }
-                
+
                 // Days in this week
                 for day_data in week.iter() {
                     CalendarDay {
@@ -478,16 +504,19 @@ struct CalendarDayProps {
 
 #[component]
 fn CalendarDay(mut props: CalendarDayProps) -> Element {
-    let theme = use_theme();
+    let _theme = use_theme();
     let mut is_hovered = use_signal(|| false);
-    
-    let date_str = format!("{:04}-{:02}-{:02}", props.date.year, props.date.month, props.date.day);
+
+    let date_str = format!(
+        "{:04}-{:02}-{:02}",
+        props.date.year, props.date.month, props.date.day
+    );
     let date_str_clone = date_str.clone();
     let date_clone = props.date.clone();
-    
+
     // Check if in selected dates (for multiple mode)
     let is_in_selected = props.selected_dates.read().contains(&date_str);
-    
+
     // Check if in range
     let range_start_read = props.range_start.read();
     let is_in_range = if let Some(start_str) = range_start_read.as_ref() {
@@ -502,9 +531,10 @@ fn CalendarDay(mut props: CalendarDayProps) -> Element {
         false
     };
     drop(range_start_read);
-    
-    let is_selected = props.is_selected || is_in_selected || (props.mode == CalendarMode::Range && is_in_range);
-    
+
+    let is_selected =
+        props.is_selected || is_in_selected || (props.mode == CalendarMode::Range && is_in_range);
+
     // Day cell style
     let day_style = use_style(move |t| {
         let mut style = Style::new()
@@ -516,10 +546,14 @@ fn CalendarDay(mut props: CalendarDayProps) -> Element {
             .text(&t.typography, "sm")
             .rounded(&t.radius, "md")
             .border(0, &t.colors.border)
-            .cursor(if props.is_disabled { "not-allowed" } else { "pointer" })
+            .cursor(if props.is_disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .transition("all 150ms ease")
             .bg_transparent();
-        
+
         // Text color
         if props.is_disabled {
             style = style.text_color(&t.colors.muted);
@@ -529,7 +563,7 @@ fn CalendarDay(mut props: CalendarDayProps) -> Element {
             // Other month days
             style = style.text_color(&t.colors.muted);
         }
-        
+
         // Background for selected/today states
         if is_selected {
             style = style
@@ -542,60 +576,73 @@ fn CalendarDay(mut props: CalendarDayProps) -> Element {
         } else if is_hovered() && !props.is_disabled {
             style = style.bg(&t.colors.muted);
         }
-        
+
         style.build()
     });
-    
+
     let handle_click = move |_| {
         if props.is_disabled {
             return;
         }
-        
+
         match props.mode {
             CalendarMode::Single => {
-                let date_str = format!("{:04}-{:02}-{:02}", date_clone.year, date_clone.month, date_clone.day);
+                let date_str = format!(
+                    "{:04}-{:02}-{:02}",
+                    date_clone.year, date_clone.month, date_clone.day
+                );
                 props.on_change.call(Some(date_str));
             }
             CalendarMode::Multiple => {
                 let mut dates = props.selected_dates.read().clone();
-                let date_str = format!("{:04}-{:02}-{:02}", date_clone.year, date_clone.month, date_clone.day);
-                
+                let date_str = format!(
+                    "{:04}-{:02}-{:02}",
+                    date_clone.year, date_clone.month, date_clone.day
+                );
+
                 if dates.contains(&date_str) {
                     dates.retain(|d| d != &date_str);
                 } else {
                     dates.push(date_str.clone());
                 }
-                
+
                 props.selected_dates.set(dates);
                 props.on_change.call(Some(date_str));
             }
             CalendarMode::Range => {
-                let date_str = format!("{:04}-{:02}-{:02}", date_clone.year, date_clone.month, date_clone.day);
-                
+                let date_str = format!(
+                    "{:04}-{:02}-{:02}",
+                    date_clone.year, date_clone.month, date_clone.day
+                );
+
                 let range_start_read = props.range_start.read();
                 let has_start = range_start_read.is_some();
                 let start_opt = range_start_read.clone();
                 drop(range_start_read);
-                
+
                 if has_start {
                     if let Some(start) = start_opt {
                         // Selecting end date
                         let start_date = parse_date(&start).unwrap();
                         let end_date = date_clone.clone();
-                        
+
                         // Ensure start is before end
                         let (actual_start, actual_end) = if start_date > end_date {
                             (end_date.clone(), start_date)
                         } else {
                             (start_date, end_date)
                         };
-                        
+
                         let range_str = format!(
                             "{:04}-{:02}-{:02}/{:04}-{:02}-{:02}",
-                            actual_start.year, actual_start.month, actual_start.day,
-                            actual_end.year, actual_end.month, actual_end.day
+                            actual_start.year,
+                            actual_start.month,
+                            actual_start.day,
+                            actual_end.year,
+                            actual_end.month,
+                            actual_end.day
                         );
-                        
+
                         props.range_start.set(None);
                         props.on_change.call(Some(range_str));
                     }
@@ -607,7 +654,7 @@ fn CalendarDay(mut props: CalendarDayProps) -> Element {
             }
         }
     };
-    
+
     rsx! {
         button {
             type: "button",
@@ -618,7 +665,7 @@ fn CalendarDay(mut props: CalendarDayProps) -> Element {
             onclick: handle_click,
             onmouseenter: move |_| if !props.is_disabled { is_hovered.set(true) },
             onmouseleave: move |_| is_hovered.set(false),
-            
+
             "{props.date.day}"
         }
     }
@@ -643,7 +690,7 @@ fn CalendarChevron(props: CalendarChevronProps) -> Element {
         ChevronDirection::Left => "rotate(180deg)",
         ChevronDirection::Right => "rotate(0deg)",
     };
-    
+
     rsx! {
         svg {
             view_box: "0 0 24 24",
@@ -653,7 +700,7 @@ fn CalendarChevron(props: CalendarChevronProps) -> Element {
             stroke_linecap: "round",
             stroke_linejoin: "round",
             style: "width: 16px; height: 16px; transform: {transform};",
-            
+
             polyline { points: "9 18 15 12 9 6" }
         }
     }
@@ -683,11 +730,11 @@ fn parse_date(s: &str) -> Option<Date> {
     if parts.len() != 3 {
         return None;
     }
-    
+
     let year = parts[0].parse().ok()?;
     let month = parts[1].parse().ok()?;
     let day = parts[2].parse().ok()?;
-    
+
     Some(Date { year, month, day })
 }
 
@@ -697,10 +744,10 @@ fn parse_month_year(s: &str) -> Option<(i32, u8)> {
     if parts.len() != 2 {
         return None;
     }
-    
+
     let year = parts[0].parse().ok()?;
     let month = parts[1].parse().ok()?;
-    
+
     Some((year, month))
 }
 
@@ -708,7 +755,11 @@ fn parse_month_year(s: &str) -> Option<(i32, u8)> {
 fn get_today() -> Date {
     // In a real implementation, use system time
     // For now, return a fixed date
-    Date { year: 2024, month: 3, day: 19 }
+    Date {
+        year: 2024,
+        month: 3,
+        day: 19,
+    }
 }
 
 /// Get number of days in a month
@@ -716,7 +767,13 @@ fn get_days_in_month(year: i32, month: u8) -> u8 {
     match month {
         1 | 3 | 5 | 7 | 8 | 10 | 12 => 31,
         4 | 6 | 9 | 11 => 30,
-        2 => if is_leap_year(year) { 29 } else { 28 },
+        2 => {
+            if is_leap_year(year) {
+                29
+            } else {
+                28
+            }
+        }
         _ => 30,
     }
 }
@@ -731,15 +788,15 @@ fn get_first_day_of_week(year: i32, month: u8) -> u8 {
     // Using Zeller's congruence
     let mut y = year;
     let mut m = month as i32;
-    
+
     if m < 3 {
         m += 12;
         y -= 1;
     }
-    
+
     let k = y % 100;
     let j = y / 100;
-    
+
     let day = (1 + (13 * (m + 1)) / 5 + k + k / 4 + j / 4 + 5 * j) % 7;
     ((day + 5) % 7) as u8
 }
@@ -755,11 +812,11 @@ fn get_week_number(date: &Date) -> u8 {
 /// Get day of year (1-366)
 fn get_day_of_year(date: &Date) -> u16 {
     let mut day_of_year = date.day as u16;
-    
+
     for m in 1..date.month {
         day_of_year += get_days_in_month(date.year, m) as u16;
     }
-    
+
     day_of_year
 }
 
@@ -790,12 +847,12 @@ fn is_date_disabled(
     max_date: Option<String>,
 ) -> bool {
     let date_str = format!("{:04}-{:02}-{:02}", date.year, date.month, date.day);
-    
+
     // Check explicit disabled dates
     if disabled_dates.contains(&date_str) {
         return true;
     }
-    
+
     // Check min date
     if let Some(min_str) = min_date {
         if let Some(min_date) = parse_date(&min_str) {
@@ -804,7 +861,7 @@ fn is_date_disabled(
             }
         }
     }
-    
+
     // Check max date
     if let Some(max_str) = max_date {
         if let Some(max_date) = parse_date(&max_str) {
@@ -813,6 +870,6 @@ fn is_date_disabled(
             }
         }
     }
-    
+
     false
 }

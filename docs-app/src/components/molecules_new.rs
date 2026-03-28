@@ -1,22 +1,28 @@
 //! New Molecule component documentation pages (Phase 1-4)
 
+use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, Section};
 use dioxus::prelude::*;
+use dioxus_ui_system::atoms::{Box, HStack, SpacingSize, VStack};
+use dioxus_ui_system::molecules::{
+    use_sonner, Collapsible, Command, CommandEmpty, CommandGroup, CommandInput, CommandItem,
+    CommandList, ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
+    ContextMenuTrigger, HoverCard, HoverCardContent, HoverCardHeader, MultiSelect, OtpInput,
+    QrCode, Sheet, SheetSide, Sonner, TimePicker, ToastPosition, ToggleGroup, ToggleGroupType,
+    ToggleItem,
+};
 use dioxus_ui_system::prelude::*;
-use dioxus_ui_system::atoms::{Box, VStack, HStack, SpacingSize};
-use dioxus_ui_system::molecules::{Command, CommandInput, CommandList, CommandGroup, CommandItem, CommandEmpty, Sheet, SheetSide, MultiSelect, OtpInput, TimePicker, ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, HoverCard, HoverCardHeader, HoverCardContent, QrCode, Collapsible, ToggleGroup, ToggleGroupType, ToggleItem, use_sonner, Sonner, ToastPosition};
-use crate::docs_ui::{DocPage, Section, ExampleBox, CodeBlock, PropsTable};
 
 /// Command documentation page
 #[component]
 pub fn CommandPage() -> Element {
     let mut value = use_signal(|| "".to_string());
     let mut message = use_signal(|| "Select a command...".to_string());
-    
+
     rsx! {
         DocPage {
             title: "Command",
             description: "A command palette for quick navigation and actions.",
-            
+
             Section { title: "Basic",
                 p { "{message}" }
                 ExampleBox {
@@ -82,16 +88,16 @@ Command {
 pub fn SheetPage() -> Element {
     let mut open = use_signal(|| false);
     let mut open_left = use_signal(|| false);
-    
+
     rsx! {
         DocPage {
             title: "Sheet",
             description: "A side panel that slides in from any edge of the screen.",
-            
+
             Section { title: "Basic (Right Side)",
                 ExampleBox {
                     Button { onclick: move |_| open.set(true), "Open Sheet" }
-                    
+
                     Sheet {
                         open: open(),
                         on_open_change: move |o| open.set(o),
@@ -121,11 +127,11 @@ Sheet {
     // Content
 }"#.to_string() }
             }
-            
+
             Section { title: "Left Side",
                 ExampleBox {
                     Button { onclick: move |_| open_left.set(true), "Open Left Sheet" }
-                    
+
                     Sheet {
                         open: open_left(),
                         on_open_change: move |o| open_left.set(o),
@@ -147,7 +153,7 @@ Sheet {
 #[component]
 pub fn MultiSelectPage() -> Element {
     let mut selected = use_signal(|| vec!["react".to_string()]);
-    
+
     let options = vec![
         SelectOption::new("react", "React"),
         SelectOption::new("vue", "Vue"),
@@ -155,12 +161,12 @@ pub fn MultiSelectPage() -> Element {
         SelectOption::new("svelte", "Svelte"),
         SelectOption::new("solid", "Solid"),
     ];
-    
+
     rsx! {
         DocPage {
             title: "MultiSelect",
             description: "A dropdown that allows selecting multiple items with tag display.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Box { style: "max-width: 300px;",
@@ -183,7 +189,7 @@ MultiSelect {
     on_change: move |v| selected.set(v),
 }"#.to_string() }
             }
-            
+
             Section { title: "Creatable",
                 ExampleBox {
                     Box { style: "max-width: 300px;",
@@ -208,7 +214,7 @@ pub fn OtpInputPage() -> Element {
         DocPage {
             title: "OTP Input",
             description: "A one-time password input with individual digit boxes.",
-            
+
             Section { title: "Basic (6 digits)",
                 ExampleBox {
                     OtpInput {
@@ -223,7 +229,7 @@ pub fn OtpInputPage() -> Element {
     on_change: move |v| otp.set(v),
 }"#.to_string() }
             }
-            
+
             Section { title: "Masked",
                 ExampleBox {
                     OtpInput {
@@ -234,7 +240,7 @@ pub fn OtpInputPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Error State",
                 ExampleBox {
                     OtpInput {
@@ -256,7 +262,7 @@ pub fn TimePickerPage() -> Element {
         DocPage {
             title: "Time Picker",
             description: "A time selection component with hours, minutes, and optional seconds.",
-            
+
             Section { title: "24-Hour Format",
                 ExampleBox {
                     Box { style: "max-width: 200px;",
@@ -273,7 +279,7 @@ pub fn TimePickerPage() -> Element {
     use_24h: true,
 }"#.to_string() }
             }
-            
+
             Section { title: "12-Hour Format (AM/PM)",
                 ExampleBox {
                     Box { style: "max-width: 200px;",
@@ -285,7 +291,7 @@ pub fn TimePickerPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "With Seconds",
                 ExampleBox {
                     Box { style: "max-width: 250px;",
@@ -308,12 +314,12 @@ pub fn ContextMenuPage() -> Element {
         DocPage {
             title: "Context Menu",
             description: "A right-click context menu for additional actions.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     ContextMenu {
                         ContextMenuTrigger {
-                            Box { 
+                            Box {
                                 style: "padding: 40px; background: #f3f4f6; border-radius: 8px; text-align: center; cursor: context-menu; user-select: none;",
                                 "Right-click here"
                             }
@@ -323,8 +329,8 @@ pub fn ContextMenuPage() -> Element {
                             ContextMenuItem { on_click: move |_| {}, "Copy" }
                             ContextMenuItem { on_click: move |_| {}, "Paste" }
                             ContextMenuSeparator {}
-                            ContextMenuItem { 
-                                on_click: move |_| {}, 
+                            ContextMenuItem {
+                                on_click: move |_| {},
                                 shortcut: Some("⌘D".to_string()),
                                 "Duplicate"
                             }
@@ -359,12 +365,12 @@ pub fn HoverCardPage() -> Element {
         DocPage {
             title: "Hover Card",
             description: "A card that appears when hovering over a trigger element.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Box { style: "padding: 40px;",
                         HoverCard {
-                            trigger: rsx! { 
+                            trigger: rsx! {
                                 span { style: "color: #3b82f6; cursor: pointer; text-decoration: underline; font-weight: 500;", "@username" }
                             },
                             HoverCardHeader {
@@ -373,7 +379,7 @@ pub fn HoverCardPage() -> Element {
                             }
                             HoverCardContent {
                                 VStack { gap: SpacingSize::Sm,
-                                    p { style: "margin: 0; font-size: 14px; color: #6b7280;", 
+                                    p { style: "margin: 0; font-size: 14px; color: #6b7280;",
                                         "Passionate about building great user experiences with Rust and Dioxus."
                                     }
                                     HStack { gap: SpacingSize::Md,
@@ -407,31 +413,31 @@ pub fn HoverCardPage() -> Element {
 pub fn SonnerPage() -> Element {
     let mut sonner = use_sonner();
     let toasts_sig = sonner.toasts_signal();
-    
+
     // Read the signal to trigger re-renders
     let toasts_list = toasts_sig();
-    
+
     rsx! {
         DocPage {
             title: "Sonner",
             description: "Modern toast notifications with rich styling and progress bars.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap;",
-                        Button { 
-                            onclick: move |_| { sonner.toast("Hello World!"); }, 
-                            "Show Toast" 
+                        Button {
+                            onclick: move |_| { sonner.toast("Hello World!"); },
+                            "Show Toast"
                         }
-                        Button { 
-                            variant: ButtonVariant::Secondary, 
-                            onclick: move |_| { sonner.success("Operation completed!"); }, 
-                            "Success" 
+                        Button {
+                            variant: ButtonVariant::Secondary,
+                            onclick: move |_| { sonner.success("Operation completed!"); },
+                            "Success"
                         }
-                        Button { 
-                            variant: ButtonVariant::Destructive, 
-                            onclick: move |_| { sonner.error("Something went wrong"); }, 
-                            "Error" 
+                        Button {
+                            variant: ButtonVariant::Destructive,
+                            onclick: move |_| { sonner.error("Something went wrong"); },
+                            "Error"
                         }
                     }
                 }
@@ -447,12 +453,12 @@ Sonner {
     toasts: sonner.toasts(),
 }"#.to_string() }
             }
-            
+
             Section { title: "Positions",
                 p { "Sonner supports multiple positions: BottomRight, BottomCenter, BottomLeft, TopRight, TopCenter, TopLeft" }
             }
         }
-        
+
         // Sonner is rendered at the page level, outside of any containers
         Sonner {
             toasts: toasts_list.clone(),
@@ -469,7 +475,7 @@ pub fn QrCodePage() -> Element {
         DocPage {
             title: "QR Code",
             description: "A QR code generator and display component.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     HStack { gap: SpacingSize::Lg, style: "justify-content: center;",
@@ -485,7 +491,7 @@ pub fn QrCodePage() -> Element {
     level: QrCodeLevel::Medium,
 }"#.to_string() }
             }
-            
+
             Section { title: "Error Correction Levels",
                 p { "Low (~7%), Medium (~15%), Quartile (~25%), High (~30%)" }
             }
@@ -500,7 +506,7 @@ pub fn CollapsiblePage() -> Element {
         DocPage {
             title: "Collapsible",
             description: "A component that shows or hides content with smooth animation.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Collapsible {
@@ -513,7 +519,7 @@ pub fn CollapsiblePage() -> Element {
     "Hidden content revealed!"
 }"#.to_string() }
             }
-            
+
             Section { title: "Default Open",
                 ExampleBox {
                     Collapsible {
@@ -532,12 +538,12 @@ pub fn CollapsiblePage() -> Element {
 pub fn ToggleGroupPage() -> Element {
     let mut single_value = use_signal(|| vec!["bold".to_string()]);
     let mut multi_value = use_signal(|| vec!["bold".to_string(), "italic".to_string()]);
-    
+
     rsx! {
         DocPage {
             title: "Toggle Group",
             description: "A group of toggle buttons for single or multiple selection.",
-            
+
             Section { title: "Single Selection",
                 ExampleBox {
                     ToggleGroup {
@@ -558,7 +564,7 @@ pub fn ToggleGroupPage() -> Element {
     ToggleItem { value: "right", "Right" }
 }"#.to_string() }
             }
-            
+
             Section { title: "Multiple Selection",
                 ExampleBox {
                     ToggleGroup {

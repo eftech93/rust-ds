@@ -3,7 +3,7 @@
 //! Provides a fluent API for building CSS style strings in pure Rust.
 //! Similar to Tailwind's utility classes but type-safe and compiled.
 
-use crate::theme::tokens::{ThemeTokens, Color, SpacingScale, RadiusScale, TypographyScale};
+use crate::theme::tokens::{Color, RadiusScale, SpacingScale, ThemeTokens, TypographyScale};
 use std::fmt::Write;
 
 /// CSS Style builder with fluent API
@@ -36,7 +36,7 @@ pub struct Style {
     pub gap: Option<String>,
     pub row_gap: Option<String>,
     pub column_gap: Option<String>,
-    
+
     // Spacing
     pub padding: Option<String>,
     pub padding_top: Option<String>,
@@ -48,12 +48,12 @@ pub struct Style {
     pub margin_right: Option<String>,
     pub margin_bottom: Option<String>,
     pub margin_left: Option<String>,
-    
+
     // Colors
     pub background_color: Option<String>,
     pub color: Option<String>,
     pub border_color: Option<String>,
-    
+
     // Typography
     pub font_size: Option<String>,
     pub font_weight: Option<String>,
@@ -62,7 +62,7 @@ pub struct Style {
     pub text_align: Option<String>,
     pub text_decoration: Option<String>,
     pub letter_spacing: Option<String>,
-    
+
     // Effects
     pub border_radius: Option<String>,
     pub border: Option<String>,
@@ -72,7 +72,7 @@ pub struct Style {
     pub border_left: Option<String>,
     pub border_width: Option<String>,
     pub box_shadow: Option<String>,
-    
+
     // Sizing
     pub width: Option<String>,
     pub height: Option<String>,
@@ -80,7 +80,7 @@ pub struct Style {
     pub min_height: Option<String>,
     pub max_width: Option<String>,
     pub max_height: Option<String>,
-    
+
     // Position
     pub position: Option<String>,
     pub top: Option<String>,
@@ -88,7 +88,7 @@ pub struct Style {
     pub bottom: Option<String>,
     pub left: Option<String>,
     pub z_index: Option<String>,
-    
+
     // Misc
     pub cursor: Option<String>,
     pub opacity: Option<String>,
@@ -341,25 +341,25 @@ impl Style {
         self.padding_left = Some(format!("{}px", val));
         self
     }
-    
+
     /// Set top padding in pixels
     pub fn pt_px(mut self, px: u16) -> Self {
         self.padding_top = Some(format!("{}px", px));
         self
     }
-    
+
     /// Set right padding in pixels
     pub fn pr_px(mut self, px: u16) -> Self {
         self.padding_right = Some(format!("{}px", px));
         self
     }
-    
+
     /// Set bottom padding in pixels
     pub fn pb_px(mut self, px: u16) -> Self {
         self.padding_bottom = Some(format!("{}px", px));
         self
     }
-    
+
     /// Set left padding in pixels
     pub fn pl_px(mut self, px: u16) -> Self {
         self.padding_left = Some(format!("{}px", px));
@@ -580,31 +580,31 @@ impl Style {
         self.border_width = Some(format!("{}px", width));
         self
     }
-    
+
     /// Set top border
     pub fn border_top(mut self, width: u8, color: &Color) -> Self {
         self.border_top = Some(format!("{}px solid {}", width, color.to_rgba()));
         self
     }
-    
+
     /// Set right border
     pub fn border_right(mut self, width: u8, color: &Color) -> Self {
         self.border_right = Some(format!("{}px solid {}", width, color.to_rgba()));
         self
     }
-    
+
     /// Set bottom border
     pub fn border_bottom(mut self, width: u8, color: &Color) -> Self {
         self.border_bottom = Some(format!("{}px solid {}", width, color.to_rgba()));
         self
     }
-    
+
     /// Set left border
     pub fn border_left(mut self, width: u8, color: &Color) -> Self {
         self.border_left = Some(format!("{}px solid {}", width, color.to_rgba()));
         self
     }
-    
+
     /// Set border style (dashed, dotted, etc.)
     pub fn border_style(mut self, style: &str) -> Self {
         // This is a simplified implementation - border_style would need proper field
@@ -741,7 +741,7 @@ impl Style {
         self.position = Some(value.into());
         self
     }
-    
+
     /// Set position to relative
     pub fn relative(mut self) -> Self {
         self.position = Some("relative".into());
@@ -889,7 +889,7 @@ impl Style {
         self.word_break = Some("break-all".into());
         self
     }
-    
+
     /// Set outline style
     pub fn outline(mut self, value: &str) -> Self {
         self.outline = Some(value.into());
@@ -974,7 +974,7 @@ impl Style {
     /// Build the style string
     pub fn build(self) -> String {
         let mut style = String::new();
-        
+
         // Layout
         write_if_some(&mut style, "display", &self.display);
         write_if_some(&mut style, "flex-direction", &self.flex_direction);
@@ -986,7 +986,7 @@ impl Style {
         write_if_some(&mut style, "gap", &self.gap);
         write_if_some(&mut style, "row-gap", &self.row_gap);
         write_if_some(&mut style, "column-gap", &self.column_gap);
-        
+
         // Spacing
         write_if_some(&mut style, "padding", &self.padding);
         write_if_some(&mut style, "padding-top", &self.padding_top);
@@ -998,12 +998,12 @@ impl Style {
         write_if_some(&mut style, "margin-right", &self.margin_right);
         write_if_some(&mut style, "margin-bottom", &self.margin_bottom);
         write_if_some(&mut style, "margin-left", &self.margin_left);
-        
+
         // Colors
         write_if_some(&mut style, "background-color", &self.background_color);
         write_if_some(&mut style, "color", &self.color);
         write_if_some(&mut style, "border-color", &self.border_color);
-        
+
         // Typography
         write_if_some(&mut style, "font-size", &self.font_size);
         write_if_some(&mut style, "font-weight", &self.font_weight);
@@ -1012,7 +1012,7 @@ impl Style {
         write_if_some(&mut style, "text-align", &self.text_align);
         write_if_some(&mut style, "text-decoration", &self.text_decoration);
         write_if_some(&mut style, "letter-spacing", &self.letter_spacing);
-        
+
         // Effects
         write_if_some(&mut style, "border-radius", &self.border_radius);
         write_if_some(&mut style, "border", &self.border);
@@ -1022,7 +1022,7 @@ impl Style {
         write_if_some(&mut style, "border-left", &self.border_left);
         write_if_some(&mut style, "border-width", &self.border_width);
         write_if_some(&mut style, "box-shadow", &self.box_shadow);
-        
+
         // Sizing
         write_if_some(&mut style, "width", &self.width);
         write_if_some(&mut style, "height", &self.height);
@@ -1030,7 +1030,7 @@ impl Style {
         write_if_some(&mut style, "min-height", &self.min_height);
         write_if_some(&mut style, "max-width", &self.max_width);
         write_if_some(&mut style, "max-height", &self.max_height);
-        
+
         // Position
         write_if_some(&mut style, "position", &self.position);
         write_if_some(&mut style, "top", &self.top);
@@ -1038,7 +1038,7 @@ impl Style {
         write_if_some(&mut style, "bottom", &self.bottom);
         write_if_some(&mut style, "left", &self.left);
         write_if_some(&mut style, "z-index", &self.z_index);
-        
+
         // Misc
         write_if_some(&mut style, "cursor", &self.cursor);
         write_if_some(&mut style, "opacity", &self.opacity);
@@ -1052,90 +1052,214 @@ impl Style {
         write_if_some(&mut style, "word-break", &self.word_break);
         write_if_some(&mut style, "outline", &self.outline);
         write_if_some(&mut style, "resize", &self.resize);
-        
+
         style
     }
 
     /// Merge another style into this one (other takes precedence)
     pub fn merge(mut self, other: Style) -> Self {
         // Layout
-        if other.display.is_some() { self.display = other.display; }
-        if other.flex_direction.is_some() { self.flex_direction = other.flex_direction; }
-        if other.flex_wrap.is_some() { self.flex_wrap = other.flex_wrap; }
-        if other.align_items.is_some() { self.align_items = other.align_items; }
-        if other.align_self.is_some() { self.align_self = other.align_self; }
-        if other.justify_content.is_some() { self.justify_content = other.justify_content; }
-        if other.justify_items.is_some() { self.justify_items = other.justify_items; }
-        if other.gap.is_some() { self.gap = other.gap; }
-        if other.row_gap.is_some() { self.row_gap = other.row_gap; }
-        if other.column_gap.is_some() { self.column_gap = other.column_gap; }
-        
+        if other.display.is_some() {
+            self.display = other.display;
+        }
+        if other.flex_direction.is_some() {
+            self.flex_direction = other.flex_direction;
+        }
+        if other.flex_wrap.is_some() {
+            self.flex_wrap = other.flex_wrap;
+        }
+        if other.align_items.is_some() {
+            self.align_items = other.align_items;
+        }
+        if other.align_self.is_some() {
+            self.align_self = other.align_self;
+        }
+        if other.justify_content.is_some() {
+            self.justify_content = other.justify_content;
+        }
+        if other.justify_items.is_some() {
+            self.justify_items = other.justify_items;
+        }
+        if other.gap.is_some() {
+            self.gap = other.gap;
+        }
+        if other.row_gap.is_some() {
+            self.row_gap = other.row_gap;
+        }
+        if other.column_gap.is_some() {
+            self.column_gap = other.column_gap;
+        }
+
         // Spacing
-        if other.padding.is_some() { self.padding = other.padding; }
-        if other.padding_top.is_some() { self.padding_top = other.padding_top; }
-        if other.padding_right.is_some() { self.padding_right = other.padding_right; }
-        if other.padding_bottom.is_some() { self.padding_bottom = other.padding_bottom; }
-        if other.padding_left.is_some() { self.padding_left = other.padding_left; }
-        if other.margin.is_some() { self.margin = other.margin; }
-        if other.margin_top.is_some() { self.margin_top = other.margin_top; }
-        if other.margin_right.is_some() { self.margin_right = other.margin_right; }
-        if other.margin_bottom.is_some() { self.margin_bottom = other.margin_bottom; }
-        if other.margin_left.is_some() { self.margin_left = other.margin_left; }
-        
+        if other.padding.is_some() {
+            self.padding = other.padding;
+        }
+        if other.padding_top.is_some() {
+            self.padding_top = other.padding_top;
+        }
+        if other.padding_right.is_some() {
+            self.padding_right = other.padding_right;
+        }
+        if other.padding_bottom.is_some() {
+            self.padding_bottom = other.padding_bottom;
+        }
+        if other.padding_left.is_some() {
+            self.padding_left = other.padding_left;
+        }
+        if other.margin.is_some() {
+            self.margin = other.margin;
+        }
+        if other.margin_top.is_some() {
+            self.margin_top = other.margin_top;
+        }
+        if other.margin_right.is_some() {
+            self.margin_right = other.margin_right;
+        }
+        if other.margin_bottom.is_some() {
+            self.margin_bottom = other.margin_bottom;
+        }
+        if other.margin_left.is_some() {
+            self.margin_left = other.margin_left;
+        }
+
         // Colors
-        if other.background_color.is_some() { self.background_color = other.background_color; }
-        if other.color.is_some() { self.color = other.color; }
-        if other.border_color.is_some() { self.border_color = other.border_color; }
-        
+        if other.background_color.is_some() {
+            self.background_color = other.background_color;
+        }
+        if other.color.is_some() {
+            self.color = other.color;
+        }
+        if other.border_color.is_some() {
+            self.border_color = other.border_color;
+        }
+
         // Typography
-        if other.font_size.is_some() { self.font_size = other.font_size; }
-        if other.font_weight.is_some() { self.font_weight = other.font_weight; }
-        if other.font_family.is_some() { self.font_family = other.font_family; }
-        if other.line_height.is_some() { self.line_height = other.line_height; }
-        if other.text_align.is_some() { self.text_align = other.text_align; }
-        if other.text_decoration.is_some() { self.text_decoration = other.text_decoration; }
-        if other.letter_spacing.is_some() { self.letter_spacing = other.letter_spacing; }
-        
+        if other.font_size.is_some() {
+            self.font_size = other.font_size;
+        }
+        if other.font_weight.is_some() {
+            self.font_weight = other.font_weight;
+        }
+        if other.font_family.is_some() {
+            self.font_family = other.font_family;
+        }
+        if other.line_height.is_some() {
+            self.line_height = other.line_height;
+        }
+        if other.text_align.is_some() {
+            self.text_align = other.text_align;
+        }
+        if other.text_decoration.is_some() {
+            self.text_decoration = other.text_decoration;
+        }
+        if other.letter_spacing.is_some() {
+            self.letter_spacing = other.letter_spacing;
+        }
+
         // Effects
-        if other.border_radius.is_some() { self.border_radius = other.border_radius; }
-        if other.border.is_some() { self.border = other.border; }
-        if other.border_top.is_some() { self.border_top = other.border_top; }
-        if other.border_right.is_some() { self.border_right = other.border_right; }
-        if other.border_bottom.is_some() { self.border_bottom = other.border_bottom; }
-        if other.border_left.is_some() { self.border_left = other.border_left; }
-        if other.border_width.is_some() { self.border_width = other.border_width; }
-        if other.box_shadow.is_some() { self.box_shadow = other.box_shadow; }
-        
+        if other.border_radius.is_some() {
+            self.border_radius = other.border_radius;
+        }
+        if other.border.is_some() {
+            self.border = other.border;
+        }
+        if other.border_top.is_some() {
+            self.border_top = other.border_top;
+        }
+        if other.border_right.is_some() {
+            self.border_right = other.border_right;
+        }
+        if other.border_bottom.is_some() {
+            self.border_bottom = other.border_bottom;
+        }
+        if other.border_left.is_some() {
+            self.border_left = other.border_left;
+        }
+        if other.border_width.is_some() {
+            self.border_width = other.border_width;
+        }
+        if other.box_shadow.is_some() {
+            self.box_shadow = other.box_shadow;
+        }
+
         // Sizing
-        if other.width.is_some() { self.width = other.width; }
-        if other.height.is_some() { self.height = other.height; }
-        if other.min_width.is_some() { self.min_width = other.min_width; }
-        if other.min_height.is_some() { self.min_height = other.min_height; }
-        if other.max_width.is_some() { self.max_width = other.max_width; }
-        if other.max_height.is_some() { self.max_height = other.max_height; }
-        
+        if other.width.is_some() {
+            self.width = other.width;
+        }
+        if other.height.is_some() {
+            self.height = other.height;
+        }
+        if other.min_width.is_some() {
+            self.min_width = other.min_width;
+        }
+        if other.min_height.is_some() {
+            self.min_height = other.min_height;
+        }
+        if other.max_width.is_some() {
+            self.max_width = other.max_width;
+        }
+        if other.max_height.is_some() {
+            self.max_height = other.max_height;
+        }
+
         // Position
-        if other.position.is_some() { self.position = other.position; }
-        if other.top.is_some() { self.top = other.top; }
-        if other.right.is_some() { self.right = other.right; }
-        if other.bottom.is_some() { self.bottom = other.bottom; }
-        if other.left.is_some() { self.left = other.left; }
-        if other.z_index.is_some() { self.z_index = other.z_index; }
-        
+        if other.position.is_some() {
+            self.position = other.position;
+        }
+        if other.top.is_some() {
+            self.top = other.top;
+        }
+        if other.right.is_some() {
+            self.right = other.right;
+        }
+        if other.bottom.is_some() {
+            self.bottom = other.bottom;
+        }
+        if other.left.is_some() {
+            self.left = other.left;
+        }
+        if other.z_index.is_some() {
+            self.z_index = other.z_index;
+        }
+
         // Misc
-        if other.cursor.is_some() { self.cursor = other.cursor; }
-        if other.opacity.is_some() { self.opacity = other.opacity; }
-        if other.transition.is_some() { self.transition = other.transition; }
-        if other.transform.is_some() { self.transform = other.transform; }
-        if other.overflow.is_some() { self.overflow = other.overflow; }
-        if other.visibility.is_some() { self.visibility = other.visibility; }
-        if other.pointer_events.is_some() { self.pointer_events = other.pointer_events; }
-        if other.user_select.is_some() { self.user_select = other.user_select; }
-        if other.white_space.is_some() { self.white_space = other.white_space; }
-        if other.word_break.is_some() { self.word_break = other.word_break; }
-        if other.outline.is_some() { self.outline = other.outline; }
-        if other.resize.is_some() { self.resize = other.resize; }
-        
+        if other.cursor.is_some() {
+            self.cursor = other.cursor;
+        }
+        if other.opacity.is_some() {
+            self.opacity = other.opacity;
+        }
+        if other.transition.is_some() {
+            self.transition = other.transition;
+        }
+        if other.transform.is_some() {
+            self.transform = other.transform;
+        }
+        if other.overflow.is_some() {
+            self.overflow = other.overflow;
+        }
+        if other.visibility.is_some() {
+            self.visibility = other.visibility;
+        }
+        if other.pointer_events.is_some() {
+            self.pointer_events = other.pointer_events;
+        }
+        if other.user_select.is_some() {
+            self.user_select = other.user_select;
+        }
+        if other.white_space.is_some() {
+            self.white_space = other.white_space;
+        }
+        if other.word_break.is_some() {
+            self.word_break = other.word_break;
+        }
+        if other.outline.is_some() {
+            self.outline = other.outline;
+        }
+        if other.resize.is_some() {
+            self.resize = other.resize;
+        }
+
         self
     }
 }
@@ -1154,11 +1278,8 @@ mod tests {
 
     #[test]
     fn test_basic_style() {
-        let style = Style::new()
-            .flex()
-            .items_center()
-            .build();
-        
+        let style = Style::new().flex().items_center().build();
+
         assert!(style.contains("display:flex"));
         assert!(style.contains("align-items:center"));
     }
@@ -1172,7 +1293,7 @@ mod tests {
             .bg(&theme.colors.primary)
             .rounded(&theme.radius, "md")
             .build();
-        
+
         assert!(style.contains("display:flex"));
         assert!(style.contains("gap:16px"));
         assert!(style.contains("background-color:"));
@@ -1183,10 +1304,10 @@ mod tests {
     fn test_style_merge() {
         let base = Style::new().flex().items_center();
         let override_style = Style::new().justify_center();
-        
+
         let merged = base.merge(override_style);
         let style_str = merged.build();
-        
+
         assert!(style_str.contains("display:flex"));
         assert!(style_str.contains("align-items:center"));
         assert!(style_str.contains("justify-content:center"));

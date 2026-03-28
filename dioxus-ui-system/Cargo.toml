@@ -8,7 +8,7 @@ license = "MIT OR Apache-2.0"
 repository = "https://github.com/eftech93/rust-ds"
 keywords = ["dioxus", "ui", "design-system", "components", "rust"]
 categories = ["gui", "web-programming", "wasm"]
-rust-version = "1.70"
+rust-version = "1.76"
 readme = "README.md"
 
 [dependencies]

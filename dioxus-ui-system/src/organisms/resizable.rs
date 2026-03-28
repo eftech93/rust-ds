@@ -3,9 +3,9 @@
 //! A split-pane component with draggable resize handles.
 //! Supports both horizontal and vertical resizing with mouse and touch input.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Direction of the resizable panel group
 #[derive(Clone, Copy, PartialEq, Default)]
@@ -76,7 +76,7 @@ impl ResizableContext {
 /// Calculate initial sizes for all panels
 fn calculate_sizes(configs: &[PanelConfig]) -> Vec<f32> {
     let panel_count = configs.len();
-    
+
     if panel_count == 0 {
         return Vec::new();
     }
@@ -130,7 +130,7 @@ pub struct ResizablePanelGroupProps {
 pub fn ResizablePanelGroup(props: ResizablePanelGroupProps) -> Element {
     let _theme = use_theme();
     let direction = props.direction;
-    
+
     let ctx = ResizableContext::new(direction);
     use_context_provider(|| ctx);
 
@@ -180,7 +180,7 @@ pub struct ResizablePanelProps {
 pub fn ResizablePanel(props: ResizablePanelProps) -> Element {
     let mut ctx = use_context::<ResizableContext>();
     let mut panel_index = use_signal(|| None::<usize>);
-    
+
     use_hook({
         let config = PanelConfig {
             default_size: props.default_size,
@@ -191,11 +191,11 @@ pub fn ResizablePanel(props: ResizablePanelProps) -> Element {
             let idx = *ctx.panel_count.read();
             panel_index.set(Some(idx));
             ctx.panel_count.set(idx + 1);
-            
+
             ctx.panel_configs.with_mut(|configs| {
                 configs.push(config);
             });
-            
+
             let new_sizes = calculate_sizes(&ctx.panel_configs.read());
             ctx.panel_sizes.set(new_sizes);
         }
@@ -269,10 +269,14 @@ pub fn ResizableHandle(props: ResizableHandleProps) -> Element {
         let theme = theme.clone();
         move || {
             let t = theme.tokens.read();
-            
+
             let base = Style::new()
                 .flex_shrink(0)
-                .cursor(if disabled { "not-allowed" } else { direction.cursor() })
+                .cursor(if disabled {
+                    "not-allowed"
+                } else {
+                    direction.cursor()
+                })
                 .transition("background-color 150ms ease")
                 .flex()
                 .items_center()
@@ -304,7 +308,7 @@ pub fn ResizableHandle(props: ResizableHandleProps) -> Element {
             let t = theme.tokens.read();
             let hovered = *is_hovered.read();
             let is_drag = *is_dragging.read();
-            
+
             let base = Style::new()
                 .rounded(&t.radius, "full")
                 .transition("all 150ms ease");
@@ -346,7 +350,7 @@ pub fn ResizableHandle(props: ResizableHandleProps) -> Element {
 
             let configs = ctx.panel_configs.read();
             let start_sizes = ctx.drag_start_sizes.read();
-            
+
             if start_sizes.len() < 2 || handle_idx >= start_sizes.len() - 1 {
                 return;
             }
@@ -385,7 +389,7 @@ pub fn ResizableHandle(props: ResizableHandleProps) -> Element {
                 if disabled {
                     return;
                 }
-                
+
                 if let Some(idx) = *handle_index.read() {
                     let coords = evt.data().client_coordinates();
                     let pos = match direction {
@@ -404,7 +408,7 @@ pub fn ResizableHandle(props: ResizableHandleProps) -> Element {
                     if !*ctx.dragging.read() {
                         return;
                     }
-                    
+
                     let coords = evt.data().client_coordinates();
                     let pos = match direction {
                         Direction::Horizontal => coords.x as f32,
@@ -427,7 +431,7 @@ pub fn ResizableHandle(props: ResizableHandleProps) -> Element {
                 if disabled {
                     return;
                 }
-                
+
                 if let Some(touch) = evt.touches().first() {
                     if let Some(idx) = *handle_index.read() {
                         let coords = touch.client_coordinates();
@@ -448,7 +452,7 @@ pub fn ResizableHandle(props: ResizableHandleProps) -> Element {
                     if !*ctx.dragging.read() {
                         return;
                     }
-                    
+
                     if let Some(touch) = evt.touches().first() {
                         let coords = touch.client_coordinates();
                         let pos = match direction {

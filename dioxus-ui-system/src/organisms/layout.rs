@@ -2,10 +2,10 @@
 //!
 //! Provides flexible page layouts including sidebar, drawer, and top navigation variants.
 
-use dioxus::prelude::*;
-use crate::theme::use_style;
+use crate::atoms::{Box, Button, ButtonVariant, HStack, Icon, IconColor, IconSize, VStack};
 use crate::styles::Style;
-use crate::atoms::{Button, ButtonVariant, Icon, IconSize, IconColor, Box, VStack, HStack};
+use crate::theme::use_style;
+use dioxus::prelude::*;
 
 /// Layout type variants
 #[derive(Clone, PartialEq, Default)]
@@ -26,7 +26,7 @@ pub enum LayoutType {
 pub struct LayoutProps {
     /// Layout type
     #[props(default)]
-pub layout_type: LayoutType,
+    pub layout_type: LayoutType,
     /// Navigation items
     #[props(default)]
     pub nav_items: Vec<LayoutNavItem>,
@@ -101,7 +101,7 @@ impl LayoutNavItem {
 #[component]
 pub fn Layout(props: LayoutProps) -> Element {
     let layout_type = props.layout_type.clone();
-    
+
     match layout_type {
         LayoutType::Sidebar => rsx! {
             SidebarLayoutRenderer {
@@ -167,18 +167,21 @@ pub struct SidebarLayoutProps {
 #[component]
 fn SidebarLayoutRenderer(props: SidebarLayoutProps) -> Element {
     let mut is_collapsed = use_signal(|| props.sidebar_collapsed);
-    let sidebar_width = if is_collapsed() { 80 } else { props.sidebar_width };
+    let sidebar_width = if is_collapsed() {
+        80
+    } else {
+        props.sidebar_width
+    };
 
-    let _layout_style = use_style(|_t| {
-        "display: flex; height: 100vh;".to_string()
-    });
+    let _layout_style = use_style(|_t| "display: flex; height: 100vh;".to_string());
 
     let sidebar_style = format!(
         "width: {}px; height: 100vh; display: flex; flex-direction: column; border-right: 1px solid #e2e8f0; transition: width 200ms ease;",
         sidebar_width
     );
 
-    let main_style = "display: flex; flex-direction: column; flex: 1; height: 100vh; overflow: auto;";
+    let main_style =
+        "display: flex; flex-direction: column; flex: 1; height: 100vh; overflow: auto;";
 
     let header_style = format!(
         "height: {}px; display: flex; align-items: center; justify-content: space-between; padding: 0 24px; border-bottom: 1px solid #e2e8f0;",
@@ -192,11 +195,11 @@ fn SidebarLayoutRenderer(props: SidebarLayoutProps) -> Element {
             display: crate::atoms::BoxDisplay::Flex,
             height: Some("100vh".to_string()),
             class: props.class.clone(),
-            
+
             // Sidebar
             aside {
                 style: "{sidebar_style}",
-                
+
                 // Brand
                 HStack {
                     align: crate::atoms::AlignItems::Center,
@@ -204,19 +207,19 @@ fn SidebarLayoutRenderer(props: SidebarLayoutProps) -> Element {
                     height: Some(format!("{}px", props.header_height)),
                     padding: crate::atoms::SpacingSize::Lg,
                     style: Some(format!("border-bottom: 1px solid #e2e8f0; padding-left: 24px; padding-right: 24px; height: {}px;", props.header_height)),
-                    
+
                     if let Some(brand) = props.brand.clone() {
                         div {
                             style: "flex: 1; overflow: hidden;",
                             {brand}
                         }
                     }
-                    
+
                     if props.collapsible {
                         button {
                             style: "background: none; border: none; cursor: pointer; padding: 8px;",
                             onclick: move |_| is_collapsed.toggle(),
-                            
+
                             if is_collapsed() {
                                 "→"
                             } else {
@@ -225,11 +228,11 @@ fn SidebarLayoutRenderer(props: SidebarLayoutProps) -> Element {
                         }
                     }
                 }
-                
+
                 // Navigation
                 nav {
                     style: "flex: 1; overflow-y: auto; padding: 16px 12px;",
-                    
+
                     for item in props.nav_items.clone() {
                         SidebarNavItem {
                             item: item,
@@ -238,22 +241,22 @@ fn SidebarLayoutRenderer(props: SidebarLayoutProps) -> Element {
                     }
                 }
             }
-            
+
             // Main content area
             main {
                 style: "{main_style}",
-                
+
                 // Header
                 header {
                     style: "{header_style}",
-                    
+
                     if let Some(title) = props.title.clone() {
                         h1 {
                             style: "margin: 0; font-size: 20px; font-weight: 600;",
                             "{title}"
                         }
                     }
-                    
+
                     if let Some(actions) = props.actions.clone() {
                         HStack {
                             align: crate::atoms::AlignItems::Center,
@@ -262,7 +265,7 @@ fn SidebarLayoutRenderer(props: SidebarLayoutProps) -> Element {
                         }
                     }
                 }
-                
+
                 // Content
                 Box {
                     width: Some("100%".to_string()),
@@ -295,35 +298,38 @@ fn TopNavLayoutRenderer(props: TopNavLayoutProps) -> Element {
         props.header_height
     );
 
-    let content_style = format!("flex: 1; padding: 24px; overflow: auto; min-height: calc(100vh - {}px);", props.header_height);
+    let content_style = format!(
+        "flex: 1; padding: 24px; overflow: auto; min-height: calc(100vh - {}px);",
+        props.header_height
+    );
 
     rsx! {
         VStack {
             height: Some("100vh".to_string()),
             class: props.class.clone(),
             style: Some("min-height: 100vh;".to_string()),
-            
+
             // Header with navigation
             header {
                 style: "{header_style}",
-                
+
                 HStack {
                     align: crate::atoms::AlignItems::Center,
                     gap: crate::atoms::SpacingSize::Lg,
-                    
+
                     if let Some(brand) = props.brand.clone() {
                         {brand}
                     }
-                    
+
                     nav {
                         style: "display: flex; align-items: center; gap: 24px;",
-                        
+
                         for item in props.nav_items.clone() {
                             TopNavLink { item: item }
                         }
                     }
                 }
-                
+
                 if let Some(actions) = props.actions.clone() {
                     HStack {
                         align: crate::atoms::AlignItems::Center,
@@ -332,7 +338,7 @@ fn TopNavLayoutRenderer(props: TopNavLayoutProps) -> Element {
                     }
                 }
             }
-            
+
             // Main content
             main {
                 style: "{content_style}",
@@ -381,15 +387,15 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
             height: Some("100vh".to_string()),
             class: props.class.clone(),
             style: Some("min-height: 100vh;".to_string()),
-            
+
             // Header
             header {
                 style: "{header_style}",
-                
+
                 HStack {
                     align: crate::atoms::AlignItems::Center,
                     gap: crate::atoms::SpacingSize::Md,
-                    
+
                     Button {
                         variant: ButtonVariant::Ghost,
                         size: crate::atoms::ButtonSize::Icon,
@@ -400,11 +406,11 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
                             color: IconColor::Current,
                         }
                     }
-                    
+
                     if let Some(brand) = props.brand.clone() {
                         {brand}
                     }
-                    
+
                     if let Some(title) = props.title.clone() {
                         h1 {
                             style: "margin: 0; font-size: 20px; font-weight: 600;",
@@ -412,7 +418,7 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
                         }
                     }
                 }
-                
+
                 if let Some(actions) = props.actions.clone() {
                     HStack {
                         align: crate::atoms::AlignItems::Center,
@@ -421,13 +427,13 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
                     }
                 }
             }
-            
+
             // Main content
             main {
                 style: "{content_style}",
                 {props.children}
             }
-            
+
             // Drawer overlay
             if drawer_open() {
                 Box {
@@ -439,12 +445,12 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
                     style: Some("background: rgba(0,0,0,0.5); z-index: 40;".to_string()),
                     onclick: move |_| drawer_open.set(false),
                 }
-                
+
                 // Drawer
                 aside {
                     style: "{drawer_style}",
                     onclick: move |e| e.stop_propagation(),
-                    
+
                     // Drawer header
                     HStack {
                         align: crate::atoms::AlignItems::Center,
@@ -452,14 +458,14 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
                         height: Some(format!("{}px", props.header_height)),
                         padding: crate::atoms::SpacingSize::Lg,
                         style: Some("border-bottom: 1px solid #e2e8f0;".to_string()),
-                        
+
                         if let Some(brand) = props.brand.clone() {
                             Box {
                                 width: Some("100%".to_string()),
                                 {brand}
                             }
                         }
-                        
+
                         Button {
                             variant: ButtonVariant::Ghost,
                             size: crate::atoms::ButtonSize::Icon,
@@ -467,11 +473,11 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
                             "✕"
                         }
                     }
-                    
+
                     // Drawer navigation
                     nav {
                         style: "flex: 1; overflow-y: auto; padding: 16px 12px;",
-                        
+
                         for item in props.nav_items.clone() {
                             SidebarNavItem {
                                 item: item,
@@ -542,11 +548,11 @@ fn SidebarNavItem(props: SidebarNavItemProps) -> Element {
             base.bg(&t.colors.secondary)
                 .text_color(&t.colors.secondary_foreground)
         } else if is_hovered() {
-            base.bg(&t.colors.muted)
-                .text_color(&t.colors.foreground)
+            base.bg(&t.colors.muted).text_color(&t.colors.foreground)
         } else {
             base.text_color(&t.colors.muted_foreground)
-        }.build()
+        }
+        .build()
     });
 
     rsx! {
@@ -555,7 +561,7 @@ fn SidebarNavItem(props: SidebarNavItemProps) -> Element {
             style: "{link_style}",
             onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
-            
+
             if has_icon {
                 Icon {
                     name: item.icon.clone().unwrap(),
@@ -563,7 +569,7 @@ fn SidebarNavItem(props: SidebarNavItemProps) -> Element {
                     color: IconColor::Current,
                 }
             }
-            
+
             if !props.collapsed {
                 span {
                     "{item.label}"
@@ -599,14 +605,13 @@ fn TopNavLink(props: TopNavLinkProps) -> Element {
             .no_underline();
 
         if item.active {
-            base.bg(&t.colors.muted)
-                .text_color(&t.colors.foreground)
+            base.bg(&t.colors.muted).text_color(&t.colors.foreground)
         } else if is_hovered() {
-            base.bg(&t.colors.muted)
-                .text_color(&t.colors.foreground)
+            base.bg(&t.colors.muted).text_color(&t.colors.foreground)
         } else {
             base.text_color(&t.colors.muted_foreground)
-        }.build()
+        }
+        .build()
     });
 
     rsx! {
@@ -615,7 +620,7 @@ fn TopNavLink(props: TopNavLinkProps) -> Element {
             style: "{link_style}",
             onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
-            
+
             if has_icon {
                 Icon {
                     name: item.icon.clone().unwrap(),
@@ -623,7 +628,7 @@ fn TopNavLink(props: TopNavLinkProps) -> Element {
                     color: IconColor::Current,
                 }
             }
-            
+
             "{item.label}"
         }
     }

@@ -1,5 +1,5 @@
 //! Design tokens for the UI system
-//! 
+//!
 //! This module provides type-safe design tokens including colors, spacing,
 //! typography, and other visual properties that define the theme.
 
@@ -116,8 +116,13 @@ impl Color {
     /// Convert to hex string
     pub fn to_hex(&self) -> String {
         if self.a < 1.0 {
-            format!("#{:02x}{:02x}{:02x}{:02x}", 
-                self.r, self.g, self.b, (self.a * 255.0) as u8)
+            format!(
+                "#{:02x}{:02x}{:02x}{:02x}",
+                self.r,
+                self.g,
+                self.b,
+                (self.a * 255.0) as u8
+            )
         } else {
             format!("#{:02x}{:02x}{:02x}", self.r, self.g, self.b)
         }
@@ -287,7 +292,7 @@ impl ShadowScale {
             _ => &self.md,
         }
     }
-    
+
     /// Create a colored shadow based on a color
     pub fn colored(&self, size: &str, color: &Color) -> String {
         let base = self.get(size);
@@ -470,7 +475,8 @@ impl ThemeTokens {
 
 /// Determine if a color is dark (useful for choosing contrasting text)
 fn is_dark_color(color: &Color) -> bool {
-    let luminance = (0.299 * color.r as f32 + 0.587 * color.g as f32 + 0.114 * color.b as f32) / 255.0;
+    let luminance =
+        (0.299 * color.r as f32 + 0.587 * color.g as f32 + 0.114 * color.b as f32) / 255.0;
     luminance < 0.5
 }
 
@@ -480,10 +486,10 @@ impl ThemeTokens {
     pub fn rose() -> Self {
         let mut rose = Self::light();
         rose.mode = ThemeMode::Brand("rose".into());
-        rose.colors.primary = Color::new(225, 29, 72);     // Rose 600
+        rose.colors.primary = Color::new(225, 29, 72); // Rose 600
         rose.colors.primary_foreground = Color::new(255, 255, 255);
         rose.colors.ring = Color::new(225, 29, 72);
-        rose.colors.accent = Color::new(255, 228, 230);    // Rose 100
+        rose.colors.accent = Color::new(255, 228, 230); // Rose 100
         rose.colors.accent_foreground = Color::new(136, 19, 55); // Rose 800
         rose
     }
@@ -492,10 +498,10 @@ impl ThemeTokens {
     pub fn blue() -> Self {
         let mut blue = Self::light();
         blue.mode = ThemeMode::Brand("blue".into());
-        blue.colors.primary = Color::new(37, 99, 235);     // Blue 600
+        blue.colors.primary = Color::new(37, 99, 235); // Blue 600
         blue.colors.primary_foreground = Color::new(255, 255, 255);
         blue.colors.ring = Color::new(37, 99, 235);
-        blue.colors.accent = Color::new(219, 234, 254);    // Blue 100
+        blue.colors.accent = Color::new(219, 234, 254); // Blue 100
         blue.colors.accent_foreground = Color::new(30, 58, 138); // Blue 800
         blue
     }
@@ -504,10 +510,10 @@ impl ThemeTokens {
     pub fn green() -> Self {
         let mut green = Self::light();
         green.mode = ThemeMode::Brand("green".into());
-        green.colors.primary = Color::new(22, 163, 74);    // Green 600
+        green.colors.primary = Color::new(22, 163, 74); // Green 600
         green.colors.primary_foreground = Color::new(255, 255, 255);
         green.colors.ring = Color::new(22, 163, 74);
-        green.colors.accent = Color::new(220, 252, 231);   // Green 100
+        green.colors.accent = Color::new(220, 252, 231); // Green 100
         green.colors.accent_foreground = Color::new(20, 83, 45); // Green 800
         green
     }
@@ -516,10 +522,10 @@ impl ThemeTokens {
     pub fn violet() -> Self {
         let mut violet = Self::light();
         violet.mode = ThemeMode::Brand("violet".into());
-        violet.colors.primary = Color::new(124, 58, 237);  // Violet 600
+        violet.colors.primary = Color::new(124, 58, 237); // Violet 600
         violet.colors.primary_foreground = Color::new(255, 255, 255);
         violet.colors.ring = Color::new(124, 58, 237);
-        violet.colors.accent = Color::new(237, 233, 254);  // Violet 100
+        violet.colors.accent = Color::new(237, 233, 254); // Violet 100
         violet.colors.accent_foreground = Color::new(91, 33, 182); // Violet 800
         violet
     }
@@ -528,10 +534,10 @@ impl ThemeTokens {
     pub fn orange() -> Self {
         let mut orange = Self::light();
         orange.mode = ThemeMode::Brand("orange".into());
-        orange.colors.primary = Color::new(234, 88, 12);   // Orange 600
+        orange.colors.primary = Color::new(234, 88, 12); // Orange 600
         orange.colors.primary_foreground = Color::new(255, 255, 255);
         orange.colors.ring = Color::new(234, 88, 12);
-        orange.colors.accent = Color::new(255, 237, 213);  // Orange 100
+        orange.colors.accent = Color::new(255, 237, 213); // Orange 100
         orange.colors.accent_foreground = Color::new(154, 52, 18); // Orange 800
         orange
     }

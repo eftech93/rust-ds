@@ -2,8 +2,8 @@
 //!
 //! Range slider input for selecting numeric values.
 
-use dioxus::prelude::*;
 use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 /// Slider properties
 #[derive(Props, Clone, PartialEq)]
@@ -65,7 +65,7 @@ impl SliderSize {
             SliderSize::Lg => 8,
         }
     }
-    
+
     fn to_thumb_size(&self) -> u8 {
         match self {
             SliderSize::Sm => 14,
@@ -86,44 +86,51 @@ pub struct SliderMark {
 #[component]
 pub fn Slider(props: SliderProps) -> Element {
     let theme = use_theme();
-    
-    let color = props.color.unwrap_or_else(|| {
-        theme.tokens.read().colors.primary.to_rgba()
-    });
-    
-    let class_css = props.class.as_ref()
+
+    let color = props
+        .color
+        .unwrap_or_else(|| theme.tokens.read().colors.primary.to_rgba());
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let range = props.max - props.min;
     let percentage = if range > 0.0 {
         ((props.value - props.min) / range * 100.0).clamp(0.0, 100.0)
     } else {
         0.0
     };
-    
+
     let height = props.size.to_height();
     let thumb_size = props.size.to_thumb_size();
-    
+
     let track_color = theme.tokens.read().colors.muted.to_rgba();
-    
+
     // Format value display
-    let value_text = props.format_value
+    let value_text = props
+        .format_value
         .map(|f| f(props.value))
         .unwrap_or_else(|| format!("{:.0}", props.value));
-    
-    let disabled_css = if props.disabled { "opacity: 0.5; cursor: not-allowed;" } else { "cursor: pointer;" };
-    
+
+    let disabled_css = if props.disabled {
+        "opacity: 0.5; cursor: not-allowed;"
+    } else {
+        "cursor: pointer;"
+    };
+
     rsx! {
         div {
             class: "slider{class_css}",
             style: "display: flex; flex-direction: column; gap: 8px; {disabled_css}",
-            
+
             // Label row
             if props.label.is_some() || props.show_value {
                 div {
                     style: "display: flex; justify-content: space-between; align-items: center;",
-                    
+
                     if let Some(label) = props.label {
                         label {
                             class: "slider-label",
@@ -131,7 +138,7 @@ pub fn Slider(props: SliderProps) -> Element {
                             "{label}"
                         }
                     }
-                    
+
                     if props.show_value {
                         span {
                             class: "slider-value",
@@ -141,11 +148,11 @@ pub fn Slider(props: SliderProps) -> Element {
                     }
                 }
             }
-            
+
             // Slider input
             div {
                 style: "position: relative; height: {thumb_size}px; display: flex; align-items: center;",
-                
+
                 input {
                     type: "range",
                     class: "slider-input",
@@ -161,18 +168,18 @@ pub fn Slider(props: SliderProps) -> Element {
                         }
                     },
                 }
-                
+
                 // Visual track
                 div {
                     class: "slider-track",
                     style: "position: relative; width: 100%; height: {height}px; background: {track_color}; border-radius: 9999px;",
-                    
+
                     // Fill
                     div {
                         class: "slider-fill",
                         style: "position: absolute; left: 0; top: 0; height: 100%; width: {percentage}%; background: {color}; border-radius: 9999px;",
                     }
-                    
+
                     // Thumb
                     div {
                         class: "slider-thumb",
@@ -180,13 +187,13 @@ pub fn Slider(props: SliderProps) -> Element {
                     }
                 }
             }
-            
+
             // Marks
             if !props.marks.is_empty() {
                 div {
                     class: "slider-marks",
                     style: "position: relative; height: 20px; margin-top: 4px;",
-                    
+
                     for mark in props.marks.iter() {
                         {
                             let mark_pct = if range > 0.0 {
@@ -194,16 +201,16 @@ pub fn Slider(props: SliderProps) -> Element {
                             } else {
                                 0.0
                             };
-                            
+
                             rsx! {
                                 div {
                                     key: "{mark.value}",
                                     style: "position: absolute; left: {mark_pct}%; transform: translateX(-50%); text-align: center;",
-                                    
+
                                     div {
                                         style: "width: 2px; height: 6px; background: {track_color}; margin: 0 auto;",
                                     }
-                                    
+
                                     if let Some(label) = mark.label.clone() {
                                         span {
                                             style: "font-size: 10px; color: {theme.tokens.read().colors.muted.to_rgba()}; white-space: nowrap;",
@@ -250,23 +257,25 @@ pub struct RangeSliderProps {
 #[component]
 pub fn RangeSlider(props: RangeSliderProps) -> Element {
     let theme = use_theme();
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let range = props.max - props.min;
     let min_pct = ((props.min_value - props.min) / range * 100.0).clamp(0.0, 100.0);
     let max_pct = ((props.max_value - props.min) / range * 100.0).clamp(0.0, 100.0);
-    
+
     let color = theme.tokens.read().colors.primary.to_rgba();
     let track_color = theme.tokens.read().colors.muted.to_rgba();
-    
+
     rsx! {
         div {
             class: "range-slider{class_css}",
             style: "display: flex; flex-direction: column; gap: 8px;",
-            
+
             if let Some(label) = props.label {
                 label {
                     class: "range-slider-label",
@@ -274,10 +283,10 @@ pub fn RangeSlider(props: RangeSliderProps) -> Element {
                     "{label}"
                 }
             }
-            
+
             div {
                 style: "display: flex; align-items: center; gap: 12px;",
-                
+
                 // Min value input
                 input {
                     type: "number",
@@ -294,27 +303,27 @@ pub fn RangeSlider(props: RangeSliderProps) -> Element {
                         }
                     },
                 }
-                
+
                 // Visual slider
                 div {
                     style: "flex: 1; position: relative; height: 20px; display: flex; align-items: center;",
-                    
+
                     div {
                         class: "range-slider-track",
                         style: "width: 100%; height: 6px; background: {track_color}; border-radius: 9999px; position: relative;",
-                        
+
                         // Fill between handles
                         div {
                             class: "range-slider-fill",
                             style: format!("position: absolute; left: {min_pct}%; right: {}%; height: 100%; background: {color}; border-radius: 9999px;", 100.0 - max_pct),
                         }
-                        
+
                         // Min handle
                         div {
                             class: "range-slider-handle range-slider-handle-min",
                             style: "position: absolute; left: {min_pct}%; top: 50%; transform: translate(-50%, -50%); width: 18px; height: 18px; background: white; border: 2px solid {color}; border-radius: 50%; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1);",
                         }
-                        
+
                         // Max handle
                         div {
                             class: "range-slider-handle range-slider-handle-max",
@@ -322,7 +331,7 @@ pub fn RangeSlider(props: RangeSliderProps) -> Element {
                         }
                     }
                 }
-                
+
                 // Max value input
                 input {
                     type: "number",

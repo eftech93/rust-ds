@@ -2,9 +2,9 @@
 //!
 //! An input with +/- buttons for incrementing/decrementing numeric values.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Number input properties
 #[derive(Props, Clone, PartialEq)]
@@ -49,16 +49,10 @@ pub struct NumberInputProps {
 /// Number input component with increment/decrement buttons
 #[component]
 pub fn NumberInput(props: NumberInputProps) -> Element {
-    let theme = use_theme();
-    
-    let container_style = use_style(|t| {
-        Style::new()
-            .flex()
-            .flex_col()
-            .w_full()
-            .build()
-    });
-    
+    let _theme = use_theme();
+
+    let container_style = use_style(|_t| Style::new().flex().flex_col().w_full().build());
+
     let input_wrapper_style = use_style(|t| {
         Style::new()
             .flex()
@@ -69,7 +63,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
             .overflow_hidden()
             .build()
     });
-    
+
     let button_style = use_style(|t| {
         Style::new()
             .flex()
@@ -84,7 +78,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
             .transition("background 0.15s ease")
             .build()
     });
-    
+
     let input_style = use_style(|t| {
         Style::new()
             .flex()
@@ -95,7 +89,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
             .text_align("center")
             .build()
     });
-    
+
     let label_style = use_style(|t| {
         Style::new()
             .block()
@@ -105,7 +99,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
             .text_color(&t.colors.foreground)
             .build()
     });
-    
+
     let error_style = use_style(|t| {
         Style::new()
             .mt(&t.spacing, "xs")
@@ -113,7 +107,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
             .text_color(&t.colors.destructive)
             .build()
     });
-    
+
     let handle_increment = move |_| {
         if props.disabled {
             return;
@@ -127,7 +121,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
         let formatted = format_value(clamped, props.precision);
         props.on_change.call(formatted);
     };
-    
+
     let handle_decrement = move |_| {
         if props.disabled {
             return;
@@ -141,7 +135,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
         let formatted = format_value(clamped, props.precision);
         props.on_change.call(formatted);
     };
-    
+
     let handle_input = move |e: Event<FormData>| {
         if props.disabled {
             return;
@@ -152,33 +146,33 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
             props.on_change.call(formatted);
         }
     };
-    
+
     let display_value = format_value(props.value, props.precision);
-    
+
     rsx! {
         div {
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
-            
+
             if let Some(label) = props.label.clone() {
                 label {
                     style: "{label_style}",
                     "{label}"
                 }
             }
-            
+
             div {
                 style: "{input_wrapper_style}",
                 opacity: if props.disabled { "0.5" } else { "1" },
                 pointer_events: if props.disabled { "none" } else { "auto" },
-                
+
                 button {
                     style: "{button_style}",
                     onclick: handle_decrement,
                     disabled: props.disabled,
                     "−"
                 }
-                
+
                 input {
                     style: "{input_style}",
                     r#type: "number",
@@ -190,7 +184,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
                     disabled: props.disabled,
                     oninput: handle_input,
                 }
-                
+
                 button {
                     style: "{button_style}",
                     onclick: handle_increment,
@@ -198,7 +192,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
                     "+"
                 }
             }
-            
+
             if let Some(error) = props.error.clone() {
                 span {
                     style: "{error_style}",

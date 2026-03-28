@@ -2,20 +2,20 @@
 //!
 //! SVG icon component with theme integration and sizing options.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
 use crate::theme::tokens::Color;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Icon sizes
 #[derive(Default, Copy, Clone, PartialEq)]
 pub enum IconSize {
-    ExtraSmall,  // 12px
-    Small,       // 16px
+    ExtraSmall, // 12px
+    Small,      // 16px
     #[default]
-    Medium,      // 20px
-    Large,       // 24px
-    ExtraLarge,  // 32px
+    Medium, // 20px
+    Large,      // 24px
+    ExtraLarge, // 32px
 }
 
 impl IconSize {
@@ -34,7 +34,7 @@ impl IconSize {
 #[derive(Default, Clone, PartialEq)]
 pub enum IconColor {
     #[default]
-    Current,     // Uses currentColor (inherits from parent)
+    Current, // Uses currentColor (inherits from parent)
     Primary,
     Secondary,
     Muted,
@@ -97,13 +97,13 @@ pub struct IconProps {
 #[component]
 pub fn Icon(props: IconProps) -> Element {
     let _theme = use_theme();
-    
+
     let size = props.size.clone();
     let color = props.color.clone();
     let flip_h = props.flip_h;
     let flip_v = props.flip_v;
     let rotate = props.rotate;
-    
+
     // Memoized styles
     let style = use_style(move |t| {
         let base = Style::new()
@@ -113,7 +113,7 @@ pub fn Icon(props: IconProps) -> Element {
             .w_px(size.to_px())
             .h_px(size.to_px())
             .transition("color 150ms ease");
-            
+
         // Apply color
         let base = match &color {
             IconColor::Current => base,
@@ -126,10 +126,10 @@ pub fn Icon(props: IconProps) -> Element {
             IconColor::Inverse => base.text_color(&t.colors.background),
             IconColor::Custom(c) => base.text_color(c),
         };
-        
+
         // Transforms
         let mut transform = String::new();
-        
+
         if flip_h {
             transform.push_str("scaleX(-1) ");
         }
@@ -139,32 +139,33 @@ pub fn Icon(props: IconProps) -> Element {
         if rotate != 0 {
             transform.push_str(&format!("rotate({}deg)", rotate));
         }
-        
+
         if !transform.is_empty() {
             Style {
                 transform: Some(transform.trim().to_string()),
                 ..base
-            }.build()
+            }
+            .build()
         } else {
             base.build()
         }
     });
-    
+
     // Combine with custom styles
     let final_style = if let Some(custom) = &props.style {
         format!("{} {}", style(), custom)
     } else {
         style()
     };
-    
+
     let class = props.class.clone().unwrap_or_default();
     let aria_label = props.aria_label.clone();
-    
+
     // Get SVG content
     let svg_content = get_icon_svg(&props.name);
     let px = size.to_px();
     let view_box = get_icon_viewbox(&props.name);
-    
+
     rsx! {
         svg {
             style: "{final_style}",
@@ -232,12 +233,12 @@ fn get_icon_svg(name: &str) -> String {
 /// Get viewBox for preset icons
 fn get_icon_viewbox(name: &str) -> &'static str {
     match name {
-        "check" | "x" | "close" | "plus" | "minus" | "arrow-left" | "arrow-right" | 
-        "arrow-up" | "arrow-down" | "chevron-left" | "chevron-right" | "chevron-up" | 
-        "chevron-down" | "menu" | "search" | "user" | "settings" | "home" | "bell" | 
-        "heart" | "star" | "trash" | "edit" | "copy" | "external-link" | "loading" | 
-        "spinner" | "info" | "warning" | "alert" | "error" | "alert-circle" | "moon" | "sun" |
-        "book" | "layout" | "sidebar" | "maximize" | "box" | "smartphone" | "palette" => "0 0 24 24",
+        "check" | "x" | "close" | "plus" | "minus" | "arrow-left" | "arrow-right" | "arrow-up"
+        | "arrow-down" | "chevron-left" | "chevron-right" | "chevron-up" | "chevron-down"
+        | "menu" | "search" | "user" | "settings" | "home" | "bell" | "heart" | "star"
+        | "trash" | "edit" | "copy" | "external-link" | "loading" | "spinner" | "info"
+        | "warning" | "alert" | "error" | "alert-circle" | "moon" | "sun" | "book" | "layout"
+        | "sidebar" | "maximize" | "box" | "smartphone" | "palette" => "0 0 24 24",
         // Default
         _ => "0 0 24 24",
     }
@@ -265,11 +266,8 @@ pub struct IconButtonProps {
 
 #[component]
 pub fn IconButton(props: IconButtonProps) -> Element {
-    let class = format!(
-        "icon-button {}",
-        props.class.clone().unwrap_or_default()
-    );
-    
+    let class = format!("icon-button {}", props.class.clone().unwrap_or_default());
+
     rsx! {
         button {
             class: "{class}",

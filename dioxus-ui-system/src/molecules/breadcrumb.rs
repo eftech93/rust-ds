@@ -2,10 +2,10 @@
 //!
 //! Displays the path to the current resource using a hierarchy of links.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
+use crate::atoms::{AlignItems, HStack, SpacingSize};
 use crate::styles::Style;
-use crate::atoms::{HStack, AlignItems, SpacingSize};
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Breadcrumb item
 #[derive(Clone, PartialEq)]
@@ -27,7 +27,7 @@ impl BreadcrumbItem {
             icon: None,
         }
     }
-    
+
     /// Create a new breadcrumb item without link (current page)
     pub fn current(label: impl Into<String>) -> Self {
         Self {
@@ -36,7 +36,7 @@ impl BreadcrumbItem {
             icon: None,
         }
     }
-    
+
     /// Add an icon to the breadcrumb item
     pub fn with_icon(mut self, icon: impl Into<String>) -> Self {
         self.icon = Some(icon.into());
@@ -64,34 +64,34 @@ pub struct BreadcrumbProps {
 #[component]
 pub fn Breadcrumb(props: BreadcrumbProps) -> Element {
     let _theme = use_theme();
-    
+
     let separator = props.separator.unwrap_or_else(|| "›".to_string());
     let items_count = props.items.len();
-    
+
     rsx! {
         nav {
             aria_label: "breadcrumb",
             style: props.style.clone().unwrap_or_default(),
             class: "{props.class.clone().unwrap_or_default()}",
-            
+
             HStack {
                 style: "flex-wrap: wrap; list-style: none; margin: 0; padding: 0;",
                 gap: SpacingSize::Sm,
                 align: AlignItems::Center,
-                
+
                 for (index, item) in props.items.iter().enumerate() {
                     HStack {
                         key: "{item.label}",
                         gap: SpacingSize::Sm,
                         align: AlignItems::Center,
-                        
+
                         if index > 0 {
                             span {
                                 style: "color: #94a3b8; user-select: none;",
                                 "{separator}"
                             }
                         }
-                        
+
                         BreadcrumbLink {
                             item: item.clone(),
                             is_last: index == items_count - 1,
@@ -112,35 +112,34 @@ struct BreadcrumbLinkProps {
 #[component]
 fn BreadcrumbLink(props: BreadcrumbLinkProps) -> Element {
     let _theme = use_theme();
-    
+
     let link_style = use_style(move |t| {
         let base = Style::new()
             .flex()
             .items_center()
             .gap(&t.spacing, "xs")
             .transition("color 150ms ease");
-        
+
         if props.is_last {
-            base.text_color(&t.colors.foreground)
-                .font_weight(500)
+            base.text_color(&t.colors.foreground).font_weight(500)
         } else {
-            base.text_color(&t.colors.muted_foreground)
-                .no_underline()
-        }.build()
+            base.text_color(&t.colors.muted_foreground).no_underline()
+        }
+        .build()
     });
-    
+
     let has_icon = props.item.icon.is_some();
-    
+
     if props.is_last || props.item.href.is_none() {
         rsx! {
             span {
                 style: "{link_style} cursor: default;",
                 aria_current: "page",
-                
+
                 if has_icon {
                     BreadcrumbIcon { name: props.item.icon.clone().unwrap() }
                 }
-                
+
                 "{props.item.label}"
             }
         }
@@ -153,11 +152,11 @@ fn BreadcrumbLink(props: BreadcrumbLinkProps) -> Element {
                     let _ = e;
                     // Could add hover effect here
                 },
-                
+
                 if has_icon {
                     BreadcrumbIcon { name: props.item.icon.clone().unwrap() }
                 }
-                
+
                 "{props.item.label}"
             }
         }
@@ -180,7 +179,7 @@ fn BreadcrumbIcon(props: BreadcrumbIconProps) -> Element {
             stroke_linecap: "round",
             stroke_linejoin: "round",
             style: "width: 16px; height: 16px;",
-            
+
             match props.name.as_str() {
                 "home" => rsx! {
                     path { d: "m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" }

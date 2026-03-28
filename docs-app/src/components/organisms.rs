@@ -1,12 +1,12 @@
 //! Organism component documentation pages
 
+use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, Section};
 use dioxus::prelude::*;
-use dioxus_ui_system::prelude::*;
-use dioxus_ui_system::organisms::*;
-use dioxus_ui_system::organisms::FooterVariant;
+use dioxus_ui_system::atoms::{Box, HStack, VStack};
 use dioxus_ui_system::molecules::ToastVariant;
-use dioxus_ui_system::atoms::{Box, VStack, HStack};
-use crate::docs_ui::{DocPage, Section, ExampleBox, CodeBlock};
+use dioxus_ui_system::organisms::FooterVariant;
+use dioxus_ui_system::organisms::*;
+use dioxus_ui_system::prelude::*;
 
 #[component]
 pub fn OrganismsPage() -> Element {
@@ -14,7 +14,7 @@ pub fn OrganismsPage() -> Element {
         DocPage {
             title: "Organisms",
             description: "Complex UI components composed of molecules and atoms.",
-            
+
             Section { title: "Overview",
                 p { "Organisms include:" }
                 ul {
@@ -47,7 +47,7 @@ pub fn HeaderPage() -> Element {
         DocPage {
             title: "Header",
             description: "Application header with navigation and branding.",
-            
+
             Section { title: "Example",
                 ExampleBox {
                     Box { style: "border: 1px solid rgb(226,232,240); border-radius: 8px; overflow: hidden;",
@@ -81,19 +81,19 @@ pub fn HeaderPage() -> Element {
 #[component]
 pub fn LayoutPage() -> Element {
     let mut layout_type = use_signal(|| LayoutType::Sidebar);
-    
+
     rsx! {
         DocPage {
             title: "Layout",
             description: "Page layout system with multiple variants.",
-            
+
             Section { title: "Layout Types",
                 ExampleBox {
                     HStack { gap: SpacingSize::Sm, style: "margin-bottom: 16px;",
                         Button { variant: if layout_type() == LayoutType::Sidebar { ButtonVariant::Primary } else { ButtonVariant::Secondary }, onclick: move |_| layout_type.set(LayoutType::Sidebar), "Sidebar" }
                         Button { variant: if layout_type() == LayoutType::TopNav { ButtonVariant::Primary } else { ButtonVariant::Secondary }, onclick: move |_| layout_type.set(LayoutType::TopNav), "TopNav" }
                     }
-                    
+
                     Box { style: "height: 300px; border: 1px solid rgb(226,232,240); border-radius: 8px; overflow: hidden;",
                         Box { style: "transform: scale(0.5); transform-origin: top left; width: 200%; height: 200%;",
                             Layout {
@@ -128,18 +128,18 @@ pub fn LayoutPage() -> Element {
 #[component]
 pub fn TabsPage() -> Element {
     let mut active = use_signal(|| "account".to_string());
-    
+
     let tabs = vec![
         TabItem::new("account", "Account").with_icon("user"),
         TabItem::new("password", "Password"),
         TabItem::new("notifications", "Notifications"),
     ];
-    
+
     rsx! {
         DocPage {
             title: "Tabs",
             description: "Tabbed content navigation.",
-            
+
             Section { title: "Example",
                 ExampleBox {
                     Tabs {
@@ -184,18 +184,26 @@ Tabs {{
 #[component]
 pub fn AccordionPage() -> Element {
     let mut expanded = use_signal(|| vec!["item1".to_string()]);
-    
+
     let items = vec![
-        AccordionItem::new("item1", "Is it accessible?", "Yes. It adheres to the WAI-ARIA design pattern."),
-        AccordionItem::new("item2", "Is it styled?", "Yes. It comes with default styles."),
+        AccordionItem::new(
+            "item1",
+            "Is it accessible?",
+            "Yes. It adheres to the WAI-ARIA design pattern.",
+        ),
+        AccordionItem::new(
+            "item2",
+            "Is it styled?",
+            "Yes. It comes with default styles.",
+        ),
         AccordionItem::new("item3", "Is it animated?", "Yes. It's animated by default."),
     ];
-    
+
     rsx! {
         DocPage {
             title: "Accordion",
             description: "Collapsible content sections.",
-            
+
             Section { title: "Example",
                 ExampleBox {
                     Accordion {
@@ -232,7 +240,7 @@ pub fn CardsPage() -> Element {
         DocPage {
             title: "Card Organisms",
             description: "Pre-built card patterns for common use cases.",
-            
+
             Section { title: "Action Card",
                 ExampleBox {
                     ActionCard {
@@ -244,7 +252,7 @@ pub fn CardsPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Profile Card",
                 ExampleBox {
                     ProfileCard {
@@ -258,7 +266,7 @@ pub fn CardsPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Stat Card",
                 ExampleBox {
                     Box { style: "max-width: 300px;",
@@ -273,7 +281,7 @@ pub fn CardsPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Pricing Card",
                 ExampleBox {
                     Box { style: "max-width: 300px;",
@@ -303,9 +311,11 @@ pub fn CardsPage() -> Element {
 
 #[component]
 pub fn DataTablePage() -> Element {
-    use dioxus_ui_system::organisms::{DataTable, TableColumn, ColumnAlign, TablePagination, TableFilter, FilterOption};
+    use dioxus_ui_system::organisms::{
+        ColumnAlign, DataTable, FilterOption, TableColumn, TableFilter, TablePagination,
+    };
     use std::collections::HashMap;
-    
+
     #[derive(Clone, PartialEq)]
     struct User {
         id: String,
@@ -315,9 +325,13 @@ pub fn DataTablePage() -> Element {
         status: String,
         department: String,
     }
-    
+
     fn render_status(user: &User) -> Element {
-        let bg = if user.status == "Active" { "rgb(34,197,94)" } else { "rgb(148,163,184)" };
+        let bg = if user.status == "Active" {
+            "rgb(34,197,94)"
+        } else {
+            "rgb(148,163,184)"
+        };
         rsx! {
             span {
                 style: "padding: 4px 12px; background: {bg}; color: white; border-radius: 9999px; font-size: 12px;",
@@ -325,18 +339,74 @@ pub fn DataTablePage() -> Element {
             }
         }
     }
-    
+
     let all_users = vec![
-        User { id: "1".to_string(), name: "Alice Johnson".to_string(), email: "alice@example.com".to_string(), role: "Admin".to_string(), status: "Active".to_string(), department: "Engineering".to_string() },
-        User { id: "2".to_string(), name: "Bob Smith".to_string(), email: "bob@example.com".to_string(), role: "User".to_string(), status: "Active".to_string(), department: "Marketing".to_string() },
-        User { id: "3".to_string(), name: "Carol White".to_string(), email: "carol@example.com".to_string(), role: "Editor".to_string(), status: "Inactive".to_string(), department: "Design".to_string() },
-        User { id: "4".to_string(), name: "David Brown".to_string(), email: "david@example.com".to_string(), role: "User".to_string(), status: "Active".to_string(), department: "Engineering".to_string() },
-        User { id: "5".to_string(), name: "Emma Davis".to_string(), email: "emma@example.com".to_string(), role: "Admin".to_string(), status: "Active".to_string(), department: "Sales".to_string() },
-        User { id: "6".to_string(), name: "Frank Wilson".to_string(), email: "frank@example.com".to_string(), role: "User".to_string(), status: "Inactive".to_string(), department: "Marketing".to_string() },
-        User { id: "7".to_string(), name: "Grace Lee".to_string(), email: "grace@example.com".to_string(), role: "Editor".to_string(), status: "Active".to_string(), department: "Design".to_string() },
-        User { id: "8".to_string(), name: "Henry Taylor".to_string(), email: "henry@example.com".to_string(), role: "User".to_string(), status: "Active".to_string(), department: "Engineering".to_string() },
+        User {
+            id: "1".to_string(),
+            name: "Alice Johnson".to_string(),
+            email: "alice@example.com".to_string(),
+            role: "Admin".to_string(),
+            status: "Active".to_string(),
+            department: "Engineering".to_string(),
+        },
+        User {
+            id: "2".to_string(),
+            name: "Bob Smith".to_string(),
+            email: "bob@example.com".to_string(),
+            role: "User".to_string(),
+            status: "Active".to_string(),
+            department: "Marketing".to_string(),
+        },
+        User {
+            id: "3".to_string(),
+            name: "Carol White".to_string(),
+            email: "carol@example.com".to_string(),
+            role: "Editor".to_string(),
+            status: "Inactive".to_string(),
+            department: "Design".to_string(),
+        },
+        User {
+            id: "4".to_string(),
+            name: "David Brown".to_string(),
+            email: "david@example.com".to_string(),
+            role: "User".to_string(),
+            status: "Active".to_string(),
+            department: "Engineering".to_string(),
+        },
+        User {
+            id: "5".to_string(),
+            name: "Emma Davis".to_string(),
+            email: "emma@example.com".to_string(),
+            role: "Admin".to_string(),
+            status: "Active".to_string(),
+            department: "Sales".to_string(),
+        },
+        User {
+            id: "6".to_string(),
+            name: "Frank Wilson".to_string(),
+            email: "frank@example.com".to_string(),
+            role: "User".to_string(),
+            status: "Inactive".to_string(),
+            department: "Marketing".to_string(),
+        },
+        User {
+            id: "7".to_string(),
+            name: "Grace Lee".to_string(),
+            email: "grace@example.com".to_string(),
+            role: "Editor".to_string(),
+            status: "Active".to_string(),
+            department: "Design".to_string(),
+        },
+        User {
+            id: "8".to_string(),
+            name: "Henry Taylor".to_string(),
+            email: "henry@example.com".to_string(),
+            role: "User".to_string(),
+            status: "Active".to_string(),
+            department: "Engineering".to_string(),
+        },
     ];
-    
+
     let columns = vec![
         TableColumn {
             key: "name".to_string(),
@@ -379,65 +449,102 @@ pub fn DataTablePage() -> Element {
             render: Some(render_status),
         },
     ];
-    
+
     // Filter definitions
     let filters = vec![
         TableFilter {
             key: "role".to_string(),
             label: "All Roles".to_string(),
             options: vec![
-                FilterOption { label: "Admin".to_string(), value: "Admin".to_string() },
-                FilterOption { label: "User".to_string(), value: "User".to_string() },
-                FilterOption { label: "Editor".to_string(), value: "Editor".to_string() },
+                FilterOption {
+                    label: "Admin".to_string(),
+                    value: "Admin".to_string(),
+                },
+                FilterOption {
+                    label: "User".to_string(),
+                    value: "User".to_string(),
+                },
+                FilterOption {
+                    label: "Editor".to_string(),
+                    value: "Editor".to_string(),
+                },
             ],
         },
         TableFilter {
             key: "status".to_string(),
             label: "All Status".to_string(),
             options: vec![
-                FilterOption { label: "Active".to_string(), value: "Active".to_string() },
-                FilterOption { label: "Inactive".to_string(), value: "Inactive".to_string() },
+                FilterOption {
+                    label: "Active".to_string(),
+                    value: "Active".to_string(),
+                },
+                FilterOption {
+                    label: "Inactive".to_string(),
+                    value: "Inactive".to_string(),
+                },
             ],
         },
         TableFilter {
             key: "department".to_string(),
             label: "All Departments".to_string(),
             options: vec![
-                FilterOption { label: "Engineering".to_string(), value: "Engineering".to_string() },
-                FilterOption { label: "Marketing".to_string(), value: "Marketing".to_string() },
-                FilterOption { label: "Design".to_string(), value: "Design".to_string() },
-                FilterOption { label: "Sales".to_string(), value: "Sales".to_string() },
+                FilterOption {
+                    label: "Engineering".to_string(),
+                    value: "Engineering".to_string(),
+                },
+                FilterOption {
+                    label: "Marketing".to_string(),
+                    value: "Marketing".to_string(),
+                },
+                FilterOption {
+                    label: "Design".to_string(),
+                    value: "Design".to_string(),
+                },
+                FilterOption {
+                    label: "Sales".to_string(),
+                    value: "Sales".to_string(),
+                },
             ],
         },
     ];
-    
+
     // State for search and filters
     let mut search_query = use_signal(|| "".to_string());
     let mut active_filters = use_signal(|| HashMap::<String, String>::new());
-    
+
     // Filter the data based on search query and active filters
-    let filtered_users: Vec<User> = all_users.clone().into_iter().filter(|user| {
-        // Text search
-        let search_lower = search_query().to_lowercase();
-        let matches_search = search_lower.is_empty() || 
-            user.name.to_lowercase().contains(&search_lower) ||
-            user.email.to_lowercase().contains(&search_lower) ||
-            user.role.to_lowercase().contains(&search_lower) ||
-            user.department.to_lowercase().contains(&search_lower);
-        
-        // Custom filters
-        let matches_role = active_filters().get("role").map_or(true, |v| v == &user.role);
-        let matches_status = active_filters().get("status").map_or(true, |v| v == &user.status);
-        let matches_dept = active_filters().get("department").map_or(true, |v| v == &user.department);
-        
-        matches_search && matches_role && matches_status && matches_dept
-    }).collect();
-    
+    let filtered_users: Vec<User> = all_users
+        .clone()
+        .into_iter()
+        .filter(|user| {
+            // Text search
+            let search_lower = search_query().to_lowercase();
+            let matches_search = search_lower.is_empty()
+                || user.name.to_lowercase().contains(&search_lower)
+                || user.email.to_lowercase().contains(&search_lower)
+                || user.role.to_lowercase().contains(&search_lower)
+                || user.department.to_lowercase().contains(&search_lower);
+
+            // Custom filters
+            let matches_role = active_filters()
+                .get("role")
+                .map_or(true, |v| v == &user.role);
+            let matches_status = active_filters()
+                .get("status")
+                .map_or(true, |v| v == &user.status);
+            let matches_dept = active_filters()
+                .get("department")
+                .map_or(true, |v| v == &user.department);
+
+            matches_search && matches_role && matches_status && matches_dept
+        })
+        .collect();
+
     rsx! {
         DocPage {
             title: "DataTable",
             description: "Data display component with sorting, pagination, search, and custom filters.",
-            
+
             Section { title: "Basic Table",
                 ExampleBox {
                     DataTable {
@@ -451,7 +558,7 @@ pub fn DataTablePage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "With Search & Filters",
                 p { "Search across all fields and filter by role, status, and department:" }
                 ExampleBox {
@@ -516,7 +623,7 @@ DataTable {{
     }})),
 }}".to_string() }
             }
-            
+
             Section { title: "Search Only",
                 p { "Table with text search only:" }
                 ExampleBox {
@@ -533,7 +640,7 @@ DataTable {{
                     }
                 }
             }
-            
+
             Section { title: "With Pagination",
                 ExampleBox {
                     VStack { style: "border: 1px solid rgb(226,232,240); border-radius: 8px; overflow: hidden;",
@@ -555,7 +662,7 @@ DataTable {{
                     }
                 }
             }
-            
+
             Section { title: "Selectable Rows",
                 ExampleBox {
                     DataTable {
@@ -572,7 +679,7 @@ DataTable {{
                     }
                 }
             }
-            
+
             Section { title: "Loading State",
                 ExampleBox {
                     DataTable {
@@ -592,35 +699,37 @@ DataTable {{
 
 #[component]
 pub fn StepperWizardPage() -> Element {
-    use dioxus_ui_system::organisms::{Wizard, WizardStep, StepSummary, StepSummaryItem, CompactStepper};
     use dioxus_ui_system::molecules::StepItem;
-    
+    use dioxus_ui_system::organisms::{
+        CompactStepper, StepSummary, StepSummaryItem, Wizard, WizardStep,
+    };
+
     let wizard_steps = vec![
         WizardStep::new("Personal Information").with_description("Enter your personal details"),
         WizardStep::new("Account Setup").with_description("Create your account credentials"),
         WizardStep::new("Preferences").with_description("Set your preferences"),
         WizardStep::new("Review").with_description("Review your information"),
     ];
-    
+
     let compact_steps = vec![
         StepItem::new("Personal Info"),
         StepItem::new("Account"),
         StepItem::new("Preferences"),
         StepItem::new("Review"),
     ];
-    
+
     let summary_steps = vec![
         StepSummaryItem::new("Full Name", "Alice Johnson"),
         StepSummaryItem::new("Email", "alice@example.com"),
         StepSummaryItem::new("Username", "alice_j"),
         StepSummaryItem::new("Plan", "Pro Plan"),
     ];
-    
+
     rsx! {
         DocPage {
             title: "Stepper Wizard",
             description: "Full-featured wizard with validation for multi-step forms.",
-            
+
             Section { title: "Basic Wizard",
                 ExampleBox {
                     Box { style: "border: 1px solid rgb(226,232,240); border-radius: 12px; overflow: hidden;",
@@ -629,7 +738,7 @@ pub fn StepperWizardPage() -> Element {
                             active_step: 0,
                             on_step_change: move |_| {},
                             on_finish: move |_| {},
-                            
+
                             // Step 1: Personal Info
                             Box { style: "padding: 24px;",
                                 h3 { style: "margin: 0 0 16px 0;", "Personal Information" }
@@ -650,7 +759,7 @@ pub fn StepperWizardPage() -> Element {
                                     }
                                 }
                             }
-                            
+
                             // Step 2: Account
                             Box { style: "padding: 24px;",
                                 h3 { style: "margin: 0 0 16px 0;", "Account Setup" }
@@ -665,7 +774,7 @@ pub fn StepperWizardPage() -> Element {
                                     }
                                 }
                             }
-                            
+
                             // Step 3: Preferences
                             Box { style: "padding: 24px;",
                                 h3 { style: "margin: 0 0 16px 0;", "Preferences" }
@@ -684,7 +793,7 @@ pub fn StepperWizardPage() -> Element {
                                     }
                                 }
                             }
-                            
+
                             // Step 4: Review
                             Box { style: "padding: 24px;",
                                 h3 { style: "margin: 0 0 16px 0;", "Review Your Information" }
@@ -698,7 +807,7 @@ pub fn StepperWizardPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Compact Stepper",
                 ExampleBox {
                     Box { style: "padding: 16px;",
@@ -722,7 +831,7 @@ Wizard {{
     // Step content goes here
 }}".to_string() }
             }
-            
+
             Section { title: "Validation States",
                 ExampleBox {
                     VStack { gap: SpacingSize::Sm,
@@ -746,7 +855,7 @@ Wizard {{
 pub fn ChartsPage() -> Element {
     use dioxus_ui_system::organisms::charts::*;
     use dioxus_ui_system::theme::tokens::Color;
-    
+
     // Sample data for charts
     let bar_data = vec![
         ChartDataPoint::new("Jan", 100.0),
@@ -756,7 +865,7 @@ pub fn ChartsPage() -> Element {
         ChartDataPoint::new("May", 250.0),
         ChartDataPoint::new("Jun", 300.0),
     ];
-    
+
     let line_data = vec![
         ChartDataPoint::new("Mon", 20.0),
         ChartDataPoint::new("Tue", 45.0),
@@ -766,20 +875,20 @@ pub fn ChartsPage() -> Element {
         ChartDataPoint::new("Sat", 80.0),
         ChartDataPoint::new("Sun", 65.0),
     ];
-    
+
     let pie_data = vec![
         ChartDataPoint::new("Desktop", 45.0),
         ChartDataPoint::new("Mobile", 35.0),
         ChartDataPoint::new("Tablet", 20.0),
     ];
-    
+
     let sparkline_data = vec![10.0, 15.0, 8.0, 20.0, 25.0, 18.0, 30.0, 22.0, 35.0, 28.0];
-    
+
     rsx! {
         DocPage {
             title: "Charts",
             description: "Pure Rust data visualization components with no external dependencies.",
-            
+
             Section { title: "Bar Chart",
                 ExampleBox {
                     BarChart {
@@ -802,7 +911,7 @@ pub fn ChartsPage() -> Element {
     height: \"300px\".to_string(),
 }}".to_string() }
             }
-            
+
             Section { title: "Bar Chart with Tooltips",
                 p { "Hover over bars to see detailed values:" }
                 ExampleBox {
@@ -835,7 +944,7 @@ BarChart {{
     tooltip: ChartTooltip::disabled(),
 }}".to_string() }
             }
-            
+
             Section { title: "Line Chart",
                 ExampleBox {
                     LineChart {
@@ -849,7 +958,7 @@ BarChart {{
                     }
                 }
             }
-            
+
             Section { title: "Multi-Series Line Chart with Tooltips",
                 p { "Hover over points to see values for each series:" }
                 ExampleBox {
@@ -901,7 +1010,7 @@ LineChart {{
     }}),
 }}".to_string() }
             }
-            
+
             Section { title: "Area Chart",
                 ExampleBox {
                     LineChart {
@@ -914,7 +1023,7 @@ LineChart {{
                     }
                 }
             }
-            
+
             Section { title: "Pie Chart",
                 ExampleBox {
                     Box { style: "display: flex; justify-content: center;",
@@ -943,7 +1052,7 @@ LineChart {{
     tooltip: ChartTooltip::default(),
 }}".to_string() }
             }
-            
+
             Section { title: "Pie Chart with Custom Tooltips",
                 p { "Hover over slices to see custom formatted values:" }
                 ExampleBox {
@@ -961,8 +1070,8 @@ LineChart {{
                             show_labels: false,
                             legend_position: LegendPosition::Right,
                             tooltip: ChartTooltip::with_formatter(|point, _| {
-                                format!("{}: {} units ({:.1}%)", 
-                                    point.label, 
+                                format!("{}: {} units ({:.1}%)",
+                                    point.label,
                                     point.value as i32,
                                     point.value
                                 )
@@ -981,7 +1090,7 @@ LineChart {{
     }}),
 }}".to_string() }
             }
-            
+
             Section { title: "Donut Chart",
                 ExampleBox {
                     Box { style: "display: flex; justify-content: center;",
@@ -995,7 +1104,7 @@ LineChart {{
                     }
                 }
             }
-            
+
             Section { title: "Gauge Chart",
                 ExampleBox {
                     Box { style: "display: flex; justify-content: center;",
@@ -1011,7 +1120,7 @@ LineChart {{
                     }
                 }
             }
-            
+
             Section { title: "Sparkline",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
@@ -1056,7 +1165,7 @@ LineChart {{
     show_last_point: true,
 }}".to_string() }
             }
-            
+
             Section { title: "Trend Indicator",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
@@ -1079,7 +1188,7 @@ LineChart {{
                     }
                 }
             }
-            
+
             Section { title: "Chart Types Reference",
                 p { "Available chart components:" }
                 ul {
@@ -1092,7 +1201,7 @@ LineChart {{
                     li { "TrendIndicator - Sparkline with trend arrow" }
                 }
             }
-            
+
             Section { title: "Tooltip Configuration",
                 p { "All chart components support tooltips for better data exploration:" }
                 ul {
@@ -1136,7 +1245,7 @@ pub fn FooterPage() -> Element {
         DocPage {
             title: "Footer",
             description: "Page footer with links, branding, and legal information.",
-            
+
             Section { title: "Default Footer",
                 ExampleBox {
                     Footer {
@@ -1159,7 +1268,7 @@ pub fn FooterPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Simple Footer",
                 ExampleBox {
                     SimpleFooter {
@@ -1193,7 +1302,7 @@ pub fn NotificationCenterPage() -> Element {
         DocPage {
             title: "Notification Center",
             description: "Centralized alert management with categorization.",
-            
+
             Section { title: "Notification Center",
                 ExampleBox {
                     NotificationCenter {
@@ -1205,7 +1314,7 @@ pub fn NotificationCenterPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Banner Alert",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
@@ -1233,7 +1342,7 @@ pub fn HeroPage() -> Element {
         DocPage {
             title: "Hero",
             description: "Prominent page header with CTA for landing pages.",
-            
+
             Section { title: "Basic Hero",
                 ExampleBox {
                     Hero {
@@ -1245,7 +1354,7 @@ pub fn HeroPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "With Features",
                 ExampleBox {
                     Hero {
@@ -1261,7 +1370,7 @@ pub fn HeroPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Social Proof",
                 ExampleBox {
                     SocialProofBar {
@@ -1293,7 +1402,7 @@ pub fn FileUploadPage() -> Element {
         DocPage {
             title: "File Upload",
             description: "Drag-and-drop file upload with progress and preview.",
-            
+
             Section { title: "Basic File Upload",
                 ExampleBox {
                     FileUpload {
@@ -1305,7 +1414,7 @@ pub fn FileUploadPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Multiple Files",
                 ExampleBox {
                     FileUpload {
@@ -1337,17 +1446,17 @@ pub fn ConfirmationDialogPage() -> Element {
     let mut show_delete = use_signal(|| false);
     let mut show_unsaved = use_signal(|| false);
     let mut show_signout = use_signal(|| false);
-    
+
     rsx! {
         DocPage {
             title: "Confirmation Dialog",
             description: "Critical decision dialogs with clear action labeling.",
-            
+
             Section { title: "Delete Confirmation",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md, style: "align-items: flex-start;",
                         Button { variant: ButtonVariant::Destructive, onclick: move |_| show_delete.set(true), "Delete Item" }
-                        
+
                         DeleteConfirmDialog {
                             open: show_delete(),
                             on_close: move |_| show_delete.set(false),
@@ -1358,12 +1467,12 @@ pub fn ConfirmationDialogPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Unsaved Changes",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md, style: "align-items: flex-start;",
                         Button { onclick: move |_| show_unsaved.set(true), "Show Unsaved Dialog" }
-                        
+
                         UnsavedChangesDialog {
                             open: show_unsaved(),
                             on_close: move |_| show_unsaved.set(false),
@@ -1373,12 +1482,12 @@ pub fn ConfirmationDialogPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Sign Out",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md, style: "align-items: flex-start;",
                         Button { onclick: move |_| show_signout.set(true), "Sign Out" }
-                        
+
                         SignOutDialog {
                             open: show_signout(),
                             on_close: move |_| show_signout.set(false),

@@ -3,9 +3,9 @@
 //! A WYSIWYG text editor with formatting toolbar supporting bold, italic,
 //! underline, headings, lists, links, code blocks, and text alignment.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Rich text editor features configuration
 #[derive(Clone, PartialEq, Debug)]
@@ -90,14 +90,16 @@ pub struct RichTextEditorProps {
 /// Rich text editor component
 #[component]
 pub fn RichTextEditor(props: RichTextEditorProps) -> Element {
-    let theme = use_theme();
+    let _theme = use_theme();
     let content = use_signal(|| props.value.clone());
     let is_focused = use_signal(|| false);
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let container_style = use_style(|t| {
         Style::new()
             .w_full()
@@ -106,8 +108,8 @@ pub fn RichTextEditor(props: RichTextEditorProps) -> Element {
             .bg(&t.colors.background)
             .build()
     });
-    
-    let on_input = {
+
+    let _on_input = {
         let on_change = props.on_change.clone();
         move |_e: Event<dioxus::events::KeyboardData>| {
             if let Some(handler) = &on_change {
@@ -117,12 +119,12 @@ pub fn RichTextEditor(props: RichTextEditorProps) -> Element {
             }
         }
     };
-    
+
     rsx! {
         div {
             class: "rich-text-editor{class_css}",
             style: "{container_style}",
-            
+
             // Toolbar
             if !props.disabled {
                 RichTextToolbar {
@@ -130,7 +132,7 @@ pub fn RichTextEditor(props: RichTextEditorProps) -> Element {
                     disabled: props.disabled,
                 }
             }
-            
+
             // Content editable area
             RichTextContent {
                 value: props.value.clone(),
@@ -159,7 +161,7 @@ pub struct RichTextToolbarProps {
 #[component]
 pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
     let theme = use_theme();
-    
+
     let toolbar_style = use_style(|t| {
         Style::new()
             .flex()
@@ -171,7 +173,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
             .border_bottom(1, &t.colors.border)
             .build()
     });
-    
+
     let button_style = use_style(|t| {
         Style::new()
             .inline_flex()
@@ -185,23 +187,23 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
             .text_color(&t.colors.foreground)
             .build()
     });
-    
+
     let button_hover_style = format!(
         "background: {};",
         theme.tokens.read().colors.muted.to_rgba()
     );
-    
+
     let disabled_style = if props.disabled {
         "opacity: 0.5; pointer-events: none;"
     } else {
         ""
     };
-    
+
     rsx! {
         div {
             class: "rich-text-toolbar",
             style: "{toolbar_style} {disabled_style}",
-            
+
             // Text formatting group
             if props.features.bold {
                 ToolbarButton {
@@ -239,12 +241,12 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     hover_style: &button_hover_style,
                 }
             }
-            
+
             // Separator
             if props.features.bold || props.features.italic || props.features.underline || props.features.strikethrough {
                 ToolbarSeparator {}
             }
-            
+
             // Headings
             if props.features.heading {
                 ToolbarButton {
@@ -273,7 +275,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                 }
                 ToolbarSeparator {}
             }
-            
+
             // Lists
             if props.features.bullet_list {
                 ToolbarButton {
@@ -293,12 +295,12 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     hover_style: &button_hover_style,
                 }
             }
-            
+
             // Separator
             if props.features.bullet_list || props.features.numbered_list {
                 ToolbarSeparator {}
             }
-            
+
             // Alignment
             if props.features.align_left {
                 ToolbarButton {
@@ -327,12 +329,12 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     hover_style: &button_hover_style,
                 }
             }
-            
+
             // Separator
             if props.features.align_left || props.features.align_center || props.features.align_right {
                 ToolbarSeparator {}
             }
-            
+
             // Special blocks
             if props.features.quote {
                 ToolbarButton {
@@ -372,7 +374,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
 #[component]
 fn ToolbarSeparator() -> Element {
     let theme = use_theme();
-    
+
     rsx! {
         div {
             class: "rich-text-separator",
@@ -425,16 +427,16 @@ fn execute_command(command: &str, value: Option<&str>) {
     #[cfg(target_arch = "wasm32")]
     {
         use wasm_bindgen::prelude::*;
-        
+
         #[wasm_bindgen]
         extern "C" {
             #[wasm_bindgen(js_namespace = document)]
             fn execCommand(command: &str, show_ui: bool, value: Option<&str>) -> bool;
         }
-        
+
         let _ = execCommand(command, false, value);
     }
-    
+
     // For non-WASM targets, commands are no-ops
     #[cfg(not(target_arch = "wasm32"))]
     {
@@ -470,25 +472,29 @@ pub struct RichTextContentProps {
 #[component]
 pub fn RichTextContent(props: RichTextContentProps) -> Element {
     let theme = use_theme();
-    let mut inner_html = use_signal(|| props.value.clone());
-    
-    let max_height_style = props.max_height
+    let inner_html = use_signal(|| props.value.clone());
+
+    let max_height_style = props
+        .max_height
         .as_ref()
         .map(|h| format!("max-height: {};", h))
         .unwrap_or_default();
-    
+
     let disabled_style = if props.disabled {
         "background: #f5f5f5; cursor: not-allowed; opacity: 0.7;"
     } else {
         ""
     };
-    
+
     let focus_style = if props.is_focused {
-        format!("outline: 2px solid {}; outline-offset: -2px;", theme.tokens.read().colors.primary.to_rgba())
+        format!(
+            "outline: 2px solid {}; outline-offset: -2px;",
+            theme.tokens.read().colors.primary.to_rgba()
+        )
     } else {
         String::new()
     };
-    
+
     let content_style = use_style(|t| {
         Style::new()
             .w_full()
@@ -499,7 +505,7 @@ pub fn RichTextContent(props: RichTextContentProps) -> Element {
             .text_color(&t.colors.foreground)
             .build()
     });
-    
+
     let on_input = {
         let on_input_handler = props.on_input.clone();
         move |_e: Event<dioxus::events::FormData>| {
@@ -510,12 +516,12 @@ pub fn RichTextContent(props: RichTextContentProps) -> Element {
             }
         }
     };
-    
+
     rsx! {
         div {
             class: "rich-text-content",
             style: "{content_style} {max_height_style} {disabled_style} {focus_style} overflow: auto;",
-            
+
             // Placeholder (shown when empty)
             if inner_html().is_empty() && props.placeholder.is_some() {
                 div {
@@ -523,13 +529,13 @@ pub fn RichTextContent(props: RichTextContentProps) -> Element {
                     "{props.placeholder.clone().unwrap()}"
                 }
             }
-            
+
             // Content editable div
             div {
                 contenteditable: !props.disabled,
                 style: "min-height: 100%; outline: none;",
                 oninput: on_input,
-                
+
                 // Render the initial content
                 dangerous_inner_html: "{inner_html}",
             }
@@ -572,7 +578,7 @@ pub fn SimpleRichText(props: SimpleRichTextProps) -> Element {
         align_center: false,
         align_right: false,
     };
-    
+
     rsx! {
         RichTextEditor {
             value: props.value,
@@ -619,7 +625,7 @@ pub fn MinimalRichText(props: MinimalRichTextProps) -> Element {
         align_center: false,
         align_right: false,
     };
-    
+
     rsx! {
         RichTextEditor {
             value: props.value,

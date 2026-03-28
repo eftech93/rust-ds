@@ -2,10 +2,10 @@
 //!
 //! Modern toast notifications with rich styling, swipe to dismiss, and progress bars.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
 use crate::theme::tokens::Color;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 use std::time::Duration;
 
 /// Toast position on screen
@@ -75,10 +75,10 @@ pub struct SonnerProps {
 /// Sonner toast notification container
 #[component]
 pub fn Sonner(props: SonnerProps) -> Element {
-    let theme = use_theme();
+    let _theme = use_theme();
     let position = props.position.clone();
-    
-    let container_style = use_style(move |t| {
+
+    let container_style = use_style(move |_t| {
         let position_css = match position {
             ToastPosition::BottomRight => "bottom: 16px; right: 16px;",
             ToastPosition::BottomCenter => "bottom: 16px; left: 50%; transform: translateX(-50%);",
@@ -87,7 +87,7 @@ pub fn Sonner(props: SonnerProps) -> Element {
             ToastPosition::TopCenter => "top: 16px; left: 50%; transform: translateX(-50%);",
             ToastPosition::TopLeft => "top: 16px; left: 16px;",
         };
-        
+
         Style::new()
             .fixed()
             .z_index(9999)
@@ -99,11 +99,11 @@ pub fn Sonner(props: SonnerProps) -> Element {
             .pointer_events_none()
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
-            
+
             for toast in props.toasts.iter() {
                 ToastItem {
                     key: "{toast.id}",
@@ -130,13 +130,13 @@ fn ToastItem(props: ToastItemProps) -> Element {
     let theme = use_theme();
     let progress = use_signal(|| 100.0);
     let toast_id = props.toast.id.clone();
-    
+
     // Read theme colors
     let theme_fg = use_memo(move || theme.tokens.read().colors.foreground.clone());
     let theme_muted = use_memo(move || theme.tokens.read().colors.muted.clone());
     let theme_primary = use_memo(move || theme.tokens.read().colors.primary.clone());
     let theme_border = use_memo(move || theme.tokens.read().colors.border.clone());
-    
+
     let variant_colors = if props.rich_colors {
         match props.toast.variant {
             SonnerVariant::Success => (Color::new(34, 197, 94), "✓"),
@@ -149,7 +149,7 @@ fn ToastItem(props: ToastItemProps) -> Element {
     } else {
         (theme_fg(), "")
     };
-    
+
     let toast_style = use_style(move |t| {
         Style::new()
             .pointer_events_auto()
@@ -162,13 +162,14 @@ fn ToastItem(props: ToastItemProps) -> Element {
             .overflow_hidden()
             .build()
     });
-    
-    let border_color = if props.rich_colors && !matches!(props.toast.variant, SonnerVariant::Default) {
-        variant_colors.0.to_rgba()
-    } else {
-        theme_border().to_rgba()
-    };
-    
+
+    let border_color =
+        if props.rich_colors && !matches!(props.toast.variant, SonnerVariant::Default) {
+            variant_colors.0.to_rgba()
+        } else {
+            theme_border().to_rgba()
+        };
+
     let icon_color = variant_colors.0.clone();
     let icon_style = use_style(move |t| {
         Style::new()
@@ -184,7 +185,7 @@ fn ToastItem(props: ToastItemProps) -> Element {
             .flex_shrink(0)
             .build()
     });
-    
+
     let title_style = use_style(|t| {
         Style::new()
             .font_size(14)
@@ -192,7 +193,7 @@ fn ToastItem(props: ToastItemProps) -> Element {
             .text_color(&t.colors.foreground)
             .build()
     });
-    
+
     let desc_style = use_style(|t| {
         Style::new()
             .font_size(13)
@@ -200,7 +201,7 @@ fn ToastItem(props: ToastItemProps) -> Element {
             .mt(&t.spacing, "xs")
             .build()
     });
-    
+
     let variant_color = variant_colors.0.clone();
     let is_rich = props.rich_colors;
     let variant = props.toast.variant.clone();
@@ -210,7 +211,7 @@ fn ToastItem(props: ToastItemProps) -> Element {
         } else {
             t.colors.primary.clone()
         };
-        
+
         Style::new()
             .absolute()
             .bottom("0")
@@ -220,33 +221,33 @@ fn ToastItem(props: ToastItemProps) -> Element {
             .transition("width 0.1s linear")
             .build()
     });
-    
+
     let handle_dismiss = move |_| {
         if let Some(on_dismiss) = props.on_dismiss.clone() {
             on_dismiss.call(toast_id.clone());
         }
     };
-    
+
     let (_, icon_char) = &variant_colors;
-    
+
     rsx! {
         div {
             style: "{toast_style} border: 1px solid {border_color};",
-            
+
             div {
                 style: "display: flex; gap: 12px; align-items: flex-start;",
-                
+
                 if !icon_char.is_empty() {
                     span { style: "{icon_style}", "{icon_char}" }
                 }
-                
+
                 div { style: "flex: 1; min-width: 0;",
                     div { style: "{title_style}", "{props.toast.title}" }
-                    
+
                     if let Some(desc) = props.toast.description.clone() {
                         div { style: "{desc_style}", "{desc}" }
                     }
-                    
+
                     if let Some(action) = props.toast.action.clone() {
                         button {
                             style: "margin-top: 8px; padding: 4px 12px; font-size: 12px; font-weight: 500; color: {theme_primary().to_rgba()}; background: transparent; border: 1px solid {theme_border().to_rgba()}; border-radius: 4px; cursor: pointer;",
@@ -255,7 +256,7 @@ fn ToastItem(props: ToastItemProps) -> Element {
                         }
                     }
                 }
-                
+
                 if props.close_button {
                     button {
                         style: "padding: 4px; background: transparent; border: none; color: {theme_muted().to_rgba()}; cursor: pointer; font-size: 14px; line-height: 1;",
@@ -264,7 +265,7 @@ fn ToastItem(props: ToastItemProps) -> Element {
                     }
                 }
             }
-            
+
             div {
                 style: "{progress_style} width: {progress()}%;",
             }
@@ -275,7 +276,7 @@ fn ToastItem(props: ToastItemProps) -> Element {
 /// Hook for using Sonner/toast
 pub fn use_sonner() -> UseSonner {
     let toasts = use_signal(Vec::new);
-    
+
     UseSonner { toasts }
 }
 
@@ -300,7 +301,7 @@ impl UseSonner {
         self.toasts.write().push(toast);
         id
     }
-    
+
     /// Show success toast
     pub fn success(&mut self, title: impl Into<String>) -> String {
         let id = generate_id();
@@ -315,7 +316,7 @@ impl UseSonner {
         self.toasts.write().push(toast);
         id
     }
-    
+
     /// Show error toast
     pub fn error(&mut self, title: impl Into<String>) -> String {
         let id = generate_id();
@@ -330,17 +331,17 @@ impl UseSonner {
         self.toasts.write().push(toast);
         id
     }
-    
+
     /// Dismiss a toast
     pub fn dismiss(&mut self, id: &str) {
         self.toasts.write().retain(|t| t.id != id);
     }
-    
+
     /// Get the toasts signal for reactive reading
     pub fn toasts_signal(&self) -> Signal<Vec<Toast>> {
         self.toasts
     }
-    
+
     /// Get current toasts (for one-time reads)
     pub fn toasts(&self) -> Vec<Toast> {
         self.toasts.read().clone()

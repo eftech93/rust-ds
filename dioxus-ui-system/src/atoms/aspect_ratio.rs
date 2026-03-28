@@ -2,9 +2,9 @@
 //!
 //! A container that maintains a consistent aspect ratio for its content.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Aspect ratio properties
 #[derive(Props, Clone, PartialEq)]
@@ -41,7 +41,7 @@ pub struct AspectRatioProps {
 #[component]
 pub fn AspectRatio(props: AspectRatioProps) -> Element {
     let _theme = use_theme();
-    
+
     // Calculate percentage padding based on ratio
     // ratio = width / height, so height = width / ratio
     // padding-bottom = height / width * 100 = 1/ratio * 100
@@ -50,32 +50,21 @@ pub fn AspectRatio(props: AspectRatioProps) -> Element {
     } else {
         100.0
     };
-    
-    let container_style = use_style(|_t| {
-        Style::new()
-            .relative()
-            .w_full()
-            .build()
-    });
-    
+
+    let container_style = use_style(|_t| Style::new().relative().w_full().build());
+
     let spacer_style = format!("padding-bottom: {:.2}%", padding_bottom);
-    
-    let content_style = use_style(|_t| {
-        Style::new()
-            .absolute()
-            .inset("0")
-            .w_full()
-            .h_full()
-            .build()
-    });
-    
+
+    let content_style =
+        use_style(|_t| Style::new().absolute().inset("0").w_full().h_full().build());
+
     rsx! {
         div {
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
-            
+
             div { style: "{spacer_style}" }
-            
+
             div {
                 style: "{content_style}",
                 {props.children}

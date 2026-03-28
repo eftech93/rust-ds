@@ -2,10 +2,10 @@
 //!
 //! Small status indicators for highlighting items.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
+use crate::atoms::{Icon, IconColor, IconSize};
 use crate::styles::Style;
-use crate::atoms::{Icon, IconSize, IconColor};
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Badge variants
 #[derive(Default, Clone, PartialEq)]
@@ -85,10 +85,10 @@ pub fn Badge(props: BadgeProps) -> Element {
     let size = props.size.clone();
     let has_icon = props.icon.is_some();
     let has_onclick = props.onclick.is_some();
-    
+
     // Interactive state
     let mut is_hovered = use_signal(|| false);
-    
+
     let style = use_style(move |t| {
         let base = Style::new()
             .rounded(&t.radius, "full")
@@ -96,14 +96,14 @@ pub fn Badge(props: BadgeProps) -> Element {
             .transition("all 150ms ease")
             .whitespace_nowrap()
             .select_none();
-            
+
         // Size
         let sized = match size {
             BadgeSize::Sm => base.px(&t.spacing, "sm").py_px(2).font_size(11),
             BadgeSize::Md => base.px(&t.spacing, "md").py_px(4).font_size(12),
             BadgeSize::Lg => base.px(&t.spacing, "md").py(&t.spacing, "xs").font_size(14),
         };
-        
+
         // Variant styles
         let styled = match variant {
             BadgeVariant::Default => {
@@ -112,9 +112,7 @@ pub fn Badge(props: BadgeProps) -> Element {
                 } else {
                     t.colors.primary.clone()
                 };
-                sized
-                    .bg(&bg)
-                    .text_color(&t.colors.primary_foreground)
+                sized.bg(&bg).text_color(&t.colors.primary_foreground)
             }
             BadgeVariant::Secondary => {
                 let bg = if is_hovered() && has_onclick {
@@ -122,9 +120,7 @@ pub fn Badge(props: BadgeProps) -> Element {
                 } else {
                     t.colors.secondary.clone()
                 };
-                sized
-                    .bg(&bg)
-                    .text_color(&t.colors.secondary_foreground)
+                sized.bg(&bg).text_color(&t.colors.secondary_foreground)
             }
             BadgeVariant::Success => {
                 let bg = t.colors.success.clone();
@@ -133,16 +129,12 @@ pub fn Badge(props: BadgeProps) -> Element {
                 } else {
                     Color::new(0, 0, 0)
                 };
-                sized
-                    .bg(&bg)
-                    .text_color(&fg)
+                sized.bg(&bg).text_color(&fg)
             }
             BadgeVariant::Warning => {
                 let bg = t.colors.warning.clone();
                 let fg = Color::new(0, 0, 0);
-                sized
-                    .bg(&bg)
-                    .text_color(&fg)
+                sized.bg(&bg).text_color(&fg)
             }
             BadgeVariant::Destructive => {
                 let bg = if is_hovered() && has_onclick {
@@ -150,9 +142,7 @@ pub fn Badge(props: BadgeProps) -> Element {
                 } else {
                     t.colors.destructive.clone()
                 };
-                sized
-                    .bg(&bg)
-                    .text_color(&Color::new(255, 255, 255))
+                sized.bg(&bg).text_color(&Color::new(255, 255, 255))
             }
             BadgeVariant::Outline => {
                 let border_color = if is_hovered() && has_onclick {
@@ -170,12 +160,10 @@ pub fn Badge(props: BadgeProps) -> Element {
                 } else {
                     Color::new_rgba(0, 0, 0, 0.0)
                 };
-                sized
-                    .bg(&bg)
-                    .text_color(&t.colors.foreground)
+                sized.bg(&bg).text_color(&t.colors.foreground)
             }
         };
-        
+
         // Cursor
         if has_onclick {
             styled.cursor_pointer().build()
@@ -183,17 +171,17 @@ pub fn Badge(props: BadgeProps) -> Element {
             styled.build()
         }
     });
-    
+
     let final_style = if let Some(custom) = &props.style {
         format!("{} {}", style(), custom)
     } else {
         style()
     };
-    
+
     let class = props.class.clone().unwrap_or_default();
     let icon_element = props.icon.clone();
     let onclick_handler = props.onclick.clone();
-    
+
     rsx! {
         div {
             style: "{final_style} display: inline-flex; align-items: center; gap: 4px;",
@@ -205,7 +193,7 @@ pub fn Badge(props: BadgeProps) -> Element {
                     handler.call(e);
                 }
             },
-            
+
             if has_icon {
                 Icon {
                     name: icon_element.unwrap(),
@@ -217,7 +205,7 @@ pub fn Badge(props: BadgeProps) -> Element {
                     color: IconColor::Current,
                 }
             }
-            
+
             {props.children}
         }
     }
@@ -227,7 +215,8 @@ use crate::theme::tokens::Color;
 
 /// Determine if a color is dark
 fn is_dark_color(color: &Color) -> bool {
-    let luminance = (0.299 * color.r as f32 + 0.587 * color.g as f32 + 0.114 * color.b as f32) / 255.0;
+    let luminance =
+        (0.299 * color.r as f32 + 0.587 * color.g as f32 + 0.114 * color.b as f32) / 255.0;
     luminance < 0.5
 }
 
@@ -262,7 +251,7 @@ pub fn StatusBadge(props: StatusBadgeProps) -> Element {
         StatusType::Warning => (BadgeVariant::Warning, Some("alert".to_string())),
         StatusType::Error => (BadgeVariant::Destructive, Some("x".to_string())),
     };
-    
+
     rsx! {
         Badge {
             variant: variant,

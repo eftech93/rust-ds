@@ -4,11 +4,10 @@
 
 use dioxus::prelude::*;
 
-use crate::atoms::{StepState, StepSize, Heading, HeadingLevel};
+use crate::atoms::{Heading, HeadingLevel, StepSize, StepState};
 use crate::molecules::{
-    StepItem, HorizontalStepper, VerticalStepper, StepperActions,
-    StepperActionsAlign, StepItemComponent,
-    Card, CardVariant,
+    Card, CardVariant, HorizontalStepper, StepItem, StepItemComponent, StepperActions,
+    StepperActionsAlign, VerticalStepper,
 };
 
 /// Stepper variant
@@ -63,26 +62,31 @@ pub struct StepperProps {
 #[component]
 pub fn Stepper(props: StepperProps) -> Element {
     // Update step states based on active step
-    let steps: Vec<StepItem> = props.steps.iter().enumerate().map(|(i, step)| {
-        let mut updated = step.clone();
-        updated.state = if i < props.active_step {
-            StepState::Completed
-        } else if i == props.active_step {
-            StepState::Active
-        } else {
-            StepState::Pending
-        };
-        updated
-    }).collect();
-    
+    let steps: Vec<StepItem> = props
+        .steps
+        .iter()
+        .enumerate()
+        .map(|(i, step)| {
+            let mut updated = step.clone();
+            updated.state = if i < props.active_step {
+                StepState::Completed
+            } else if i == props.active_step {
+                StepState::Active
+            } else {
+                StepState::Pending
+            };
+            updated
+        })
+        .collect();
+
     rsx! {
         Card {
             variant: CardVariant::Default,
             full_width: true,
-            
+
             div {
                 style: "display: flex; flex-direction: column; gap: 24px;",
-                
+
                 // Header
                 if props.title.is_some() || props.description.is_some() {
                     div {
@@ -92,7 +96,7 @@ pub fn Stepper(props: StepperProps) -> Element {
                                 "{title}"
                             }
                         }
-                        
+
                         if let Some(desc) = props.description.clone() {
                             p {
                                 style: "margin: 4px 0 0 0; color: #64748b; font-size: 14px;",
@@ -101,7 +105,7 @@ pub fn Stepper(props: StepperProps) -> Element {
                         }
                     }
                 }
-                
+
                 // Stepper header
                 match props.variant {
                     StepperVariant::Horizontal => rsx! {
@@ -137,12 +141,12 @@ pub fn Stepper(props: StepperProps) -> Element {
                         }
                     },
                 }
-                
+
                 // Content area
                 if props.show_content {
                     div {
                         style: "min-height: 100px;",
-                        
+
                         {props.children}
                     }
                 }
@@ -171,12 +175,12 @@ pub fn CompactStepper(props: CompactStepperProps) -> Element {
     rsx! {
         div {
             style: "display: flex; align-items: center; justify-content: center; gap: 8px;",
-            
+
             for (index, step) in props.steps.iter().enumerate() {
                 div {
                     key: "{index}",
                     style: "display: flex; align-items: center; gap: 8px;",
-                    
+
                     StepItemComponent {
                         index: index,
                         step: step.clone(),
@@ -186,7 +190,7 @@ pub fn CompactStepper(props: CompactStepperProps) -> Element {
                         horizontal: true,
                         on_click: props.on_step_click.clone(),
                     }
-                    
+
                     if index < props.steps.len() - 1 {
                         div {
                             style: if index < props.active_step { "width: 16px; height: 2px; background: #22c55e;" } else { "width: 16px; height: 2px; background: #e2e8f0;" },
@@ -267,58 +271,63 @@ impl WizardStep {
 pub fn Wizard(props: WizardProps) -> Element {
     let total_steps = props.steps.len();
     let current = props.active_step;
-    
+
     // Convert wizard steps to step items
-    let step_items: Vec<StepItem> = props.steps.iter().enumerate().map(|(i, step)| {
-        let state = if i < current {
-            StepState::Completed
-        } else if i == current {
-            if step.is_valid {
-                StepState::Active
+    let step_items: Vec<StepItem> = props
+        .steps
+        .iter()
+        .enumerate()
+        .map(|(i, step)| {
+            let state = if i < current {
+                StepState::Completed
+            } else if i == current {
+                if step.is_valid {
+                    StepState::Active
+                } else {
+                    StepState::Error
+                }
             } else {
-                StepState::Error
+                StepState::Pending
+            };
+
+            StepItem {
+                label: step.label.clone(),
+                description: step.description.clone(),
+                icon: None,
+                state,
+                disabled: false,
+                error: if !step.is_valid && i == current {
+                    Some("Please complete required fields".to_string())
+                } else {
+                    None
+                },
             }
-        } else {
-            StepState::Pending
-        };
-        
-        StepItem {
-            label: step.label.clone(),
-            description: step.description.clone(),
-            icon: None,
-            state,
-            disabled: false,
-            error: if !step.is_valid && i == current {
-                Some("Please complete required fields".to_string())
-            } else {
-                None
-            },
-        }
-    }).collect();
-    
+        })
+        .collect();
+
     let can_go_next = props.steps.get(current).map(|s| s.is_valid).unwrap_or(true);
     let can_finish = current == total_steps - 1 && can_go_next;
-    
+
     let progress = ((current + 1) as f32 / total_steps as f32 * 100.0) as u32;
-    
+
     rsx! {
         Card {
             variant: CardVariant::Elevated,
             full_width: true,
-            
+
             div {
                 style: "display: flex; flex-direction: column; gap: 24px;",
-                
+
                 // Header with progress
                 if let Some(title) = props.title.clone() {
                     div {
                         style: "display: flex; justify-content: space-between; align-items: center;",
-                        
+
                         Heading {
                             level: HeadingLevel::H3,
                             "{title}"
                         }
-                        
+
                         if props.show_progress {
                             span {
                                 style: "font-size: 14px; color: #64748b;",
@@ -327,18 +336,18 @@ pub fn Wizard(props: WizardProps) -> Element {
                         }
                     }
                 }
-                
+
                 // Progress bar
                 if props.show_progress {
                     div {
                         style: "width: 100%; height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden;",
-                        
+
                         div {
                             style: "height: 100%; width: {progress}%; background: #22c55e; transition: width 300ms ease;",
                         }
                     }
                 }
-                
+
                 // Stepper
                 HorizontalStepper {
                     steps: step_items,
@@ -351,14 +360,14 @@ pub fn Wizard(props: WizardProps) -> Element {
                         }
                     })),
                 }
-                
+
                 // Content
                 div {
                     style: "min-height: 150px; padding: 16px 0;",
-                    
+
                     {props.children}
                 }
-                
+
                 // Actions
                 StepperActions {
                     current_step: current,
@@ -438,7 +447,7 @@ pub fn StepSummary(props: StepSummaryProps) -> Element {
     rsx! {
         div {
             style: "display: flex; flex-direction: column; gap: 16px;",
-            
+
             for (index, item) in props.steps.iter().enumerate() {
                 div {
                     key: "{index}",
@@ -451,21 +460,21 @@ pub fn StepSummary(props: StepSummaryProps) -> Element {
                         border-radius: 8px;
                         border: 1px solid #e2e8f0;
                     ",
-                    
+
                     div {
                         style: "display: flex; flex-direction: column; gap: 4px;",
-                        
+
                         span {
                             style: "font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase;",
                             "{item.label}"
                         }
-                        
+
                         span {
                             style: "font-size: 14px; color: #0f172a;",
                             "{item.value}"
                         }
                     }
-                    
+
                     if props.editable {
                         if let Some(on_edit) = props.on_edit.clone() {
                             crate::atoms::Button {

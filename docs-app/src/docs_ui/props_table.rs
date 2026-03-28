@@ -13,7 +13,7 @@ pub fn PropsTable(props: PropsTableProps) -> Element {
     rsx! {
         table {
             style: "width: 100%; border-collapse: collapse; font-size: 14px;",
-            
+
             thead {
                 tr {
                     style: "background: rgb(248,250,252);",
@@ -22,7 +22,7 @@ pub fn PropsTable(props: PropsTableProps) -> Element {
                     th { style: "text-align: left; padding: 12px; border-bottom: 1px solid rgb(226,232,240); font-weight: 600;", "Description" }
                 }
             }
-            
+
             tbody {
                 for (name, typ, desc) in props.props.iter() {
                     tr {

@@ -3,7 +3,7 @@
 use dioxus::prelude::*;
 
 /// Syntax-highlighted code display
-/// 
+///
 /// Note: Currently uses simple styling. Could be enhanced with
 /// proper syntax highlighting in the future.
 #[component]

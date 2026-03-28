@@ -2,8 +2,8 @@
 //!
 //! Page navigation for lists and tables.
 
-use dioxus::prelude::*;
 use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 /// Pagination size
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -45,27 +45,29 @@ pub struct PaginationProps {
 #[component]
 pub fn Pagination(props: PaginationProps) -> Element {
     let theme = use_theme();
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let current = props.current_page.max(1).min(props.total_pages);
     let bg_color = theme.tokens.read().colors.primary.to_rgba();
     let muted_color = theme.tokens.read().colors.muted.to_rgba();
     let text_color = theme.tokens.read().colors.foreground.to_rgba();
     let border_color = theme.tokens.read().colors.border.to_rgba();
-    
+
     // Generate page numbers to display
     let pages = generate_pages(current, props.total_pages, props.sibling_count);
     let total_pages = props.total_pages;
-    
+
     rsx! {
         nav {
             class: "pagination{class_css}",
             style: "display: flex; align-items: center; gap: 4px;",
             aria_label: "Pagination",
-            
+
             if props.simple {
                 // Simple mode: just prev/next
                 button {
@@ -80,13 +82,13 @@ pub fn Pagination(props: PaginationProps) -> Element {
                     },
                     "← Previous"
                 }
-                
+
                 span {
                     class: "pagination-info",
                     style: "padding: 0 12px; font-size: 14px; color: {muted_color};",
                     "Page {current} of {total_pages}"
                 }
-                
+
                 button {
                     type: "button",
                     class: "pagination-next",
@@ -101,7 +103,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                 }
             } else {
                 // Full pagination
-                
+
                 // First page button
                 if props.show_first_last && props.total_pages > 1 {
                     button {
@@ -113,7 +115,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         "«"
                     }
                 }
-                
+
                 // Previous button
                 if props.show_prev_next {
                     button {
@@ -130,7 +132,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         "‹"
                     }
                 }
-                
+
                 // Page numbers
                 for (idx, item) in pages.iter().enumerate() {
                     {
@@ -142,7 +144,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                                 let btn_color = if is_active { "white".to_string() } else { text_color.clone() };
                                 let btn_border = if is_active { bg_color.clone() } else { border_color.clone() };
                                 let page_num = *page;
-                                
+
                                 rsx! {
                                     button {
                                         key: "page-{page_num}",
@@ -168,7 +170,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         }
                     }
                 }
-                
+
                 // Next button
                 if props.show_prev_next {
                     button {
@@ -184,7 +186,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         "›"
                     }
                 }
-                
+
                 // Last page button
                 if props.show_first_last && props.total_pages > 1 {
                     button {
@@ -209,7 +211,7 @@ enum PageItem {
 
 fn generate_pages(current: u32, total: u32, sibling_count: u32) -> Vec<PageItem> {
     let mut pages = Vec::new();
-    
+
     if total <= 7 {
         // Show all pages
         for i in 1..=total {
@@ -219,38 +221,38 @@ fn generate_pages(current: u32, total: u32, sibling_count: u32) -> Vec<PageItem>
         // Complex case with ellipsis
         let left_sibling = current.saturating_sub(sibling_count).max(1);
         let right_sibling = (current + sibling_count).min(total);
-        
+
         let show_left_ellipsis = left_sibling > 2;
         let show_right_ellipsis = right_sibling < total - 1;
-        
+
         // Always show first page
         pages.push(PageItem::Number(1));
-        
+
         if show_left_ellipsis {
             pages.push(PageItem::Ellipsis);
         } else if left_sibling > 1 {
             pages.push(PageItem::Number(2));
         }
-        
+
         // Middle pages
         for i in left_sibling..=right_sibling {
             if i > 1 && i < total {
                 pages.push(PageItem::Number(i));
             }
         }
-        
+
         if show_right_ellipsis {
             pages.push(PageItem::Ellipsis);
         } else if right_sibling < total {
             pages.push(PageItem::Number(total - 1));
         }
-        
+
         // Always show last page
         if total > 1 {
             pages.push(PageItem::Number(total));
         }
     }
-    
+
     pages
 }
 
@@ -278,21 +280,23 @@ pub struct PageSizeSelectorProps {
 /// Page size selector component
 #[component]
 pub fn PageSizeSelector(props: PageSizeSelectorProps) -> Element {
-    let class_css = props.class.as_ref()
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     rsx! {
         div {
             class: "page-size-selector{class_css}",
             style: "display: flex; align-items: center; gap: 8px; font-size: 14px;",
-            
+
             if let Some(label) = props.label.clone() {
                 span {
                     "{label}"
                 }
             }
-            
+
             select {
                 class: "page-size-select",
                 style: "padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: white; cursor: pointer;",
@@ -301,7 +305,7 @@ pub fn PageSizeSelector(props: PageSizeSelectorProps) -> Element {
                         props.on_change.call(val);
                     }
                 },
-                
+
                 for size in props.options.iter() {
                     option {
                         key: "{size}",
@@ -311,7 +315,7 @@ pub fn PageSizeSelector(props: PageSizeSelectorProps) -> Element {
                     }
                 }
             }
-            
+
             if let Some(suffix) = props.suffix.clone() {
                 span {
                     "{suffix}"
@@ -339,16 +343,18 @@ pub struct PaginationInfoProps {
 #[component]
 pub fn PaginationInfo(props: PaginationInfoProps) -> Element {
     let theme = use_theme();
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let start = ((props.current_page - 1) * props.page_size) + 1;
     let end = (props.current_page * props.page_size).min(props.total_items);
     let total_items = props.total_items;
     let muted_color = theme.tokens.read().colors.muted.to_rgba();
-    
+
     rsx! {
         div {
             class: "pagination-info{class_css}",

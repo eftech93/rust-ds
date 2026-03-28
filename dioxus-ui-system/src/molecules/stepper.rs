@@ -4,7 +4,10 @@
 
 use dioxus::prelude::*;
 
-use crate::atoms::{StepIndicator, StepConnector, StepLabel, StepState, StepSize, Box, VStack, HStack, JustifyContent, AlignItems, SpacingSize};
+use crate::atoms::{
+    AlignItems, Box, HStack, JustifyContent, SpacingSize, StepConnector, StepIndicator, StepLabel,
+    StepSize, StepState, VStack,
+};
 
 /// Step item data structure
 #[derive(Clone, PartialEq, Debug)]
@@ -99,7 +102,7 @@ pub fn StepItemComponent(props: StepItemProps) -> Element {
     let clickable = !step.disabled && props.on_click.is_some();
     let on_click = props.on_click.clone();
     let index = props.index;
-    
+
     let indicator = rsx! {
         StepIndicator {
             step: (props.index + 1) as u32,
@@ -117,7 +120,7 @@ pub fn StepItemComponent(props: StepItemProps) -> Element {
             },
         }
     };
-    
+
     let label = rsx! {
         StepLabel {
             label: step.label.clone(),
@@ -126,7 +129,7 @@ pub fn StepItemComponent(props: StepItemProps) -> Element {
             size: props.size.clone(),
         }
     };
-    
+
     let connector = if props.show_connector {
         Some(rsx! {
             StepConnector {
@@ -137,23 +140,23 @@ pub fn StepItemComponent(props: StepItemProps) -> Element {
     } else {
         None
     };
-    
+
     let cursor_val = if clickable { "pointer" } else { "default" };
     let opacity_val = if step.disabled { "0.5" } else { "1" };
-    
+
     if props.horizontal {
         rsx! {
             div {
                 style: "display: flex; align-items: center; flex: 1;",
-                
+
                 // Step content (indicator + label stacked)
                 div {
                     style: "display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: {cursor_val}; opacity: {opacity_val};",
-                    
+
                     {indicator}
                     {label}
                 }
-                
+
                 // Connector
                 {connector}
             }
@@ -162,19 +165,19 @@ pub fn StepItemComponent(props: StepItemProps) -> Element {
         rsx! {
             div {
                 style: "display: flex; flex-direction: column;",
-                
+
                 // Step content row (indicator + label side by side)
                 div {
                     style: "display: flex; align-items: flex-start; gap: 12px; cursor: {cursor_val}; opacity: {opacity_val};",
-                    
+
                     // Indicator column
                     div {
                         style: "display: flex; flex-direction: column; align-items: center;",
-                        
+
                         {indicator}
                         {connector}
                     }
-                    
+
                     // Label column
                     Box {
                         style: "padding-top: 6px;",
@@ -212,7 +215,7 @@ pub fn HorizontalStepper(props: HorizontalStepperProps) -> Element {
             style: "display: flex; align-items: flex-start; width: 100%;",
             role: "tablist",
             aria_label: Some("Progress steps"),
-            
+
             for (index, step) in props.steps.iter().enumerate() {
                 StepItemComponent {
                     key: "{index}",
@@ -251,13 +254,13 @@ pub fn VerticalStepper(props: VerticalStepperProps) -> Element {
         VStack {
             gap: SpacingSize::None,
             align: AlignItems::Stretch,
-            
+
             div {
                 style: "display: flex; flex-direction: column; gap: 0;",
                 role: "tablist",
                 aria_label: Some("Progress steps"),
                 aria_orientation: "vertical",
-                
+
                 for (index, step) in props.steps.iter().enumerate() {
                     StepItemComponent {
                         key: "{index}",
@@ -290,7 +293,7 @@ pub struct StepContentProps {
 #[component]
 pub fn StepContent(props: StepContentProps) -> Element {
     let is_active = props.active_step == props.step_index;
-    
+
     rsx! {
         if is_active {
             div {
@@ -298,7 +301,7 @@ pub fn StepContent(props: StepContentProps) -> Element {
                 role: "tabpanel",
                 id: "step-content-{props.step_index}",
                 aria_labelledby: "step-{props.step_index}",
-                
+
                 {props.children}
             }
         }
@@ -361,20 +364,20 @@ pub enum StepperActionsAlign {
 pub fn StepperActions(props: StepperActionsProps) -> Element {
     let is_first = props.current_step == 0;
     let is_last = props.current_step >= props.total_steps - 1;
-    
+
     let justify_content = match props.align {
         StepperActionsAlign::End => JustifyContent::End,
         StepperActionsAlign::Center => JustifyContent::Center,
         StepperActionsAlign::SpaceBetween => JustifyContent::SpaceBetween,
     };
-    
+
     rsx! {
         HStack {
             style: "margin-top: 24px; padding-top: 24px; border-top: 1px solid #e2e8f0;",
             justify: justify_content,
             align: AlignItems::Center,
             gap: SpacingSize::Md,
-            
+
             // Back button (or spacer for alignment)
             if !is_first {
                 if let Some(on_back) = props.on_back.clone() {
@@ -388,7 +391,7 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
             } else if props.align == StepperActionsAlign::SpaceBetween {
                 Box {}
             }
-            
+
             // Skip button (optional)
             if props.show_skip && !is_last {
                 if let Some(on_skip) = props.on_skip.clone() {
@@ -399,7 +402,7 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
                     }
                 }
             }
-            
+
             // Next/Finish button
             if is_last {
                 if let Some(on_finish) = props.on_finish.clone() {

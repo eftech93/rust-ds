@@ -8,11 +8,11 @@ use dioxus_ui_system::prelude::*;
 #[component]
 pub fn ExampleBox(children: Element) -> Element {
     rsx! {
-        Card { 
-            variant: CardVariant::Default, 
-            padding: Some("24px".to_string()), 
+        Card {
+            variant: CardVariant::Default,
+            padding: Some("24px".to_string()),
             overflow_hidden: false,
-            {children} 
+            {children}
         }
     }
 }

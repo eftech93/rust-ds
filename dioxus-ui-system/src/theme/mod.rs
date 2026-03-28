@@ -6,12 +6,12 @@
 //! - Theme context for reactive theme switching
 //! - Utility hooks for theme-aware styling
 
-pub mod tokens;
 pub mod context;
+pub mod tokens;
 
 // Re-export commonly used items
+pub use context::{use_style, use_theme, ThemeContext, ThemeProvider, ThemeSelector, ThemeToggle};
 pub use tokens::{
-    ThemeTokens, ThemeMode, ColorScale, Color, SpacingScale, 
-    RadiusScale, TypographyScale, Typography, ShadowScale
+    Color, ColorScale, RadiusScale, ShadowScale, SpacingScale, ThemeMode, ThemeTokens, Typography,
+    TypographyScale,
 };
-pub use context::{ThemeContext, ThemeProvider, use_theme, use_style, ThemeToggle, ThemeSelector};

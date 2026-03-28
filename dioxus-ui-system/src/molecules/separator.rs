@@ -2,9 +2,9 @@
 //!
 //! Visually or semantically separates content.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Separator orientation
 #[derive(Default, Clone, PartialEq)]
@@ -37,9 +37,9 @@ pub struct SeparatorProps {
 #[component]
 pub fn Separator(props: SeparatorProps) -> Element {
     let _theme = use_theme();
-    
+
     let is_horizontal = props.orientation == SeparatorOrientation::Horizontal;
-    
+
     let separator_style = use_style(move |t| {
         if is_horizontal {
             Style::new()
@@ -57,15 +57,19 @@ pub fn Separator(props: SeparatorProps) -> Element {
                 .build()
         }
     });
-    
+
     let aria_props = if props.decorative {
         "aria-hidden: true;"
     } else {
         "role: separator;"
     };
-    
-    let orientation_attr = if is_horizontal { "horizontal" } else { "vertical" };
-    
+
+    let orientation_attr = if is_horizontal {
+        "horizontal"
+    } else {
+        "vertical"
+    };
+
     rsx! {
         div {
             style: "{separator_style} {props.style.clone().unwrap_or_default()} {aria_props}",

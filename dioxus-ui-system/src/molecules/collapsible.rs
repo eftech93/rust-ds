@@ -3,9 +3,9 @@
 //! A component that shows/hides content with smooth animation.
 //! Supports both controlled and uncontrolled modes.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Collapsible properties
 #[derive(Props, Clone, PartialEq)]
@@ -65,7 +65,7 @@ pub struct CollapsibleProps {
 pub fn Collapsible(props: CollapsibleProps) -> Element {
     let _theme = use_theme();
     let mut internal_open = use_signal(|| props.default_open);
-    
+
     // Determine if we're in controlled mode and get current open state
     let is_controlled = props.open.is_some();
     let is_open = if is_controlled {
@@ -74,30 +74,30 @@ pub fn Collapsible(props: CollapsibleProps) -> Element {
         internal_open()
     };
     let is_disabled = props.disabled;
-    
+
     // Generate unique IDs for accessibility
     let collapsible_id = use_memo(|| format!("collapsible-{}", generate_id()));
     let content_id = use_memo(move || format!("{}-content", collapsible_id()));
-    
+
     // Handle toggle
     let handle_toggle = move |_| {
         if is_disabled {
             return;
         }
-        
+
         let new_state = !is_open;
-        
+
         // Update internal state if uncontrolled
         if props.open.is_none() {
             internal_open.set(new_state);
         }
-        
+
         // Call callback if provided
         if let Some(on_change) = &props.on_open_change {
             on_change.call(new_state);
         }
     };
-    
+
     // Container style
     let container_style = use_style(|t| {
         Style::new()
@@ -108,7 +108,7 @@ pub fn Collapsible(props: CollapsibleProps) -> Element {
             .overflow_hidden()
             .build()
     });
-    
+
     // Trigger/header style
     let trigger_base_style = use_style(move |t| {
         Style::new()
@@ -121,7 +121,11 @@ pub fn Collapsible(props: CollapsibleProps) -> Element {
             .bg_transparent()
             .border(0, &t.colors.border)
             .outline("none")
-            .cursor(if is_disabled { "not-allowed" } else { "pointer" })
+            .cursor(if is_disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .text_color(&t.colors.foreground)
             .text(&t.typography, "base")
             .font_weight(500)
@@ -129,7 +133,7 @@ pub fn Collapsible(props: CollapsibleProps) -> Element {
             .opacity(if is_disabled { 0.5 } else { 1.0 })
             .build()
     });
-    
+
     // Content wrapper style with animation
     let duration = props.transition_duration;
     let content_wrapper_style = use_style(move |_t| {
@@ -138,14 +142,15 @@ pub fn Collapsible(props: CollapsibleProps) -> Element {
             .w_full()
             .overflow_hidden()
             .transition(&transition_str);
-        
+
         if is_open {
             base.opacity(1.0)
         } else {
             base.opacity(0.0)
-        }.build()
+        }
+        .build()
     });
-    
+
     // Content inner style
     let content_inner_style = use_style(|t| {
         Style::new()
@@ -156,15 +161,19 @@ pub fn Collapsible(props: CollapsibleProps) -> Element {
             .line_height(1.6)
             .build()
     });
-    
+
     // Chevron rotation
-    let chevron_rotation = if is_open { "rotate(180deg)" } else { "rotate(0deg)" };
-    
+    let chevron_rotation = if is_open {
+        "rotate(180deg)"
+    } else {
+        "rotate(0deg)"
+    };
+
     rsx! {
         div {
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
             id: "{collapsible_id}",
-            
+
             // Trigger button
             button {
                 style: "{trigger_base_style} {props.trigger_style.clone().unwrap_or_default()}",
@@ -173,13 +182,13 @@ pub fn Collapsible(props: CollapsibleProps) -> Element {
                 aria_controls: "{content_id}",
                 disabled: is_disabled,
                 onclick: handle_toggle,
-                
+
                 // Trigger content wrapper
                 div {
                     style: "flex: 1; display: flex; align-items: center;",
                     {props.trigger}
                 }
-                
+
                 // Chevron indicator
                 if props.show_chevron {
                     if let Some(custom_chevron) = props.chevron {
@@ -195,13 +204,13 @@ pub fn Collapsible(props: CollapsibleProps) -> Element {
                     }
                 }
             }
-            
+
             // Collapsible content
             div {
                 style: "{content_wrapper_style}",
                 id: "{content_id}",
                 aria_hidden: "{!is_open}",
-                
+
                 // Use a conditional render with animation support
                 if is_open {
                     div {
@@ -295,9 +304,9 @@ pub struct CollapsibleGroupProps {
 #[component]
 pub fn CollapsibleGroup(props: CollapsibleGroupProps) -> Element {
     let _theme = use_theme();
-    
+
     let gap_style = props.gap.clone().unwrap_or_else(|| "8px".to_string());
-    
+
     rsx! {
         div {
             style: "display: flex; flex-direction: column; gap: {gap_style}; {props.style.clone().unwrap_or_default()}",

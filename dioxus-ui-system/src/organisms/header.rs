@@ -2,10 +2,12 @@
 //!
 //! Application header with navigation, branding, and actions.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
+use crate::atoms::{
+    Button, ButtonVariant, HStack, Heading, HeadingLevel, Icon, IconColor, IconSize,
+};
 use crate::styles::Style;
-use crate::atoms::{Button, ButtonVariant, Icon, IconSize, IconColor, Heading, HeadingLevel, HStack};
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Navigation item
 #[derive(Clone, PartialEq)]
@@ -75,7 +77,7 @@ pub fn Header(props: HeaderProps) -> Element {
     let _theme = use_theme();
     let sticky = props.sticky;
     let bordered = props.bordered;
-    
+
     let style = use_style(move |t| {
         let base = Style::new()
             .w_full()
@@ -86,28 +88,29 @@ pub fn Header(props: HeaderProps) -> Element {
             .px(&t.spacing, "lg")
             .bg(&t.colors.background)
             .z_index(50);
-            
+
         // Sticky positioning
         let base = if sticky {
             base.position("sticky").top("0")
         } else {
             base
         };
-        
+
         // Border
         if bordered {
             base.border_bottom(1, &t.colors.border)
         } else {
             base
-        }.build()
+        }
+        .build()
     });
-    
+
     let final_style = if let Some(custom) = &props.style {
         format!("{} {}", style(), custom)
     } else {
         style()
     };
-    
+
     // Brand element
     let brand = if let Some(brand_el) = props.brand {
         brand_el
@@ -125,11 +128,11 @@ pub fn Header(props: HeaderProps) -> Element {
     } else {
         rsx! {}
     };
-    
+
     // Navigation
     let nav_items = props.nav_items.clone();
     let has_nav = !nav_items.is_empty();
-    
+
     let nav_style = use_style(|t| {
         Style::new()
             .flex()
@@ -137,7 +140,7 @@ pub fn Header(props: HeaderProps) -> Element {
             .gap(&t.spacing, "md")
             .build()
     });
-    
+
     let nav = if has_nav {
         rsx! {
             nav {
@@ -150,11 +153,11 @@ pub fn Header(props: HeaderProps) -> Element {
     } else {
         rsx! {}
     };
-    
+
     rsx! {
         header {
             style: "{final_style}",
-            
+
             // Left section: Brand + Nav
             HStack {
                 align: crate::atoms::AlignItems::Center,
@@ -162,7 +165,7 @@ pub fn Header(props: HeaderProps) -> Element {
                 {brand}
                 {nav}
             }
-            
+
             // Right section: Actions
             if props.actions.is_some() {
                 HStack {
@@ -185,7 +188,7 @@ pub struct HeaderNavLinkProps {
 pub fn HeaderNavLink(props: HeaderNavLinkProps) -> Element {
     let item = props.item.clone();
     let is_active = item.active;
-    
+
     let style = use_style(move |t| {
         let base = Style::new()
             .inline_flex()
@@ -198,25 +201,23 @@ pub fn HeaderNavLink(props: HeaderNavLinkProps) -> Element {
             .font_weight(500)
             .transition("all 150ms ease")
             .no_underline();
-            
+
         if is_active {
-            base
-                .bg(&t.colors.muted)
-                .text_color(&t.colors.foreground)
+            base.bg(&t.colors.muted).text_color(&t.colors.foreground)
         } else {
-            base
-                .text_color(&t.colors.muted_foreground)
-        }.build()
+            base.text_color(&t.colors.muted_foreground)
+        }
+        .build()
     });
-    
+
     let href = item.href.clone();
     let has_icon = item.icon.is_some();
-    
+
     rsx! {
         a {
             style: "{style}",
             href: "{href}",
-            
+
             if has_icon {
                 Icon {
                     name: item.icon.unwrap(),
@@ -224,7 +225,7 @@ pub fn HeaderNavLink(props: HeaderNavLinkProps) -> Element {
                     color: IconColor::Current,
                 }
             }
-            
+
             "{item.label}"
         }
     }
@@ -233,13 +234,15 @@ pub fn HeaderNavLink(props: HeaderNavLinkProps) -> Element {
 /// Mobile menu toggle button
 #[component]
 pub fn MobileMenuToggle(
-    #[props(default)]
-    is_open: bool,
-    #[props(default)]
-    onclick: Option<EventHandler<()>>,
+    #[props(default)] is_open: bool,
+    #[props(default)] onclick: Option<EventHandler<()>>,
 ) -> Element {
-    let icon_name = if is_open { "x".to_string() } else { "menu".to_string() };
-    
+    let icon_name = if is_open {
+        "x".to_string()
+    } else {
+        "menu".to_string()
+    };
+
     rsx! {
         Button {
             variant: ButtonVariant::Ghost,
@@ -286,7 +289,7 @@ pub struct UserMenuItem {
 #[component]
 pub fn UserMenu(props: UserMenuProps) -> Element {
     let mut is_open = use_signal(|| false);
-    
+
     let avatar = if let Some(url) = props.avatar {
         rsx! {
             img {
@@ -297,7 +300,8 @@ pub fn UserMenu(props: UserMenuProps) -> Element {
         }
     } else {
         // Default avatar with initials
-        let initials: String = props.name
+        let initials: String = props
+            .name
             .split_whitespace()
             .filter_map(|s| s.chars().next())
             .collect::<String>()
@@ -305,7 +309,7 @@ pub fn UserMenu(props: UserMenuProps) -> Element {
             .chars()
             .take(2)
             .collect();
-        
+
         let style = use_style(|t| {
             Style::new()
                 .w_px(32)
@@ -320,20 +324,20 @@ pub fn UserMenu(props: UserMenuProps) -> Element {
                 .font_weight(600)
                 .build()
         });
-        
+
         rsx! {
             div { style: "{style}", "{initials}" }
         }
     };
-    
+
     rsx! {
         div {
             style: "position: relative;",
-            
+
             Button {
                 variant: ButtonVariant::Ghost,
                 onclick: move |_| is_open.toggle(),
-                
+
                 div {
                     style: "display: flex; align-items: center; gap: 8px;",
                     {avatar}
@@ -344,7 +348,7 @@ pub fn UserMenu(props: UserMenuProps) -> Element {
                     }
                 }
             }
-            
+
             if is_open() {
                 UserMenuDropdown {
                     items: props.menu_items.clone(),
@@ -379,11 +383,11 @@ pub fn UserMenuDropdown(props: UserMenuDropdownProps) -> Element {
             .p(&t.spacing, "xs")
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{style}",
-            
+
             for item in props.items {
                 UserMenuItemView {
                     item: item,
@@ -403,7 +407,7 @@ pub struct UserMenuItemViewProps {
 #[component]
 pub fn UserMenuItemView(props: UserMenuItemViewProps) -> Element {
     let item = props.item.clone();
-    
+
     let style = use_style(|t| {
         Style::new()
             .flex()
@@ -417,9 +421,9 @@ pub fn UserMenuItemView(props: UserMenuItemViewProps) -> Element {
             .transition("all 150ms ease")
             .build()
     });
-    
+
     let has_icon = item.icon.is_some();
-    
+
     rsx! {
         button {
             style: "{style} background: transparent; border: none; text-align: left; color: inherit;",
@@ -429,7 +433,7 @@ pub fn UserMenuItemView(props: UserMenuItemViewProps) -> Element {
                 }
                 props.on_close.call(());
             },
-            
+
             if has_icon {
                 Icon {
                     name: item.icon.unwrap(),
@@ -437,7 +441,7 @@ pub fn UserMenuItemView(props: UserMenuItemViewProps) -> Element {
                     color: IconColor::Current,
                 }
             }
-            
+
             "{item.label}"
         }
     }

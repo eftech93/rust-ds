@@ -4,10 +4,10 @@
 //! bold/italic in text editors, or any feature that requires a simple on/off state.
 //! Similar to a checkbox but styled as a button.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
 use crate::theme::tokens::Color;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Toggle variant styles
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -83,21 +83,21 @@ pub struct ToggleProps {
 #[component]
 pub fn Toggle(props: ToggleProps) -> Element {
     let _theme = use_theme();
-    
+
     let mut is_pressed = use_signal(|| props.pressed);
     let mut is_hovered = use_signal(|| false);
     let mut is_focused = use_signal(|| false);
-    
+
     // Sync with prop changes
     use_effect(move || {
         is_pressed.set(props.pressed);
     });
-    
+
     let pressed = is_pressed();
     let disabled = props.disabled;
     let variant = props.variant.clone();
     let size = props.size.clone();
-    
+
     // Memoized styles
     let style = use_style(move |t| {
         let base = Style::new()
@@ -113,21 +113,21 @@ pub fn Toggle(props: ToggleProps) -> Element {
             .select_none()
             .whitespace_nowrap()
             .cursor(if disabled { "not-allowed" } else { "pointer" });
-        
+
         // Apply opacity for disabled state
         let base = if disabled {
             base.opacity(0.5)
         } else {
             base.opacity(1.0)
         };
-        
+
         // Size styles
         let sized = match size {
             ToggleSize::Sm => base.px(&t.spacing, "sm").h_px(32),
             ToggleSize::Md => base.px(&t.spacing, "md").h_px(40),
             ToggleSize::Lg => base.px(&t.spacing, "lg").h_px(48),
         };
-        
+
         // Variant styles based on pressed state
         let (bg, fg, border) = match variant {
             ToggleVariant::Default => {
@@ -166,7 +166,11 @@ pub fn Toggle(props: ToggleProps) -> Element {
                     } else {
                         Color::new_rgba(0, 0, 0, 0.0)
                     };
-                    (bg, t.colors.foreground.clone(), Some(t.colors.border.clone()))
+                    (
+                        bg,
+                        t.colors.foreground.clone(),
+                        Some(t.colors.border.clone()),
+                    )
                 }
             }
             ToggleVariant::Ghost => {
@@ -187,16 +191,14 @@ pub fn Toggle(props: ToggleProps) -> Element {
                 }
             }
         };
-        
-        let mut final_style = sized
-            .bg(&bg)
-            .text_color(&fg);
-        
+
+        let mut final_style = sized.bg(&bg).text_color(&fg);
+
         // Add border for outline variant
         if let Some(border_color) = border {
             final_style = final_style.border(1, &border_color);
         }
-        
+
         // Add focus ring
         if is_focused() && !disabled {
             final_style = Style {
@@ -204,19 +206,19 @@ pub fn Toggle(props: ToggleProps) -> Element {
                 ..final_style
             };
         }
-        
+
         final_style.build()
     });
-    
+
     // Combine with custom styles
     let final_style = if let Some(custom) = &props.style {
         format!("{} {}", style(), custom)
     } else {
         style()
     };
-    
+
     let class = props.class.clone().unwrap_or_default();
-    
+
     let handle_click = move |_| {
         if !disabled {
             let new_pressed = !is_pressed();
@@ -226,7 +228,7 @@ pub fn Toggle(props: ToggleProps) -> Element {
             }
         }
     };
-    
+
     rsx! {
         button {
             r#type: "button",

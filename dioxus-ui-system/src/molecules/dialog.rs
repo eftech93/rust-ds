@@ -2,10 +2,10 @@
 //!
 //! A window overlaid on either the primary window or another dialog window.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
+use crate::atoms::{Box, Button, ButtonVariant};
 use crate::styles::Style;
-use crate::atoms::{Button, ButtonVariant, Box};
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Dialog properties
 #[derive(Props, Clone, PartialEq)]
@@ -37,11 +37,11 @@ pub struct DialogProps {
 #[component]
 pub fn Dialog(props: DialogProps) -> Element {
     let _theme = use_theme();
-    
+
     if !props.open {
         return rsx! {};
     }
-    
+
     let overlay_style = use_style(|_t| {
         Style::new()
             .fixed()
@@ -56,7 +56,7 @@ pub fn Dialog(props: DialogProps) -> Element {
             .justify_center()
             .build()
     });
-    
+
     let content_style = use_style(|t| {
         Style::new()
             .w_full()
@@ -70,24 +70,24 @@ pub fn Dialog(props: DialogProps) -> Element {
             .flex_col()
             .build()
     });
-    
+
     let handle_overlay_click = move |_| {
         if props.close_on_overlay_click {
             props.on_close.call(());
         }
     };
-    
+
     let custom_content_style = props.content_style.clone().unwrap_or_default();
-    
+
     rsx! {
         div {
             style: "{overlay_style}",
             onclick: handle_overlay_click,
-            
+
             div {
                 style: "{content_style} {custom_content_style}",
                 onclick: move |e| e.stop_propagation(),
-                
+
                 // Header
                 if props.title.is_some() || props.show_close_button {
                     DialogHeader {
@@ -96,12 +96,12 @@ pub fn Dialog(props: DialogProps) -> Element {
                         on_close: props.on_close.clone(),
                     }
                 }
-                
+
                 // Description
                 if let Some(description) = props.description.clone() {
                     DialogDescription { description: description }
                 }
-                
+
                 // Content
                 Box {
                     style: "padding: 0 24px 24px 24px; overflow-y: auto;",
@@ -124,7 +124,7 @@ struct DialogHeaderProps {
 #[component]
 fn DialogHeader(props: DialogHeaderProps) -> Element {
     let _theme = use_theme();
-    
+
     let header_style = use_style(|t| {
         Style::new()
             .flex()
@@ -134,11 +134,11 @@ fn DialogHeader(props: DialogHeaderProps) -> Element {
             .border_bottom(1, &t.colors.border)
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{header_style}",
-            
+
             if let Some(title) = props.title {
                 h2 {
                     style: "margin: 0; font-size: 18px; font-weight: 600;",
@@ -147,7 +147,7 @@ fn DialogHeader(props: DialogHeaderProps) -> Element {
             } else {
                 div {}
             }
-            
+
             if props.show_close_button {
                 Button {
                     variant: ButtonVariant::Ghost,
@@ -202,14 +202,14 @@ pub enum DialogFooterAlign {
 #[component]
 pub fn DialogFooter(props: DialogFooterProps) -> Element {
     let _theme = use_theme();
-    
+
     let justify = match props.align {
         DialogFooterAlign::Start => "flex-start",
         DialogFooterAlign::Center => "center",
         DialogFooterAlign::End => "flex-end",
         DialogFooterAlign::Between => "space-between",
     };
-    
+
     let footer_style = use_style(|t| {
         Style::new()
             .flex()
@@ -219,7 +219,7 @@ pub fn DialogFooter(props: DialogFooterProps) -> Element {
             .border_top(1, &t.colors.border)
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{footer_style} justify-content: {justify};",
@@ -260,7 +260,7 @@ pub fn AlertDialog(props: AlertDialogProps) -> Element {
     } else {
         ButtonVariant::Primary
     };
-    
+
     rsx! {
         Dialog {
             open: props.open,
@@ -268,21 +268,21 @@ pub fn AlertDialog(props: AlertDialogProps) -> Element {
             title: props.title.clone(),
             show_close_button: false,
             close_on_overlay_click: false,
-            
+
             p {
                 style: "margin: 0 0 24px 0; font-size: 14px; color: #64748b; line-height: 1.5;",
                 "{props.description}"
             }
-            
+
             DialogFooter {
                 align: DialogFooterAlign::End,
-                
+
                 Button {
                     variant: ButtonVariant::Ghost,
                     onclick: move |_| props.on_close.call(()),
                     "{props.cancel_text}"
                 }
-                
+
                 Button {
                     variant: confirm_variant,
                     onclick: move |_| props.on_confirm.call(()),

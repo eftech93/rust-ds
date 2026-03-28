@@ -3,9 +3,9 @@
 //! A right-click context menu that displays actions when the user right-clicks on an element.
 //! Uses fixed positioning with portal-like behavior to escape parent overflow clipping.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Context Menu properties
 #[derive(Props, Clone, PartialEq)]
@@ -61,19 +61,19 @@ pub fn ContextMenuTrigger(props: ContextMenuTriggerProps) -> Element {
 
     let handle_context_menu = move |event: Event<MouseData>| {
         event.prevent_default();
-        
+
         // Get click coordinates
         let coords = event.data().page_coordinates();
         let click_x = coords.x as i32;
         let click_y = coords.y as i32;
-        
+
         // Basic padding to ensure menu is not at the very edge
         let padding = 8;
-        
+
         // Position with basic bounds checking
         let menu_x = click_x.max(padding);
         let menu_y = click_y.max(padding);
-        
+
         ctx.menu_position.set((menu_x, menu_y));
         ctx.is_open.set(true);
         ctx.focused_index.set(0);
@@ -119,10 +119,7 @@ pub fn ContextMenuContent(props: ContextMenuContentProps) -> Element {
 
     let menu_x = ctx.menu_position.read().0;
     let menu_y = ctx.menu_position.read().1;
-    let position_style = format!(
-        "position: fixed; left: {}px; top: {}px;",
-        menu_x, menu_y
-    );
+    let position_style = format!("position: fixed; left: {}px; top: {}px;", menu_x, menu_y);
 
     // Handle keyboard navigation
     let handle_keydown = move |event: Event<KeyboardData>| {
@@ -151,7 +148,7 @@ pub fn ContextMenuContent(props: ContextMenuContentProps) -> Element {
                 style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9998;",
                 onclick: handle_overlay_click,
             }
-            
+
             // Menu content
             div {
                 style: "{menu_base_style} {position_style}",
@@ -204,10 +201,14 @@ pub fn ContextMenuItem(props: ContextMenuItemProps) -> Element {
             .py(&t.spacing, "sm")
             .rounded(&t.radius, "sm")
             .text(&t.typography, "sm")
-            .cursor(if props.disabled { "not-allowed" } else { "pointer" })
+            .cursor(if props.disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .opacity(if props.disabled { 0.5 } else { 1.0 })
             .outline("none");
-        
+
         if is_hovered() && !props.disabled {
             base.bg(&t.colors.accent).build()
         } else {
@@ -239,7 +240,7 @@ pub fn ContextMenuItem(props: ContextMenuItemProps) -> Element {
             onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
             onclick: handle_click,
-            
+
             // Left section: icon and content
             div {
                 style: "display: flex; align-items: center; gap: 8px;",
@@ -248,7 +249,7 @@ pub fn ContextMenuItem(props: ContextMenuItemProps) -> Element {
                 }
                 {props.children}
             }
-            
+
             // Right section: shortcut
             if let Some(shortcut) = &props.shortcut {
                 span {
@@ -266,7 +267,7 @@ pub fn ContextMenuItem(props: ContextMenuItemProps) -> Element {
 #[component]
 pub fn ContextMenuSeparator() -> Element {
     let _theme = use_theme();
-    
+
     let separator_style = use_style(|t| {
         Style::new()
             .h_px(1)
@@ -275,7 +276,7 @@ pub fn ContextMenuSeparator() -> Element {
             .bg(&t.colors.border)
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{separator_style}",
@@ -297,7 +298,7 @@ pub struct ContextMenuLabelProps {
 #[component]
 pub fn ContextMenuLabel(props: ContextMenuLabelProps) -> Element {
     let _theme = use_theme();
-    
+
     let label_style = use_style(|t| {
         Style::new()
             .px(&t.spacing, "sm")
@@ -307,7 +308,7 @@ pub fn ContextMenuLabel(props: ContextMenuLabelProps) -> Element {
             .text_color(&t.colors.muted_foreground)
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{label_style} user-select: none;",
@@ -355,10 +356,14 @@ pub fn ContextMenuCheckboxItem(props: ContextMenuCheckboxItemProps) -> Element {
             .py(&t.spacing, "sm")
             .rounded(&t.radius, "sm")
             .text(&t.typography, "sm")
-            .cursor(if props.disabled { "not-allowed" } else { "pointer" })
+            .cursor(if props.disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .opacity(if props.disabled { 0.5 } else { 1.0 })
             .outline("none");
-        
+
         if is_hovered() && !props.disabled {
             base.bg(&t.colors.accent).build()
         } else {
@@ -409,11 +414,11 @@ pub fn ContextMenuCheckboxItem(props: ContextMenuCheckboxItemProps) -> Element {
             onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
             onclick: handle_click,
-            
+
             // Left section: checkbox and content
             div {
                 style: "display: flex; align-items: center;",
-                
+
                 // Checkbox indicator
                 div {
                     style: "{checkbox_style} margin-right: 8px;",
@@ -424,10 +429,10 @@ pub fn ContextMenuCheckboxItem(props: ContextMenuCheckboxItemProps) -> Element {
                         }
                     }
                 }
-                
+
                 {props.children}
             }
-            
+
             // Right section: shortcut
             if let Some(shortcut) = &props.shortcut {
                 span {
@@ -475,7 +480,7 @@ pub fn ContextMenuSub(props: ContextMenuSubProps) -> Element {
     rsx! {
         div {
             style: "position: relative;",
-            
+
             // Trigger with hover handling
             div {
                 onmouseenter: move |e: Event<MouseData>| {
@@ -485,18 +490,18 @@ pub fn ContextMenuSub(props: ContextMenuSubProps) -> Element {
                 },
                 {props.trigger}
             }
-            
+
             // Submenu content
             if is_open() {
                 div {
                     onmouseleave: move |_| is_open.set(false),
-                    
+
                     // Submenu overlay
                     div {
                         style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9997;",
                         onmouseenter: move |_| is_open.set(false),
                     }
-                    
+
                     // Submenu
                     div {
                         style: "{submenu_style} position: fixed; left: {menu_position.read().0}px; top: {menu_position.read().1}px;",
@@ -542,10 +547,14 @@ pub fn ContextMenuSubTrigger(props: ContextMenuSubTriggerProps) -> Element {
             .py(&t.spacing, "sm")
             .rounded(&t.radius, "sm")
             .text(&t.typography, "sm")
-            .cursor(if props.disabled { "not-allowed" } else { "pointer" })
+            .cursor(if props.disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .opacity(if props.disabled { 0.5 } else { 1.0 })
             .outline("none");
-        
+
         if is_hovered() && !props.disabled {
             base.bg(&t.colors.accent).build()
         } else {
@@ -571,13 +580,13 @@ pub fn ContextMenuSubTrigger(props: ContextMenuSubTriggerProps) -> Element {
             aria_haspopup: "menu",
             onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
-            
+
             // Content
             div {
                 style: "display: flex; align-items: center; gap: 8px;",
                 {props.children}
             }
-            
+
             // Shortcut and chevron
             div {
                 style: "{shortcut_style} margin-left: auto;",

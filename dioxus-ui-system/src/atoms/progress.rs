@@ -2,8 +2,8 @@
 //!
 //! Linear and circular progress indicators.
 
-use dioxus::prelude::*;
 use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 pub fn default_width() -> String {
     "100%".to_string()
@@ -21,9 +21,9 @@ pub enum ProgressVariant {
 #[derive(Default, Clone, PartialEq, Debug)]
 pub enum ProgressSize {
     #[default]
-    Sm,  // Small
-    Md,  // Medium
-    Lg,  // Large
+    Sm, // Small
+    Md, // Medium
+    Lg, // Large
 }
 
 impl ProgressSize {
@@ -34,7 +34,7 @@ impl ProgressSize {
             ProgressSize::Lg => 12,
         }
     }
-    
+
     fn to_diameter(&self) -> u8 {
         match self {
             ProgressSize::Sm => 16,
@@ -42,7 +42,7 @@ impl ProgressSize {
             ProgressSize::Lg => 48,
         }
     }
-    
+
     fn to_stroke(&self) -> u8 {
         match self {
             ProgressSize::Sm => 2,
@@ -100,19 +100,21 @@ pub enum LabelPosition {
 #[component]
 pub fn Progress(props: ProgressProps) -> Element {
     let theme = use_theme();
-    
-    let color = props.color.unwrap_or_else(|| {
-        theme.tokens.read().colors.primary.to_rgba()
-    });
-    
-    let track_color = props.track_color.unwrap_or_else(|| {
-        theme.tokens.read().colors.muted.to_rgba()
-    });
-    
-    let class_css = props.class.as_ref()
+
+    let color = props
+        .color
+        .unwrap_or_else(|| theme.tokens.read().colors.primary.to_rgba());
+
+    let track_color = props
+        .track_color
+        .unwrap_or_else(|| theme.tokens.read().colors.muted.to_rgba());
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     // Calculate percentage
     let percentage = if props.indeterminate || props.value.is_none() {
         0.0
@@ -120,9 +122,9 @@ pub fn Progress(props: ProgressProps) -> Element {
         let val = props.value.unwrap();
         ((val / props.max) * 100.0).clamp(0.0, 100.0)
     };
-    
+
     let label_text = format!("{:.0}%", percentage);
-    
+
     match props.variant {
         ProgressVariant::Linear => {
             let height = props.size.to_height();
@@ -131,15 +133,15 @@ pub fn Progress(props: ProgressProps) -> Element {
             } else {
                 ""
             };
-            
+
             rsx! {
                 div {
                     class: "progress progress-linear{class_css}",
                     style: "display: flex; align-items: center; gap: 8px; width: {props.width};",
-                    
+
                     div {
                         style: "flex: 1; height: {height}px; background: {track_color}; border-radius: 9999px; overflow: hidden;",
-                        
+
                         if props.indeterminate {
                             div {
                                 style: "height: 100%; width: 50%; background: {color}; border-radius: 9999px; animation: progress-indeterminate 1.5s ease-in-out infinite;",
@@ -150,7 +152,7 @@ pub fn Progress(props: ProgressProps) -> Element {
                             }
                         }
                     }
-                    
+
                     if props.show_label {
                         span {
                             style: "font-size: 12px; color: {theme.tokens.read().colors.foreground.to_rgba()}; min-width: 40px; text-align: right;",
@@ -158,7 +160,7 @@ pub fn Progress(props: ProgressProps) -> Element {
                         }
                     }
                 }
-                
+
                 style { "{{"
                     "@keyframes progress-indeterminate {{"
                     "0% {{ transform: translateX(-100%); }}"
@@ -177,20 +179,20 @@ pub fn Progress(props: ProgressProps) -> Element {
             } else {
                 circumference * (1.0 - percentage / 100.0)
             };
-            
+
             let center = diameter as f32 / 2.0;
-            
+
             rsx! {
                 div {
                     class: "progress progress-circular{class_css}",
                     style: "display: inline-flex; align-items: center; justify-content: center; position: relative;",
-                    
+
                     svg {
                         width: "{diameter}px",
                         height: "{diameter}px",
                         view_box: "0 0 {diameter} {diameter}",
                         style: if props.indeterminate { "animation: rotate 1s linear infinite;" } else { "" },
-                        
+
                         // Background track
                         circle {
                             cx: "{center}",
@@ -200,7 +202,7 @@ pub fn Progress(props: ProgressProps) -> Element {
                             stroke: "{track_color}",
                             stroke_width: "{stroke}",
                         }
-                        
+
                         // Progress arc
                         circle {
                             cx: "{center}",
@@ -212,14 +214,14 @@ pub fn Progress(props: ProgressProps) -> Element {
                             stroke_linecap: "round",
                             stroke_dasharray: "{circumference}",
                             stroke_dashoffset: "{stroke_dashoffset}",
-                            style: if props.indeterminate { 
-                                "animation: circular-progress 1.5s ease-in-out infinite;" 
-                            } else { 
-                                "transition: stroke-dashoffset 0.3s ease; transform: rotate(-90deg); transform-origin: center;" 
+                            style: if props.indeterminate {
+                                "animation: circular-progress 1.5s ease-in-out infinite;"
+                            } else {
+                                "transition: stroke-dashoffset 0.3s ease; transform: rotate(-90deg); transform-origin: center;"
                             },
                         }
                     }
-                    
+
                     if props.show_label {
                         span {
                             style: format!("position: absolute; font-size: {}px; color: {}; font-weight: 500;", diameter / 4, theme.tokens.read().colors.foreground.to_rgba()),
@@ -227,7 +229,7 @@ pub fn Progress(props: ProgressProps) -> Element {
                         }
                     }
                 }
-                
+
                 style { "@keyframes rotate {{ from {{ transform: rotate(0deg); }} to {{ transform: rotate(360deg); }} }} @keyframes circular-progress {{ 0% {{ stroke-dasharray: 1, 200; stroke-dashoffset: 0; }} 50% {{ stroke-dasharray: 89, 200; stroke-dashoffset: -35; }} 100% {{ stroke-dasharray: 89, 200; stroke-dashoffset: -124; }} }}" }
             }
         }
@@ -255,18 +257,18 @@ pub struct StepProgressProps {
 #[component]
 pub fn StepProgress(props: StepProgressProps) -> Element {
     let theme = use_theme();
-    
-    let color = props.color.unwrap_or_else(|| {
-        theme.tokens.read().colors.primary.to_rgba()
-    });
-    
+
+    let color = props
+        .color
+        .unwrap_or_else(|| theme.tokens.read().colors.primary.to_rgba());
+
     let muted_color = theme.tokens.read().colors.muted.to_rgba();
-    
+
     rsx! {
         div {
             class: "step-progress",
             style: "display: flex; align-items: center; width: 100%;",
-            
+
             for i in 0..props.total_steps {
                 {
                     let is_completed = i < props.current_step;
@@ -275,23 +277,23 @@ pub fn StepProgress(props: StepProgressProps) -> Element {
                     let bg_color = if is_completed || is_current { color.clone() } else { "transparent".to_string() };
                     let border_color = step_color.clone();
                     let text_color = if is_completed || is_current { "white".to_string() } else { muted_color.clone() };
-                    
+
                     rsx! {
                         div {
                             key: "step-{i}",
                             style: "display: flex; flex-direction: column; align-items: center; flex: 1; position: relative;",
-                            
+
                             // Step circle
                             div {
                                 style: "width: 32px; height: 32px; border-radius: 50%; background: {bg_color}; border: 2px solid {border_color}; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: {text_color}; transition: all 0.3s ease;",
-                                
+
                                 if is_completed {
                                     "✓"
                                 } else {
                                     "{i + 1}"
                                 }
                             }
-                            
+
                             // Label
                             if props.show_labels && i < props.labels.len() {
                                 span {
@@ -299,7 +301,7 @@ pub fn StepProgress(props: StepProgressProps) -> Element {
                                     "{props.labels[i]}"
                                 }
                             }
-                            
+
                             // Connector line (except for last step)
                             if i < props.total_steps - 1 {
                                 div {

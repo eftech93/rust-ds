@@ -1,9 +1,15 @@
 //! New Organism component documentation pages (Phase 1-4)
 
+use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, Section};
 use dioxus::prelude::*;
+use dioxus_ui_system::organisms::{
+    default_presets, Calendar, CalendarMode, Carousel, CarouselContent, CarouselItem, CarouselNext,
+    CarouselPrevious, DateRangePicker, Direction, ImageUploader,
+    Kanban, KanbanCard, KanbanColumn, Menubar, ResizableHandle, ResizablePanel,
+    ResizablePanelGroup, Timeline, TimelineContent, TimelineDot, TimelineItem, TimelinePosition,
+    Tree, TreeNodeData,
+};
 use dioxus_ui_system::prelude::*;
-use dioxus_ui_system::organisms::{Calendar, CalendarMode, DateRangePicker, DateRangePreset, default_presets, Carousel, CarouselOptions, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext, Tree, TreeNodeData, Timeline, TimelinePosition, TimelineItem, TimelineDot, TimelineContent, Menubar, ResizablePanelGroup, ResizablePanel, ResizableHandle, Direction, Kanban, KanbanColumn, KanbanCard, ImageUploader};
-use crate::docs_ui::{DocPage, Section, ExampleBox, CodeBlock, PropsTable};
 
 /// Calendar documentation page
 #[component]
@@ -12,7 +18,7 @@ pub fn CalendarPage() -> Element {
         DocPage {
             title: "Calendar",
             description: "A full calendar view for date selection and display.",
-            
+
             Section { title: "Single Selection",
                 ExampleBox {
                     Box { style: "max-width: 350px;",
@@ -29,7 +35,7 @@ pub fn CalendarPage() -> Element {
     on_change: move |date| selected.set(date),
 }"#.to_string() }
             }
-            
+
             Section { title: "Range Selection",
                 ExampleBox {
                     Box { style: "max-width: 350px;",
@@ -40,7 +46,7 @@ pub fn CalendarPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "With Week Numbers",
                 ExampleBox {
                     Box { style: "max-width: 380px;",
@@ -62,7 +68,7 @@ pub fn DateRangePickerPage() -> Element {
         DocPage {
             title: "Date Range Picker",
             description: "A date picker for selecting date ranges with presets.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Box { style: "max-width: 300px;",
@@ -81,7 +87,7 @@ pub fn DateRangePickerPage() -> Element {
     on_end_date_change: move |d| end.set(d),
 }"#.to_string() }
             }
-            
+
             Section { title: "With Presets",
                 ExampleBox {
                     Box { style: "max-width: 300px;",
@@ -104,7 +110,7 @@ pub fn CarouselPage() -> Element {
         DocPage {
             title: "Carousel",
             description: "An image and content slider with navigation controls.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Carousel {
@@ -133,7 +139,7 @@ pub fn CarouselPage() -> Element {
     CarouselNext {}
 }"#.to_string() }
             }
-            
+
             Section { title: "With Dots",
                 ExampleBox {
                     "Carousel with dot indicators"
@@ -147,29 +153,35 @@ pub fn CarouselPage() -> Element {
 #[component]
 pub fn TreePage() -> Element {
     // Use use_memo to prevent tree_data from being recreated on every render
-    let tree_data = use_memo(|| vec![
-        TreeNodeData::new("1", "src")
-            .with_child(TreeNodeData::new("1-1", "components")
-                .with_child(TreeNodeData::new("1-1-1", "button.rs"))
-                .with_child(TreeNodeData::new("1-1-2", "input.rs")))
-            .with_child(TreeNodeData::new("1-2", "styles")
-                .with_child(TreeNodeData::new("1-2-1", "theme.rs"))),
-        TreeNodeData::new("2", "Cargo.toml"),
-    ]);
-    
+    let tree_data = use_memo(|| {
+        vec![
+            TreeNodeData::new("1", "src")
+                .with_child(
+                    TreeNodeData::new("1-1", "components")
+                        .with_child(TreeNodeData::new("1-1-1", "button.rs"))
+                        .with_child(TreeNodeData::new("1-1-2", "input.rs")),
+                )
+                .with_child(
+                    TreeNodeData::new("1-2", "styles")
+                        .with_child(TreeNodeData::new("1-2-1", "theme.rs")),
+                ),
+            TreeNodeData::new("2", "Cargo.toml"),
+        ]
+    });
+
     // State for Basic example
     let mut basic_expanded = use_signal(|| vec!["1".to_string()]);
     let mut basic_selected = use_signal(|| None::<String>);
-    
-    // State for With Connector Lines example  
+
+    // State for With Connector Lines example
     let mut lines_expanded = use_signal(|| vec!["1".to_string()]);
     let mut lines_selected = use_signal(|| None::<String>);
-    
+
     rsx! {
         DocPage {
             title: "Tree",
             description: "A hierarchical tree view for displaying nested data.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Box { style: "max-width: 300px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;",
@@ -209,7 +221,7 @@ Tree {
     },
 }"#.to_string() }
             }
-            
+
             Section { title: "With Connector Lines",
                 ExampleBox {
                     Box { style: "max-width: 300px; border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px;",
@@ -243,7 +255,7 @@ pub fn TimelinePage() -> Element {
         DocPage {
             title: "Timeline",
             description: "A vertical timeline for displaying chronological events.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Timeline {
@@ -280,7 +292,7 @@ pub fn TimelinePage() -> Element {
     }
 }"#.to_string() }
             }
-            
+
             Section { title: "Alternate Position",
                 ExampleBox {
                     Timeline {
@@ -320,7 +332,7 @@ pub fn MenubarPage() -> Element {
         DocPage {
             title: "Menubar",
             description: "An application menu bar with nested dropdown menus.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Menubar {
@@ -350,13 +362,13 @@ pub fn ResizablePage() -> Element {
         DocPage {
             title: "Resizable Panels",
             description: "Split-pane layout with draggable resize handles.",
-            
+
             Section { title: "Horizontal",
                 ExampleBox {
                     Box { style: "height: 200px; border: 1px solid #e5e7eb; border-radius: 8px;",
                         ResizablePanelGroup {
                             direction: Direction::Horizontal,
-                            ResizablePanel { default_size: Some(30.0), 
+                            ResizablePanel { default_size: Some(30.0),
                                 Box { style: "padding: 16px; background: #f3f4f6; height: 100%;", "Left Panel" }
                             }
                             ResizableHandle {}
@@ -373,7 +385,7 @@ pub fn ResizablePage() -> Element {
     ResizablePanel { default_size: Some(70.0), "Right" }
 }"#.to_string() }
             }
-            
+
             Section { title: "Vertical",
                 ExampleBox {
                     Box { style: "height: 300px; border: 1px solid #e5e7eb; border-radius: 8px;",
@@ -419,16 +431,14 @@ pub fn KanbanPage() -> Element {
             id: "inprogress".to_string(),
             title: "In Progress".to_string(),
             color: Some("#f59e0b".to_string()),
-            cards: vec![
-                KanbanCard {
-                    id: "3".to_string(),
-                    title: "Implement auth".to_string(),
-                    description: Some("JWT authentication".to_string()),
-                    tags: vec!["backend".to_string(), "urgent".to_string()],
-                    assignee: Some("MK".to_string()),
-                    due_date: Some("2024-03-18".to_string()),
-                },
-            ],
+            cards: vec![KanbanCard {
+                id: "3".to_string(),
+                title: "Implement auth".to_string(),
+                description: Some("JWT authentication".to_string()),
+                tags: vec!["backend".to_string(), "urgent".to_string()],
+                assignee: Some("MK".to_string()),
+                due_date: Some("2024-03-18".to_string()),
+            }],
         },
         KanbanColumn {
             id: "done".to_string(),
@@ -437,12 +447,12 @@ pub fn KanbanPage() -> Element {
             cards: vec![],
         },
     ];
-    
+
     rsx! {
         DocPage {
             title: "Kanban Board",
             description: "A drag-and-drop task board with columns and cards.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Box { style: "height: 400px; overflow-x: auto;",
@@ -477,7 +487,7 @@ pub fn ImageUploaderPage() -> Element {
         DocPage {
             title: "Image Uploader",
             description: "A file upload component for images with preview and validation.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     ImageUploader {
@@ -493,7 +503,7 @@ pub fn ImageUploaderPage() -> Element {
     accept: vec!["image/*".to_string()],
 }"#.to_string() }
             }
-            
+
             Section { title: "With Preview",
                 ExampleBox {
                     ImageUploader {
@@ -503,7 +513,7 @@ pub fn ImageUploaderPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Single File",
                 ExampleBox {
                     ImageUploader {

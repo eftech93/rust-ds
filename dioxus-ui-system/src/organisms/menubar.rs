@@ -3,9 +3,9 @@
 //! An application menu bar (File, Edit, View, etc.) with nested menus.
 //! Uses a compound component pattern for flexibility.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 // ============================================================================
 // Context
@@ -75,12 +75,12 @@ pub struct MenubarProps {
 #[component]
 pub fn Menubar(props: MenubarProps) -> Element {
     let _theme = use_theme();
-    
+
     let active_menu = use_signal(|| None);
     let is_open = use_signal(|| false);
     let menu_count = use_signal(|| 0);
     let loop_navigation = use_signal(|| props.loop_navigation);
-    
+
     use_context_provider(|| MenubarContext {
         active_menu,
         is_open,
@@ -128,12 +128,12 @@ pub struct MenubarMenuProps {
 #[component]
 pub fn MenubarMenu(props: MenubarMenuProps) -> Element {
     let ctx: MenubarContext = use_context();
-    
+
     // Get the index for this menu
     let mut count_sig = ctx.menu_count;
     let index = *count_sig.read();
     count_sig.set(index + 1);
-    
+
     use_context_provider(|| MenuContext { index });
 
     rsx! {
@@ -169,7 +169,7 @@ pub fn MenubarTrigger(props: MenubarTriggerProps) -> Element {
     let menubar_ctx: MenubarContext = use_context();
     let menu_ctx: MenuContext = use_context();
     let mut is_hovered = use_signal(|| false);
-    
+
     // Check if this menu is active
     let is_active = (*menubar_ctx.active_menu.read()) == Some(menu_ctx.index);
 
@@ -180,16 +180,24 @@ pub fn MenubarTrigger(props: MenubarTriggerProps) -> Element {
             .rounded(&t.radius, "sm")
             .text(&t.typography, "sm")
             .font_weight(500)
-            .cursor(if props.disabled { "not-allowed" } else { "pointer" })
+            .cursor(if props.disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .opacity(if props.disabled { 0.5 } else { 1.0 })
             .select_none();
-        
+
         let hovered = *is_hovered.read();
-        
+
         if is_active {
-            base.bg(&t.colors.accent).text_color(&t.colors.accent_foreground).build()
+            base.bg(&t.colors.accent)
+                .text_color(&t.colors.accent_foreground)
+                .build()
         } else if hovered && !props.disabled {
-            base.bg(&t.colors.muted).text_color(&t.colors.muted_foreground).build()
+            base.bg(&t.colors.muted)
+                .text_color(&t.colors.muted_foreground)
+                .build()
         } else {
             base.text_color(&t.colors.foreground).build()
         }
@@ -200,12 +208,12 @@ pub fn MenubarTrigger(props: MenubarTriggerProps) -> Element {
     let mut is_open_sig = menubar_ctx.is_open;
     let menu_idx = menu_ctx.index;
     let is_open_val = *is_open_sig.read();
-    
+
     let handle_click = move |_| {
         if props.disabled {
             return;
         }
-        
+
         if is_active {
             // Close this menu
             active_menu_sig.set(None);
@@ -221,9 +229,9 @@ pub fn MenubarTrigger(props: MenubarTriggerProps) -> Element {
         if props.disabled {
             return;
         }
-        
+
         is_hovered.set(true);
-        
+
         // If menubar is in "open" mode, switch to this menu
         if is_open_val && !is_active {
             active_menu_sig.set(Some(menu_idx));
@@ -315,32 +323,40 @@ pub fn MenubarContent(props: MenubarContentProps) -> Element {
         let key = event.key();
         let loop_nav = *loop_nav_sig.read();
         let count = *menu_count_sig.read();
-        
+
         if key == Key::Escape {
             event.stop_propagation();
             active_menu_sig.set(None);
             is_open_sig.set(false);
         } else if key == Key::ArrowLeft {
             event.prevent_default();
-            
+
             let new_index = if current_idx == 0 {
-                if loop_nav { count.saturating_sub(1) } else { 0 }
+                if loop_nav {
+                    count.saturating_sub(1)
+                } else {
+                    0
+                }
             } else {
                 current_idx.saturating_sub(1)
             };
-            
+
             if new_index != current_idx {
                 active_menu_sig.set(Some(new_index));
             }
         } else if key == Key::ArrowRight {
             event.prevent_default();
-            
+
             let new_index = if current_idx >= count.saturating_sub(1) {
-                if loop_nav { 0 } else { current_idx }
+                if loop_nav {
+                    0
+                } else {
+                    current_idx
+                }
             } else {
                 current_idx + 1
             };
-            
+
             if new_index != current_idx {
                 active_menu_sig.set(Some(new_index));
             }
@@ -368,7 +384,7 @@ pub fn MenubarContent(props: MenubarContentProps) -> Element {
                 style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9998;",
                 onclick: handle_overlay_click,
             }
-            
+
             // Menu content
             div {
                 style: "{content_style} position: absolute; top: 100%; left: {align_offset}px; margin-top: {menu_y}px;",
@@ -424,12 +440,18 @@ pub fn MenubarItem(props: MenubarItemProps) -> Element {
             .py(&t.spacing, "sm")
             .rounded(&t.radius, "sm")
             .text(&t.typography, "sm")
-            .cursor(if props.disabled { "not-allowed" } else { "pointer" })
+            .cursor(if props.disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .opacity(if props.disabled { 0.5 } else { 1.0 })
             .outline("none");
-        
+
         if is_hovered() && !props.disabled {
-            base.bg(&t.colors.accent).text_color(&t.colors.accent_foreground).build()
+            base.bg(&t.colors.accent)
+                .text_color(&t.colors.accent_foreground)
+                .build()
         } else {
             base.text_color(&t.colors.foreground).build()
         }
@@ -438,7 +460,7 @@ pub fn MenubarItem(props: MenubarItemProps) -> Element {
     // Clone signals for use in closures
     let mut active_menu_sig = menubar_ctx.active_menu;
     let mut is_open_sig = menubar_ctx.is_open;
-    
+
     let handle_click = move |_| {
         if !props.disabled {
             props.on_click.call(());
@@ -463,7 +485,7 @@ pub fn MenubarItem(props: MenubarItemProps) -> Element {
             onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
             onclick: handle_click,
-            
+
             // Left section: icon and content
             div {
                 style: "display: flex; align-items: center; gap: 8px;",
@@ -472,7 +494,7 @@ pub fn MenubarItem(props: MenubarItemProps) -> Element {
                 }
                 {props.children}
             }
-            
+
             // Right section: shortcut
             if let Some(shortcut) = &props.shortcut {
                 span {
@@ -494,7 +516,7 @@ pub fn MenubarItem(props: MenubarItemProps) -> Element {
 #[component]
 pub fn MenubarSeparator() -> Element {
     let _theme = use_theme();
-    
+
     let separator_style = use_style(|t| {
         Style::new()
             .h_px(1)
@@ -503,7 +525,7 @@ pub fn MenubarSeparator() -> Element {
             .bg(&t.colors.border)
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{separator_style}",
@@ -529,7 +551,7 @@ pub struct MenubarSubProps {
 #[component]
 pub fn MenubarSub(props: MenubarSubProps) -> Element {
     let is_open = use_signal(|| false);
-    
+
     use_context_provider(|| SubmenuContext { is_open });
 
     rsx! {
@@ -578,12 +600,18 @@ pub fn MenubarSubTrigger(props: MenubarSubTriggerProps) -> Element {
             .py(&t.spacing, "sm")
             .rounded(&t.radius, "sm")
             .text(&t.typography, "sm")
-            .cursor(if props.disabled { "not-allowed" } else { "pointer" })
+            .cursor(if props.disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .opacity(if props.disabled { 0.5 } else { 1.0 })
             .outline("none");
-        
+
         if is_hovered() && !props.disabled {
-            base.bg(&t.colors.accent).text_color(&t.colors.accent_foreground).build()
+            base.bg(&t.colors.accent)
+                .text_color(&t.colors.accent_foreground)
+                .build()
         } else {
             base.text_color(&t.colors.foreground).build()
         }
@@ -619,13 +647,13 @@ pub fn MenubarSubTrigger(props: MenubarSubTriggerProps) -> Element {
             aria_disabled: props.disabled,
             onmouseenter: handle_mouse_enter,
             onmouseleave: handle_mouse_leave,
-            
+
             // Content
             div {
                 style: "display: flex; align-items: center; gap: 8px;",
                 {props.children}
             }
-            
+
             // Shortcut and chevron
             div {
                 style: "{shortcut_style} margin-left: auto;",
@@ -656,7 +684,7 @@ pub struct MenubarSubContentProps {
 pub fn MenubarSubContent(props: MenubarSubContentProps) -> Element {
     let _theme = use_theme();
     let mut submenu_ctx: SubmenuContext = use_context();
-    
+
     let is_open = *submenu_ctx.is_open.read();
 
     let content_style = use_style(|t| {
@@ -683,13 +711,13 @@ pub fn MenubarSubContent(props: MenubarSubContentProps) -> Element {
             div {
                 style: "position: relative;",
                 onmouseleave: handle_mouse_leave,
-                
+
                 // Submenu overlay (to close when moving away)
                 div {
                     style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9997;",
                     onmouseenter: move |_| submenu_ctx.is_open.set(false),
                 }
-                
+
                 // Submenu content
                 div {
                     style: "{content_style} position: absolute; left: 100%; top: 0; margin-left: 4px;",
@@ -719,7 +747,7 @@ pub struct MenubarLabelProps {
 #[component]
 pub fn MenubarLabel(props: MenubarLabelProps) -> Element {
     let _theme = use_theme();
-    
+
     let label_style = use_style(|t| {
         Style::new()
             .px(&t.spacing, "sm")
@@ -729,7 +757,7 @@ pub fn MenubarLabel(props: MenubarLabelProps) -> Element {
             .text_color(&t.colors.muted_foreground)
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{label_style} user-select: none;",
@@ -779,12 +807,18 @@ pub fn MenubarCheckboxItem(props: MenubarCheckboxItemProps) -> Element {
             .py(&t.spacing, "sm")
             .rounded(&t.radius, "sm")
             .text(&t.typography, "sm")
-            .cursor(if props.disabled { "not-allowed" } else { "pointer" })
+            .cursor(if props.disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .opacity(if props.disabled { 0.5 } else { 1.0 })
             .outline("none");
-        
+
         if is_hovered() && !props.disabled {
-            base.bg(&t.colors.accent).text_color(&t.colors.accent_foreground).build()
+            base.bg(&t.colors.accent)
+                .text_color(&t.colors.accent_foreground)
+                .build()
         } else {
             base.text_color(&t.colors.foreground).build()
         }
@@ -832,11 +866,11 @@ pub fn MenubarCheckboxItem(props: MenubarCheckboxItemProps) -> Element {
             onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
             onclick: handle_click,
-            
+
             // Left section: checkbox and content
             div {
                 style: "display: flex; align-items: center;",
-                
+
                 // Checkbox indicator
                 div {
                     style: "{checkbox_style}",
@@ -847,10 +881,10 @@ pub fn MenubarCheckboxItem(props: MenubarCheckboxItemProps) -> Element {
                         }
                     }
                 }
-                
+
                 {props.children}
             }
-            
+
             // Right section: shortcut
             if let Some(shortcut) = &props.shortcut {
                 span {

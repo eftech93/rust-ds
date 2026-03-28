@@ -2,9 +2,9 @@
 //!
 //! Text input field with full theme integration and state management.
 
-use dioxus::prelude::*;
-use crate::theme::use_style;
 use crate::styles::Style;
+use crate::theme::use_style;
+use dioxus::prelude::*;
 
 /// Input types
 #[derive(Default, Clone, PartialEq)]
@@ -115,11 +115,11 @@ pub struct InputProps {
 pub fn Input(props: InputProps) -> Element {
     let disabled = props.disabled;
     let readonly = props.readonly;
-    
+
     // Interactive states
     let mut is_focused = use_signal(|| false);
     let mut is_hovered = use_signal(|| false);
-    
+
     // Memoized styles
     let style = use_style(move |t| {
         let base = Style::new()
@@ -127,24 +127,28 @@ pub fn Input(props: InputProps) -> Element {
             .w_full()
             .h_px(40)
             .rounded(&t.radius, "md")
-            .border(1, if is_focused() { &t.colors.ring } else { &t.colors.border })
+            .border(
+                1,
+                if is_focused() {
+                    &t.colors.ring
+                } else {
+                    &t.colors.border
+                },
+            )
             .bg(&t.colors.background)
             .text_color(&t.colors.foreground)
             .px(&t.spacing, "md")
             .text(&t.typography, "sm")
             .transition("all 150ms cubic-bezier(0.4, 0, 0.2, 1)")
             .outline("none");
-            
+
         // Disabled state
         let base = if disabled || readonly {
-            base.cursor("not-allowed")
-                .opacity(0.5)
-                .bg(&t.colors.muted)
+            base.cursor("not-allowed").opacity(0.5).bg(&t.colors.muted)
         } else {
-            base.cursor("text")
-                .opacity(1.0)
+            base.cursor("text").opacity(1.0)
         };
-        
+
         // Focus ring effect
         let base = if is_focused() && !disabled {
             Style {
@@ -154,24 +158,24 @@ pub fn Input(props: InputProps) -> Element {
         } else {
             base
         };
-        
+
         // Hover effect (only when not focused)
         let base = if is_hovered() && !is_focused() && !disabled {
             base.border_color(&t.colors.foreground.darken(0.2))
         } else {
             base
         };
-        
+
         base.build()
     });
-    
+
     // Combine with custom styles
     let final_style = if let Some(custom) = &props.style {
         format!("{} {}", style(), custom)
     } else {
         style()
     };
-    
+
     let class = props.class.clone().unwrap_or_default();
     let input_type = props.input_type.clone();
     let placeholder = props.placeholder.clone();
@@ -182,7 +186,7 @@ pub fn Input(props: InputProps) -> Element {
     let autofocus = props.autofocus;
     let readonly = props.readonly;
     let disabled = props.disabled;
-    
+
     rsx! {
         input {
             r#type: input_type.as_str(),

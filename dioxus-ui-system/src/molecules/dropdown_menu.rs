@@ -3,10 +3,10 @@
 //! Displays a menu to the user—such as a set of actions or functions—triggered by a button.
 //! Uses fixed positioning with portal-like behavior to escape parent overflow clipping.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
+use crate::atoms::{Icon, IconColor, IconSize};
 use crate::styles::Style;
-use crate::atoms::{Icon, IconSize, IconColor};
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Dropdown menu item
 #[derive(Clone, PartialEq)]
@@ -34,19 +34,19 @@ impl DropdownMenuItem {
             shortcut: None,
         }
     }
-    
+
     /// Add an icon
     pub fn with_icon(mut self, icon: impl Into<String>) -> Self {
         self.icon = Some(icon.into());
         self
     }
-    
+
     /// Set disabled state
     pub fn disabled(mut self) -> Self {
         self.disabled = true;
         self
     }
-    
+
     /// Add keyboard shortcut
     pub fn with_shortcut(mut self, shortcut: impl Into<String>) -> Self {
         self.shortcut = Some(shortcut.into());
@@ -92,7 +92,7 @@ pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
     let _theme = use_theme();
     let mut is_open = use_signal(|| false);
     let mut menu_position = use_signal(|| (0i32, 0i32));
-    
+
     let menu_base_style = use_style(|t| {
         Style::new()
             .rounded(&t.radius, "md")
@@ -105,20 +105,20 @@ pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
             .z_index(9999)
             .build()
     });
-    
+
     // Store alignment for use in click handler
     let align = props.align.clone();
-    
+
     let handle_trigger_click = move |event: Event<MouseData>| {
         if !is_open() {
             // Get the click coordinates in viewport space
             let coords = event.data().page_coordinates();
             let click_x = coords.x as i32;
             let click_y = coords.y as i32;
-            
+
             // The menu width (used for alignment calculations)
             let menu_width = 180;
-            
+
             // Calculate menu position based on alignment
             // We position relative to the click, with some offset to show below the trigger
             let (menu_x, menu_y) = match align {
@@ -126,31 +126,34 @@ pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
                 DropdownAlign::End => (click_x - menu_width + 20, click_y + 20), // Offset right
                 DropdownAlign::Center => (click_x - menu_width / 2, click_y + 20), // Center on click
             };
-            
+
             // Ensure menu stays within viewport (with some padding)
             let padding = 8;
             let final_x = menu_x.max(padding);
             let final_y = menu_y.max(padding);
-            
+
             menu_position.set((final_x, final_y));
         }
         is_open.toggle();
     };
-    
+
     let (menu_x, menu_y) = menu_position();
-    let position_style = format!("position: fixed; left: {}px; top: {}px; width: 180px;", menu_x, menu_y);
+    let position_style = format!(
+        "position: fixed; left: {}px; top: {}px; width: 180px;",
+        menu_x, menu_y
+    );
     let custom_style = props.style.clone().unwrap_or_default();
-    
+
     rsx! {
         div {
             style: "position: relative; display: inline-block;",
-            
+
             // Trigger
             div {
                 onclick: handle_trigger_click,
                 {props.trigger}
             }
-            
+
             // Overlay to close on outside click
             if is_open() {
                 div {
@@ -158,13 +161,13 @@ pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
                     onclick: move |_| is_open.set(false),
                 }
             }
-            
+
             // Menu - rendered with fixed positioning to escape clipping
             if is_open() {
                 div {
                     style: "{menu_base_style} {position_style} {custom_style}",
                     onclick: move |e| e.stop_propagation(),
-                    
+
                     for item in props.items.clone() {
                         DropdownMenuItemView {
                             key: "{item.value}",
@@ -190,7 +193,7 @@ struct DropdownMenuItemViewProps {
 fn DropdownMenuItemView(props: DropdownMenuItemViewProps) -> Element {
     let _theme = use_theme();
     let mut is_hovered = use_signal(|| false);
-    
+
     let item_style = use_style(move |t| {
         let base = Style::new()
             .w_full()
@@ -202,20 +205,24 @@ fn DropdownMenuItemView(props: DropdownMenuItemViewProps) -> Element {
             .py(&t.spacing, "sm")
             .rounded(&t.radius, "sm")
             .text(&t.typography, "sm")
-            .cursor(if props.item.disabled { "not-allowed" } else { "pointer" })
+            .cursor(if props.item.disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .opacity(if props.item.disabled { 0.5 } else { 1.0 });
-        
+
         if is_hovered() && !props.item.disabled {
             base.bg(&t.colors.accent).build()
         } else {
             base.build()
         }
     });
-    
+
     let value = props.item.value.clone();
     let on_select = props.on_select.clone();
     let on_close = props.on_close.clone();
-    
+
     rsx! {
         div {
             style: "{item_style}",
@@ -227,7 +234,7 @@ fn DropdownMenuItemView(props: DropdownMenuItemViewProps) -> Element {
                     on_close.call(());
                 }
             },
-            
+
             // Label and icon
             div {
                 style: "display: flex; align-items: center; gap: 8px;",
@@ -236,7 +243,7 @@ fn DropdownMenuItemView(props: DropdownMenuItemViewProps) -> Element {
                 }
                 span { "{props.item.label}" }
             }
-            
+
             // Shortcut
             if let Some(shortcut) = &props.item.shortcut {
                 span {
@@ -252,7 +259,7 @@ fn DropdownMenuItemView(props: DropdownMenuItemViewProps) -> Element {
 #[component]
 pub fn DropdownMenuSeparator() -> Element {
     let _theme = use_theme();
-    
+
     let separator_style = use_style(|t| {
         Style::new()
             .h_px(1)
@@ -261,7 +268,7 @@ pub fn DropdownMenuSeparator() -> Element {
             .bg(&t.colors.border)
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{separator_style}",

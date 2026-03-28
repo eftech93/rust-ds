@@ -3,20 +3,16 @@
 //! A side panel/drawer that slides in from any edge of the screen.
 //! Similar to shadcn/ui Sheet component.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
+use crate::atoms::{Box, Button, ButtonVariant};
 use crate::styles::Style;
-use crate::atoms::{Button, ButtonVariant, Box};
 use crate::theme::tokens::Color;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 #[cfg(all(feature = "web", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
 #[cfg(all(feature = "web", target_arch = "wasm32"))]
 use wasm_bindgen::JsCast;
-#[cfg(all(feature = "web", target_arch = "wasm32"))]
-use wasm_bindgen_futures::JsFuture;
-#[cfg(all(feature = "web", target_arch = "wasm32"))]
-use js_sys::Promise;
 
 /// Which edge the sheet slides in from
 #[derive(Default, Clone, PartialEq)]
@@ -126,7 +122,7 @@ pub fn Sheet(props: SheetProps) -> Element {
         if !props.open {
             return;
         }
-        
+
         // Register keyboard event listener
         #[cfg(all(feature = "web", target_arch = "wasm32"))]
         {
@@ -137,11 +133,13 @@ pub fn Sheet(props: SheetProps) -> Element {
                 }
             }) as Box<dyn FnMut(_)>);
             if let Some(window) = web_sys::window() {
-                window.add_event_listener_with_callback("keydown", closure.as_ref().unchecked_ref()).unwrap();
+                window
+                    .add_event_listener_with_callback("keydown", closure.as_ref().unchecked_ref())
+                    .unwrap();
             }
             closure.forget(); // Keep the closure alive
         }
-        
+
         #[cfg(not(all(feature = "web", target_arch = "wasm32")))]
         {
             // Keyboard handling not implemented for non-web targets
@@ -237,12 +235,12 @@ pub fn Sheet(props: SheetProps) -> Element {
             style: "{overlay_style} opacity: {overlay_opacity}; {overlay_transition}",
             onclick: handle_overlay_click,
         }
-        
+
         // Sheet content - sibling to overlay, prevents click propagation issues
         div {
             style: "{sheet_style} transform: {transform}; {sheet_transition}",
             onclick: move |e| e.stop_propagation(),
-            
+
             // Header
             if props.title.is_some() || props.show_close_button {
                 SheetHeader {
@@ -252,7 +250,7 @@ pub fn Sheet(props: SheetProps) -> Element {
                     on_close: props.on_open_change.clone(),
                 }
             }
-            
+
             // Content
             Box {
                 style: "flex: 1; overflow-y: auto; padding: 24px;",
@@ -273,41 +271,34 @@ struct SheetHeaderProps {
 #[component]
 fn SheetHeader(props: SheetHeaderProps) -> Element {
     let _theme = use_theme();
-    
+
     let header_style = use_style(|t| {
         Style::new()
             .flex()
             .items_center()
-            .justify_between
-            ()
+            .justify_between()
             .p(&t.spacing, "lg")
             .border_bottom(1, &t.colors.border)
             .build()
     });
-    
-    let title_section_style = use_style(|_| {
-        Style::new()
-            .flex()
-            .flex_col()
-            .gap_px(4)
-            .build()
-    });
-    
+
+    let title_section_style = use_style(|_| Style::new().flex().flex_col().gap_px(4).build());
+
     rsx! {
         div {
             style: "{header_style}",
-            
+
             if props.title.is_some() || props.description.is_some() {
                 div {
                     style: "{title_section_style}",
-                    
+
                     if let Some(title) = props.title {
                         h2 {
                             style: "margin: 0; font-size: 18px; font-weight: 600;",
                             "{title}"
                         }
                     }
-                    
+
                     if let Some(description) = props.description {
                         p {
                             style: "margin: 0; font-size: 14px; color: #64748b;",
@@ -318,7 +309,7 @@ fn SheetHeader(props: SheetHeaderProps) -> Element {
             } else {
                 div {}
             }
-            
+
             if props.show_close_button {
                 Button {
                     variant: ButtonVariant::Ghost,
@@ -358,25 +349,24 @@ pub enum SheetFooterAlign {
 #[component]
 pub fn SheetFooter(props: SheetFooterProps) -> Element {
     let _theme = use_theme();
-    
+
     let justify = match props.align {
         SheetFooterAlign::Start => "flex-start",
         SheetFooterAlign::Center => "center",
         SheetFooterAlign::End => "flex-end",
         SheetFooterAlign::Between => "space-between",
     };
-    
+
     let footer_style = use_style(|t| {
         Style::new()
             .flex()
-            .items_center
-            ()
+            .items_center()
             .gap(&t.spacing, "sm")
             .p(&t.spacing, "lg")
             .border_top(1, &t.colors.border)
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{footer_style} justify-content: {justify};",

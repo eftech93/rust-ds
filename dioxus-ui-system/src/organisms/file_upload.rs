@@ -2,8 +2,8 @@
 //!
 //! Drag-and-drop file upload with progress and preview.
 
-use dioxus::prelude::*;
 use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 /// File upload properties
 #[derive(Props, Clone, PartialEq)]
@@ -60,11 +60,13 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
     let theme = use_theme();
     let mut is_dragging = use_signal(|| false);
     let mut files = use_signal(|| Vec::<UploadedFile>::new());
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let border_color = if props.error.is_some() {
         theme.tokens.read().colors.destructive.to_rgba()
     } else if is_dragging() {
@@ -72,20 +74,30 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
     } else {
         theme.tokens.read().colors.border.to_rgba()
     };
-    
+
     let bg_color = if is_dragging() {
-        format!("{}15", theme.tokens.read().colors.primary.to_rgba().trim_start_matches('#'))
+        format!(
+            "{}15",
+            theme
+                .tokens
+                .read()
+                .colors
+                .primary
+                .to_rgba()
+                .trim_start_matches('#')
+        )
     } else {
         theme.tokens.read().colors.background.to_rgba()
     };
-    
+
     let _handle_files = {
         let on_upload = props.on_upload.clone();
         let on_change = props.on_change.clone();
         let max_files = props.max_files;
         let max_size = props.max_size;
         move |new_files: Vec<UploadedFile>| {
-            let valid_files: Vec<_> = new_files.into_iter()
+            let valid_files: Vec<_> = new_files
+                .into_iter()
                 .filter(|f| {
                     if let Some(max) = max_size {
                         f.size <= max
@@ -95,22 +107,22 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                 })
                 .take(max_files)
                 .collect();
-            
+
             files.set(valid_files.clone());
-            
+
             if let Some(handler) = &on_change {
                 handler.call(valid_files.clone());
             }
-            
+
             on_upload.call(valid_files);
         }
     };
-    
+
     rsx! {
         div {
             class: "file-upload{class_css}",
             style: "display: flex; flex-direction: column; gap: 12px;",
-            
+
             // Drop zone
             div {
                 class: "file-upload-dropzone",
@@ -130,13 +142,13 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                     is_dragging.set(false);
                     // Handle dropped files (simplified)
                 },
-                
+
                 // Upload icon
                 div {
                     style: "font-size: 48px; margin-bottom: 16px;",
                     "📁"
                 }
-                
+
                 // Label
                 if let Some(label) = props.label.clone() {
                     p {
@@ -144,7 +156,7 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                         "{label}"
                     }
                 }
-                
+
                 // Helper text
                 if let Some(helper) = props.helper_text {
                     p {
@@ -152,14 +164,14 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                         "{helper}"
                     }
                 }
-                
+
                 // File input
                 label {
                     class: "file-upload-button",
                     style: "display: inline-block; padding: 10px 20px; font-size: 14px; font-weight: 500; color: white; background: {theme.tokens.read().colors.primary.to_rgba()}; border-radius: 8px; cursor: pointer; transition: opacity 0.15s ease;",
-                    
+
                     "Browse files"
-                    
+
                     input {
                         type: "file",
                         style: "display: none;",
@@ -174,7 +186,7 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                     }
                 }
             }
-            
+
             // Error message
             if let Some(error) = props.error {
                 p {
@@ -183,13 +195,13 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                     "{error}"
                 }
             }
-            
+
             // File list
             if !files().is_empty() {
                 div {
                     class: "file-upload-list",
                     style: "display: flex; flex-direction: column; gap: 8px;",
-                    
+
                     for (i, file) in files().iter().enumerate() {
                         FileUploadItem {
                             key: "{i}",
@@ -221,52 +233,52 @@ pub struct FileUploadItemProps {
 #[component]
 fn FileUploadItem(props: FileUploadItemProps) -> Element {
     let theme = use_theme();
-    
+
     let file_icon = get_file_icon(&props.file.file_type);
     let size_text = format_file_size(props.file.size);
-    
+
     rsx! {
         div {
             class: "file-upload-item",
             style: "display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px; background: white;",
-            
+
             // Icon
             div {
                 class: "file-upload-item-icon",
                 style: "flex-shrink: 0; width: 40px; height: 40px; border-radius: 8px; background: {theme.tokens.read().colors.muted.to_rgba()}; display: flex; align-items: center; justify-content: center; font-size: 20px;",
                 "{file_icon}"
             }
-            
+
             // Info
             div {
                 class: "file-upload-item-info",
                 style: "flex: 1; min-width: 0;",
-                
+
                 p {
                     class: "file-upload-item-name",
                     style: "margin: 0; font-size: 14px; font-weight: 500; color: {theme.tokens.read().colors.foreground.to_rgba()}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;",
                     "{props.file.name}"
                 }
-                
+
                 p {
                     class: "file-upload-item-size",
                     style: "margin: 4px 0 0 0; font-size: 12px; color: {theme.tokens.read().colors.muted.to_rgba()};",
                     "{size_text}"
                 }
-                
+
                 // Progress bar
                 if let Some(progress) = props.progress {
                     div {
                         class: "file-upload-item-progress",
                         style: "margin-top: 8px; height: 4px; background: {theme.tokens.read().colors.muted.to_rgba()}; border-radius: 2px; overflow: hidden;",
-                        
+
                         div {
                             style: "height: 100%; width: {progress}%; background: {theme.tokens.read().colors.primary.to_rgba()}; border-radius: 2px; transition: width 0.3s ease;",
                         }
                     }
                 }
             }
-            
+
             // Remove button
             button {
                 type: "button",
@@ -299,11 +311,11 @@ fn format_file_size(size: u64) -> String {
     const UNITS: &[&str] = &["B", "KB", "MB", "GB", "TB"];
     let mut size = size as f64;
     let mut unit_index = 0;
-    
+
     while size >= 1024.0 && unit_index < UNITS.len() - 1 {
         size /= 1024.0;
         unit_index += 1;
     }
-    
+
     format!("{:.1} {}", size, UNITS[unit_index])
 }

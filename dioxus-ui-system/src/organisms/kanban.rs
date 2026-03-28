@@ -2,10 +2,10 @@
 //!
 //! A drag-and-drop style board with columns and cards for task management.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
+use crate::atoms::{Button, ButtonSize, ButtonVariant, Icon, IconColor, IconSize, Label, TextSize};
 use crate::styles::Style;
-use crate::atoms::{Label, TextSize, Button, ButtonVariant, ButtonSize, Icon, IconSize, IconColor};
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Kanban card data
 #[derive(Clone, PartialEq, Debug)]
@@ -193,8 +193,8 @@ pub fn Kanban(props: KanbanProps) -> Element {
                     key: "{column.id}",
                     column: column,
                     width: column_width.clone(),
-                    on_card_click: props.on_card_click.clone(),
-                    on_add_card: props.on_add_card.clone(),
+                    on_card_click: props.on_card_click,
+                    on_add_card: props.on_add_card,
                     show_card_count: props.show_card_count,
                     card_hover: props.card_hover,
                 }
@@ -202,7 +202,7 @@ pub fn Kanban(props: KanbanProps) -> Element {
 
             if props.allow_add_column {
                 AddColumnButton {
-                    on_add_column: props.on_add_column.clone(),
+                    on_add_column: props.on_add_column,
                 }
             }
         }
@@ -378,7 +378,8 @@ pub fn KanbanCardView(props: KanbanCardViewProps) -> Element {
                 .transform("translateY(-2px)")
         } else {
             base
-        }.build()
+        }
+        .build()
     });
 
     let drag_handle_style = use_style(|t| {
@@ -530,7 +531,10 @@ pub struct KanbanTagProps {
 #[component]
 pub fn KanbanTag(props: KanbanTagProps) -> Element {
     // Generate a consistent color based on the label
-    let color_hash = props.label.bytes().fold(0u32, |acc, b| acc.wrapping_add(b as u32));
+    let color_hash = props
+        .label
+        .bytes()
+        .fold(0u32, |acc, b| acc.wrapping_add(b as u32));
     let hue = color_hash % 360;
     let bg_color = format!("hsl({}, 70%, 90%)", hue);
     let text_color = format!("hsl({}, 70%, 30%)", hue);
@@ -569,11 +573,11 @@ pub fn AddColumnButton(props: AddColumnButtonProps) -> Element {
             .transition("all 150ms ease");
 
         if is_hovered() {
-            base.border_color(&t.colors.primary)
-                .bg(&t.colors.muted)
+            base.border_color(&t.colors.primary).bg(&t.colors.muted)
         } else {
             base.border_style("dashed")
-        }.build()
+        }
+        .build()
     });
 
     let onclick_handler = props.on_add_column.clone();

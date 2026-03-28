@@ -2,9 +2,9 @@
 //!
 //! A file upload component for images with preview, drag-drop, and validation.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Upload status for an image
 #[derive(Clone, PartialEq, Debug, Default)]
@@ -39,7 +39,12 @@ pub struct UploadedImage {
 
 impl UploadedImage {
     /// Create a new uploaded image
-    pub fn new(id: impl Into<String>, file_name: impl Into<String>, preview_url: impl Into<String>, size: usize) -> Self {
+    pub fn new(
+        id: impl Into<String>,
+        file_name: impl Into<String>,
+        preview_url: impl Into<String>,
+        size: usize,
+    ) -> Self {
         Self {
             id: id.into(),
             file_name: file_name.into(),
@@ -122,14 +127,8 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
         images.set(props.value.clone());
     });
 
-    let container_style = use_style(move |_t| {
-        Style::new()
-            .flex()
-            .flex_col()
-            .gap_px(12)
-            .w_full()
-            .build()
-    });
+    let container_style =
+        use_style(move |_t| Style::new().flex().flex_col().gap_px(12).w_full().build());
 
     let max_size_bytes = (props.max_size_mb * 1024.0 * 1024.0) as usize;
     let accept_string = props.accept.join(",");
@@ -148,12 +147,17 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
                     || file_name.ends_with(".svg")
                     || file_name.ends_with(".bmp")
             } else {
-                file_name.to_lowercase().ends_with(&accept.replace("image/", "."))
+                file_name
+                    .to_lowercase()
+                    .ends_with(&accept.replace("image/", "."))
             }
         });
 
         if !is_valid_type {
-            return Err(format!("Invalid file type. Accepted: {}", accept_for_validation));
+            return Err(format!(
+                "Invalid file type. Accepted: {}",
+                accept_for_validation
+            ));
         }
 
         // Check file size
@@ -175,7 +179,7 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
     };
 
     // Handle file selection
-    let handle_files = {
+    let _handle_files = {
         let on_change = props.on_change.clone();
         move |new_files: Vec<(String, String, usize)>| {
             validation_error.set(None);
@@ -253,7 +257,11 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
             .rounded(&t.radius, "lg")
             .border(2, &t.colors.border)
             .border_color(&t.colors.border)
-            .cursor(if props.disabled { "not-allowed" } else { "pointer" })
+            .cursor(if props.disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .opacity(if props.disabled { 0.5 } else { 1.0 })
             .transition("all 150ms ease")
             .build()
@@ -611,8 +619,10 @@ fn format_file_size(size: usize) -> String {
 // Placeholder for js_sys when not targeting wasm
 #[cfg(not(target_arch = "wasm32"))]
 mod js_sys {
+    #[allow(dead_code)]
     pub struct Date;
     impl Date {
+        #[allow(dead_code)]
         pub fn now() -> f64 {
             std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)

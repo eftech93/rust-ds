@@ -2,9 +2,9 @@
 //!
 //! Centralized alert management with categorization and history.
 
-use dioxus::prelude::*;
-use crate::theme::use_theme;
 use crate::molecules::ToastVariant;
+use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 /// Notification item
 #[derive(Clone, PartialEq, Debug)]
@@ -19,7 +19,11 @@ pub struct Notification {
 }
 
 impl Notification {
-    pub fn new(id: impl Into<String>, title: impl Into<String>, message: impl Into<String>) -> Self {
+    pub fn new(
+        id: impl Into<String>,
+        title: impl Into<String>,
+        message: impl Into<String>,
+    ) -> Self {
         Self {
             id: id.into(),
             title: title.into(),
@@ -30,17 +34,17 @@ impl Notification {
             action: None,
         }
     }
-    
+
     pub fn with_variant(mut self, variant: ToastVariant) -> Self {
         self.variant = variant;
         self
     }
-    
+
     pub fn with_timestamp(mut self, timestamp: impl Into<String>) -> Self {
         self.timestamp = timestamp.into();
         self
     }
-    
+
     pub fn with_action(mut self, action: impl Into<String>) -> Self {
         self.action = Some(action.into());
         self
@@ -78,25 +82,27 @@ pub struct NotificationCenterProps {
 pub fn NotificationCenter(props: NotificationCenterProps) -> Element {
     let theme = use_theme();
     let mut is_open = use_signal(|| false);
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     rsx! {
         div {
             class: "notification-center{class_css}",
             style: "position: relative;",
-            
+
             // Trigger button
             button {
                 type: "button",
                 class: "notification-center-trigger",
                 style: "position: relative; padding: 8px; background: none; border: none; cursor: pointer; font-size: 20px;",
                 onclick: move |_| is_open.toggle(),
-                
+
                 "🔔"
-                
+
                 if props.unread_count > 0 {
                     span {
                         class: "notification-center-badge",
@@ -109,23 +115,23 @@ pub fn NotificationCenter(props: NotificationCenterProps) -> Element {
                     }
                 }
             }
-            
+
             // Dropdown
             if is_open() {
                 div {
                     class: "notification-center-dropdown",
                     style: "position: absolute; top: calc(100% + 8px); right: 0; width: 380px; max-height: 500px; background: white; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1); z-index: 50; display: flex; flex-direction: column;",
-                    
+
                     // Header
                     div {
                         class: "notification-center-header",
                         style: "display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid {theme.tokens.read().colors.border.to_rgba()};",
-                        
+
                         h3 {
                             style: "margin: 0; font-size: 16px; font-weight: 600;",
                             "Notifications"
                         }
-                        
+
                         if props.unread_count > 0 {
                             if let Some(on_mark_all_read) = props.on_mark_all_read {
                                 button {
@@ -137,21 +143,21 @@ pub fn NotificationCenter(props: NotificationCenterProps) -> Element {
                             }
                         }
                     }
-                    
+
                     // Notification list
                     div {
                         class: "notification-center-list",
                         style: "overflow-y: auto; max-height: 400px;",
-                        
+
                         if props.notifications.is_empty() {
                             div {
                                 style: "padding: 48px; text-align: center; color: {theme.tokens.read().colors.muted.to_rgba()};",
-                                
+
                                 div {
                                     style: "font-size: 48px; margin-bottom: 16px;",
                                     "🔔"
                                 }
-                                
+
                                 p {
                                     style: "margin: 0; font-size: 14px;",
                                     "No notifications yet"
@@ -166,13 +172,13 @@ pub fn NotificationCenter(props: NotificationCenterProps) -> Element {
                                         ToastVariant::Warning => ("⚠️", "#eab308"),
                                         ToastVariant::Info => ("ℹ️", "#3b82f6"),
                                     };
-                                    
+
                                     let bg_color = if notification.read {
                                         "transparent"
                                     } else {
                                         "#eff6ff"
                                     };
-                                    
+
                                     rsx! {
                                         div {
                                             key: "{notification.id}",
@@ -187,39 +193,39 @@ pub fn NotificationCenter(props: NotificationCenterProps) -> Element {
                                                     }
                                                 }
                                             },
-                                            
+
                                             // Icon
                                             div {
                                                 class: "notification-item-icon",
                                                 style: "flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: {icon_color}15; display: flex; align-items: center; justify-content: center; font-size: 16px; color: {icon_color};",
                                                 "{icon}"
                                             }
-                                            
+
                                             // Content
                                             div {
                                                 class: "notification-item-content",
                                                 style: "flex: 1; min-width: 0;",
-                                                
+
                                                 div {
                                                     class: "notification-item-header",
                                                     style: "display: flex; align-items: flex-start; justify-content: space-between; gap: 8px;",
-                                                    
+
                                                     h4 {
                                                         style: "margin: 0; font-size: 14px; font-weight: 600; color: {theme.tokens.read().colors.foreground.to_rgba()};",
                                                         "{notification.title}"
                                                     }
-                                                    
+
                                                     span {
                                                         style: "font-size: 12px; color: {theme.tokens.read().colors.muted.to_rgba()}; white-space: nowrap;",
                                                         "{notification.timestamp}"
                                                     }
                                                 }
-                                                
+
                                                 p {
                                                     style: "margin: 4px 0 0 0; font-size: 13px; color: {theme.tokens.read().colors.foreground.to_rgba()}; line-height: 1.5;",
                                                     "{notification.message}"
                                                 }
-                                                
+
                                                 if let Some(action) = notification.action.clone() {
                                                     button {
                                                         type: "button",
@@ -239,14 +245,14 @@ pub fn NotificationCenter(props: NotificationCenterProps) -> Element {
                                                     }
                                                 }
                                             }
-                                            
+
                                             // Unread indicator
                                             if !notification.read {
                                                 div {
                                                     style: "flex-shrink: 0; width: 8px; height: 8px; border-radius: 50%; background: {theme.tokens.read().colors.primary.to_rgba()}; margin-top: 4px;",
                                                 }
                                             }
-                                            
+
                                             // Dismiss button
                                             if let Some(on_dismiss) = props.on_dismiss.clone() {
                                                 button {
@@ -269,12 +275,12 @@ pub fn NotificationCenter(props: NotificationCenterProps) -> Element {
                             }
                         }
                     }
-                    
+
                     // Footer
                     div {
                         class: "notification-center-footer",
                         style: "padding: 12px; border-top: 1px solid {theme.tokens.read().colors.border.to_rgba()}; text-align: center;",
-                        
+
                         a {
                             href: "/notifications",
                             style: "font-size: 14px; color: {theme.tokens.read().colors.primary.to_rgba()}; text-decoration: none;",
@@ -316,43 +322,45 @@ pub struct BannerAlertProps {
 #[component]
 pub fn BannerAlert(props: BannerAlertProps) -> Element {
     let mut is_dismissed = use_signal(|| false);
-    
+
     let theme = use_theme();
-    
+
     if is_dismissed() {
         return rsx! {};
     }
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let (bg_color, border_color, icon) = match props.variant {
         ToastVariant::Info => ("#eff6ff", "#3b82f6", "ℹ️"),
         ToastVariant::Success => ("#f0fdf4", "#22c55e", "✓"),
         ToastVariant::Warning => ("#fefce8", "#eab308", "⚠️"),
         ToastVariant::Error => ("#fef2f2", "#ef4444", "✕"),
     };
-    
+
     let text_color = theme.tokens.read().colors.foreground.to_rgba();
-    
+
     rsx! {
         div {
             class: "banner-alert{class_css}",
             style: "padding: 12px 16px; background: {bg_color}; border-left: 4px solid {border_color}; display: flex; align-items: center; gap: 12px;",
-            
+
             span {
                 class: "banner-alert-icon",
                 style: "flex-shrink: 0; font-size: 18px; font-weight: 600; color: {border_color};",
                 "{icon}"
             }
-            
+
             p {
                 class: "banner-alert-message",
                 style: "flex: 1; margin: 0; font-size: 14px; color: {text_color};",
                 "{props.message}"
             }
-            
+
             if let Some(action) = props.action {
                 if let Some(on_action) = props.on_action {
                     button {
@@ -364,7 +372,7 @@ pub fn BannerAlert(props: BannerAlertProps) -> Element {
                     }
                 }
             }
-            
+
             if props.dismissible {
                 button {
                     type: "button",

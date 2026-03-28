@@ -2,9 +2,9 @@
 //!
 //! Displays a list of options for the user to pick from.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Select option
 #[derive(Clone, PartialEq, Debug)]
@@ -26,7 +26,7 @@ impl SelectOption {
             disabled: false,
         }
     }
-    
+
     /// Create a new disabled select option
     pub fn disabled(value: impl Into<String>, label: impl Into<String>) -> Self {
         Self {
@@ -70,43 +70,49 @@ pub struct SelectProps {
 pub fn Select(props: SelectProps) -> Element {
     let _theme = use_theme();
     let mut is_focused = use_signal(|| false);
-    
+
     let disabled = props.disabled;
     let error = props.error;
-    
+
     let select_style = use_style(move |t| {
         let base = Style::new()
             .w_full()
             .h_px(40)
             .px(&t.spacing, "md")
             .rounded(&t.radius, "md")
-            .border(1, if error { &t.colors.destructive } else { &t.colors.border })
+            .border(
+                1,
+                if error {
+                    &t.colors.destructive
+                } else {
+                    &t.colors.border
+                },
+            )
             .bg(&t.colors.background)
             .text_color(&t.colors.foreground)
             .font_size(14)
             .cursor(if disabled { "not-allowed" } else { "pointer" })
             .transition("all 150ms ease")
             .outline("none");
-        
+
         let base = if is_focused() {
             base.border_color(&t.colors.ring)
                 .shadow(&format!("0 0 0 1px {}", t.colors.ring.to_rgba()))
         } else {
             base
         };
-        
+
         let base = if disabled {
-            base.opacity(0.5)
-                .bg(&t.colors.muted)
+            base.opacity(0.5).bg(&t.colors.muted)
         } else {
             base
         };
-        
+
         // Add dropdown arrow
         let style_str = base.build();
         format!("{} appearance: none; background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 40px;", style_str)
     });
-    
+
     let handle_change = move |e: Event<FormData>| {
         let data = e.data();
         let new_value = data.value();
@@ -114,7 +120,7 @@ pub fn Select(props: SelectProps) -> Element {
             handler.call(new_value);
         }
     };
-    
+
     rsx! {
         select {
             value: "{props.value}",
@@ -124,7 +130,7 @@ pub fn Select(props: SelectProps) -> Element {
             onchange: handle_change,
             onfocus: move |_| is_focused.set(true),
             onblur: move |_| is_focused.set(false),
-            
+
             if let Some(placeholder) = props.placeholder.clone() {
                 if props.value.is_empty() {
                     option {
@@ -135,7 +141,7 @@ pub fn Select(props: SelectProps) -> Element {
                     }
                 }
             }
-            
+
             for option in props.options {
                 option {
                     key: "{option.value}",
@@ -177,12 +183,12 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
     let _theme = use_theme();
     let mut selected = use_signal(|| props.values.clone());
     let mut is_open = use_signal(|| false);
-    
+
     // Sync with props
     use_effect(move || {
         selected.set(props.values.clone());
     });
-    
+
     let container_style = use_style(|t| {
         Style::new()
             .w_full()
@@ -200,7 +206,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             .relative()
             .build()
     });
-    
+
     let tag_style = use_style(|t| {
         Style::new()
             .inline_flex()
@@ -214,10 +220,10 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             .font_size(12)
             .build()
     });
-    
+
     let onchange_clone = props.onchange.clone();
     let max_selections = props.max_selections;
-    
+
     let remove_selected = move |value: String| {
         let onchange = onchange_clone.clone();
         selected.with_mut(|s| {
@@ -227,7 +233,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             }
         });
     };
-    
+
     let add_selected = move |value: String| {
         let onchange = onchange_clone.clone();
         selected.with_mut(|s| {
@@ -244,30 +250,34 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             }
         });
     };
-    
+
     let selected_labels: Vec<_> = selected()
         .iter()
         .filter_map(|v| {
-            props.options.iter().find(|o| o.value == *v).map(|o| (v.clone(), o.label.clone()))
+            props
+                .options
+                .iter()
+                .find(|o| o.value == *v)
+                .map(|o| (v.clone(), o.label.clone()))
         })
         .collect();
-    
+
     rsx! {
         div {
             style: "position: relative;",
-            
+
             // Selected tags container
             div {
                 style: "{container_style}",
                 onclick: move |_| if !props.disabled { is_open.toggle() },
-                
+
                 if selected_labels.is_empty() {
                     span {
                         style: "color: #64748b; font-size: 14px;",
                         "{props.placeholder.clone().unwrap_or_else(|| \"Select options...\".to_string())}"
                     }
                 }
-                
+
                 for (value, label) in selected_labels {
                     MultiSelectTag {
                         key: "{value}",
@@ -277,14 +287,14 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                         on_remove: remove_selected,
                     }
                 }
-                
+
                 // Dropdown arrow
                 span {
                     style: "margin-left: auto; color: #64748b;",
                     if is_open() { "▲" } else { "▼" }
                 }
             }
-            
+
             // Dropdown
             if is_open() && !props.disabled {
                 MultiSelectDropdown {
@@ -313,7 +323,11 @@ struct CheckBoxIndicatorProps {
 
 #[component]
 fn CheckBoxIndicator(props: CheckBoxIndicatorProps) -> Element {
-    let bg_color = if props.is_selected { "#0f172a" } else { "white" };
+    let bg_color = if props.is_selected {
+        "#0f172a"
+    } else {
+        "white"
+    };
     rsx! {
         div {
             style: "width: 16px; height: 16px; border: 1px solid #cbd5e1; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: {bg_color}; color: white;",
@@ -354,7 +368,7 @@ fn MultiSelectTag(props: MultiSelectTagProps) -> Element {
 #[component]
 fn MultiSelectDropdown(props: MultiSelectDropdownProps) -> Element {
     let _theme = use_theme();
-    
+
     let dropdown_style = use_style(|t| {
         Style::new()
             .absolute()
@@ -370,7 +384,7 @@ fn MultiSelectDropdown(props: MultiSelectDropdownProps) -> Element {
             .z_index(50)
             .build()
     });
-    
+
     let item_style = use_style(|t| {
         Style::new()
             .w_full()
@@ -381,11 +395,11 @@ fn MultiSelectDropdown(props: MultiSelectDropdownProps) -> Element {
             .transition("all 100ms ease")
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{dropdown_style}",
-            
+
             for option in props.options.iter().cloned().collect::<Vec<_>>() {
                 DropdownOptionItem {
                     key: "{option.value}",
@@ -417,13 +431,13 @@ fn DropdownOptionItem(props: DropdownOptionItemProps) -> Element {
             onclick: move |_| {
                 props.on_select.call(value.clone());
             },
-            
+
             div {
                 style: "display: flex; align-items: center; gap: 8px;",
-                
+
                 // Checkbox
                 CheckBoxIndicator { is_selected: props.is_selected }
-                
+
                 span {
                     style: if props.option.disabled { "opacity: 0.5;" } else { "" },
                     "{props.option.label}"

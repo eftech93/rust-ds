@@ -1,20 +1,22 @@
 //! New Atom component documentation pages (Phase 1-4)
 
+use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, Section};
 use dioxus::prelude::*;
+use dioxus_ui_system::atoms::{
+    AspectRatio, AspectRatios, NumberInput, PasswordInput, Toggle, ToggleSize, ToggleVariant,
+};
 use dioxus_ui_system::prelude::*;
-use dioxus_ui_system::atoms::{Toggle, ToggleVariant, ToggleSize, NumberInput, AspectRatio, AspectRatios, PasswordInput};
-use crate::docs_ui::{DocPage, Section, ExampleBox, CodeBlock, PropsTable};
 
 /// Toggle documentation page
 #[component]
 pub fn TogglePage() -> Element {
     let mut pressed = use_signal(|| false);
-    
+
     rsx! {
         DocPage {
             title: "Toggle",
             description: "A two-state button that can be either on or off.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Toggle {
@@ -31,7 +33,7 @@ Toggle {
     "Bold"
 }"#.to_string() }
             }
-            
+
             Section { title: "Variants",
                 ExampleBox {
                     HStack { gap: SpacingSize::Md,
@@ -41,7 +43,7 @@ Toggle {
                     }
                 }
             }
-            
+
             Section { title: "Sizes",
                 ExampleBox {
                     HStack { gap: SpacingSize::Md, style: "align-items: center;",
@@ -59,12 +61,12 @@ Toggle {
 #[component]
 pub fn NumberInputPage() -> Element {
     let mut value = use_signal(|| 0.0);
-    
+
     rsx! {
         DocPage {
             title: "Number Input",
             description: "An input with increment and decrement buttons for numeric values.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Box { style: "max-width: 200px;",
@@ -81,7 +83,7 @@ NumberInput {
     on_change: move |v| value.set(v),
 }"#.to_string() }
             }
-            
+
             Section { title: "With Min/Max",
                 ExampleBox {
                     Box { style: "max-width: 200px;",
@@ -95,7 +97,7 @@ NumberInput {
                     }
                 }
             }
-            
+
             Section { title: "With Precision",
                 ExampleBox {
                     Box { style: "max-width: 200px;",
@@ -119,12 +121,12 @@ pub fn AspectRatioPage() -> Element {
         DocPage {
             title: "Aspect Ratio",
             description: "A container that maintains a consistent aspect ratio for its content.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Box { style: "max-width: 400px;",
                         AspectRatio { ratio: 16.0/9.0,
-                            Box { 
+                            Box {
                                 style: "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;",
                                 "16:9 Aspect Ratio"
                             }
@@ -135,7 +137,7 @@ pub fn AspectRatioPage() -> Element {
     img { src: "image.jpg", style: "width: 100%; height: 100%; object-fit: cover;" }
 }"#.to_string() }
             }
-            
+
             Section { title: "Common Ratios",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
@@ -168,7 +170,7 @@ pub fn PasswordInputPage() -> Element {
         DocPage {
             title: "Password Input",
             description: "A password input with show/hide toggle and optional strength indicator.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Box { style: "max-width: 300px;",
@@ -185,7 +187,7 @@ pub fn PasswordInputPage() -> Element {
     label: Some("Password".to_string()),
 }"#.to_string() }
             }
-            
+
             Section { title: "With Strength Indicator",
                 ExampleBox {
                     Box { style: "max-width: 300px;",
@@ -198,7 +200,7 @@ pub fn PasswordInputPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "With Error",
                 ExampleBox {
                     Box { style: "max-width: 300px;",

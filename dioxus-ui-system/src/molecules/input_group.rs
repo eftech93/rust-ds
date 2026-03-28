@@ -2,10 +2,10 @@
 //!
 //! Combines Label, Input, and helper text/error messages into a cohesive form field.
 
-use dioxus::prelude::*;
-use crate::atoms::{Input, InputType, Label, TextSize, TextColor, VStack, AlignItems, SpacingSize};
-use crate::theme::use_style;
+use crate::atoms::{AlignItems, Input, InputType, Label, SpacingSize, TextColor, TextSize, VStack};
 use crate::styles::Style;
+use crate::theme::use_style;
+use dioxus::prelude::*;
 
 /// Input Group properties
 #[derive(Props, Clone, PartialEq)]
@@ -75,19 +75,11 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
     let hint = props.hint.clone();
     let required = props.required;
     let disabled = props.disabled;
-    
-    let container_style = use_style(|_t| {
-        Style::new()
-            .w_full()
-            .build()
-    });
-    
-    let input_wrapper_style = use_style(|_| {
-        Style::new()
-            .relative()
-            .build()
-    });
-    
+
+    let container_style = use_style(|_t| Style::new().w_full().build());
+
+    let input_wrapper_style = use_style(|_| Style::new().relative().build());
+
     let label_element = if required {
         rsx! {
             Label {
@@ -110,7 +102,7 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
             }
         }
     };
-    
+
     let helper_text = if let Some(err) = error {
         Some(rsx! {
             Label {
@@ -130,29 +122,29 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
     } else {
         None
     };
-    
+
     let custom_style = props.style.clone().unwrap_or_default();
-    
+
     rsx! {
         div {
             style: "{container_style} {custom_style}",
-            
+
             VStack {
                 gap: SpacingSize::Xs,
                 align: AlignItems::Stretch,
-                
+
                 {label_element}
-                
+
                 div {
                     style: "{input_wrapper_style} display: flex; align-items: center;",
-                    
+
                     if props.leading_icon.is_some() {
                         div {
                             style: "position: absolute; left: 12px; z-index: 1;",
                             {props.leading_icon.unwrap()}
                         }
                     }
-                    
+
                     Input {
                         value: value,
                         placeholder: placeholder,
@@ -160,7 +152,7 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
                         disabled: disabled,
                         onchange: props.onchange.clone(),
                     }
-                    
+
                     if props.trailing_icon.is_some() {
                         div {
                             style: "position: absolute; right: 12px; z-index: 1;",
@@ -168,7 +160,7 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
                         }
                     }
                 }
-                
+
                 {helper_text}
             }
         }
