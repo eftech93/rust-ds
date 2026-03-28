@@ -2,10 +2,10 @@
 //!
 //! Use to show a placeholder while content is loading.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
+use crate::atoms::{AlignItems, Box, HStack, SpacingSize, VStack};
 use crate::styles::Style;
-use crate::atoms::{Box, VStack, HStack, AlignItems, SpacingSize};
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Skeleton properties
 #[derive(Props, Clone, PartialEq)]
@@ -34,23 +34,19 @@ pub struct SkeletonProps {
 #[component]
 pub fn Skeleton(props: SkeletonProps) -> Element {
     let _theme = use_theme();
-    
+
     let width = props.width.unwrap_or_else(|| "100%".to_string());
     let height = props.height.unwrap_or_else(|| "20px".to_string());
     let rounded = props.rounded.unwrap_or_else(|| "4px".to_string());
-    
-    let skeleton_style = use_style(move |t| {
-        Style::new()
-            .bg(&t.colors.muted)
-            .build()
-    });
-    
+
+    let skeleton_style = use_style(move |t| Style::new().bg(&t.colors.muted).build());
+
     let animation = if props.animate {
         "animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;"
     } else {
         ""
     };
-    
+
     rsx! {
         Box {
             style: "{skeleton_style} width: {width}; height: {height}; border-radius: {rounded}; {animation} {props.style.clone().unwrap_or_default()}",
@@ -77,20 +73,16 @@ pub struct SkeletonCircleProps {
 #[component]
 pub fn SkeletonCircle(props: SkeletonCircleProps) -> Element {
     let _theme = use_theme();
-    
-    let skeleton_style = use_style(move |t| {
-        Style::new()
-            .bg(&t.colors.muted)
-            .rounded_full()
-            .build()
-    });
-    
+
+    let skeleton_style =
+        use_style(move |t| Style::new().bg(&t.colors.muted).rounded_full().build());
+
     let animation = if props.animate {
         "animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;"
     } else {
         ""
     };
-    
+
     rsx! {
         Box {
             style: "{skeleton_style} width: {props.size}px; height: {props.size}px; {animation} {props.style.clone().unwrap_or_default()}",
@@ -119,13 +111,13 @@ pub struct SkeletonTextProps {
 #[component]
 pub fn SkeletonText(props: SkeletonTextProps) -> Element {
     let _theme = use_theme();
-    
+
     rsx! {
         VStack {
             style: props.style.clone().unwrap_or_default(),
             gap: SpacingSize::Sm,
             align: AlignItems::Stretch,
-            
+
             for i in 0..props.lines {
                 Skeleton {
                     width: if i == props.lines - 1 {
@@ -163,7 +155,7 @@ pub struct SkeletonCardProps {
 #[component]
 pub fn SkeletonCard(props: SkeletonCardProps) -> Element {
     let _theme = use_theme();
-    
+
     let card_style = use_style(|t| {
         Style::new()
             .w_full()
@@ -172,25 +164,25 @@ pub fn SkeletonCard(props: SkeletonCardProps) -> Element {
             .p(&t.spacing, "lg")
             .build()
     });
-    
+
     let custom_style = props.style.clone().unwrap_or_default();
-    
+
     rsx! {
         VStack {
             style: "{card_style} {custom_style}",
             gap: SpacingSize::Md,
             align: AlignItems::Stretch,
-            
+
             if props.show_avatar {
                 HStack {
                     gap: SpacingSize::Md,
                     align: AlignItems::Center,
-                    
+
                     SkeletonCircle {
                         size: "48".to_string(),
                         animate: props.animate,
                     }
-                    
+
                     Box {
                         style: "flex: 1;",
                         Skeleton {
@@ -202,7 +194,7 @@ pub fn SkeletonCard(props: SkeletonCardProps) -> Element {
                     }
                 }
             }
-            
+
             SkeletonText {
                 lines: props.text_lines,
                 animate: props.animate,

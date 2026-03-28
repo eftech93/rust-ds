@@ -2,8 +2,8 @@
 //!
 //! Image + text content with flexible alignment.
 
-use dioxus::prelude::*;
 use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 /// Media alignment
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -44,47 +44,51 @@ pub struct MediaObjectProps {
 /// Media object component (image + text layout)
 #[component]
 pub fn MediaObject(props: MediaObjectProps) -> Element {
-    let class_css = props.class.as_ref()
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let flex_direction = if props.reverse { "row-reverse" } else { "row" };
     let align_items = match props.align {
         MediaAlign::Start => "flex-start",
         MediaAlign::Center => "center",
         MediaAlign::End => "flex-end",
     };
-    
+
     let responsive_css = if props.responsive {
         format!("@media (max-width: 640px) {{ .media-object{class_css} {{ flex-direction: column; }} }}")
     } else {
         String::new()
     };
-    
-    let media_style = props.media_width.as_ref()
+
+    let media_style = props
+        .media_width
+        .as_ref()
         .map(|w| format!("flex-shrink: 0; width: {};", w))
         .unwrap_or_else(|| "flex-shrink: 0;".to_string());
-    
+
     let gap = props.gap;
-    
+
     rsx! {
         div {
             class: "media-object{class_css}",
             style: "display: flex; flex-direction: {flex_direction}; align-items: {align_items}; gap: {gap}px;",
-            
+
             div {
                 class: "media-object-media",
                 style: "{media_style}",
                 {props.media}
             }
-            
+
             div {
                 class: "media-object-content",
                 style: "flex: 1; min-width: 0;",
                 {props.children}
             }
         }
-        
+
         if !responsive_css.is_empty() {
             style { "{{ {responsive_css} }}" }
         }
@@ -117,7 +121,7 @@ pub struct MediaContentProps {
 #[component]
 pub fn MediaContent(props: MediaContentProps) -> Element {
     let theme = use_theme();
-    
+
     let _title_tag = format!("h{}", props.title_level.clamp(1, 6));
     let font_size = match props.title_level {
         1 => 24,
@@ -126,13 +130,16 @@ pub fn MediaContent(props: MediaContentProps) -> Element {
         _ => 16,
     };
     let title_color = theme.tokens.read().colors.foreground.to_rgba();
-    let title_style = format!("margin: 0; font-size: {}px; font-weight: 600; color: {}; line-height: 1.3;", font_size, title_color);
-    
+    let title_style = format!(
+        "margin: 0; font-size: {}px; font-weight: 600; color: {}; line-height: 1.3;",
+        font_size, title_color
+    );
+
     rsx! {
         div {
             class: "media-content",
             style: "display: flex; flex-direction: column; gap: 8px;",
-            
+
             if let Some(title) = props.title.clone() {
                 match props.title_level {
                     1 => rsx! { h1 { class: "media-content-title", style: "{title_style}", "{title}" } },
@@ -143,7 +150,7 @@ pub fn MediaContent(props: MediaContentProps) -> Element {
                     _ => rsx! { h6 { class: "media-content-title", style: "{title_style}", "{title}" } },
                 }
             }
-            
+
             if let Some(meta) = props.meta {
                 span {
                     class: "media-content-meta",
@@ -151,7 +158,7 @@ pub fn MediaContent(props: MediaContentProps) -> Element {
                     "{meta}"
                 }
             }
-            
+
             if let Some(description) = props.description {
                 p {
                     class: "media-content-description",
@@ -159,14 +166,14 @@ pub fn MediaContent(props: MediaContentProps) -> Element {
                     "{description}"
                 }
             }
-            
+
             if let Some(children) = props.children {
                 div {
                     class: "media-content-body",
                     {children}
                 }
             }
-            
+
             if let Some(actions) = props.actions {
                 div {
                     class: "media-content-actions",
@@ -214,13 +221,19 @@ pub struct CommentProps {
 #[component]
 pub fn Comment(props: CommentProps) -> Element {
     let theme = use_theme();
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
-    let like_color = if props.liked { "#ef4444".to_string() } else { theme.tokens.read().colors.muted.to_rgba() };
-    
+
+    let like_color = if props.liked {
+        "#ef4444".to_string()
+    } else {
+        theme.tokens.read().colors.muted.to_rgba()
+    };
+
     let avatar_element = props.avatar.unwrap_or_else(|| {
         rsx! {
             div {
@@ -229,49 +242,49 @@ pub fn Comment(props: CommentProps) -> Element {
             }
         }
     });
-    
+
     rsx! {
         div {
             class: "comment{class_css}",
             style: "display: flex; gap: 12px;",
-            
+
             div {
                 class: "comment-avatar",
                 style: "flex-shrink: 0;",
                 {avatar_element}
             }
-            
+
             div {
                 class: "comment-body",
                 style: "flex: 1;",
-                
+
                 div {
                     class: "comment-header",
                     style: "display: flex; align-items: center; gap: 8px; margin-bottom: 4px;",
-                    
+
                     span {
                         class: "comment-author",
                         style: "font-weight: 600; font-size: 14px; color: {theme.tokens.read().colors.foreground.to_rgba()};",
                         "{props.author}"
                     }
-                    
+
                     span {
                         class: "comment-timestamp",
                         style: "font-size: 12px; color: {theme.tokens.read().colors.muted.to_rgba()};",
                         "{props.timestamp}"
                     }
                 }
-                
+
                 p {
                     class: "comment-content",
                     style: "margin: 0 0 8px 0; font-size: 14px; color: {theme.tokens.read().colors.foreground.to_rgba()}; line-height: 1.5;",
                     "{props.content}"
                 }
-                
+
                 div {
                     class: "comment-actions",
                     style: "display: flex; gap: 16px;",
-                    
+
                     if let Some(on_reply) = props.on_reply {
                         button {
                             type: "button",
@@ -281,27 +294,27 @@ pub fn Comment(props: CommentProps) -> Element {
                             "Reply"
                         }
                     }
-                    
+
                     if let Some(on_like) = props.on_like {
                         button {
                             type: "button",
                             class: "comment-like",
                             style: "font-size: 13px; color: {like_color}; background: none; border: none; cursor: pointer; display: flex; align-items: center; gap: 4px;",
                             onclick: move |_| on_like.call(()),
-                            
+
                             if props.liked {
                                 "❤️"
                             } else {
                                 "🤍"
                             }
-                            
+
                             if props.like_count > 0 {
                                 "{props.like_count}"
                             }
                         }
                     }
                 }
-                
+
                 if let Some(replies) = props.replies {
                     div {
                         class: "comment-replies",

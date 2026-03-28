@@ -2,8 +2,8 @@
 //!
 //! Loading placeholders that mimic content structure.
 
-use dioxus::prelude::*;
 use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 /// Skeleton shape variant
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -56,27 +56,29 @@ pub enum SkeletonAnimation {
 #[component]
 pub fn Skeleton(props: SkeletonProps) -> Element {
     let theme = use_theme();
-    
-    let base_color = props.color.unwrap_or_else(|| {
-        theme.tokens.read().colors.muted.to_rgba()
-    });
-    
+
+    let base_color = props
+        .color
+        .unwrap_or_else(|| theme.tokens.read().colors.muted.to_rgba());
+
     let highlight = props.highlight_color.unwrap_or_else(|| {
         // Slightly lighter version of base color
         theme.tokens.read().colors.background.to_rgba()
     });
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let border_radius = match props.shape {
         SkeletonShape::Circle => "50%",
         SkeletonShape::Rounded => "8px",
         SkeletonShape::Text => "4px",
         SkeletonShape::Rectangle => "0px",
     };
-    
+
     let animation_css = if props.animated {
         match props.animation {
             SkeletonAnimation::Shimmer => format!(
@@ -92,16 +94,16 @@ pub fn Skeleton(props: SkeletonProps) -> Element {
     } else {
         format!("background: {base_color};")
     };
-    
+
     let width = props.width.as_deref().unwrap_or("100%");
     let height = props.height.as_deref().unwrap_or("16px");
-    
+
     rsx! {
         div {
             class: "skeleton{class_css}",
             style: "width: {width}; height: {height}; border-radius: {border_radius}; {animation_css}",
         }
-        
+
 
     }
 }
@@ -129,20 +131,22 @@ pub struct SkeletonTextProps {
 /// Skeleton text loader (multiple lines)
 #[component]
 pub fn SkeletonText(props: SkeletonTextProps) -> Element {
-    let class_css = props.class.as_ref()
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     rsx! {
         div {
             class: "skeleton-text{class_css}",
             style: "display: flex; flex-direction: column; gap: 8px;",
-            
+
             for i in 0..props.lines {
                 {
                     let is_last = i == props.lines - 1;
                     let width = if is_last { format!("{}%", props.last_line_width) } else { "100%".to_string() };
-                    
+
                     rsx! {
                         Skeleton {
                             key: "{i}",
@@ -184,15 +188,17 @@ pub struct SkeletonCardProps {
 /// Skeleton card loader
 #[component]
 pub fn SkeletonCard(props: SkeletonCardProps) -> Element {
-    let class_css = props.class.as_ref()
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     rsx! {
         div {
             class: "skeleton-card{class_css}",
             style: "border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: white;",
-            
+
             if props.show_image {
                 Skeleton {
                     shape: SkeletonShape::Rectangle,
@@ -201,26 +207,26 @@ pub fn SkeletonCard(props: SkeletonCardProps) -> Element {
                     animated: props.animated,
                 }
             }
-            
+
             div {
                 style: "padding: 16px;",
-                
+
                 SkeletonText {
                     lines: props.text_lines,
                     animated: props.animated,
                 }
-                
+
                 if props.show_actions {
                     div {
                         style: "display: flex; gap: 8px; margin-top: 16px;",
-                        
+
                         Skeleton {
                             shape: SkeletonShape::Rounded,
                             width: "80px",
                             height: "36px",
                             animated: props.animated,
                         }
-                        
+
                         Skeleton {
                             shape: SkeletonShape::Rounded,
                             width: "80px",
@@ -279,7 +285,7 @@ impl AvatarSize {
 #[component]
 pub fn SkeletonAvatar(props: SkeletonAvatarProps) -> Element {
     let size = props.size.to_px();
-    
+
     rsx! {
         Skeleton {
             shape: SkeletonShape::Circle,
@@ -313,30 +319,32 @@ pub struct SkeletonListProps {
 /// Skeleton list loader
 #[component]
 pub fn SkeletonList(props: SkeletonListProps) -> Element {
-    let class_css = props.class.as_ref()
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     rsx! {
         div {
             class: "skeleton-list{class_css}",
             style: "display: flex; flex-direction: column;",
-            
+
             for i in 0..props.items {
                 div {
                     key: "{i}",
                     style: "display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #e2e8f0;",
-                    
+
                     if props.show_avatar {
                         SkeletonAvatar {
                             size: AvatarSize::Md,
                             animated: props.animated,
                         }
                     }
-                    
+
                     div {
                         style: "flex: 1;",
-                        
+
                         SkeletonText {
                             lines: props.lines,
                             animated: props.animated,

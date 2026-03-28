@@ -3,9 +3,9 @@
 //! A group of two-state toggle buttons. Supports single selection (like text alignment)
 //! or multiple selection (like bold/italic/underline).
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Toggle group selection type
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -73,11 +73,11 @@ impl ToggleGroupContext {
     pub fn is_selected(&self, value: &str) -> bool {
         self.selected_values.read().iter().any(|v| v == value)
     }
-    
+
     /// Toggle a value
     pub fn toggle_value(&mut self, value: &str) {
         let mut values = self.selected_values.write();
-        
+
         match self.group_type {
             ToggleGroupType::Single => {
                 // In single mode, select only this value (or deselect if already selected)
@@ -97,7 +97,7 @@ impl ToggleGroupContext {
                 }
             }
         }
-        
+
         // Notify parent of change
         if let Some(handler) = &self.on_value_change {
             handler.call(values.clone());
@@ -128,14 +128,14 @@ impl ToggleGroupContext {
 #[component]
 pub fn ToggleGroup(props: ToggleGroupProps) -> Element {
     let _theme = use_theme();
-    
+
     let mut selected_values = use_signal(|| props.value.clone());
-    
+
     // Sync with prop changes
     use_effect(move || {
         selected_values.set(props.value.clone());
     });
-    
+
     // Container style
     let container_style = use_style(move |t| {
         Style::new()
@@ -144,23 +144,23 @@ pub fn ToggleGroup(props: ToggleGroupProps) -> Element {
             .gap(&t.spacing, "xs")
             .build()
     });
-    
+
     // Combine with custom styles
     let final_style = if let Some(custom) = &props.style {
         format!("{} {}", container_style(), custom)
     } else {
         container_style()
     };
-    
+
     let class = props.class.clone().unwrap_or_default();
-    
+
     // Provide context to children
     use_context_provider(|| ToggleGroupContext {
         selected_values,
         group_type: props.group_type.clone(),
         on_value_change: props.on_value_change.clone(),
     });
-    
+
     rsx! {
         div {
             role: "group",
@@ -191,19 +191,19 @@ pub fn ToggleGroup(props: ToggleGroupProps) -> Element {
 #[component]
 pub fn ToggleItem(props: ToggleItemProps) -> Element {
     let _theme = use_theme();
-    
+
     // Get context from parent ToggleGroup
     let mut context = use_context::<ToggleGroupContext>();
-    
+
     let mut is_hovered = use_signal(|| false);
     let mut is_focused = use_signal(|| false);
-    
+
     let value = props.value.clone();
     let disabled = props.disabled;
-    
+
     // Check if this item is selected from context
     let is_selected = context.is_selected(&value);
-    
+
     // Memoized styles
     let style = use_style(move |t| {
         let base = Style::new()
@@ -220,14 +220,14 @@ pub fn ToggleItem(props: ToggleItemProps) -> Element {
             .select_none()
             .whitespace_nowrap()
             .cursor(if disabled { "not-allowed" } else { "pointer" });
-        
+
         // Apply opacity for disabled state
         let base = if disabled {
             base.opacity(0.5)
         } else {
             base.opacity(1.0)
         };
-        
+
         // Style based on selected state
         let (bg, fg, border) = if is_selected {
             let bg = if is_hovered() && !disabled {
@@ -242,18 +242,20 @@ pub fn ToggleItem(props: ToggleItemProps) -> Element {
             } else {
                 Color::new_rgba(0, 0, 0, 0.0)
             };
-            (bg, t.colors.foreground.clone(), Some(t.colors.border.clone()))
+            (
+                bg,
+                t.colors.foreground.clone(),
+                Some(t.colors.border.clone()),
+            )
         };
-        
-        let mut final_style = base
-            .bg(&bg)
-            .text_color(&fg);
-        
+
+        let mut final_style = base.bg(&bg).text_color(&fg);
+
         // Add border for unselected state
         if let Some(border_color) = border {
             final_style = final_style.border(1, &border_color);
         }
-        
+
         // Add focus ring
         if is_focused() && !disabled {
             final_style = Style {
@@ -261,25 +263,25 @@ pub fn ToggleItem(props: ToggleItemProps) -> Element {
                 ..final_style
             };
         }
-        
+
         final_style.build()
     });
-    
+
     // Combine with custom styles
     let final_style = if let Some(custom) = &props.style {
         format!("{} {}", style(), custom)
     } else {
         style()
     };
-    
+
     let class = props.class.clone().unwrap_or_default();
-    
+
     let handle_click = move |_| {
         if !disabled {
             context.toggle_value(&value);
         }
     };
-    
+
     rsx! {
         button {
             r#type: "button",
@@ -303,17 +305,12 @@ pub fn ToggleItem(props: ToggleItemProps) -> Element {
 /// Similar to ToggleGroup but optimized for icon-only toggles.
 #[component]
 pub fn IconToggleGroup(
-    #[props(default)]
-    group_type: ToggleGroupType,
-    #[props(default)]
-    value: Vec<String>,
-    #[props(default)]
-    on_value_change: Option<EventHandler<Vec<String>>>,
+    #[props(default)] group_type: ToggleGroupType,
+    #[props(default)] value: Vec<String>,
+    #[props(default)] on_value_change: Option<EventHandler<Vec<String>>>,
     children: Element,
-    #[props(default)]
-    style: Option<String>,
-    #[props(default)]
-    class: Option<String>,
+    #[props(default)] style: Option<String>,
+    #[props(default)] class: Option<String>,
 ) -> Element {
     rsx! {
         ToggleGroup {
@@ -334,24 +331,21 @@ pub fn IconToggleGroup(
 pub fn IconToggleItem(
     value: String,
     icon: Element,
-    #[props(default)]
-    disabled: bool,
-    #[props(default)]
-    style: Option<String>,
-    #[props(default)]
-    class: Option<String>,
+    #[props(default)] disabled: bool,
+    #[props(default)] style: Option<String>,
+    #[props(default)] class: Option<String>,
 ) -> Element {
     let _theme = use_theme();
-    
+
     // Get context from parent ToggleGroup
     let mut context = use_context::<ToggleGroupContext>();
-    
+
     let mut is_hovered = use_signal(|| false);
     let mut is_focused = use_signal(|| false);
-    
+
     let is_selected = context.is_selected(&value);
     let item_disabled = disabled;
-    
+
     // Memoized styles - square icon button style
     let item_style = use_style(move |t| {
         let base = Style::new()
@@ -365,15 +359,19 @@ pub fn IconToggleItem(
             .font_weight(500)
             .transition("all 150ms cubic-bezier(0.4, 0, 0.2, 1)")
             .select_none()
-            .cursor(if item_disabled { "not-allowed" } else { "pointer" });
-        
+            .cursor(if item_disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            });
+
         // Apply opacity for disabled state
         let base = if item_disabled {
             base.opacity(0.5)
         } else {
             base.opacity(1.0)
         };
-        
+
         // Style based on selected state
         let (bg, fg, border) = if is_selected {
             let bg = if is_hovered() && !item_disabled {
@@ -388,18 +386,20 @@ pub fn IconToggleItem(
             } else {
                 Color::new_rgba(0, 0, 0, 0.0)
             };
-            (bg, t.colors.foreground.clone(), Some(t.colors.border.clone()))
+            (
+                bg,
+                t.colors.foreground.clone(),
+                Some(t.colors.border.clone()),
+            )
         };
-        
-        let mut final_style = base
-            .bg(&bg)
-            .text_color(&fg);
-        
+
+        let mut final_style = base.bg(&bg).text_color(&fg);
+
         // Add border for unselected state
         if let Some(border_color) = border {
             final_style = final_style.border(1, &border_color);
         }
-        
+
         // Add focus ring
         if is_focused() && !item_disabled {
             final_style = Style {
@@ -407,25 +407,25 @@ pub fn IconToggleItem(
                 ..final_style
             };
         }
-        
+
         final_style.build()
     });
-    
+
     // Combine with custom styles
     let final_style = if let Some(custom) = &style {
         format!("{} {}", item_style(), custom)
     } else {
         item_style()
     };
-    
+
     let class_name = class.clone().unwrap_or_default();
-    
+
     let handle_click = move |_| {
         if !disabled {
             context.toggle_value(&value);
         }
     };
-    
+
     rsx! {
         button {
             r#type: "button",

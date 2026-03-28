@@ -2,9 +2,9 @@
 //!
 //! A control that allows the user to toggle between checked and not checked.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Switch properties
 #[derive(Props, Clone, PartialEq)]
@@ -51,25 +51,25 @@ pub fn Switch(props: SwitchProps) -> Element {
     let mut is_checked = use_signal(|| props.checked);
     let mut is_hovered = use_signal(|| false);
     let mut is_focused = use_signal(|| false);
-    
+
     // Sync with prop changes
     use_effect(move || {
         is_checked.set(props.checked);
     });
-    
+
     let checked = is_checked();
     let disabled = props.disabled;
     let cursor_style = if disabled { "not-allowed" } else { "pointer" };
     let opacity_style = if disabled { "0.5" } else { "1" };
     let size = props.size.clone();
-    
+
     // Size configurations
     let (width, height, thumb_size) = match size {
         SwitchSize::Sm => (32, 18, 14),
         SwitchSize::Md => (44, 24, 20),
         SwitchSize::Lg => (56, 30, 26),
     };
-    
+
     let switch_style = use_style(move |t| {
         let base = Style::new()
             .w_px(width)
@@ -79,13 +79,13 @@ pub fn Switch(props: SwitchProps) -> Element {
             .cursor(if disabled { "not-allowed" } else { "pointer" })
             .transition("all 150ms ease")
             .border(0, &t.colors.border);
-        
+
         let styled = if checked {
             base.bg(&t.colors.primary)
         } else {
             base.bg(&t.colors.muted)
         };
-        
+
         let styled = if is_hovered() && !disabled {
             if checked {
                 styled.bg(&t.colors.primary.darken(0.1))
@@ -95,7 +95,7 @@ pub fn Switch(props: SwitchProps) -> Element {
         } else {
             styled
         };
-        
+
         let styled = if is_focused() && !disabled {
             Style {
                 box_shadow: Some(format!("0 0 0 2px {}", t.colors.ring.to_rgba())),
@@ -104,18 +104,18 @@ pub fn Switch(props: SwitchProps) -> Element {
         } else {
             styled
         };
-        
+
         let styled = if disabled {
             styled.opacity(0.5)
         } else {
             styled
         };
-        
+
         styled.build()
     });
-    
+
     let _thumb_offset = if checked { width - height + 2 } else { 2 };
-    
+
     let thumb_style = use_style(move |t| {
         Style::new()
             .absolute()
@@ -129,7 +129,7 @@ pub fn Switch(props: SwitchProps) -> Element {
             .shadow(&t.shadows.sm)
             .build()
     });
-    
+
     let handle_click = move |_| {
         if !disabled {
             let new_checked = !is_checked();
@@ -139,7 +139,7 @@ pub fn Switch(props: SwitchProps) -> Element {
             }
         }
     };
-    
+
     let switch_element = rsx! {
         button {
             r#type: "button",
@@ -153,28 +153,28 @@ pub fn Switch(props: SwitchProps) -> Element {
             onmouseleave: move |_| is_hovered.set(false),
             onfocus: move |_| is_focused.set(true),
             onblur: move |_| is_focused.set(false),
-            
+
             span {
                 style: "{thumb_style}",
             }
         }
     };
-    
+
     let label_element = if let Some(label_text) = props.label.clone() {
         rsx! {
             label {
                 style: "display: flex; align-items: center; gap: 12px; cursor: {cursor_style};",
                 {switch_element}
-                span { 
+                span {
                     style: "opacity: {opacity_style};",
-                    "{label_text}" 
+                    "{label_text}"
                 }
             }
         }
     } else {
         switch_element
     };
-    
+
     rsx! {
         {label_element}
     }

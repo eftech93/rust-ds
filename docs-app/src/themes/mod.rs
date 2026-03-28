@@ -1,9 +1,9 @@
 //! Theme documentation pages
 
 use dioxus::prelude::*;
+use dioxus_ui_system::atoms::{Box, Button, ButtonSize, ButtonVariant, HStack, VStack};
 use dioxus_ui_system::prelude::*;
-use dioxus_ui_system::atoms::{Box, VStack, HStack, Button, ButtonVariant, ButtonSize};
-use dioxus_ui_system::theme::{ThemeTokens, Color, ThemeMode};
+use dioxus_ui_system::theme::{Color, ThemeMode, ThemeTokens};
 
 /// Local storage key for custom theme
 const CUSTOM_THEME_STORAGE_KEY: &str = "dioxus_ui_custom_theme";
@@ -13,13 +13,13 @@ pub fn ThemesPage() -> Element {
     rsx! {
         VStack {
             style: "gap: 32px;",
-            
+
             Box {
                 h1 { style: "margin: 0 0 12px 0; font-size: 32px; font-weight: 800;", "Themes" }
-                p { style: "margin: 0; font-size: 16px; color: rgb(100,116,139);", 
+                p { style: "margin: 0; font-size: 16px; color: rgb(100,116,139);",
                     "Comprehensive theming system with preset themes and full customization support." }
             }
-            
+
             Box { style: "display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;",
                 DocCard { title: "Overview", description: "Understand the theme system", route: "/themes/overview" }
                 DocCard { title: "Design Tokens", description: "Learn about design tokens", route: "/themes/tokens" }
@@ -47,12 +47,12 @@ pub fn ThemeOverviewPage() -> Element {
     rsx! {
         VStack {
             style: "gap: 32px;",
-            
+
             h1 { style: "margin: 0; font-size: 32px; font-weight: 800;", "Theme System Overview" }
-            
+
             Section { title: "Introduction",
                 p { "Dioxus UI uses a type-safe theme system based on design tokens. Design tokens are named values that represent the visual properties of your design system." }
-                
+
                 ul {
                     li { "7 preset themes included (Light, Dark, Rose, Blue, Green, Violet, Orange)" }
                     li { "Type-safe design tokens in Rust" }
@@ -61,7 +61,7 @@ pub fn ThemeOverviewPage() -> Element {
                     li { "Automatic CSS variable generation" }
                 }
             }
-            
+
             Section { title: "Using Themes",
                 p { "Wrap your app with ThemeProvider:" }
                 CodeBlock { code: "#[component]
@@ -73,7 +73,7 @@ fn App() -> Element {{
     }}
 }}".to_string() }
             }
-            
+
             Section { title: "Theme Controls",
                 p { "Add theme toggle and selector to your app:" }
                 ExampleBox {
@@ -92,9 +92,9 @@ pub fn ThemeTokensPage() -> Element {
     rsx! {
         VStack {
             style: "gap: 32px;",
-            
+
             h1 { style: "margin: 0; font-size: 32px; font-weight: 800;", "Design Tokens" }
-            
+
             Section { title: "Color Tokens",
                 p { "Colors define the visual identity of your application:" }
                 TokenTable {
@@ -110,7 +110,7 @@ pub fn ThemeTokensPage() -> Element {
                     ]
                 }
             }
-            
+
             Section { title: "Spacing Tokens",
                 p { "Consistent spacing throughout your application:" }
                 TokenTable {
@@ -123,7 +123,7 @@ pub fn ThemeTokensPage() -> Element {
                     ]
                 }
             }
-            
+
             Section { title: "Typography Tokens",
                 p { "Text styles and font settings:" }
                 TokenTable {
@@ -146,7 +146,7 @@ pub fn ThemeTokensPage() -> Element {
 pub struct CustomThemeState {
     // Identity
     pub name: String,
-    
+
     // Colors
     pub background: String,
     pub foreground: String,
@@ -157,7 +157,7 @@ pub struct CustomThemeState {
     pub accent: String,
     pub destructive: String,
     pub border: String,
-    
+
     // Spacing (in pixels)
     pub spacing_unit: u8,
     pub spacing_xs: u8,
@@ -165,7 +165,7 @@ pub struct CustomThemeState {
     pub spacing_md: u8,
     pub spacing_lg: u8,
     pub spacing_xl: u8,
-    
+
     // Typography (in pixels)
     pub font_size_sm: u16,
     pub font_size_base: u16,
@@ -176,13 +176,13 @@ pub struct CustomThemeState {
     pub font_weight_semibold: u16,
     pub font_weight_bold: u16,
     pub line_height_normal: u16,
-    
+
     // Border Radius (in pixels)
     pub radius_sm: u8,
     pub radius_md: u8,
     pub radius_lg: u8,
     pub radius_xl: u8,
-    
+
     // Shadows
     pub shadow_sm: String,
     pub shadow_md: String,
@@ -232,7 +232,7 @@ impl CustomThemeState {
     fn to_theme_tokens(&self) -> ThemeTokens {
         let mut theme = ThemeTokens::light();
         theme.mode = ThemeMode::Brand(self.name.clone());
-        
+
         // Apply colors
         theme.colors.background = hex_to_color(&self.background);
         theme.colors.foreground = hex_to_color(&self.foreground);
@@ -263,68 +263,68 @@ impl CustomThemeState {
             Color::new(30, 41, 59)
         };
         theme.colors.popover_foreground = hex_to_color(&self.foreground);
-        
+
         // Apply spacing (u16 values)
         theme.spacing.xs = self.spacing_xs as u16;
         theme.spacing.sm = self.spacing_sm as u16;
         theme.spacing.md = self.spacing_md as u16;
         theme.spacing.lg = self.spacing_lg as u16;
         theme.spacing.xl = self.spacing_xl as u16;
-        
+
         // Apply typography - update each Typography struct
         let line_height = self.line_height_normal as f32 / 10.0;
-        
+
         theme.typography.xs.size = self.font_size_sm.saturating_sub(2);
         theme.typography.xs.weight = self.font_weight_normal;
         theme.typography.xs.line_height = line_height;
-        
+
         theme.typography.sm.size = self.font_size_sm;
         theme.typography.sm.weight = self.font_weight_normal;
         theme.typography.sm.line_height = line_height;
-        
+
         theme.typography.base.size = self.font_size_base;
         theme.typography.base.weight = self.font_weight_normal;
         theme.typography.base.line_height = line_height;
-        
+
         theme.typography.lg.size = self.font_size_lg;
         theme.typography.lg.weight = self.font_weight_normal;
         theme.typography.lg.line_height = line_height;
-        
+
         theme.typography.xl.size = self.font_size_xl;
         theme.typography.xl.weight = self.font_weight_medium;
         theme.typography.xl.line_height = line_height;
-        
+
         theme.typography.xxl.size = self.font_size_xl.saturating_add(4);
         theme.typography.xxl.weight = self.font_weight_semibold;
         theme.typography.xxl.line_height = 1.2;
-        
+
         theme.typography.h1.size = self.font_size_xl.saturating_add(12);
         theme.typography.h1.weight = self.font_weight_bold;
         theme.typography.h1.line_height = 1.2;
-        
+
         theme.typography.h2.size = self.font_size_xl.saturating_add(8);
         theme.typography.h2.weight = self.font_weight_bold;
         theme.typography.h2.line_height = 1.25;
-        
+
         theme.typography.h3.size = self.font_size_xl.saturating_add(4);
         theme.typography.h3.weight = self.font_weight_semibold;
         theme.typography.h3.line_height = 1.3;
-        
+
         theme.typography.h4.size = self.font_size_xl;
         theme.typography.h4.weight = self.font_weight_semibold;
         theme.typography.h4.line_height = 1.35;
-        
+
         // Apply border radius (u16 values)
         theme.radius.sm = self.radius_sm as u16;
         theme.radius.md = self.radius_md as u16;
         theme.radius.lg = self.radius_lg as u16;
         theme.radius.xl = self.radius_xl as u16;
-        
+
         // Apply shadows
         theme.shadows.sm = self.shadow_sm.clone();
         theme.shadows.md = self.shadow_md.clone();
         theme.shadows.lg = self.shadow_lg.clone();
-        
+
         theme
     }
 
@@ -332,16 +332,25 @@ impl CustomThemeState {
         let bg = hex_to_rgb(&self.background);
         let fg = hex_to_rgb(&self.foreground);
         let primary = hex_to_rgb(&self.primary);
-        let primary_fg = if is_light_color(&self.primary) { (0, 0, 0) } else { (255, 255, 255) };
+        let primary_fg = if is_light_color(&self.primary) {
+            (0, 0, 0)
+        } else {
+            (255, 255, 255)
+        };
         let secondary = hex_to_rgb(&self.secondary);
         let muted = hex_to_rgb(&self.muted);
         let muted_fg = hex_to_rgb(&self.muted_foreground);
         let accent = hex_to_rgb(&self.accent);
         let destructive = hex_to_rgb(&self.destructive);
         let border = hex_to_rgb(&self.border);
-        let card = if is_light_color(&self.background) { (255, 255, 255) } else { (30, 41, 59) };
-        
-        format!(r#"//! Custom Theme for Dioxus UI
+        let card = if is_light_color(&self.background) {
+            (255, 255, 255)
+        } else {
+            (30, 41, 59)
+        };
+
+        format!(
+            r#"//! Custom Theme for Dioxus UI
 //! 
 //! Theme Name: {name}
 //! Generated by Dioxus UI Theme Builder
@@ -453,17 +462,39 @@ pub fn custom_theme() -> ThemeTokens {{
 "#,
             name = self.name,
             mode = self.name.to_lowercase().replace(" ", "_"),
-            bg_r = bg.0, bg_g = bg.1, bg_b = bg.2,
-            fg_r = fg.0, fg_g = fg.1, fg_b = fg.2,
-            primary_r = primary.0, primary_g = primary.1, primary_b = primary.2,
-            primary_fg_r = primary_fg.0, primary_fg_g = primary_fg.1, primary_fg_b = primary_fg.2,
-            secondary_r = secondary.0, secondary_g = secondary.1, secondary_b = secondary.2,
-            muted_r = muted.0, muted_g = muted.1, muted_b = muted.2,
-            muted_fg_r = muted_fg.0, muted_fg_g = muted_fg.1, muted_fg_b = muted_fg.2,
-            accent_r = accent.0, accent_g = accent.1, accent_b = accent.2,
-            destructive_r = destructive.0, destructive_g = destructive.1, destructive_b = destructive.2,
-            border_r = border.0, border_g = border.1, border_b = border.2,
-            card_r = card.0, card_g = card.1, card_b = card.2,
+            bg_r = bg.0,
+            bg_g = bg.1,
+            bg_b = bg.2,
+            fg_r = fg.0,
+            fg_g = fg.1,
+            fg_b = fg.2,
+            primary_r = primary.0,
+            primary_g = primary.1,
+            primary_b = primary.2,
+            primary_fg_r = primary_fg.0,
+            primary_fg_g = primary_fg.1,
+            primary_fg_b = primary_fg.2,
+            secondary_r = secondary.0,
+            secondary_g = secondary.1,
+            secondary_b = secondary.2,
+            muted_r = muted.0,
+            muted_g = muted.1,
+            muted_b = muted.2,
+            muted_fg_r = muted_fg.0,
+            muted_fg_g = muted_fg.1,
+            muted_fg_b = muted_fg.2,
+            accent_r = accent.0,
+            accent_g = accent.1,
+            accent_b = accent.2,
+            destructive_r = destructive.0,
+            destructive_g = destructive.1,
+            destructive_b = destructive.2,
+            border_r = border.0,
+            border_g = border.1,
+            border_b = border.2,
+            card_r = card.0,
+            card_g = card.1,
+            card_b = card.2,
             spacing_unit = self.spacing_unit,
             spacing_xs = self.spacing_xs,
             spacing_sm = self.spacing_sm,
@@ -513,10 +544,13 @@ fn is_light_color(hex: &str) -> bool {
 pub fn CustomThemePage() -> Element {
     let theme = use_theme();
     let mut show_code = use_signal(|| false);
-    
+
     // Load from local storage or use default
     let mut theme_state = use_signal(|| {
-        if let Some(storage) = web_sys::window().and_then(|w| w.local_storage().ok()).flatten() {
+        if let Some(storage) = web_sys::window()
+            .and_then(|w| w.local_storage().ok())
+            .flatten()
+        {
             if let Ok(Some(json)) = storage.get_item(CUSTOM_THEME_STORAGE_KEY) {
                 if let Ok(state) = serde_json::from_str::<CustomThemeState>(&json) {
                     return state;
@@ -525,32 +559,35 @@ pub fn CustomThemePage() -> Element {
         }
         CustomThemeState::default()
     });
-    
+
     // Apply custom theme on load and when state changes
     use_effect(move || {
         let custom_theme = theme_state().to_theme_tokens();
         theme.set_theme.call(custom_theme);
-        
+
         // Save to local storage
-        if let Some(storage) = web_sys::window().and_then(|w| w.local_storage().ok()).flatten() {
+        if let Some(storage) = web_sys::window()
+            .and_then(|w| w.local_storage().ok())
+            .flatten()
+        {
             if let Ok(json) = serde_json::to_string(&theme_state()) {
                 let _ = storage.set_item(CUSTOM_THEME_STORAGE_KEY, &json);
             }
         }
     });
-    
+
     let generated_code = use_memo(move || theme_state().generate_rust_code());
-    
+
     rsx! {
         VStack {
             style: "gap: 32px;",
-            
+
             Box {
                 h1 { style: "margin: 0 0 12px 0; font-size: 32px; font-weight: 800;", "Theme Builder" }
-                p { style: "margin: 0; font-size: 16px; color: rgb(100,116,139);", 
+                p { style: "margin: 0; font-size: 16px; color: rgb(100,116,139);",
                     "Create, preview, and export your custom theme. Your theme is automatically saved to local storage." }
             }
-            
+
             // Theme Name Input
             Section { title: "Theme Name",
                 input {
@@ -564,12 +601,12 @@ pub fn CustomThemePage() -> Element {
                     },
                 }
             }
-            
+
             // Color Controls
             Section { title: "Colors",
                 p { style: "margin: 0 0 16px 0; color: rgb(100,116,139); font-size: 14px;",
                     "Click on any color to edit. The preview updates automatically." }
-                
+
                 ColorGrid {
                     ColorPicker {
                         label: "Background",
@@ -654,12 +691,12 @@ pub fn CustomThemePage() -> Element {
                     }
                 }
             }
-            
+
             // Spacing Controls
             Section { title: "Spacing",
                 p { style: "margin: 0 0 16px 0; color: rgb(100,116,139); font-size: 14px;",
                     "Control the spacing scale used throughout your theme (in pixels):" }
-                
+
                 NumberGrid {
                     NumberInput {
                         label: "Unit",
@@ -729,12 +766,12 @@ pub fn CustomThemePage() -> Element {
                     }
                 }
             }
-            
+
             // Typography Controls
             Section { title: "Typography",
                 p { style: "margin: 0 0 16px 0; color: rgb(100,116,139); font-size: 14px;",
                     "Configure font sizes and weights:" }
-                
+
                 NumberGrid {
                     NumberInput {
                         label: "Font Size SM (px)",
@@ -781,7 +818,7 @@ pub fn CustomThemePage() -> Element {
                         },
                     }
                 }
-                
+
                 NumberGrid {
                     NumberInput {
                         label: "Weight Normal",
@@ -832,7 +869,7 @@ pub fn CustomThemePage() -> Element {
                         },
                     }
                 }
-                
+
                 NumberGrid {
                     NumberInput {
                         label: "Line Height",
@@ -847,12 +884,12 @@ pub fn CustomThemePage() -> Element {
                     }
                 }
             }
-            
+
             // Border Radius Controls
             Section { title: "Border Radius",
                 p { style: "margin: 0 0 16px 0; color: rgb(100,116,139); font-size: 14px;",
                     "Control corner roundness (in pixels):" }
-                
+
                 NumberGrid {
                     NumberInput {
                         label: "Small",
@@ -900,12 +937,12 @@ pub fn CustomThemePage() -> Element {
                     }
                 }
             }
-            
+
             // Shadows Controls
             Section { title: "Shadows",
                 p { style: "margin: 0 0 16px 0; color: rgb(100,116,139); font-size: 14px;",
                     "Configure shadow effects (CSS box-shadow values):" }
-                
+
                 ShadowInput {
                     label: "Small Shadow",
                     value: theme_state().shadow_sm.clone(),
@@ -934,31 +971,31 @@ pub fn CustomThemePage() -> Element {
                     },
                 }
             }
-            
+
             // Live Preview
             Section { title: "Live Preview",
                 p { style: "margin: 0 0 16px 0; color: rgb(100,116,139); font-size: 14px;",
                     "See how your theme looks with real components:" }
-                
+
                 ThemePreview {}
             }
-            
+
             // Export Code
             Section { title: "Export Theme",
                 p { style: "margin: 0 0 16px 0; color: rgb(100,116,139); font-size: 14px;",
                     "Copy this code to your project as custom_theme.rs:" }
-                
+
                 Button {
                     variant: ButtonVariant::Primary,
                     size: ButtonSize::Sm,
                     onclick: move |_| show_code.set(!show_code()),
                     if show_code() { "Hide Code" } else { "Show Generated Code" }
                 }
-                
+
                 if show_code() {
                     Box {
                         style: "margin-top: 16px; position: relative;",
-                        
+
                         Button {
                             variant: ButtonVariant::Secondary,
                             size: ButtonSize::Sm,
@@ -971,7 +1008,7 @@ pub fn CustomThemePage() -> Element {
                             },
                             "Copy to Clipboard"
                         }
-                        
+
                         pre {
                             style: "background: rgb(15,23,42); color: rgb(226,232,240); padding: 16px; border-radius: 8px; font-size: 13px; overflow-x: auto; max-height: 500px; overflow-y: auto;",
                             code { "{generated_code()}" }
@@ -979,12 +1016,12 @@ pub fn CustomThemePage() -> Element {
                     }
                 }
             }
-            
+
             // Reset Button
             Section { title: "Reset",
                 p { style: "margin: 0 0 16px 0; color: rgb(100,116,139); font-size: 14px;",
                     "Reset to default theme:" }
-                
+
                 HStack { gap: SpacingSize::Sm,
                     Button {
                         variant: ButtonVariant::Secondary,
@@ -994,7 +1031,7 @@ pub fn CustomThemePage() -> Element {
                         },
                         "Reset to Default"
                     }
-                    
+
                     Button {
                         variant: ButtonVariant::Destructive,
                         size: ButtonSize::Sm,
@@ -1034,16 +1071,16 @@ struct ColorPickerProps {
 fn ColorPicker(props: ColorPickerProps) -> Element {
     let mut show_picker = use_signal(|| false);
     let value = props.value.clone();
-    
+
     rsx! {
         div {
             style: "display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid rgb(226,232,240); border-radius: 8px; background: white; box-sizing: border-box; min-height: 72px;",
-            
+
             // Color swatch button
             div {
                 style: "width: 40px; height: 40px; border-radius: 6px; overflow: hidden; cursor: pointer; flex-shrink: 0; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); background-color: {value}; position: relative;",
                 onclick: move |_| show_picker.set(true),
-                
+
                 // Hidden color input that we trigger programmatically
                 input {
                     r#type: "color",
@@ -1057,16 +1094,16 @@ fn ColorPicker(props: ColorPickerProps) -> Element {
                     onchange: move |_| show_picker.set(false),
                 }
             }
-            
+
             // Label and hex input
             div {
                 style: "flex: 1; min-width: 0;",
-                
+
                 div {
                     style: "font-size: 13px; font-weight: 500; margin-bottom: 4px; color: rgb(71,85,105); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;",
                     "{props.label}"
                 }
-                
+
                 input {
                     r#type: "text",
                     value: "{value}",
@@ -1084,14 +1121,14 @@ fn ThemePreview() -> Element {
         Card {
             variant: CardVariant::Default,
             padding: Some("24px".to_string()),
-            
+
             VStack { gap: SpacingSize::Lg,
                 // Typography showcase
                 VStack { gap: SpacingSize::Sm,
                     h4 { style: "margin: 0; font-size: 14px; color: rgb(100,116,139);", "Typography" }
                     div {
                         style: "padding: 16px; background: rgb(248,250,252); border-radius: 8px;",
-                        
+
                         VStack { gap: SpacingSize::Xs,
                             span { style: "font-size: var(--font-size-sm);", "Small text (sm)" }
                             span { style: "font-size: var(--font-size-base); font-weight: var(--font-weight-normal);", "Base text (normal)" }
@@ -1101,9 +1138,9 @@ fn ThemePreview() -> Element {
                         }
                     }
                 }
-                
+
                 Separator {}
-                
+
                 // Primary buttons showcase
                 VStack { gap: SpacingSize::Sm,
                     h4 { style: "margin: 0; font-size: 14px; color: rgb(100,116,139);", "Buttons" }
@@ -1114,15 +1151,15 @@ fn ThemePreview() -> Element {
                         Button { variant: ButtonVariant::Ghost, "Ghost" }
                     }
                 }
-                
+
                 Separator {}
-                
+
                 // Spacing showcase
                 VStack { gap: SpacingSize::Sm,
                     h4 { style: "margin: 0; font-size: 14px; color: rgb(100,116,139);", "Spacing Scale" }
                     div {
                         style: "padding: 16px; background: rgb(248,250,252); border-radius: 8px;",
-                        
+
                         VStack { gap: SpacingSize::Xs,
                             div { style: "display: flex; align-items: center; gap: 8px;",
                                 span { style: "width: 60px; font-size: 12px; color: rgb(100,116,139);", "XS:" }
@@ -1147,9 +1184,9 @@ fn ThemePreview() -> Element {
                         }
                     }
                 }
-                
+
                 Separator {}
-                
+
                 // Border radius showcase
                 VStack { gap: SpacingSize::Sm,
                     h4 { style: "margin: 0; font-size: 14px; color: rgb(100,116,139);", "Border Radius" }
@@ -1160,9 +1197,9 @@ fn ThemePreview() -> Element {
                         div { style: "width: 60px; height: 40px; background: rgb(59,130,246); border-radius: var(--radius-xl); display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;", "XL" }
                     }
                 }
-                
+
                 Separator {}
-                
+
                 // Badges showcase
                 VStack { gap: SpacingSize::Sm,
                     h4 { style: "margin: 0; font-size: 14px; color: rgb(100,116,139);", "Badges" }
@@ -1174,9 +1211,9 @@ fn ThemePreview() -> Element {
                         Badge { variant: BadgeVariant::Destructive, "Destructive" }
                     }
                 }
-                
+
                 Separator {}
-                
+
                 // Alert showcase
                 VStack { gap: SpacingSize::Sm,
                     h4 { style: "margin: 0; font-size: 14px; color: rgb(100,116,139);", "Alert" }
@@ -1191,9 +1228,9 @@ fn ThemePreview() -> Element {
                         "Your theme has been updated!"
                     }
                 }
-                
+
                 Separator {}
-                
+
                 // Input showcase
                 VStack { gap: SpacingSize::Sm,
                     h4 { style: "margin: 0; font-size: 14px; color: rgb(100,116,139);", "Input" }
@@ -1204,9 +1241,9 @@ fn ThemePreview() -> Element {
                         onchange: move |_| {},
                     }
                 }
-                
+
                 Separator {}
-                
+
                 // Card showcase
                 VStack { gap: SpacingSize::Sm,
                     h4 { style: "margin: 0; font-size: 14px; color: rgb(100,116,139);", "Card Variants" }
@@ -1247,15 +1284,15 @@ fn NumberInput(props: NumberInputProps) -> Element {
     rsx! {
         div {
             style: "padding: 12px; border: 1px solid rgb(226,232,240); border-radius: 8px; background: white; min-width: 0;",
-            
+
             div {
                 style: "font-size: 13px; font-weight: 500; margin-bottom: 8px; color: rgb(71,85,105); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;",
                 "{props.label}"
             }
-            
+
             div {
                 style: "display: flex; align-items: center; gap: 8px; min-width: 0;",
-                
+
                 input {
                     r#type: "range",
                     min: "{props.min}",
@@ -1269,7 +1306,7 @@ fn NumberInput(props: NumberInputProps) -> Element {
                         }
                     },
                 }
-                
+
                 input {
                     r#type: "number",
                     min: "{props.min}",
@@ -1298,25 +1335,25 @@ struct ShadowInputProps {
 #[component]
 fn ShadowInput(props: ShadowInputProps) -> Element {
     let value = props.value.clone();
-    
+
     rsx! {
         div {
             style: "padding: 12px; border: 1px solid rgb(226,232,240); border-radius: 8px; background: white; margin-bottom: 12px;",
-            
+
             div {
                 style: "font-size: 13px; font-weight: 500; margin-bottom: 8px; color: rgb(71,85,105);",
                 "{props.label}"
             }
-            
+
             div {
                 style: "display: flex; align-items: center; gap: 12px;",
-                
+
                 // Preview box with shadow
                 div {
                     style: "width: 60px; height: 40px; background: white; border-radius: 4px; flex-shrink: 0;",
                     style: "box-shadow: {value};",
                 }
-                
+
                 input {
                     r#type: "text",
                     value: "{value}",
@@ -1332,7 +1369,7 @@ fn ShadowInput(props: ShadowInputProps) -> Element {
 pub fn PresetThemesPage() -> Element {
     let theme = use_theme();
     let mut selected_theme = use_signal(|| "light".to_string());
-    
+
     // Update selected theme when theme changes
     use_effect(move || {
         let current = theme.tokens.read();
@@ -1350,26 +1387,75 @@ pub fn PresetThemesPage() -> Element {
         };
         selected_theme.set(name.to_string());
     });
-    
+
     let presets = vec![
-        ("light", "Light", "Clean and bright default theme", "rgb(255,255,255)", "rgb(15,23,42)", "rgb(59,130,246)"),
-        ("dark", "Dark", "Easy on the eyes for low light", "rgb(15,23,42)", "rgb(248,250,252)", "rgb(59,130,246)"),
-        ("rose", "Rose", "Warm and inviting pink tones", "rgb(255,241,242)", "rgb(136,19,55)", "rgb(225,29,72)"),
-        ("blue", "Blue", "Professional and trustworthy", "rgb(239,246,255)", "rgb(30,58,138)", "rgb(37,99,235)"),
-        ("green", "Green", "Fresh and natural feel", "rgb(240,253,244)", "rgb(20,83,45)", "rgb(22,163,74)"),
-        ("violet", "Violet", "Creative and imaginative", "rgb(245,243,255)", "rgb(76,29,149)", "rgb(124,58,237)"),
-        ("orange", "Orange", "Energetic and vibrant", "rgb(255,247,237)", "rgb(124,45,18)", "rgb(234,88,12)"),
+        (
+            "light",
+            "Light",
+            "Clean and bright default theme",
+            "rgb(255,255,255)",
+            "rgb(15,23,42)",
+            "rgb(59,130,246)",
+        ),
+        (
+            "dark",
+            "Dark",
+            "Easy on the eyes for low light",
+            "rgb(15,23,42)",
+            "rgb(248,250,252)",
+            "rgb(59,130,246)",
+        ),
+        (
+            "rose",
+            "Rose",
+            "Warm and inviting pink tones",
+            "rgb(255,241,242)",
+            "rgb(136,19,55)",
+            "rgb(225,29,72)",
+        ),
+        (
+            "blue",
+            "Blue",
+            "Professional and trustworthy",
+            "rgb(239,246,255)",
+            "rgb(30,58,138)",
+            "rgb(37,99,235)",
+        ),
+        (
+            "green",
+            "Green",
+            "Fresh and natural feel",
+            "rgb(240,253,244)",
+            "rgb(20,83,45)",
+            "rgb(22,163,74)",
+        ),
+        (
+            "violet",
+            "Violet",
+            "Creative and imaginative",
+            "rgb(245,243,255)",
+            "rgb(76,29,149)",
+            "rgb(124,58,237)",
+        ),
+        (
+            "orange",
+            "Orange",
+            "Energetic and vibrant",
+            "rgb(255,247,237)",
+            "rgb(124,45,18)",
+            "rgb(234,88,12)",
+        ),
     ];
-    
+
     rsx! {
         VStack {
             style: "gap: 32px;",
-            
+
             h1 { style: "margin: 0; font-size: 32px; font-weight: 800;", "Preset Themes" }
-            
+
             Section { title: "Available Themes",
                 p { "Dioxus UI includes 7 preset themes ready to use. Click on any theme to apply it:" }
-                
+
                 Box { style: "display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;",
                     for (id, name, description, bg, text, accent) in presets.clone() {
                         ThemeCard {
@@ -1388,7 +1474,7 @@ pub fn PresetThemesPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Live Preview",
                 p { "See how your selected theme looks with real components:" }
                 ExampleBox {
@@ -1405,15 +1491,15 @@ pub fn PresetThemesPage() -> Element {
                             Badge { variant: BadgeVariant::Success, "Success" }
                             Badge { variant: BadgeVariant::Destructive, "Error" }
                         }
-                        Alert { 
-                            variant: AlertVariant::Default, 
+                        Alert {
+                            variant: AlertVariant::Default,
                             title: Some("Theme Preview".to_string()),
                             "This is how alerts appear with the current theme."
                         }
                     }
                 }
             }
-            
+
             Section { title: "Applying Themes Programmatically",
                 p { "Switch between themes in your code:" }
                 CodeBlock { code: "// Get current theme context
@@ -1451,7 +1537,7 @@ fn ThemeCard(props: ThemeCardProps) -> Element {
     } else {
         "border: 1px solid rgb(226,232,240);"
     };
-    
+
     let badge = if props.is_selected {
         rsx! {
             div {
@@ -1462,26 +1548,26 @@ fn ThemeCard(props: ThemeCardProps) -> Element {
     } else {
         rsx! {}
     };
-    
+
     let hover_style = if !props.is_selected {
         "&:hover { border-color: rgb(156,163,175); }"
     } else {
         ""
     };
-    
+
     rsx! {
         div {
             style: "position: relative; cursor: pointer; border-radius: 12px; overflow: hidden; transition: all 0.2s; {border_style} {hover_style}",
             onclick: move |_| props.on_select.call(()),
-            
+
             {badge}
-            
+
             div {
                 style: "height: 80px; background: {props.bg}; display: flex; align-items: center; justify-content: center; gap: 8px;",
                 div { style: "width: 24px; height: 24px; border-radius: 6px; background: {props.text};" }
                 div { style: "width: 24px; height: 24px; border-radius: 6px; background: {props.accent};" }
             }
-            
+
             div {
                 style: "padding: 16px;",
                 h3 { style: "margin: 0 0 4px 0; font-size: 16px; font-weight: 600;", "{props.name}" }
@@ -1525,7 +1611,7 @@ fn TokenTable(tokens: Vec<(&'static str, &'static str)>) -> Element {
     rsx! {
         table {
             style: "width: 100%; border-collapse: collapse; font-size: 14px;",
-            
+
             thead {
                 tr {
                     style: "background: rgb(248,250,252);",
@@ -1533,7 +1619,7 @@ fn TokenTable(tokens: Vec<(&'static str, &'static str)>) -> Element {
                     th { style: "text-align: left; padding: 12px; border-bottom: 1px solid rgb(226,232,240); font-weight: 600;", "Description" }
                 }
             }
-            
+
             tbody {
                 for (token, desc) in tokens {
                     tr {

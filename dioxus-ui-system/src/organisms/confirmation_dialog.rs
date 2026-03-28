@@ -2,9 +2,9 @@
 //!
 //! Critical decision dialogs with clear action labeling.
 
-use dioxus::prelude::*;
-use crate::theme::use_theme;
 use crate::molecules::Dialog;
+use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 /// Confirmation dialog properties
 #[derive(Props, Clone, PartialEq)]
@@ -58,7 +58,7 @@ impl ConfirmVariant {
             ConfirmVariant::Success => ("#22c55e", "#16a34a"),
         }
     }
-    
+
     fn default_icon(&self) -> &'static str {
         match self {
             ConfirmVariant::Danger => "🗑️",
@@ -73,43 +73,47 @@ impl ConfirmVariant {
 #[component]
 pub fn ConfirmationDialog(props: ConfirmationDialogProps) -> Element {
     let theme = use_theme();
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let (bg_color, _hover_color) = props.variant.colors();
-    let icon = props.icon.unwrap_or_else(|| props.variant.default_icon().to_string());
-    
+    let icon = props
+        .icon
+        .unwrap_or_else(|| props.variant.default_icon().to_string());
+
     rsx! {
         Dialog {
             open: props.open,
             on_close: props.on_close.clone(),
             title: props.title.clone(),
-            
+
             div {
                 class: "confirmation-dialog{class_css}",
                 style: "text-align: center; padding: 24px 0;",
-                
+
                 // Icon
                 div {
                     class: "confirmation-dialog-icon",
                     style: "width: 64px; height: 64px; margin: 0 auto 24px; border-radius: 50%; background: {bg_color}20; display: flex; align-items: center; justify-content: center; font-size: 32px;",
                     "{icon}"
                 }
-                
+
                 // Message
                 p {
                     class: "confirmation-dialog-message",
                     style: "margin: 0 0 32px 0; font-size: 16px; line-height: 1.6; color: {theme.tokens.read().colors.foreground.to_rgba()};",
                     "{props.message}"
                 }
-                
+
                 // Actions
                 div {
                     class: "confirmation-dialog-actions",
                     style: "display: flex; gap: 12px; justify-content: center;",
-                    
+
                     button {
                         type: "button",
                         class: "confirmation-dialog-cancel",
@@ -117,27 +121,27 @@ pub fn ConfirmationDialog(props: ConfirmationDialogProps) -> Element {
                         onclick: move |_| props.on_close.call(()),
                         "{props.cancel_text.clone().unwrap_or_else(|| \"Cancel\".to_string())}"
                     }
-                    
+
                     button {
                         type: "button",
                         class: "confirmation-dialog-confirm",
                         style: format!("padding: 12px 24px; font-size: 14px; font-weight: 500; color: white; background: {bg_color}; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s ease; opacity: {};", if props.loading { "0.7" } else { "1" }),
                         disabled: props.loading,
                         onclick: move |_| props.on_confirm.call(()),
-                        
+
                         if props.loading {
                             span {
                                 style: "display: inline-block; margin-right: 8px; animation: spin 1s linear infinite;",
                                 "⟳"
                             }
                         }
-                        
+
                         "{props.confirm_text.clone().unwrap_or_else(|| \"Confirm\".to_string())}"
                     }
                 }
             }
         }
-        
+
 
     }
 }
@@ -187,43 +191,43 @@ pub struct UnsavedChangesDialogProps {
 #[component]
 pub fn UnsavedChangesDialog(props: UnsavedChangesDialogProps) -> Element {
     let theme = use_theme();
-    
+
     rsx! {
         Dialog {
             open: props.open,
             on_close: props.on_close,
             title: "Unsaved changes",
-            
+
             div {
                 style: "text-align: center; padding: 24px 0;",
-                
+
                 div {
                     style: "width: 64px; height: 64px; margin: 0 auto 24px; border-radius: 50%; background: #f59e0b20; display: flex; align-items: center; justify-content: center; font-size: 32px;",
                     "⚠️"
                 }
-                
+
                 p {
                     style: "margin: 0 0 32px 0; font-size: 16px; line-height: 1.6; color: {theme.tokens.read().colors.foreground.to_rgba()};",
                     "You have unsaved changes. What would you like to do?"
                 }
-                
+
                 div {
                     style: "display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;",
-                    
+
                     button {
                         type: "button",
                         style: "padding: 12px 24px; font-size: 14px; font-weight: 500; color: {theme.tokens.read().colors.foreground.to_rgba()}; background: white; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px; cursor: pointer;",
                         onclick: move |_| props.on_close.call(()),
                         "Keep editing"
                     }
-                    
+
                     button {
                         type: "button",
                         style: "padding: 12px 24px; font-size: 14px; font-weight: 500; color: white; background: #ef4444; border: none; border-radius: 8px; cursor: pointer;",
                         onclick: move |_| props.on_discard.call(()),
                         "Discard changes"
                     }
-                    
+
                     button {
                         type: "button",
                         style: "padding: 12px 24px; font-size: 14px; font-weight: 500; color: white; background: {theme.tokens.read().colors.primary.to_rgba()}; border: none; border-radius: 8px; cursor: pointer;",

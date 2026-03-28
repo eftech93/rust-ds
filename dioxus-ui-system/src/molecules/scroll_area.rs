@@ -4,9 +4,9 @@
 //! Supports vertical, horizontal, and bidirectional scrolling with
 //! customizable scrollbar appearance.
 
-use dioxus::prelude::*;
-use crate::theme::use_style;
 use crate::styles::Style;
+use crate::theme::use_style;
+use dioxus::prelude::*;
 
 /// Scroll orientation options
 #[derive(Default, Clone, PartialEq)]
@@ -73,38 +73,41 @@ pub struct ScrollAreaProps {
 pub fn ScrollArea(props: ScrollAreaProps) -> Element {
     let orientation = props.orientation.clone();
     let auto_hide = props.auto_hide;
-    let scrollbar_size_val = props.scrollbar_size.clone().unwrap_or_else(|| "8px".to_string());
+    let scrollbar_size_val = props
+        .scrollbar_size
+        .clone()
+        .unwrap_or_else(|| "8px".to_string());
     let max_height = props.max_height.clone();
     let max_width = props.max_width.clone();
-    
+
     // Generate scrollbar colors from theme
     let scrollbar_colors = use_style(|t| {
         let thumb_color = t.colors.border.darken(0.2);
         let thumb_hover_color = t.colors.muted_foreground.clone();
         let track_color = t.colors.muted.lighten(0.5);
         let corner_color = t.colors.background.clone();
-        
+
         (thumb_color, thumb_hover_color, track_color, corner_color)
     });
-    
+
     // Build the base container style
     let container_style = use_style(move |t| {
         let (thumb_color, _thumb_hover, track_color, _corner_color) = scrollbar_colors().clone();
-        
+
         // Set overflow based on orientation
         let (overflow_x, overflow_y) = match orientation {
             ScrollOrientation::Vertical => ("hidden", "auto"),
             ScrollOrientation::Horizontal => ("auto", "hidden"),
             ScrollOrientation::Both => ("auto", "auto"),
         };
-        
+
         let mut style = Style::new()
             .w_full()
             .h_full()
             .overflow_hidden() // Will be overridden by inline styles for specific axes
             .rounded(&t.radius, "md")
             .bg(&t.colors.background);
-        
+
         // Add max dimensions if specified
         if let Some(ref max_h) = max_height {
             style = Style {
@@ -112,17 +115,17 @@ pub fn ScrollArea(props: ScrollAreaProps) -> Element {
                 ..style
             };
         }
-        
+
         if let Some(ref max_w) = max_width {
             style = Style {
                 max_width: Some(max_w.clone()),
                 ..style
             };
         }
-        
+
         // Build base style string
         let base_style = style.build();
-        
+
         // Add CSS custom properties for scrollbar theming
         format!(
             "{} --scrollbar-thumb: {}; --scrollbar-track: {}; --scrollbar-size: {}; overflow-x: {}; overflow-y: {}; scrollbar-width: thin; scrollbar-color: {} {};",
@@ -136,19 +139,23 @@ pub fn ScrollArea(props: ScrollAreaProps) -> Element {
             track_color.to_rgba()
         )
     });
-    
+
     // Build WebKit scrollbar styles
     let webkit_styles = use_style(move |t| {
-        let (thumb_color, thumb_hover_color, track_color, corner_color) = scrollbar_colors().clone();
-        let size = props.scrollbar_size.clone().unwrap_or_else(|| "8px".to_string());
-        
+        let (thumb_color, thumb_hover_color, track_color, corner_color) =
+            scrollbar_colors().clone();
+        let size = props
+            .scrollbar_size
+            .clone()
+            .unwrap_or_else(|| "8px".to_string());
+
         let hover_opacity = if auto_hide { "0" } else { "1" };
         let hover_transition = if auto_hide {
             "transition: opacity 0.2s ease;"
         } else {
             ""
         };
-        
+
         format!(
             r#"
             .scroll-area::-webkit-scrollbar {{
@@ -190,14 +197,14 @@ pub fn ScrollArea(props: ScrollAreaProps) -> Element {
             hover_opacity = hover_opacity,
         )
     });
-    
+
     let custom_class = props.class.clone().unwrap_or_default();
     let custom_style = props.style.clone().unwrap_or_default();
-    
+
     rsx! {
         // Inject WebKit scrollbar styles
         style { "{webkit_styles}" }
-        
+
         div {
             class: "scroll-area {custom_class}",
             style: "{container_style} {custom_style}",
@@ -235,10 +242,10 @@ pub fn ScrollViewport(props: ScrollViewportProps) -> Element {
             .p(&t.spacing, "md")
             .build()
     });
-    
+
     let custom_class = props.class.clone().unwrap_or_default();
     let custom_style = props.style.clone().unwrap_or_default();
-    
+
     rsx! {
         div {
             class: "scroll-viewport {custom_class}",

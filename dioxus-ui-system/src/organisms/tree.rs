@@ -3,9 +3,9 @@
 //! A hierarchical tree view for displaying nested data with expand/collapse,
 //! selection, and optional connector lines.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Tree node data structure for recursive tree representation
 #[derive(Clone, PartialEq)]
@@ -200,7 +200,11 @@ fn TreeNode(props: TreeNodeProps) -> Element {
             .py(&t.spacing, "xs")
             .px(&t.spacing, "sm")
             .rounded(&t.radius, "md")
-            .cursor(if is_disabled { "not-allowed" } else { "pointer" })
+            .cursor(if is_disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .transition("all 150ms ease")
             .opacity(if is_disabled { 0.5 } else { 1.0 });
 
@@ -212,23 +216,15 @@ fn TreeNode(props: TreeNodeProps) -> Element {
             base.bg(&t.colors.primary)
                 .text_color(&t.colors.primary_foreground)
         } else if is_hovered() && !is_disabled {
-            base.bg(&t.colors.muted)
-                .text_color(&t.colors.foreground)
+            base.bg(&t.colors.muted).text_color(&t.colors.foreground)
         } else {
-            base.bg_transparent()
-                .text_color(&t.colors.foreground)
+            base.bg_transparent().text_color(&t.colors.foreground)
         };
 
         base.build()
     });
 
-    let children_container_style = use_style(|_| {
-        Style::new()
-            .w_full()
-            .flex()
-            .flex_col()
-            .build()
-    });
+    let children_container_style = use_style(|_| Style::new().w_full().flex().flex_col().build());
 
     let handle_select = {
         let node_id = node_id.clone();
@@ -357,13 +353,7 @@ fn TreeChevron() -> Element {
 #[component]
 fn TreeConnector(is_last: bool) -> Element {
     let _theme = use_theme();
-    let line_style = use_style(|t| {
-        Style::new()
-            .w_px(8)
-            .h_px(1)
-            .bg(&t.colors.border)
-            .build()
-    });
+    let line_style = use_style(|t| Style::new().w_px(8).h_px(1).bg(&t.colors.border).build());
 
     rsx! {
         span { style: "{line_style}" }
@@ -434,7 +424,7 @@ pub struct TreeNodeBuilderProps {
 }
 
 /// Stateful tree component with built-in state management
-/// 
+///
 /// This component manages its own state for selection and expansion,
 /// making it easier to use when you don't need external control.
 #[component]
@@ -445,7 +435,7 @@ pub fn TreeWithState(props: TreeProps) -> Element {
 
     // Determine which state to use - external (props) or internal (signals)
     let selected_id = props.selected_id.clone().or_else(|| internal_selected());
-    
+
     let expanded_ids = if props.expanded_ids.is_empty() {
         internal_expanded()
     } else {
@@ -462,20 +452,21 @@ pub fn TreeWithState(props: TreeProps) -> Element {
         })
     };
 
-    let on_toggle_expand: EventHandler<String> = if let Some(handler) = props.on_toggle_expand.clone() {
-        handler
-    } else {
-        let mut expanded = internal_expanded.clone();
-        EventHandler::new(move |id: String| {
-            expanded.with_mut(|exp| {
-                if exp.contains(&id) {
-                    exp.retain(|x| x != &id);
-                } else {
-                    exp.push(id);
-                }
-            });
-        })
-    };
+    let on_toggle_expand: EventHandler<String> =
+        if let Some(handler) = props.on_toggle_expand.clone() {
+            handler
+        } else {
+            let mut expanded = internal_expanded.clone();
+            EventHandler::new(move |id: String| {
+                expanded.with_mut(|exp| {
+                    if exp.contains(&id) {
+                        exp.retain(|x| x != &id);
+                    } else {
+                        exp.push(id);
+                    }
+                });
+            })
+        };
 
     rsx! {
         Tree {
@@ -513,8 +504,7 @@ mod tests {
         let leaf = TreeNodeData::new("1", "Leaf");
         assert!(leaf.is_leaf());
 
-        let parent = TreeNodeData::new("2", "Parent")
-            .with_child(TreeNodeData::new("2.1", "Child"));
+        let parent = TreeNodeData::new("2", "Parent").with_child(TreeNodeData::new("2.1", "Child"));
         assert!(!parent.is_leaf());
     }
 }

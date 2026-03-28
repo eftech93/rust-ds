@@ -3,9 +3,9 @@
 //! A time selection component with scrollable columns for hours, minutes,
 //! and optionally seconds. Supports 12h (AM/PM) and 24h formats.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Time picker properties
 #[derive(Props, Clone, PartialEq)]
@@ -144,10 +144,14 @@ pub fn TimePicker(props: TimePickerProps) -> Element {
     let mut is_open = use_signal(|| false);
 
     // Parse current value
-    let current_time = props.value.as_ref()
+    let current_time = props
+        .value
+        .as_ref()
         .and_then(|v| TimeValue::from_string(v, props.use_24h));
 
-    let class_css = props.class.as_ref()
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
@@ -185,11 +189,22 @@ pub fn TimePicker(props: TimePickerProps) -> Element {
             .h_px(40)
             .px(&t.spacing, "md")
             .rounded(&t.radius, "md")
-            .border(1, if has_error { &t.colors.destructive } else { &t.colors.border })
+            .border(
+                1,
+                if has_error {
+                    &t.colors.destructive
+                } else {
+                    &t.colors.border
+                },
+            )
             .bg(&t.colors.background)
             .text_color(&t.colors.foreground)
             .font_size(14)
-            .cursor(if is_disabled { "not-allowed" } else { "pointer" })
+            .cursor(if is_disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .inline_flex()
             .items_center()
             .justify_between()
@@ -217,7 +232,10 @@ pub fn TimePicker(props: TimePickerProps) -> Element {
     };
 
     let disabled_style = if props.disabled { "opacity: 0.5;" } else { "" };
-    let placeholder_text = props.placeholder.clone().unwrap_or_else(|| "Select time".to_string());
+    let placeholder_text = props
+        .placeholder
+        .clone()
+        .unwrap_or_else(|| "Select time".to_string());
 
     rsx! {
         div {
@@ -346,12 +364,7 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
             .build()
     });
 
-    let columns_container_style = use_style(|_| {
-        Style::new()
-            .flex()
-            .gap_px(8)
-            .build()
-    });
+    let columns_container_style = use_style(|_| Style::new().flex().gap_px(8).build());
 
     let column_style = use_style(|_| {
         Style::new()
@@ -392,9 +405,7 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
     };
 
     // Generate minute options based on step
-    let minute_options: Vec<u32> = (0..60)
-        .step_by(props.minute_step as usize)
-        .collect();
+    let minute_options: Vec<u32> = (0..60).step_by(props.minute_step as usize).collect();
 
     // Generate second options
     let second_options: Vec<u32> = (0..60).step_by(5).collect();
@@ -658,17 +669,17 @@ struct TimePickerNowButtonProps {
 fn TimePickerNowButton(props: TimePickerNowButtonProps) -> Element {
     let theme = use_theme();
     let mut is_hovered = use_signal(|| false);
-    
+
     let bg_color = if is_hovered() {
         theme.tokens.read().colors.muted.to_rgba()
     } else {
         "transparent".to_string()
     };
-    
+
     rsx! {
         div {
             style: "display: flex; justify-content: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid {theme.tokens.read().colors.border.to_rgba()};",
-            
+
             button {
                 type: "button",
                 style: "font-size: 13px; font-weight: 500; color: {theme.tokens.read().colors.primary.to_rgba()}; background: {bg_color}; border: none; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 100ms ease;",
@@ -717,7 +728,9 @@ pub fn TimeInput(props: TimeInputProps) -> Element {
         input_value.set(props.value.clone().unwrap_or_default());
     });
 
-    let class_css = props.class.as_ref()
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
@@ -731,7 +744,11 @@ pub fn TimeInput(props: TimeInputProps) -> Element {
             .bg(&t.colors.background)
             .text_color(&t.colors.foreground)
             .font_size(14)
-            .cursor(if props.disabled { "not-allowed" } else { "text" })
+            .cursor(if props.disabled {
+                "not-allowed"
+            } else {
+                "text"
+            })
             .transition("all 150ms ease")
             .outline("none")
             .build()
@@ -741,7 +758,8 @@ pub fn TimeInput(props: TimeInputProps) -> Element {
         let value = e.value();
 
         // Basic validation - allow only digits and colons
-        let filtered: String = value.chars()
+        let filtered: String = value
+            .chars()
             .filter(|c| c.is_ascii_digit() || *c == ':')
             .collect();
 
@@ -756,9 +774,15 @@ pub fn TimeInput(props: TimeInputProps) -> Element {
     };
 
     let placeholder = if props.show_seconds {
-        props.placeholder.clone().unwrap_or_else(|| "HH:MM:SS".to_string())
+        props
+            .placeholder
+            .clone()
+            .unwrap_or_else(|| "HH:MM:SS".to_string())
     } else {
-        props.placeholder.clone().unwrap_or_else(|| "HH:MM".to_string())
+        props
+            .placeholder
+            .clone()
+            .unwrap_or_else(|| "HH:MM".to_string())
     };
 
     rsx! {
@@ -782,7 +806,12 @@ fn format_time_input(input: &str, show_seconds: bool) -> String {
         match digits.len() {
             0..=2 => digits,
             3..=4 => format!("{}:{}", &digits[..2], &digits[2..]),
-            _ => format!("{}:{}:{}", &digits[..2], &digits[2..4], &digits[4..6.min(digits.len())]),
+            _ => format!(
+                "{}:{}:{}",
+                &digits[..2],
+                &digits[2..4],
+                &digits[4..6.min(digits.len())]
+            ),
         }
     } else {
         match digits.len() {
@@ -800,7 +829,11 @@ fn is_valid_time(input: &str, show_seconds: bool) -> bool {
         if parts.len() != 3 {
             return false;
         }
-        if let (Ok(h), Ok(m), Ok(s)) = (parts[0].parse::<u32>(), parts[1].parse::<u32>(), parts[2].parse::<u32>()) {
+        if let (Ok(h), Ok(m), Ok(s)) = (
+            parts[0].parse::<u32>(),
+            parts[1].parse::<u32>(),
+            parts[2].parse::<u32>(),
+        ) {
             h <= 23 && m <= 59 && s <= 59
         } else {
             false
@@ -840,7 +873,12 @@ mod tests {
 
     #[test]
     fn test_time_value_to_string() {
-        let time = TimeValue { hour: 2, minute: 30, second: 0, is_pm: true };
+        let time = TimeValue {
+            hour: 2,
+            minute: 30,
+            second: 0,
+            is_pm: true,
+        };
         assert_eq!(time.to_string(true, false), "14:30");
         assert_eq!(time.to_string(false, false), "02:30");
     }

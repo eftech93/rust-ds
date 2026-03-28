@@ -24,7 +24,7 @@ impl ChartDataPoint {
             color: None,
         }
     }
-    
+
     /// Create a new data point with color
     pub fn with_color(label: impl Into<String>, value: f64, color: Color) -> Self {
         Self {
@@ -55,15 +55,21 @@ impl ChartSeries {
             data,
         }
     }
-    
+
     /// Get the minimum value in this series
     pub fn min_value(&self) -> f64 {
-        self.data.iter().map(|p| p.value).fold(f64::INFINITY, f64::min)
+        self.data
+            .iter()
+            .map(|p| p.value)
+            .fold(f64::INFINITY, f64::min)
     }
-    
+
     /// Get the maximum value in this series
     pub fn max_value(&self) -> f64 {
-        self.data.iter().map(|p| p.value).fold(f64::NEG_INFINITY, f64::max)
+        self.data
+            .iter()
+            .map(|p| p.value)
+            .fold(f64::NEG_INFINITY, f64::max)
     }
 }
 
@@ -97,7 +103,7 @@ impl ChartMargin {
             left: margin,
         }
     }
-    
+
     /// Create margins with only horizontal/vertical
     pub fn symmetric(vertical: u16, horizontal: u16) -> Self {
         Self {
@@ -213,7 +219,7 @@ impl ChartTooltip {
             ..Default::default()
         }
     }
-    
+
     /// Create a tooltip with custom values
     pub fn with_custom_values(values: std::collections::HashMap<String, String>) -> Self {
         Self {
@@ -222,7 +228,7 @@ impl ChartTooltip {
             ..Default::default()
         }
     }
-    
+
     /// Disable tooltip
     pub fn disabled() -> Self {
         Self {
@@ -230,25 +236,25 @@ impl ChartTooltip {
             ..Default::default()
         }
     }
-    
+
     /// Get tooltip content for a data point
     pub fn get_content(&self, point: &ChartDataPoint, series_name: Option<&str>) -> String {
         // Use custom formatter if provided
         if let Some(formatter) = self.formatter {
             return formatter(point, series_name);
         }
-        
+
         // Build tooltip content
         let mut parts = Vec::new();
-        
+
         // Series name
         if self.show_series_name && series_name.is_some() {
             parts.push(series_name.unwrap().to_string());
         }
-        
+
         // Label
         parts.push(point.label.clone());
-        
+
         // Value
         if self.show_value {
             let value_str = if let Some(format) = self.value_format {
@@ -258,7 +264,7 @@ impl ChartTooltip {
             };
             parts.push(format!(": {}", value_str));
         }
-        
+
         parts.join("")
     }
 }
@@ -312,19 +318,19 @@ pub fn calculate_nice_ticks(min: f64, max: f64, count: u8) -> Vec<f64> {
     if min == max {
         return vec![min];
     }
-    
+
     let range = max - min;
     let step = nice_number(range / count as f64, false);
     let nice_min = (min / step).floor() * step;
     let nice_max = (max / step).ceil() * step;
-    
+
     let mut ticks = Vec::new();
     let mut current = nice_min;
     while current <= nice_max + step / 2.0 {
         ticks.push(current);
         current += step;
     }
-    
+
     ticks
 }
 
@@ -332,13 +338,29 @@ pub fn calculate_nice_ticks(min: f64, max: f64, count: u8) -> Vec<f64> {
 fn nice_number(x: f64, round: bool) -> f64 {
     let exp = x.log10().floor() as i32;
     let f = x / 10.0_f64.powi(exp);
-    
+
     let nf = if round {
-        if f < 1.5 { 1.0 } else if f < 3.0 { 2.0 } else if f < 7.0 { 5.0 } else { 10.0 }
+        if f < 1.5 {
+            1.0
+        } else if f < 3.0 {
+            2.0
+        } else if f < 7.0 {
+            5.0
+        } else {
+            10.0
+        }
     } else {
-        if f <= 1.0 { 1.0 } else if f <= 2.0 { 2.0 } else if f <= 5.0 { 5.0 } else { 10.0 }
+        if f <= 1.0 {
+            1.0
+        } else if f <= 2.0 {
+            2.0
+        } else if f <= 5.0 {
+            5.0
+        } else {
+            10.0
+        }
     };
-    
+
     nf * 10.0_f64.powi(exp)
 }
 
@@ -375,22 +397,29 @@ pub fn calculate_smooth_line(points: &[(f64, f64)]) -> String {
     if points.len() < 2 {
         return String::new();
     }
-    
+
     let mut path = format!("M {},{} ", points[0].0, points[0].1);
-    
+
     for i in 1..points.len() {
         let prev = if i > 0 { points[i - 1] } else { points[0] };
         let curr = points[i];
-        let next = if i < points.len() - 1 { points[i + 1] } else { curr };
-        
+        let next = if i < points.len() - 1 {
+            points[i + 1]
+        } else {
+            curr
+        };
+
         let cp1x = prev.0 + (curr.0 - prev.0) * 0.5;
         let cp1y = prev.1;
         let cp2x = curr.0 - (next.0 - prev.0) * 0.5;
         let cp2y = curr.1;
-        
-        path.push_str(&format!("C {},{} {},{} {},{} ", cp1x, cp1y, cp2x, cp2y, curr.0, curr.1));
+
+        path.push_str(&format!(
+            "C {},{} {},{} {},{} ",
+            cp1x, cp1y, cp2x, cp2y, curr.0, curr.1
+        ));
     }
-    
+
     path
 }
 
@@ -399,15 +428,19 @@ pub fn calculate_area_path(points: &[(f64, f64)], baseline_y: f64) -> String {
     if points.is_empty() {
         return String::new();
     }
-    
+
     let mut path = format!("M {},{} ", points[0].0, baseline_y);
     path.push_str(&format!("L {},{} ", points[0].0, points[0].1));
-    
+
     for i in 1..points.len() {
         path.push_str(&format!("L {},{} ", points[i].0, points[i].1));
     }
-    
-    path.push_str(&format!("L {},{} Z", points[points.len() - 1].0, baseline_y));
+
+    path.push_str(&format!(
+        "L {},{} Z",
+        points[points.len() - 1].0,
+        baseline_y
+    ));
     path
 }
 
@@ -438,7 +471,7 @@ mod tests {
             ChartDataPoint::new("C", 30.0),
         ];
         let series = ChartSeries::new("Test", Color::new(0, 0, 255), data);
-        
+
         assert_eq!(series.name, "Test");
         assert_eq!(series.min_value(), 10.0);
         assert_eq!(series.max_value(), 30.0);

@@ -4,10 +4,12 @@
 
 #![allow(unpredictable_function_pointer_comparisons)]
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
+use crate::atoms::{
+    Button, ButtonSize, ButtonVariant, Icon, IconColor, IconSize, Label, TextColor, TextSize,
+};
 use crate::styles::Style;
-use crate::atoms::{Label, TextSize, TextColor, Button, ButtonVariant, ButtonSize, Icon, IconSize, IconColor};
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Filter option for custom filters
 #[derive(Clone, PartialEq)]
@@ -164,20 +166,15 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
             .overflow_hidden()
             .build()
     });
-    
+
     let final_style = if let Some(custom) = &props.style {
         format!("{} {}", style(), custom)
     } else {
         style()
     };
-    
-    let table_style = use_style(|t| {
-        Style::new()
-            .w_full()
-            .text(&t.typography, "sm")
-            .build()
-    });
-    
+
+    let table_style = use_style(|t| Style::new().w_full().text(&t.typography, "sm").build());
+
     let toolbar_style = use_style(|t| {
         Style::new()
             .flex()
@@ -190,7 +187,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
             .gap(&t.spacing, "sm")
             .build()
     });
-    
+
     let search_container_style = use_style(|t| {
         Style::new()
             .flex()
@@ -198,7 +195,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
             .gap(&t.spacing, "sm")
             .build()
     });
-    
+
     let filters_container_style = use_style(|t| {
         Style::new()
             .flex()
@@ -206,10 +203,10 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
             .gap(&t.spacing, "sm")
             .build()
     });
-    
-    let show_toolbar = (props.show_search && props.on_search_change.is_some()) || 
-                       (props.show_filters && !props.filters.is_empty() && props.on_filter_change.is_some());
-    
+
+    let show_toolbar = (props.show_search && props.on_search_change.is_some())
+        || (props.show_filters && !props.filters.is_empty() && props.on_filter_change.is_some());
+
     // Loading state (without toolbar)
     if props.loading {
         return rsx! {
@@ -226,7 +223,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
             }
         };
     }
-    
+
     // Empty state (without toolbar)
     if props.data.is_empty() {
         return rsx! {
@@ -243,21 +240,21 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
             }
         };
     }
-    
+
     let columns = props.columns.clone();
     let data = props.data.clone();
     let selectable = props.selectable;
     let selected_keys = props.selected_keys.clone();
     let search_query = props.search_query.clone().unwrap_or_default();
-    
+
     rsx! {
         div {
             style: "{final_style}",
-            
+
             if show_toolbar {
                 div {
                     style: "{toolbar_style}",
-                    
+
                     if props.show_search && props.on_search_change.is_some() {
                         div {
                             style: "{search_container_style} flex: 1;",
@@ -295,7 +292,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
                             }
                         }
                     }
-                    
+
                     if props.show_filters && !props.filters.is_empty() && props.on_filter_change.is_some() {
                         div {
                             style: "{filters_container_style}",
@@ -310,10 +307,10 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
                     }
                 }
             }
-            
+
             table {
                 style: "{table_style}",
-                
+
                 DataTableHeader {
                     columns: columns.clone(),
                     selectable: selectable,
@@ -321,7 +318,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
                     total_count: data.len(),
                     on_select_all: props.on_selection_change.clone(),
                 }
-                
+
                 tbody {
                     for row in data {
                         DataTableRow {
@@ -353,10 +350,10 @@ pub fn DataTableFilter(props: DataTableFilterProps) -> Element {
     let filter = props.filter.clone();
     let active_value = props.active_value.clone();
     let has_value = !active_value.is_empty();
-    
+
     rsx! {
         select {
-            style: if has_value { 
+            style: if has_value {
                 "padding: 8px 12px; border: 1px solid rgb(59,130,246); border-radius: 6px; font-size: 14px; background: white; cursor: pointer; outline: none; color: rgb(15,23,42);"
             } else {
                 "padding: 8px 12px; border: 1px solid rgb(226,232,240); border-radius: 6px; font-size: 14px; background: white; cursor: pointer; outline: none; color: rgb(100,116,139);"
@@ -395,7 +392,7 @@ pub struct DataTableHeaderProps<T: Clone + PartialEq + 'static> {
 #[component]
 pub fn DataTableHeader<T: Clone + PartialEq>(props: DataTableHeaderProps<T>) -> Element {
     let _theme = use_theme();
-    
+
     let header_style = use_style(|t| {
         Style::new()
             .bg(&t.colors.muted)
@@ -403,7 +400,7 @@ pub fn DataTableHeader<T: Clone + PartialEq>(props: DataTableHeaderProps<T>) -> 
             .font_weight(500)
             .build()
     });
-    
+
     let th_style = use_style(|t| {
         Style::new()
             .p(&t.spacing, "md")
@@ -411,13 +408,13 @@ pub fn DataTableHeader<T: Clone + PartialEq>(props: DataTableHeaderProps<T>) -> 
             .border_bottom(1, &t.colors.border)
             .build()
     });
-    
+
     let all_selected = props.selected_count == props.total_count && props.total_count > 0;
-    
+
     rsx! {
         thead {
             style: "{header_style}",
-            
+
             tr {
                 if props.selectable {
                     th {
@@ -431,11 +428,11 @@ pub fn DataTableHeader<T: Clone + PartialEq>(props: DataTableHeaderProps<T>) -> 
                         }
                     }
                 }
-                
+
                 for col in props.columns {
                     th {
                         style: "{th_style} text-align: {col.align.as_str()}; width: {col.width.clone().unwrap_or_default()};",
-                        
+
                         if col.sortable {
                             div {
                                 style: "display: inline-flex; align-items: center; gap: 4px; cursor: pointer;",
@@ -474,32 +471,29 @@ pub fn DataTableRow<T: Clone + PartialEq + 'static>(props: DataTableRowProps<T>)
     let _key = (props.key_extractor)(&props.row);
     let is_selected = props.is_selected;
     let _has_onclick = props.on_click.is_some();
-    
+
     let mut is_hovered = use_signal(|| false);
-    
+
     let row_style = use_style(move |t| {
         let base = Style::new()
             .border_bottom(1, &t.colors.border)
             .transition("background-color 150ms ease");
-            
+
         if is_selected {
             base.bg(&t.colors.primary.blend(&t.colors.background, 0.9))
         } else if is_hovered() {
             base.bg(&t.colors.muted)
         } else {
             base
-        }.build()
+        }
+        .build()
     });
-    
-    let td_style = use_style(|t| {
-        Style::new()
-            .p(&t.spacing, "md")
-            .build()
-    });
-    
+
+    let td_style = use_style(|t| Style::new().p(&t.spacing, "md").build());
+
     let row_data = props.row.clone();
     let onclick_handler = props.on_click.clone();
-    
+
     rsx! {
         tr {
             style: "{row_style}",
@@ -510,7 +504,7 @@ pub fn DataTableRow<T: Clone + PartialEq + 'static>(props: DataTableRowProps<T>)
                     handler.call(row_data.clone());
                 }
             },
-            
+
             if props.selectable {
                 td {
                     style: "width: 48px; padding: 12px;",
@@ -523,7 +517,7 @@ pub fn DataTableRow<T: Clone + PartialEq + 'static>(props: DataTableRowProps<T>)
                     }
                 }
             }
-            
+
             for col in props.columns {
                 DataTableCell {
                     row: props.row.clone(),
@@ -547,12 +541,12 @@ pub struct DataTableCellProps<T: Clone + PartialEq + 'static> {
 pub fn DataTableCell<T: Clone + PartialEq>(props: DataTableCellProps<T>) -> Element {
     let col = props.column.clone();
     let align = col.align.as_str();
-    
+
     // Get cell value using key
     let cell_content = if let Some(render_fn) = col.render {
         render_fn(&props.row)
     } else {
-        // Default: just show the value (in a real implementation, 
+        // Default: just show the value (in a real implementation,
         // we'd use reflection or require a trait to extract values)
         rsx! {
             Label {
@@ -561,7 +555,7 @@ pub fn DataTableCell<T: Clone + PartialEq>(props: DataTableCellProps<T>) -> Elem
             }
         }
     };
-    
+
     rsx! {
         td {
             style: "{props.base_style} text-align: {align};",
@@ -584,7 +578,7 @@ pub struct PaginationProps {
 pub fn Pagination(props: PaginationProps) -> Element {
     let current = props.current_page;
     let total = props.total_pages;
-    
+
     let container_style = use_style(|t| {
         Style::new()
             .flex()
@@ -595,26 +589,26 @@ pub fn Pagination(props: PaginationProps) -> Element {
             .border_top(1, &t.colors.border)
             .build()
     });
-    
+
     let info_style = use_style(|t| {
         Style::new()
             .text(&t.typography, "sm")
             .text_color(&t.colors.muted_foreground)
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{container_style}",
-            
+
             div {
                 style: "{info_style}",
                 "Page {current + 1} of {total}"
             }
-            
+
             div {
                 style: "display: flex; align-items: center; gap: 4px;",
-                
+
                 if props.show_first_last && current > 0 {
                     Button {
                         variant: ButtonVariant::Ghost,
@@ -627,7 +621,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         }
                     }
                 }
-                
+
                 Button {
                     variant: ButtonVariant::Ghost,
                     size: ButtonSize::Sm,
@@ -639,7 +633,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         color: IconColor::Current,
                     }
                 }
-                
+
                 Button {
                     variant: ButtonVariant::Ghost,
                     size: ButtonSize::Sm,
@@ -651,7 +645,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         color: IconColor::Current,
                     }
                 }
-                
+
                 if props.show_first_last && current < total - 1 {
                     Button {
                         variant: ButtonVariant::Ghost,
@@ -668,4 +662,3 @@ pub fn Pagination(props: PaginationProps) -> Element {
         }
     }
 }
-

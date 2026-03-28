@@ -2,10 +2,10 @@
 //!
 //! A dropdown that allows selecting multiple items with tag/chip display.
 
-use dioxus::prelude::*;
 use crate::atoms::select::SelectOption;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// MultiSelect properties
 #[derive(Props, Clone, PartialEq)]
@@ -52,7 +52,9 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
         selected_values.set(props.value.clone());
     });
 
-    let class_css = props.class.as_ref()
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
@@ -68,8 +70,8 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                 options
                     .iter()
                     .filter(|o| {
-                        o.label.to_lowercase().contains(&search) || 
-                        o.value.to_lowercase().contains(&search)
+                        o.label.to_lowercase().contains(&search)
+                            || o.value.to_lowercase().contains(&search)
                     })
                     .cloned()
                     .collect()
@@ -79,7 +81,10 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
 
     // Check if at max selection
     let is_at_max = move || {
-        props.max_selected.map(|max| selected_values().len() >= max).unwrap_or(false)
+        props
+            .max_selected
+            .map(|max| selected_values().len() >= max)
+            .unwrap_or(false)
     };
 
     // Toggle option selection
@@ -122,12 +127,12 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                 .filter(|o| !o.disabled)
                 .map(|o| o.value.clone())
                 .collect();
-            
+
             // Respect max_selected limit
             if let Some(max) = max_selected {
                 new_values.truncate(max);
             }
-            
+
             selected_values.set(new_values.clone());
             on_change.call(new_values);
         }
@@ -169,7 +174,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
         move |e: Event<dioxus::html::KeyboardData>| {
             use dioxus::html::input_data::keyboard_types::Key;
             let filtered = filtered_options();
-            
+
             match e.key() {
                 Key::ArrowDown => {
                     e.prevent_default();
@@ -194,7 +199,10 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                             if !option.disabled {
                                 toggle_option.call(option.value.clone());
                             }
-                        } else if creatable && !search_value().trim().is_empty() && highlighted_index() == filtered.len() {
+                        } else if creatable
+                            && !search_value().trim().is_empty()
+                            && highlighted_index() == filtered.len()
+                        {
                             create_option.call(());
                         }
                     } else {
@@ -224,7 +232,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
         } else {
             t.colors.border.to_rgba()
         };
-        
+
         Style::new()
             .w_full()
             .min_h_px(40)
@@ -237,9 +245,14 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             .flex_wrap()
             .items_center()
             .gap_px(6)
-            .cursor(if props.disabled { "not-allowed" } else { "pointer" })
+            .cursor(if props.disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .transition("all 150ms ease")
-            .build() + &format!("; border-color: {}", border_color)
+            .build()
+            + &format!("; border-color: {}", border_color)
     });
 
     // Container focus shadow style
@@ -313,8 +326,10 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
     let all_selected = move || {
         let filtered = filtered_options();
         let selected = selected_values();
-        !filtered.is_empty() && 
-        filtered.iter().all(|o| o.disabled || selected.contains(&o.value))
+        !filtered.is_empty()
+            && filtered
+                .iter()
+                .all(|o| o.disabled || selected.contains(&o.value))
     };
 
     // Check if any option is selected
@@ -322,12 +337,17 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
 
     // Can create new option from search
     let can_create = move || {
-        props.creatable && 
-        !search_value().trim().is_empty() &&
-        !options.iter().any(|o| o.label.to_lowercase() == search_value().trim().to_lowercase())
+        props.creatable
+            && !search_value().trim().is_empty()
+            && !options
+                .iter()
+                .any(|o| o.label.to_lowercase() == search_value().trim().to_lowercase())
     };
 
-    let placeholder_text = props.placeholder.clone().unwrap_or_else(|| "Select items...".to_string());
+    let placeholder_text = props
+        .placeholder
+        .clone()
+        .unwrap_or_else(|| "Select items...".to_string());
 
     // Colors for styling
     let muted_color = use_style(|t| t.colors.muted.to_rgba());
@@ -574,7 +594,7 @@ fn MultiSelectOptionItem(props: MultiSelectOptionItemProps) -> Element {
     } else {
         "transparent".to_string()
     };
-    
+
     let opacity = if props.is_disabled { "0.5" } else { "1" };
     let checkbox_border = if props.is_selected {
         props.primary_color.clone()
@@ -588,7 +608,7 @@ fn MultiSelectOptionItem(props: MultiSelectOptionItemProps) -> Element {
     };
     let value = props.option.value.clone();
     let idx = props.index;
-    
+
     rsx! {
         div {
             class: "multi-select-option",
@@ -647,7 +667,7 @@ fn MultiSelectCreateOptionItem(props: MultiSelectCreateOptionItemProps) -> Eleme
     } else {
         "transparent".to_string()
     };
-    
+
     rsx! {
         div {
             class: "multi-select-create",

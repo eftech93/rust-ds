@@ -4,11 +4,11 @@
 
 #![allow(unpredictable_function_pointer_comparisons)]
 
-use dioxus::prelude::*;
-use crate::theme::use_theme;
+use crate::atoms::Box;
 use crate::organisms::charts::common::*;
 use crate::theme::tokens::Color;
-use crate::atoms::Box;
+use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 /// Pie chart variant
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -85,10 +85,10 @@ pub struct PieChartProps {
 pub fn PieChart(props: PieChartProps) -> Element {
     let theme = use_theme();
     let tokens = theme.tokens.read();
-    
+
     // Tooltip state
     let mut tooltip_state = use_signal(|| None as Option<(i32, i32, String)>);
-    
+
     if props.data.is_empty() {
         return rsx! {
             Box {
@@ -101,10 +101,10 @@ pub fn PieChart(props: PieChartProps) -> Element {
             }
         };
     }
-    
+
     // Calculate total value
     let total: f64 = props.data.iter().map(|p| p.value.abs()).sum();
-    
+
     if total == 0.0 {
         return rsx! {
             Box {
@@ -117,31 +117,35 @@ pub fn PieChart(props: PieChartProps) -> Element {
             }
         };
     }
-    
+
     // Default colors from theme
     let default_colors = vec![
         tokens.colors.primary.clone(),
-        Color::new(59, 130, 246),   // Blue
-        Color::new(34, 197, 94),    // Green
-        Color::new(234, 179, 8),    // Yellow
-        Color::new(239, 68, 68),    // Red
-        Color::new(168, 85, 247),   // Purple
-        Color::new(236, 72, 153),   // Pink
-        Color::new(20, 184, 166),   // Teal
-        Color::new(249, 115, 22),   // Orange
-        Color::new(99, 102, 241),   // Indigo
+        Color::new(59, 130, 246), // Blue
+        Color::new(34, 197, 94),  // Green
+        Color::new(234, 179, 8),  // Yellow
+        Color::new(239, 68, 68),  // Red
+        Color::new(168, 85, 247), // Purple
+        Color::new(236, 72, 153), // Pink
+        Color::new(20, 184, 166), // Teal
+        Color::new(249, 115, 22), // Orange
+        Color::new(99, 102, 241), // Indigo
     ];
-    
+
     let colors = props.colors.clone().unwrap_or(default_colors);
-    
+
     // Calculate dimensions
     let svg_width = 400;
-    let svg_height = if props.variant == PieChartVariant::Gauge { 240 } else { 400 };
+    let svg_height = if props.variant == PieChartVariant::Gauge {
+        240
+    } else {
+        400
+    };
     let center_x = svg_width as f64 / 2.0;
-    let center_y = if props.variant == PieChartVariant::Gauge { 
-        svg_height as f64 * 0.85 
-    } else { 
-        svg_height as f64 / 2.0 
+    let center_y = if props.variant == PieChartVariant::Gauge {
+        svg_height as f64 * 0.85
+    } else {
+        svg_height as f64 / 2.0
     };
     let radius = if props.variant == PieChartVariant::Gauge {
         (svg_width.min(svg_height) as f64 / 2.0) * 0.8
@@ -149,7 +153,7 @@ pub fn PieChart(props: PieChartProps) -> Element {
         (svg_width.min(svg_height) as f64 / 2.0) * 0.85
     };
     let inner_radius = radius * props.inner_radius_pct as f64;
-    
+
     // Calculate angles for each slice
     let (start_angle_rad, end_angle_rad) = if props.variant == PieChartVariant::Gauge {
         (std::f64::consts::PI, 0.0)
@@ -157,47 +161,51 @@ pub fn PieChart(props: PieChartProps) -> Element {
         let start = props.start_angle as f64 * std::f64::consts::PI / 180.0;
         (start, start + 2.0 * std::f64::consts::PI)
     };
-    
+
     let total_angle = end_angle_rad - start_angle_rad;
     let gap_rad = props.slice_gap as f64 * std::f64::consts::PI / 180.0;
-    
+
     // Tooltip and related props
     let tooltip = props.tooltip.clone();
-    
+
     // Prepare slice data
     let mut current_angle = start_angle_rad;
     let mut slice_data = Vec::new();
-    
+
     for (idx, point) in props.data.iter().enumerate() {
         let percentage = point.value.abs() / total;
         let angle = total_angle * percentage;
         let sweep_angle = angle - gap_rad.max(0.0);
-        
+
         let start_a = current_angle;
         let end_a = current_angle + sweep_angle.max(0.01);
-        
+
         // Calculate path
-        let path = if props.variant == PieChartVariant::Donut || props.variant == PieChartVariant::Gauge {
-            create_arc_path(center_x, center_y, radius, inner_radius, start_a, end_a)
-        } else {
-            create_pie_slice_path(center_x, center_y, radius, start_a, end_a)
-        };
-        
+        let path =
+            if props.variant == PieChartVariant::Donut || props.variant == PieChartVariant::Gauge {
+                create_arc_path(center_x, center_y, radius, inner_radius, start_a, end_a)
+            } else {
+                create_pie_slice_path(center_x, center_y, radius, start_a, end_a)
+            };
+
         let color = point.color.clone().unwrap_or_else(|| {
-            colors.get(idx % colors.len()).cloned().unwrap_or_else(|| tokens.colors.primary.clone())
+            colors
+                .get(idx % colors.len())
+                .cloned()
+                .unwrap_or_else(|| tokens.colors.primary.clone())
         });
         let color_css = color.to_rgba();
-        
+
         // Calculate label position
         let mid_angle = (start_a + end_a) / 2.0;
         let label_radius = (radius + inner_radius) / 2.0;
         let label_x = center_x + mid_angle.cos() * label_radius;
         let label_y = center_y + mid_angle.sin() * label_radius;
-        
+
         // Calculate tooltip position (center of slice)
         let tooltip_x = center_x + mid_angle.cos() * ((radius + inner_radius) / 2.0);
         let tooltip_y = center_y + mid_angle.sin() * ((radius + inner_radius) / 2.0);
-        
+
         let pct = percentage * 100.0;
         let label_text = if let Some(formatter) = props.label_format {
             formatter(point, pct)
@@ -206,21 +214,32 @@ pub fn PieChart(props: PieChartProps) -> Element {
         } else {
             point.label.clone()
         };
-        
+
         // Generate tooltip content
         let tooltip_content = tooltip.get_content(point, None);
-        
-        slice_data.push((idx, path, color_css, label_x, label_y, label_text, point.clone(), tooltip_content, tooltip_x, tooltip_y));
+
+        slice_data.push((
+            idx,
+            path,
+            color_css,
+            label_x,
+            label_y,
+            label_text,
+            point.clone(),
+            tooltip_content,
+            tooltip_x,
+            tooltip_y,
+        ));
         current_angle += angle;
     }
-    
+
     let container_style = format!(
         "width: {}; height: {}; display: flex; align-items: center; justify-content: center; font-family: system-ui, -apple-system, sans-serif; position: relative; {}",
         props.width,
         props.height,
         props.style.as_deref().unwrap_or("")
     );
-    
+
     let flex_direction = match props.legend_position {
         LegendPosition::Top => "column",
         LegendPosition::Bottom => "column-reverse",
@@ -228,16 +247,18 @@ pub fn PieChart(props: PieChartProps) -> Element {
         LegendPosition::Right => "row",
         _ => "column",
     };
-    
+
     let show_labels = props.show_labels;
     let show_percentages = props.show_percentages;
     let on_slice_click = props.on_slice_click.clone();
     let legend_position = props.legend_position.clone();
     let title = props.title.clone();
     let variant = props.variant.clone();
-    
+
     // Pre-compute center text for donut/gauge
-    let center_text = if (variant == PieChartVariant::Donut || variant == PieChartVariant::Gauge) && show_percentages {
+    let center_text = if (variant == PieChartVariant::Donut || variant == PieChartVariant::Gauge)
+        && show_percentages
+    {
         let main_value = props.data.first().map(|p| p.value).unwrap_or(0.0);
         let main_pct = (main_value / total * 100.0) as i32;
         let label = if variant == PieChartVariant::Gauge {
@@ -245,25 +266,37 @@ pub fn PieChart(props: PieChartProps) -> Element {
         } else {
             format_compact_number(total)
         };
-        let y_offset = if variant == PieChartVariant::Gauge { -10.0 } else { 0.0 };
+        let y_offset = if variant == PieChartVariant::Gauge {
+            -10.0
+        } else {
+            0.0
+        };
         Some((label, y_offset))
     } else {
         None
     };
-    
+
     // Pre-compute legend items: (idx, color_css, label)
     let legend_items: Vec<(usize, String, String)> = if legend_position != LegendPosition::None {
-        props.data.iter().enumerate().map(|(idx, point)| {
-            let color = point.color.clone().unwrap_or_else(|| {
-                colors.get(idx % colors.len()).cloned().unwrap_or_else(|| tokens.colors.primary.clone())
-            });
-            let color_css = color.to_rgba();
-            (idx, color_css, point.label.clone())
-        }).collect()
+        props
+            .data
+            .iter()
+            .enumerate()
+            .map(|(idx, point)| {
+                let color = point.color.clone().unwrap_or_else(|| {
+                    colors
+                        .get(idx % colors.len())
+                        .cloned()
+                        .unwrap_or_else(|| tokens.colors.primary.clone())
+                });
+                let color_css = color.to_rgba();
+                (idx, color_css, point.label.clone())
+            })
+            .collect()
     } else {
         vec![]
     };
-    
+
     let legend_style = match legend_position {
         LegendPosition::Right => "display: flex; flex-direction: column; gap: 8px; margin-left: 16px;",
         LegendPosition::Left => "display: flex; flex-direction: column; gap: 8px; margin-right: 16px;",
@@ -271,12 +304,12 @@ pub fn PieChart(props: PieChartProps) -> Element {
         LegendPosition::Bottom => "display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; justify-content: center;",
         _ => "",
     };
-    
+
     // Tooltip styling
     let tooltip_bg = tokens.colors.popover.to_rgba();
     let tooltip_fg = tokens.colors.popover_foreground.to_rgba();
     let tooltip_border = tokens.colors.border.to_rgba();
-    
+
     rsx! {
         Box {
             width: Some(props.width.clone()),
@@ -285,7 +318,7 @@ pub fn PieChart(props: PieChartProps) -> Element {
             align_items: crate::atoms::AlignItems::Center,
             justify_content: crate::atoms::JustifyContent::Center,
             style: Some(format!("{container_style}; flex-direction: {flex_direction};")),
-            
+
             // Tooltip
             if tooltip.enabled {
                 if let Some((x, y, content)) = tooltip_state() {
@@ -295,7 +328,7 @@ pub fn PieChart(props: PieChartProps) -> Element {
                     }
                 }
             }
-            
+
             // Legend
             if legend_position != LegendPosition::None {
                 div {
@@ -312,13 +345,13 @@ pub fn PieChart(props: PieChartProps) -> Element {
                     }
                 }
             }
-            
+
             svg {
                 view_box: "0 0 {svg_width} {svg_height}",
                 width: "100%",
                 height: "100%",
                 preserve_aspect_ratio: "xMidYMid meet",
-                
+
                 // Title
                 if let Some(t) = title {
                     text {
@@ -331,7 +364,7 @@ pub fn PieChart(props: PieChartProps) -> Element {
                         "{t}"
                     }
                 }
-                
+
                 // Slices
                 for (idx, path, color_css, label_x, label_y, label_text, point, tooltip_content, _tooltip_x, _tooltip_y) in slice_data.clone() {
                     PieSlice {
@@ -354,7 +387,7 @@ pub fn PieChart(props: PieChartProps) -> Element {
                         })),
                     }
                 }
-                
+
                 // Center text
                 if let Some((label, y_offset)) = center_text {
                     text {
@@ -395,7 +428,7 @@ fn PieSlice(props: PieSliceProps) -> Element {
     let on_click = props.on_slice_click.clone();
     let point = props.point.clone();
     let tooltip_content = props.tooltip_content.clone();
-    
+
     rsx! {
         g {
             key: "{props.idx}",
@@ -447,9 +480,13 @@ fn create_pie_slice_path(cx: f64, cy: f64, r: f64, start_angle: f64, end_angle: 
     let y1 = cy + r * start_angle.sin();
     let x2 = cx + r * end_angle.cos();
     let y2 = cy + r * end_angle.sin();
-    
-    let large_arc = if end_angle - start_angle > std::f64::consts::PI { 1 } else { 0 };
-    
+
+    let large_arc = if end_angle - start_angle > std::f64::consts::PI {
+        1
+    } else {
+        0
+    };
+
     format!(
         "M {},{} L {},{} A {},{} 0 {},1 {},{} Z",
         cx, cy, x1, y1, r, r, large_arc, x2, y2
@@ -457,26 +494,48 @@ fn create_pie_slice_path(cx: f64, cy: f64, r: f64, start_angle: f64, end_angle: 
 }
 
 /// Create an arc path (for donut/gauge)
-fn create_arc_path(cx: f64, cy: f64, outer_r: f64, inner_r: f64, start_angle: f64, end_angle: f64) -> String {
+fn create_arc_path(
+    cx: f64,
+    cy: f64,
+    outer_r: f64,
+    inner_r: f64,
+    start_angle: f64,
+    end_angle: f64,
+) -> String {
     let outer_x1 = cx + outer_r * start_angle.cos();
     let outer_y1 = cy + outer_r * start_angle.sin();
     let outer_x2 = cx + outer_r * end_angle.cos();
     let outer_y2 = cy + outer_r * end_angle.sin();
-    
+
     let inner_x1 = cx + inner_r * start_angle.cos();
     let inner_y1 = cy + inner_r * start_angle.sin();
     let inner_x2 = cx + inner_r * end_angle.cos();
     let inner_y2 = cy + inner_r * end_angle.sin();
-    
-    let large_arc = if end_angle - start_angle > std::f64::consts::PI { 1 } else { 0 };
-    
+
+    let large_arc = if end_angle - start_angle > std::f64::consts::PI {
+        1
+    } else {
+        0
+    };
+
     format!(
         "M {},{} L {},{} A {},{} 0 {},1 {},{} L {},{} A {},{} 0 {},0 {},{} Z",
-        inner_x1, inner_y1,
-        outer_x1, outer_y1,
-        outer_r, outer_r, large_arc, outer_x2, outer_y2,
-        inner_x2, inner_y2,
-        inner_r, inner_r, large_arc, inner_x1, inner_y1
+        inner_x1,
+        inner_y1,
+        outer_x1,
+        outer_y1,
+        outer_r,
+        outer_r,
+        large_arc,
+        outer_x2,
+        outer_y2,
+        inner_x2,
+        inner_y2,
+        inner_r,
+        inner_r,
+        large_arc,
+        inner_x1,
+        inner_y1
     )
 }
 
@@ -484,26 +543,16 @@ fn create_arc_path(cx: f64, cy: f64, outer_r: f64, inner_r: f64, start_angle: f6
 #[component]
 pub fn DonutChart(
     data: Vec<ChartDataPoint>,
-    #[props(default)]
-    title: Option<String>,
-    #[props(default = "100%".to_string())]
-    width: String,
-    #[props(default = "300px".to_string())]
-    height: String,
-    #[props(default = 0.6)]
-    inner_radius_pct: f32,
-    #[props(default = true)]
-    show_center_text: bool,
-    #[props(default)]
-    legend_position: LegendPosition,
-    #[props(default)]
-    on_slice_click: Option<EventHandler<ChartDataPoint>>,
-    #[props(default)]
-    style: Option<String>,
-    #[props(default)]
-    colors: Option<Vec<Color>>,
-    #[props(default)]
-    tooltip: ChartTooltip,
+    #[props(default)] title: Option<String>,
+    #[props(default = "100%".to_string())] width: String,
+    #[props(default = "300px".to_string())] height: String,
+    #[props(default = 0.6)] inner_radius_pct: f32,
+    #[props(default = true)] show_center_text: bool,
+    #[props(default)] legend_position: LegendPosition,
+    #[props(default)] on_slice_click: Option<EventHandler<ChartDataPoint>>,
+    #[props(default)] style: Option<String>,
+    #[props(default)] colors: Option<Vec<Color>>,
+    #[props(default)] tooltip: ChartTooltip,
 ) -> Element {
     rsx! {
         PieChart {
@@ -527,24 +576,15 @@ pub fn DonutChart(
 #[component]
 pub fn GaugeChart(
     data: Vec<ChartDataPoint>,
-    #[props(default)]
-    title: Option<String>,
-    #[props(default = "100%".to_string())]
-    width: String,
-    #[props(default = "200px".to_string())]
-    height: String,
-    #[props(default = 0.7)]
-    inner_radius_pct: f32,
-    #[props(default)]
-    legend_position: LegendPosition,
-    #[props(default)]
-    on_slice_click: Option<EventHandler<ChartDataPoint>>,
-    #[props(default)]
-    style: Option<String>,
-    #[props(default)]
-    colors: Option<Vec<Color>>,
-    #[props(default)]
-    tooltip: ChartTooltip,
+    #[props(default)] title: Option<String>,
+    #[props(default = "100%".to_string())] width: String,
+    #[props(default = "200px".to_string())] height: String,
+    #[props(default = 0.7)] inner_radius_pct: f32,
+    #[props(default)] legend_position: LegendPosition,
+    #[props(default)] on_slice_click: Option<EventHandler<ChartDataPoint>>,
+    #[props(default)] style: Option<String>,
+    #[props(default)] colors: Option<Vec<Color>>,
+    #[props(default)] tooltip: ChartTooltip,
 ) -> Element {
     rsx! {
         PieChart {

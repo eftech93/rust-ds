@@ -15,18 +15,18 @@
 
 use axum::{response::Html, routing::get, Router};
 use dioxus::prelude::*;
-use dioxus_ui_system::atoms::{Box, HStack, SpacingSize, AlignItems, JustifyContent};
+use dioxus_ui_system::atoms::{AlignItems, Box, HStack, JustifyContent, SpacingSize};
 use example_shared::{ComponentShowcaseInner, LayoutShowcaseInner};
 
 #[tokio::main]
 async fn main() {
     // Initialize logging
     dioxus::logger::init(tracing::Level::INFO).unwrap();
-    
+
     // Try different ports starting from 3000
     let ports = [3000, 3001, 3002, 3003, 8080];
     let mut listener = None;
-    
+
     for port in ports {
         match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", port)).await {
             Ok(l) => {
@@ -39,14 +39,14 @@ async fn main() {
             }
         }
     }
-    
+
     let listener = listener.expect("Could not bind to any port");
-    
+
     // Build the router
     let app = Router::new()
         .route("/", get(root_handler))
         .route("/static/*path", get(static_handler));
-    
+
     // Start the server
     axum::serve(listener, app).await.unwrap();
 }
@@ -57,7 +57,7 @@ async fn root_handler() -> Html<String> {
     let html = dioxus::ssr::render_element(rsx! {
         App {}
     });
-    
+
     // Wrap in a full HTML document
     let full_html = format!(
         r#"<!DOCTYPE html>
@@ -92,7 +92,7 @@ async fn root_handler() -> Html<String> {
 </html>"#,
         html
     );
-    
+
     Html(full_html)
 }
 
@@ -110,42 +110,40 @@ fn App() -> Element {
     }
 }
 
-
-
 /// App with view switcher for Components and Layouts
 #[component]
 fn AppWithViewSwitcher() -> Element {
     let mut current_view = use_signal(|| "components".to_string());
-    
+
     rsx! {
         Box {
             style: "font-family: 'Inter', system-ui, -apple-system, sans-serif;",
-            
+
             // SSR Banner with View Switcher
             HStack {
                 style: "background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 24px;",
                 align: AlignItems::Center,
                 justify: JustifyContent::SpaceBetween,
-                
+
                 HStack {
                     align: AlignItems::Center,
                     gap: SpacingSize::Md,
-                    
+
                     span {
                         style: "font-weight: 600;",
                         "🔥 SSR"
                     }
-                    
+
                     // View buttons
                     HStack {
                         gap: SpacingSize::Sm,
-                        
+
                         ViewButton {
                             label: "Components",
                             is_active: current_view() == "components",
                             onclick: move || current_view.set("components".to_string()),
                         }
-                        
+
                         ViewButton {
                             label: "Layouts",
                             is_active: current_view() == "layouts",
@@ -153,20 +151,20 @@ fn AppWithViewSwitcher() -> Element {
                         }
                     }
                 }
-                
+
                 HStack {
                     align: AlignItems::Center,
                     gap: SpacingSize::Md,
-                    
+
                     ThemeSelector {}
-                    
+
                     span {
                         style: "font-size: 12px; opacity: 0.8;",
                         "Dioxus UI System"
                     }
                 }
             }
-            
+
             // Main content
             if current_view() == "components" {
                 ComponentShowcaseInner {}
@@ -187,9 +185,17 @@ struct ViewButtonProps {
 
 #[component]
 fn ViewButton(props: ViewButtonProps) -> Element {
-    let bg_color = if props.is_active { "rgba(255,255,255,0.2)" } else { "transparent" };
-    let border = if props.is_active { "1px solid rgba(255,255,255,0.4)" } else { "1px solid transparent" };
-    
+    let bg_color = if props.is_active {
+        "rgba(255,255,255,0.2)"
+    } else {
+        "transparent"
+    };
+    let border = if props.is_active {
+        "1px solid rgba(255,255,255,0.4)"
+    } else {
+        "1px solid transparent"
+    };
+
     rsx! {
         button {
             style: "padding: 6px 14px; border-radius: 6px; border: {border}; background: {bg_color}; color: white; cursor: pointer; font-weight: 500; font-size: 14px; transition: all 150ms;",

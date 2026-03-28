@@ -6,29 +6,28 @@
 pub mod layout_showcase;
 
 use dioxus::prelude::*;
-use dioxus_ui_system::prelude::*;
-use dioxus_ui_system::organisms::*;
-use dioxus_ui_system::atoms::{StepState, StepSize, TextWeight};
-use dioxus_ui_system::atoms::{Box, VStack, HStack, SpacingSize, AlignItems, JustifyContent};
-use dioxus_ui_system::molecules::{StepItem, HorizontalStepper, VerticalStepper};
-use dioxus_ui_system::organisms::{TableColumn, ColumnAlign, TableFilter, FilterOption};
+use dioxus_ui_system::atoms::{AlignItems, Box, HStack, JustifyContent, SpacingSize, VStack};
+use dioxus_ui_system::atoms::{
+    AspectRatio, AspectRatios, DatePicker, InputTag, NumberInput, Rating, Slider, Toggle,
+    ToggleVariant,
+};
+use dioxus_ui_system::atoms::{StepSize, StepState, TextWeight};
 use dioxus_ui_system::molecules::{
-    Command, CommandInput, CommandList, CommandGroup, CommandItem, CommandEmpty, 
-    Sheet, MultiSelect, ContextMenu, ContextMenuTrigger, ContextMenuContent, ContextMenuItem, 
-    HoverCard, HoverCardHeader, HoverCardContent, Sonner, ToastPosition, use_sonner, 
-    Collapsible, ToggleGroup, ToggleGroupType, ToggleItem,
-    OtpInput, TimePicker, Combobox, ComboboxOption, Pagination, PaginationInfo,
-    QrCode, QrCodeLevel,
-    ListGroup, ListItem, ListItemVariant,
+    use_sonner, Collapsible, Combobox, ComboboxOption, Command, CommandEmpty, CommandGroup,
+    CommandInput, CommandItem, CommandList, ContextMenu, ContextMenuContent, ContextMenuItem,
+    ContextMenuTrigger, HoverCard, HoverCardContent, HoverCardHeader, ListGroup, ListItem,
+    ListItemVariant, MultiSelect, OtpInput, Pagination, PaginationInfo, QrCode, QrCodeLevel, Sheet,
+    Sonner, TimePicker, ToastPosition, ToggleGroup, ToggleGroupType, ToggleItem,
 };
+use dioxus_ui_system::molecules::{HorizontalStepper, StepItem, VerticalStepper};
+use dioxus_ui_system::organisms::*;
 use dioxus_ui_system::organisms::{
-    Tree, TreeNodeData, SimpleCarousel, CarouselOptions, 
-    ResizablePanelGroup, ResizablePanel, ResizableHandle, Direction,
-    SimpleKanban, KanbanColumn, KanbanCard, MinimalRichText,
-    Calendar, CalendarMode, Tour, TourStep, WizardStep,
-    SimpleTimeline, TimelineEvent,
+    Calendar, CalendarMode, CarouselOptions, Direction, KanbanCard, KanbanColumn, MinimalRichText,
+    ResizableHandle, ResizablePanel, ResizablePanelGroup, SimpleCarousel, SimpleKanban,
+    SimpleTimeline, TimelineEvent, Tour, TourStep, Tree, TreeNodeData, WizardStep,
 };
-use dioxus_ui_system::atoms::{DatePicker, Slider, InputTag, Toggle, ToggleVariant, NumberInput, AspectRatio, AspectRatios, Rating};
+use dioxus_ui_system::organisms::{ColumnAlign, FilterOption, TableColumn, TableFilter};
+use dioxus_ui_system::prelude::*;
 pub use layout_showcase::{LayoutShowcase, LayoutShowcaseInner};
 
 /// Main showcase component that displays all UI components (includes ThemeProvider)
@@ -47,14 +46,14 @@ pub fn ComponentShowcaseInner() -> Element {
     rsx! {
         Box {
             style: "min-height: 100vh; padding: 32px; max-width: 1400px; margin: 0 auto;",
-            
+
             // Header
             ShowcaseHeader {}
-            
+
             // Component sections
             div {
                 style: "display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-top: 32px;",
-                
+
                 ButtonShowcase {}
                 InputShowcase {}
                 BadgeShowcase {}
@@ -81,7 +80,7 @@ pub fn ComponentShowcaseInner() -> Element {
                 NewMoleculesShowcase {}
                 NewOrganismsShowcase {}
             }
-            
+
             // Footer
             ShowcaseFooter {}
         }
@@ -94,17 +93,17 @@ fn ShowcaseHeader() -> Element {
     rsx! {
         div {
             style: "text-align: center; margin-bottom: 48px;",
-            
+
             Heading {
                 level: HeadingLevel::H1,
                 "Dioxus UI System"
             }
-            
+
             MutedText {
                 size: TextSize::Large,
                 "A pure Rust design system for Dioxus with 100+ components"
             }
-            
+
             HStack {
                 justify: JustifyContent::Center,
                 gap: SpacingSize::Sm,
@@ -135,7 +134,7 @@ fn ButtonShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     // Variants
                     HStack {
                         style: "flex-wrap: wrap;",
@@ -146,7 +145,7 @@ fn ButtonShowcase() -> Element {
                         Button { variant: ButtonVariant::Destructive, "Destructive" }
                         Button { variant: ButtonVariant::Link, "Link" }
                     }
-                    
+
                     // Sizes
                     HStack {
                         align: AlignItems::Center,
@@ -156,16 +155,16 @@ fn ButtonShowcase() -> Element {
                         Button { size: ButtonSize::Md, "Medium" }
                         Button { size: ButtonSize::Lg, "Large" }
                     }
-                    
+
                     // States
                     HStack {
                         style: "flex-wrap: wrap;",
                         gap: SpacingSize::Sm,
                         Button { disabled: true, "Disabled" }
-                        Button { 
+                        Button {
                             variant: ButtonVariant::Primary,
                             full_width: true,
-                            "Full Width" 
+                            "Full Width"
                         }
                     }
                 }
@@ -180,7 +179,7 @@ fn InputShowcase() -> Element {
     let mut email = use_signal(|| String::new());
     let mut password = use_signal(|| String::new());
     let mut error = use_signal(|| false);
-    
+
     rsx! {
         Card {
             CardHeader {
@@ -190,7 +189,7 @@ fn InputShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     InputGroup {
                         label: "Email Address",
                         value: email(),
@@ -200,7 +199,7 @@ fn InputShowcase() -> Element {
                         hint: Some("We'll never share your email.".to_string()),
                         onchange: move |v| email.set(v),
                     }
-                    
+
                     InputGroup {
                         label: "Password",
                         value: password(),
@@ -216,7 +215,7 @@ fn InputShowcase() -> Element {
                             error.set(true);
                         },
                     }
-                    
+
                     Button {
                         variant: ButtonVariant::Primary,
                         full_width: true,
@@ -241,7 +240,7 @@ fn BadgeShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     // Variants
                     HStack {
                         style: "flex-wrap: wrap;",
@@ -254,7 +253,7 @@ fn BadgeShowcase() -> Element {
                         Badge { variant: BadgeVariant::Outline, "Outline" }
                         Badge { variant: BadgeVariant::Ghost, "Ghost" }
                     }
-                    
+
                     // Status badges
                     HStack {
                         style: "flex-wrap: wrap;",
@@ -282,25 +281,25 @@ fn CardShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     Card {
                         variant: CardVariant::Default,
                         padding: Some("12px".to_string()),
                         "Default card with border"
                     }
-                    
+
                     Card {
                         variant: CardVariant::Muted,
                         padding: Some("12px".to_string()),
                         "Muted card with subtle background"
                     }
-                    
+
                     Card {
                         variant: CardVariant::Elevated,
                         padding: Some("12px".to_string()),
                         "Elevated card with shadow"
                     }
-                    
+
                     Card {
                         variant: CardVariant::Outlined,
                         padding: Some("12px".to_string()),
@@ -316,7 +315,7 @@ fn CardShowcase() -> Element {
 #[component]
 fn CardsOrganismsShowcase() -> Element {
     let mut notification_visible = use_signal(|| true);
-    
+
     rsx! {
         Card {
             CardHeader {
@@ -326,7 +325,7 @@ fn CardsOrganismsShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Lg,
-                    
+
                     // Action Card
                     ActionCard {
                         title: "Deploy Project",
@@ -335,7 +334,7 @@ fn CardsOrganismsShowcase() -> Element {
                         on_action: move |_| println!("Deploying project..."),
                         icon: Some("rocket".to_string()),
                     }
-                    
+
                     // Dual Action Card
                     DualActionCard {
                         title: "Save Changes?",
@@ -345,7 +344,7 @@ fn CardsOrganismsShowcase() -> Element {
                         on_primary: move |_| println!("Saving..."),
                         on_secondary: move |_| println!("Discarding..."),
                     }
-                    
+
                     // Profile Card
                     ProfileCard {
                         name: "Sarah Chen".to_string(),
@@ -359,11 +358,11 @@ fn CardsOrganismsShowcase() -> Element {
                             ("Followers".to_string(), "1.2K".to_string()),
                         ],
                     }
-                    
+
                     // Stat Cards Row
                     div {
                         style: "display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;",
-                        
+
                         StatCard {
                             label: "Revenue",
                             value: "$48.2K",
@@ -372,7 +371,7 @@ fn CardsOrganismsShowcase() -> Element {
                             icon: Some("trending-up".to_string()),
                             icon_bg: "#dbeafe".to_string(),
                         }
-                        
+
                         StatCard {
                             label: "Users",
                             value: "2,420",
@@ -381,7 +380,7 @@ fn CardsOrganismsShowcase() -> Element {
                             icon: Some("users".to_string()),
                             icon_bg: "#dcfce7".to_string(),
                         }
-                        
+
                         StatCard {
                             label: "Bounce Rate",
                             value: "42%",
@@ -391,7 +390,7 @@ fn CardsOrganismsShowcase() -> Element {
                             icon_bg: "#fef3c7".to_string(),
                         }
                     }
-                    
+
                     // Notification Cards
                     if notification_visible() {
                         NotificationCard {
@@ -401,14 +400,14 @@ fn CardsOrganismsShowcase() -> Element {
                             on_dismiss: Some(EventHandler::new(move |_| notification_visible.set(false))),
                         }
                     }
-                    
+
                     NotificationCard {
                         title: "Update Available".to_string(),
                         message: "A new version of the app is available.".to_string(),
                         notification_type: NotificationType::Info,
                         on_dismiss: None,
                     }
-                    
+
                     // Expandable Card
                     ExpandableCard {
                         title: "Advanced Settings",
@@ -421,7 +420,7 @@ fn CardsOrganismsShowcase() -> Element {
                             VStack {
                                 gap: SpacingSize::Md,
                                 style: "padding-top: 12px;",
-                                
+
                                 Label { "API Key" }
                                 InputGroup {
                                     label: "",
@@ -429,7 +428,7 @@ fn CardsOrganismsShowcase() -> Element {
                                     input_type: InputType::Password,
                                     onchange: move |_| {},
                                 }
-                                
+
                                 Checkbox {
                                     checked: true,
                                     label: Some("Enable notifications".to_string()),
@@ -439,11 +438,11 @@ fn CardsOrganismsShowcase() -> Element {
                         },
                         default_expanded: false,
                     }
-                    
+
                     // Pricing Cards Row
                     div {
                         style: "display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;",
-                        
+
                         PricingCard {
                             plan: "Starter".to_string(),
                             price: "$9".to_string(),
@@ -458,7 +457,7 @@ fn CardsOrganismsShowcase() -> Element {
                             on_cta: EventHandler::new(move |_| println!("Selected Starter")),
                             recommended: false,
                         }
-                        
+
                         PricingCard {
                             plan: "Pro".to_string(),
                             price: "$29".to_string(),
@@ -475,7 +474,7 @@ fn CardsOrganismsShowcase() -> Element {
                             recommended: true,
                         }
                     }
-                    
+
                     // Image Card
                     ImageCard {
                         image_url: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&h=300&fit=crop".to_string(),
@@ -486,7 +485,7 @@ fn CardsOrganismsShowcase() -> Element {
                         on_action: Some(EventHandler::new(move |_| println!("Viewing gallery..."))),
                         aspect_ratio: "16/9".to_string(),
                     }
-                    
+
                     // Image Action Card
                     ImageActionCard {
                         image_url: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=400&h=250&fit=crop".to_string(),
@@ -498,7 +497,7 @@ fn CardsOrganismsShowcase() -> Element {
                         on_secondary: EventHandler::new(move |_| println!("Saving article...")),
                         badge: Some("New".to_string()),
                     }
-                    
+
                     // Horizontal Card
                     HorizontalCard {
                         image_url: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=200&h=200&fit=crop".to_string(),
@@ -507,7 +506,7 @@ fn CardsOrganismsShowcase() -> Element {
                         action_label: Some("Read".to_string()),
                         on_action: Some(EventHandler::new(move |_| println!("Reading..."))),
                     }
-                    
+
                     // Media Card
                     MediaCard {
                         title: "Getting Started Video".to_string(),
@@ -530,21 +529,29 @@ fn CardsOrganismsShowcase() -> Element {
 fn StepperShowcase() -> Element {
     let mut active_step = use_signal(|| 1);
     let mut wizard_step = use_signal(|| 0);
-    
+
     let steps = vec![
-        StepItem::new("Account").with_description("Login details").with_icon("user"),
-        StepItem::new("Personal").with_description("Your info").with_icon("settings"),
-        StepItem::new("Review").with_description("Verify data").with_icon("check"),
-        StepItem::new("Complete").with_description("Done!").with_icon("star"),
+        StepItem::new("Account")
+            .with_description("Login details")
+            .with_icon("user"),
+        StepItem::new("Personal")
+            .with_description("Your info")
+            .with_icon("settings"),
+        StepItem::new("Review")
+            .with_description("Verify data")
+            .with_icon("check"),
+        StepItem::new("Complete")
+            .with_description("Done!")
+            .with_icon("star"),
     ];
     let steps_len = steps.len();
-    
+
     let wizard_steps = vec![
         WizardStep::new("Account Setup").with_description("Create your account"),
         WizardStep::new("Profile").with_description("Add your details"),
         WizardStep::new("Preferences").with_description("Set your preferences"),
     ];
-    
+
     rsx! {
         Card {
             CardHeader {
@@ -554,13 +561,13 @@ fn StepperShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Xl,
-                    
+
                     // Horizontal Stepper
                     VStack {
                         gap: SpacingSize::Sm,
-                        
+
                         Label { size: TextSize::Small, color: TextColor::Muted, "Horizontal Stepper" }
-                        
+
                         HorizontalStepper {
                             steps: steps.clone(),
                             active_step: active_step(),
@@ -570,12 +577,12 @@ fn StepperShowcase() -> Element {
                             })),
                         }
                     }
-                    
+
                     // Step Navigation
                     HStack {
                         justify: JustifyContent::Center,
                         gap: SpacingSize::Sm,
-                        
+
                         Button {
                             variant: ButtonVariant::Secondary,
                             size: ButtonSize::Sm,
@@ -583,7 +590,7 @@ fn StepperShowcase() -> Element {
                             onclick: move |_| if active_step() > 0 { active_step -= 1 },
                             "Previous"
                         }
-                        
+
                         Button {
                             variant: ButtonVariant::Primary,
                             size: ButtonSize::Sm,
@@ -592,18 +599,18 @@ fn StepperShowcase() -> Element {
                             "Next"
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Vertical Stepper
                     VStack {
                         gap: SpacingSize::Sm,
-                        
+
                         Label { size: TextSize::Small, color: TextColor::Muted, "Vertical Stepper" }
-                        
+
                         div {
                             style: "max-width: 300px;",
-                            
+
                             VerticalStepper {
                                 steps: vec![
                                     StepItem::new("Upload").with_description("File uploaded successfully").with_state(StepState::Completed),
@@ -616,40 +623,40 @@ fn StepperShowcase() -> Element {
                             }
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Compact Stepper
                     VStack {
                         gap: SpacingSize::Sm,
-                        
+
                         Label { size: TextSize::Small, color: TextColor::Muted, "Compact Stepper" }
-                        
+
                         CompactStepper {
                             steps: steps.clone(),
                             active_step: active_step(),
                             size: StepSize::Sm,
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Wizard
                     VStack {
                         gap: SpacingSize::Sm,
-                        
+
                         Label { size: TextSize::Small, color: TextColor::Muted, "Wizard with Content" }
-                        
+
                         Wizard {
                             steps: wizard_steps,
                             active_step: wizard_step(),
                             on_step_change: EventHandler::new(move |step: usize| wizard_step.set(step)),
                             on_finish: EventHandler::new(move |_| println!("Wizard completed!")),
                             title: Some("Setup Wizard".to_string()),
-                            
+
                             Box {
                                 style: "padding: 16px; background: #f8fafc; border-radius: 8px;",
-                                
+
                                 match wizard_step() {
                                     0 => rsx! {
                                         VStack {
@@ -719,7 +726,7 @@ fn IconShowcase() -> Element {
         ("minus", IconColor::Destructive),
         ("menu", IconColor::Current),
     ];
-    
+
     rsx! {
         Card {
             CardHeader {
@@ -729,13 +736,13 @@ fn IconShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     // Icon grid
                     HStack {
                         style: "flex-wrap: wrap;",
                         justify: JustifyContent::Center,
                         gap: SpacingSize::Md,
-                        
+
                         for (name, color) in icons {
                             VStack {
                                 align: AlignItems::Center,
@@ -754,7 +761,7 @@ fn IconShowcase() -> Element {
                             }
                         }
                     }
-                    
+
                     // Size comparison
                     HStack {
                         align: AlignItems::Center,
@@ -785,35 +792,35 @@ fn TypographyShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     Heading { level: HeadingLevel::H1, "Heading 1" }
                     Heading { level: HeadingLevel::H2, "Heading 2" }
                     Heading { level: HeadingLevel::H3, "Heading 3" }
                     Heading { level: HeadingLevel::H4, "Heading 4" }
-                    
+
                     div {
                         style: "border-top: 1px solid #e2e8f0; margin: 8px 0;",
                     }
-                    
+
                     Label { size: TextSize::ExtraSmall, "Extra Small Text" }
                     Label { size: TextSize::Small, "Small Text" }
                     Label { size: TextSize::Base, "Base Text" }
                     Label { size: TextSize::Large, "Large Text" }
                     Label { size: TextSize::ExtraLarge, "Extra Large Text" }
-                    
+
                     div {
                         style: "border-top: 1px solid #e2e8f0; margin: 8px 0;",
                     }
-                    
+
                     Label { weight: TextWeight::Normal, "Normal Weight" }
                     Label { weight: TextWeight::Medium, "Medium Weight" }
                     Label { weight: TextWeight::Semibold, "Semibold Weight" }
                     Label { weight: TextWeight::Bold, "Bold Weight" }
-                    
+
                     div {
                         style: "border-top: 1px solid #e2e8f0; margin: 8px 0;",
                     }
-                    
+
                     MutedText { "This is muted/secondary text" }
                 }
             }
@@ -829,14 +836,14 @@ fn NewFormControlsShowcase() -> Element {
     let mut switch_on = use_signal(|| true);
     let mut selected = use_signal(|| "".to_string());
     let mut textarea = use_signal(|| String::new());
-    
+
     let options = vec![
         SelectOption::new("", "Select an option..."),
         SelectOption::new("option1", "Option 1"),
         SelectOption::new("option2", "Option 2"),
         SelectOption::new("option3", "Option 3"),
     ];
-    
+
     rsx! {
         Card {
             CardHeader {
@@ -846,20 +853,20 @@ fn NewFormControlsShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     // Checkbox
                     Checkbox {
                         checked: checked(),
                         label: Some("Accept terms and conditions".to_string()),
                         onchange: move |v| checked.set(v),
                     }
-                    
+
                     // Radio
                     VStack {
                         gap: SpacingSize::Sm,
-                        
+
                         Label { "Select an option:" }
-                        
+
                         Radio {
                             name: "radio-group".to_string(),
                             value: "option1".to_string(),
@@ -882,18 +889,18 @@ fn NewFormControlsShowcase() -> Element {
                             onchange: move |_| radio_value.set("option3".to_string()),
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Switch
                     Switch {
                         checked: switch_on(),
                         label: Some(if switch_on() { "Notifications ON" } else { "Notifications OFF" }.to_string()),
                         onchange: move |v| switch_on.set(v),
                     }
-                    
+
                     Separator {}
-                    
+
                     // Select
                     Label { "Choose from dropdown:" }
                     Select {
@@ -902,9 +909,9 @@ fn NewFormControlsShowcase() -> Element {
                         placeholder: Some("Select...".to_string()),
                         onchange: move |v| selected.set(v),
                     }
-                    
+
                     Separator {}
-                    
+
                     // TextArea
                     Label { "Your message:" }
                     TextArea {
@@ -932,27 +939,27 @@ fn AlertShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     Alert {
                         variant: AlertVariant::Default,
                         title: Some("Note".to_string()),
                         "This is a default alert with some information."
                     }
-                    
+
                     Alert {
                         variant: AlertVariant::Success,
                         title: Some("Success".to_string()),
                         icon: Some("check-circle".to_string()),
                         "Your changes have been saved successfully."
                     }
-                    
+
                     Alert {
                         variant: AlertVariant::Warning,
                         title: Some("Warning".to_string()),
                         icon: Some("alert-triangle".to_string()),
                         "Please review your settings before continuing."
                     }
-                    
+
                     Alert {
                         variant: AlertVariant::Destructive,
                         title: Some("Error".to_string()),
@@ -977,13 +984,13 @@ fn AvatarShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     // Different sizes
                     HStack {
                         align: AlignItems::Center,
                         style: "flex-wrap: wrap;",
                         gap: SpacingSize::Md,
-                        
+
                         Avatar {
                             size: AvatarSize::Xs,
                             name: Some("John Doe".to_string()),
@@ -1030,14 +1037,14 @@ fn AvatarShowcase() -> Element {
                             class: None,
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // With image
                     HStack {
                         align: AlignItems::Center,
                         gap: SpacingSize::Md,
-                        
+
                         Label { "With initials fallback:" }
                         Avatar {
                             size: AvatarSize::Lg,
@@ -1060,7 +1067,7 @@ fn AvatarShowcase() -> Element {
 fn DialogShowcase() -> Element {
     let mut dialog_open = use_signal(|| false);
     let mut alert_open = use_signal(|| false);
-    
+
     rsx! {
         Card {
             CardHeader {
@@ -1070,39 +1077,39 @@ fn DialogShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     Button {
                         variant: ButtonVariant::Primary,
                         onclick: move |_| dialog_open.set(true),
                         "Open Dialog"
                     }
-                    
+
                     Button {
                         variant: ButtonVariant::Destructive,
                         onclick: move |_| alert_open.set(true),
                         "Open Alert Dialog"
                     }
-                    
+
                     Dialog {
                         open: dialog_open(),
                         on_close: move |_| dialog_open.set(false),
                         title: Some("Example Dialog".to_string()),
                         description: Some("This is a dialog component with rich content.".to_string()),
-                        
+
                         p {
                             style: "margin: 0; font-size: 14px; color: #64748b; line-height: 1.5;",
                             "Dialogs are great for displaying important information or getting user confirmation for actions."
                         }
-                        
+
                         DialogFooter {
                             align: DialogFooterAlign::End,
-                            
+
                             Button {
                                 variant: ButtonVariant::Ghost,
                                 onclick: move |_| dialog_open.set(false),
                                 "Cancel"
                             }
-                            
+
                             Button {
                                 variant: ButtonVariant::Primary,
                                 onclick: move |_| dialog_open.set(false),
@@ -1110,7 +1117,7 @@ fn DialogShowcase() -> Element {
                             }
                         }
                     }
-                    
+
                     AlertDialog {
                         open: alert_open(),
                         on_close: move |_| alert_open.set(false),
@@ -1129,13 +1136,13 @@ fn DialogShowcase() -> Element {
 #[component]
 fn TabsShowcase() -> Element {
     let mut active_tab = use_signal(|| "account".to_string());
-    
+
     let tabs = vec![
         TabItem::new("account", "Account").with_icon("settings"),
         TabItem::new("password", "Password"),
         TabItem::new("notifications", "Notifications"),
     ];
-    
+
     rsx! {
         Card {
             CardHeader {
@@ -1145,12 +1152,12 @@ fn TabsShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     Tabs {
                         tabs: tabs,
                         active_tab: active_tab(),
                         on_change: move |id| active_tab.set(id),
-                        
+
                         TabPanel {
                             if active_tab() == "account" {
                                 "Manage your account settings and preferences."
@@ -1171,13 +1178,25 @@ fn TabsShowcase() -> Element {
 #[component]
 fn AccordionShowcase() -> Element {
     let mut expanded = use_signal(|| vec!["item1".to_string()]);
-    
+
     let items = vec![
-        AccordionItem::new("item1", "Is it accessible?", "Yes. It adheres to the WAI-ARIA design pattern."),
-        AccordionItem::new("item2", "Is it styled?", "Yes. It comes with default styles that match the other components."),
-        AccordionItem::new("item3", "Is it animated?", "Yes. It's animated by default, but you can disable it if you prefer."),
+        AccordionItem::new(
+            "item1",
+            "Is it accessible?",
+            "Yes. It adheres to the WAI-ARIA design pattern.",
+        ),
+        AccordionItem::new(
+            "item2",
+            "Is it styled?",
+            "Yes. It comes with default styles that match the other components.",
+        ),
+        AccordionItem::new(
+            "item3",
+            "Is it animated?",
+            "Yes. It's animated by default, but you can disable it if you prefer.",
+        ),
     ];
-    
+
     rsx! {
         Card {
             CardHeader {
@@ -1200,7 +1219,7 @@ fn AccordionShowcase() -> Element {
 #[component]
 fn SkeletonShowcase() -> Element {
     let mut loading = use_signal(|| true);
-    
+
     rsx! {
         Card {
             CardHeader {
@@ -1210,29 +1229,29 @@ fn SkeletonShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     Switch {
                         checked: loading(),
                         label: Some("Show Skeleton".to_string()),
                         onchange: move |v| loading.set(v),
                     }
-                    
+
                     if loading() {
                         VStack {
                             gap: SpacingSize::Md,
-                            
+
                             HStack {
                                 align: AlignItems::Center,
                                 gap: SpacingSize::Md,
-                                SkeletonCircle { 
-                                    size: "48".to_string(), 
+                                SkeletonCircle {
+                                    size: "48".to_string(),
                                     animate: true,
                                     style: None,
                                 }
                                 VStack {
                                     style: "flex: 1;",
                                     gap: SpacingSize::Sm,
-                                    Skeleton { 
+                                    Skeleton {
                                         width: Some("150px".to_string()),
                                         height: None,
                                         animated: true,
@@ -1242,7 +1261,7 @@ fn SkeletonShowcase() -> Element {
                                         highlight_color: None,
                                         class: None,
                                     }
-                                    Skeleton { 
+                                    Skeleton {
                                         width: Some("100px".to_string()),
                                         height: None,
                                         animated: true,
@@ -1254,7 +1273,7 @@ fn SkeletonShowcase() -> Element {
                                     }
                                 }
                             }
-                            
+
                             SkeletonText {
                                 lines: 3,
                                 animate: true,
@@ -1266,7 +1285,7 @@ fn SkeletonShowcase() -> Element {
                         HStack {
                             align: AlignItems::Center,
                             gap: SpacingSize::Md,
-                            
+
                             Avatar {
                                 size: AvatarSize::Lg,
                                 name: Some("Loading Complete".to_string()),
@@ -1276,7 +1295,7 @@ fn SkeletonShowcase() -> Element {
                                 style: None,
                                 class: None,
                             }
-                            
+
                             div {
                                 p { style: "margin: 0; font-weight: 600;", "Content Loaded" }
                                 p { style: "margin: 0; color: #64748b; font-size: 14px;", "The skeleton has been replaced with actual content." }
@@ -1303,17 +1322,17 @@ fn TooltipPopoverShowcase() -> Element {
                     style: "flex-wrap: wrap;",
                     align: AlignItems::Center,
                     gap: SpacingSize::Md,
-                    
+
                     SimpleTooltip {
                         text: "This is a tooltip".to_string(),
                         placement: TooltipPlacement::Top,
-                        
+
                         Button {
                             variant: ButtonVariant::Secondary,
                             "Hover for Tooltip"
                         }
                     }
-                    
+
                     Popover {
                         trigger: rsx! {
                             Button {
@@ -1321,14 +1340,14 @@ fn TooltipPopoverShowcase() -> Element {
                                 "Click for Popover"
                             }
                         },
-                        
+
                         PopoverHeader {
                             title: "Popover Title".to_string(),
                             description: Some("This is a popover with more detailed content.".to_string()),
                         }
-                        
+
                         "Popovers can contain rich content, forms, and other interactive elements."
-                        
+
                         PopoverFooter {
                             Button {
                                 variant: ButtonVariant::Primary,
@@ -1346,13 +1365,15 @@ fn TooltipPopoverShowcase() -> Element {
 #[component]
 fn DropdownMenuShowcase() -> Element {
     let mut last_action = use_signal(|| "No action yet".to_string());
-    
+
     let items = vec![
         DropdownMenuItem::new("edit", "Edit").with_icon("edit"),
         DropdownMenuItem::new("duplicate", "Duplicate").with_icon("copy"),
-        DropdownMenuItem::new("delete", "Delete").with_icon("trash").disabled(),
+        DropdownMenuItem::new("delete", "Delete")
+            .with_icon("trash")
+            .disabled(),
     ];
-    
+
     rsx! {
         Card {
             CardHeader {
@@ -1362,7 +1383,7 @@ fn DropdownMenuShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Md,
-                    
+
                     DropdownMenu {
                         trigger: rsx! {
                             Button {
@@ -1373,7 +1394,7 @@ fn DropdownMenuShowcase() -> Element {
                         items: items,
                         on_select: move |value| last_action.set(format!("Selected: {}", value)),
                     }
-                    
+
                     Label {
                         color: TextColor::Muted,
                         "{last_action}"
@@ -1389,7 +1410,7 @@ fn DropdownMenuShowcase() -> Element {
 fn InteractiveDemo() -> Element {
     let mut count = use_signal(|| 0);
     let mut message = use_signal(|| "Click the buttons!".to_string());
-    
+
     rsx! {
         Card {
             CardHeader {
@@ -1399,23 +1420,23 @@ fn InteractiveDemo() -> Element {
             CardContent {
                 Box {
                     style: "text-align: center;",
-                    
+
                     Heading {
                         level: HeadingLevel::H2,
                         "{count}"
                     }
-                    
+
                     Label {
                         size: TextSize::Small,
                         color: TextColor::Muted,
                         "{message}"
                     }
-                    
+
                     HStack {
                         justify: JustifyContent::Center,
                         gap: SpacingSize::Sm,
                         style: "margin-top: 16px;",
-                        
+
                         Button {
                             variant: ButtonVariant::Secondary,
                             onclick: move |_| {
@@ -1428,7 +1449,7 @@ fn InteractiveDemo() -> Element {
                                 color: IconColor::Current,
                             }
                         }
-                        
+
                         Button {
                             variant: ButtonVariant::Destructive,
                             onclick: move |_| {
@@ -1437,7 +1458,7 @@ fn InteractiveDemo() -> Element {
                             },
                             "Reset"
                         }
-                        
+
                         Button {
                             variant: ButtonVariant::Primary,
                             onclick: move |_| {
@@ -1461,7 +1482,7 @@ fn InteractiveDemo() -> Element {
 #[component]
 fn ChartShowcase() -> Element {
     use dioxus_ui_system::organisms::charts::*;
-    
+
     let bar_data = vec![
         ChartDataPoint::new("Jan", 100.0),
         ChartDataPoint::new("Feb", 150.0),
@@ -1470,13 +1491,13 @@ fn ChartShowcase() -> Element {
         ChartDataPoint::new("May", 250.0),
         ChartDataPoint::new("Jun", 300.0),
     ];
-    
+
     let pie_data = vec![
         ChartDataPoint::new("Desktop", 45.0),
         ChartDataPoint::new("Mobile", 35.0),
         ChartDataPoint::new("Tablet", 20.0),
     ];
-    
+
     rsx! {
         Card {
             CardHeader {
@@ -1486,7 +1507,7 @@ fn ChartShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Lg,
-                    
+
                     // Bar chart with tooltips
                     div {
                         BarChart {
@@ -1499,7 +1520,7 @@ fn ChartShowcase() -> Element {
                             }),
                         }
                     }
-                    
+
                     // Pie chart with tooltips
                     HStack {
                         justify: JustifyContent::Center,
@@ -1513,7 +1534,7 @@ fn ChartShowcase() -> Element {
                             }),
                         }
                     }
-                    
+
                     Label {
                         size: TextSize::ExtraSmall,
                         color: TextColor::Muted,
@@ -1529,7 +1550,7 @@ fn ChartShowcase() -> Element {
 #[component]
 fn DataTableShowcase() -> Element {
     use std::collections::HashMap;
-    
+
     #[derive(Clone, PartialEq)]
     struct Product {
         id: String,
@@ -1539,21 +1560,77 @@ fn DataTableShowcase() -> Element {
         stock: i32,
         status: String,
     }
-    
+
     let all_products = vec![
-        Product { id: "1".to_string(), name: "Wireless Headphones".to_string(), category: "Electronics".to_string(), price: 99.99, stock: 45, status: "In Stock".to_string() },
-        Product { id: "2".to_string(), name: "Running Shoes".to_string(), category: "Sports".to_string(), price: 129.99, stock: 12, status: "Low Stock".to_string() },
-        Product { id: "3".to_string(), name: "Coffee Maker".to_string(), category: "Home".to_string(), price: 79.99, stock: 0, status: "Out of Stock".to_string() },
-        Product { id: "4".to_string(), name: "Laptop Stand".to_string(), category: "Electronics".to_string(), price: 49.99, stock: 78, status: "In Stock".to_string() },
-        Product { id: "5".to_string(), name: "Yoga Mat".to_string(), category: "Sports".to_string(), price: 29.99, stock: 34, status: "In Stock".to_string() },
-        Product { id: "6".to_string(), name: "Desk Lamp".to_string(), category: "Home".to_string(), price: 39.99, stock: 5, status: "Low Stock".to_string() },
-        Product { id: "7".to_string(), name: "Bluetooth Speaker".to_string(), category: "Electronics".to_string(), price: 59.99, stock: 23, status: "In Stock".to_string() },
-        Product { id: "8".to_string(), name: "Water Bottle".to_string(), category: "Sports".to_string(), price: 19.99, stock: 0, status: "Out of Stock".to_string() },
+        Product {
+            id: "1".to_string(),
+            name: "Wireless Headphones".to_string(),
+            category: "Electronics".to_string(),
+            price: 99.99,
+            stock: 45,
+            status: "In Stock".to_string(),
+        },
+        Product {
+            id: "2".to_string(),
+            name: "Running Shoes".to_string(),
+            category: "Sports".to_string(),
+            price: 129.99,
+            stock: 12,
+            status: "Low Stock".to_string(),
+        },
+        Product {
+            id: "3".to_string(),
+            name: "Coffee Maker".to_string(),
+            category: "Home".to_string(),
+            price: 79.99,
+            stock: 0,
+            status: "Out of Stock".to_string(),
+        },
+        Product {
+            id: "4".to_string(),
+            name: "Laptop Stand".to_string(),
+            category: "Electronics".to_string(),
+            price: 49.99,
+            stock: 78,
+            status: "In Stock".to_string(),
+        },
+        Product {
+            id: "5".to_string(),
+            name: "Yoga Mat".to_string(),
+            category: "Sports".to_string(),
+            price: 29.99,
+            stock: 34,
+            status: "In Stock".to_string(),
+        },
+        Product {
+            id: "6".to_string(),
+            name: "Desk Lamp".to_string(),
+            category: "Home".to_string(),
+            price: 39.99,
+            stock: 5,
+            status: "Low Stock".to_string(),
+        },
+        Product {
+            id: "7".to_string(),
+            name: "Bluetooth Speaker".to_string(),
+            category: "Electronics".to_string(),
+            price: 59.99,
+            stock: 23,
+            status: "In Stock".to_string(),
+        },
+        Product {
+            id: "8".to_string(),
+            name: "Water Bottle".to_string(),
+            category: "Sports".to_string(),
+            price: 19.99,
+            stock: 0,
+            status: "Out of Stock".to_string(),
+        },
     ];
-    
+
     #[derive(Clone, PartialEq)]
     struct ProductRef(Product);
-    
+
     fn render_price(product: &ProductRef) -> Element {
         let price = product.0.price;
         rsx! {
@@ -1563,7 +1640,7 @@ fn DataTableShowcase() -> Element {
             }
         }
     }
-    
+
     fn render_status(product: &ProductRef) -> Element {
         let (bg, color) = match product.0.status.as_str() {
             "In Stock" => ("rgb(220,252,231)", "rgb(22,163,74)"),
@@ -1577,7 +1654,7 @@ fn DataTableShowcase() -> Element {
             }
         }
     }
-    
+
     let columns = vec![
         TableColumn {
             key: "name".to_string(),
@@ -1620,47 +1697,72 @@ fn DataTableShowcase() -> Element {
             render: Some(|p: &ProductRef| render_status(p)),
         },
     ];
-    
+
     let filters = vec![
         TableFilter {
             key: "category".to_string(),
             label: "All Categories".to_string(),
             options: vec![
-                FilterOption { label: "Electronics".to_string(), value: "Electronics".to_string() },
-                FilterOption { label: "Sports".to_string(), value: "Sports".to_string() },
-                FilterOption { label: "Home".to_string(), value: "Home".to_string() },
+                FilterOption {
+                    label: "Electronics".to_string(),
+                    value: "Electronics".to_string(),
+                },
+                FilterOption {
+                    label: "Sports".to_string(),
+                    value: "Sports".to_string(),
+                },
+                FilterOption {
+                    label: "Home".to_string(),
+                    value: "Home".to_string(),
+                },
             ],
         },
         TableFilter {
             key: "status".to_string(),
             label: "All Status".to_string(),
             options: vec![
-                FilterOption { label: "In Stock".to_string(), value: "In Stock".to_string() },
-                FilterOption { label: "Low Stock".to_string(), value: "Low Stock".to_string() },
-                FilterOption { label: "Out of Stock".to_string(), value: "Out of Stock".to_string() },
+                FilterOption {
+                    label: "In Stock".to_string(),
+                    value: "In Stock".to_string(),
+                },
+                FilterOption {
+                    label: "Low Stock".to_string(),
+                    value: "Low Stock".to_string(),
+                },
+                FilterOption {
+                    label: "Out of Stock".to_string(),
+                    value: "Out of Stock".to_string(),
+                },
             ],
         },
     ];
-    
+
     // State for search and filters
     let mut search_query = use_signal(|| "".to_string());
     let mut active_filters = use_signal(|| HashMap::<String, String>::new());
-    
+
     // Filter the data
-    let filtered_products: Vec<ProductRef> = all_products.clone().into_iter()
+    let filtered_products: Vec<ProductRef> = all_products
+        .clone()
+        .into_iter()
         .map(ProductRef)
         .filter(|p| {
             let search_lower = search_query().to_lowercase();
-            let matches_search = search_lower.is_empty() || 
-                p.0.name.to_lowercase().contains(&search_lower) ||
-                p.0.category.to_lowercase().contains(&search_lower);
-            
-            let matches_category = active_filters().get("category").map_or(true, |v| v == &p.0.category);
-            let matches_status = active_filters().get("status").map_or(true, |v| v == &p.0.status);
-            
+            let matches_search = search_lower.is_empty()
+                || p.0.name.to_lowercase().contains(&search_lower)
+                || p.0.category.to_lowercase().contains(&search_lower);
+
+            let matches_category = active_filters()
+                .get("category")
+                .map_or(true, |v| v == &p.0.category);
+            let matches_status = active_filters()
+                .get("status")
+                .map_or(true, |v| v == &p.0.status);
+
             matches_search && matches_category && matches_status
-        }).collect();
-    
+        })
+        .collect();
+
     rsx! {
         Card {
             CardHeader {
@@ -1707,27 +1809,27 @@ fn ThemeShowcase() -> Element {
                 VStack {
                     align: AlignItems::Center,
                     gap: SpacingSize::Md,
-                    
+
                     Label {
                         size: TextSize::Small,
                         "Select a theme:"
                     }
-                    
+
                     ThemeSelector {}
-                    
+
                     Separator {}
-                    
+
                     Label {
                         size: TextSize::Small,
                         "Or toggle dark mode:"
                     }
-                    
+
                     ThemeToggle {}
-                    
+
                     div {
                         style: "border-top: 1px solid #e2e8f0; margin: 8px 0; width: 100%;",
                     }
-                    
+
                     Label {
                         size: TextSize::ExtraSmall,
                         color: TextColor::Muted,
@@ -1745,13 +1847,10 @@ fn NewAtomsShowcase() -> Element {
     let mut rating = use_signal(|| 3.5_f32);
     let mut slider_value = use_signal(|| 50.0);
     let mut date = use_signal(|| "2024-01-15".to_string());
-    let mut tags = use_signal(|| vec![
-        "Rust".to_string(),
-        "Dioxus".to_string(),
-    ]);
+    let mut tags = use_signal(|| vec!["Rust".to_string(), "Dioxus".to_string()]);
     let mut toggle_on = use_signal(|| false);
     let mut number = use_signal(|| 42.0);
-    
+
     rsx! {
         Card {
             overflow_hidden: false,
@@ -1762,7 +1861,7 @@ fn NewAtomsShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Lg,
-                    
+
                     // Rating Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -1770,9 +1869,9 @@ fn NewAtomsShowcase() -> Element {
                         HStack {
                             gap: SpacingSize::Md,
                             Rating { value: 4.5, max: 5, size: 20, interactive: false }
-                            Rating { 
-                                value: rating(), 
-                                max: 5, 
+                            Rating {
+                                value: rating(),
+                                max: 5,
                                 size: 20,
                                 interactive: true,
                                 on_change: Some(EventHandler::new(move |v: f32| rating.set(v))),
@@ -1780,9 +1879,9 @@ fn NewAtomsShowcase() -> Element {
                         }
                         Label { size: TextSize::ExtraSmall, color: TextColor::Muted, "Value: {rating:.1}" }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Slider Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -1796,9 +1895,9 @@ fn NewAtomsShowcase() -> Element {
                         }
                         Label { size: TextSize::ExtraSmall, color: TextColor::Muted, "Value: {slider_value:.0}%" }
                     }
-                    
+
                     Separator {}
-                    
+
                     // DatePicker Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -1809,9 +1908,9 @@ fn NewAtomsShowcase() -> Element {
                             placeholder: Some("Select a date...".to_string()),
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Tag Input Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -1822,9 +1921,9 @@ fn NewAtomsShowcase() -> Element {
                             placeholder: Some("Type and press Enter...".to_string()),
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Toggle Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -1836,9 +1935,9 @@ fn NewAtomsShowcase() -> Element {
                             if toggle_on() { "ON" } else { "OFF" }
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // NumberInput Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -1851,9 +1950,9 @@ fn NewAtomsShowcase() -> Element {
                             on_change: move |v| number.set(v),
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // AspectRatio Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -1880,7 +1979,7 @@ fn NewMoleculesShowcase() -> Element {
     let mut combo_value = use_signal(|| "".to_string());
     let mut page = use_signal(|| 1);
     let page_size = use_signal(|| 10);
-    
+
     let combo_options = vec![
         ComboboxOption::new("next", "Next.js"),
         ComboboxOption::new("react", "React"),
@@ -1888,7 +1987,7 @@ fn NewMoleculesShowcase() -> Element {
         ComboboxOption::new("angular", "Angular"),
         ComboboxOption::new("svelte", "Svelte"),
     ];
-    
+
     rsx! {
         Card {
             overflow_hidden: false,
@@ -1899,7 +1998,7 @@ fn NewMoleculesShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Lg,
-                    
+
                     // OTP Input Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -1912,9 +2011,9 @@ fn NewMoleculesShowcase() -> Element {
                         }
                         Label { size: TextSize::ExtraSmall, color: TextColor::Muted, "Value: {otp_value}" }
                     }
-                    
+
                     Separator {}
-                    
+
                     // TimePicker Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -1925,9 +2024,9 @@ fn NewMoleculesShowcase() -> Element {
                             use_24h: true,
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Combobox Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -1939,9 +2038,9 @@ fn NewMoleculesShowcase() -> Element {
                             placeholder: "Search frameworks...",
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Pagination Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -1957,9 +2056,9 @@ fn NewMoleculesShowcase() -> Element {
                             total_items: 95,
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // List Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -1986,9 +2085,9 @@ fn NewMoleculesShowcase() -> Element {
                             }
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // QRCode Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2019,7 +2118,7 @@ fn NewOrganismsShowcase() -> Element {
     let _carousel_index = use_signal(|| 0);
     let mut tour_open = use_signal(|| false);
     let mut calendar_date = use_signal(|| Some("2024-01-15".to_string()));
-    
+
     let carousel_items = vec![
         rsx! {
             div { style: "height: 200px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: 600;",
@@ -2037,7 +2136,7 @@ fn NewOrganismsShowcase() -> Element {
             }
         },
     ];
-    
+
     let tree_data = vec![
         TreeNodeData::new("root1", "Documents").with_children(vec![
             TreeNodeData::new("doc1", "Resume.pdf"),
@@ -2052,37 +2151,34 @@ fn NewOrganismsShowcase() -> Element {
             TreeNodeData::new("img2", "photo2.jpg"),
         ]),
     ];
-    
+
     let timeline_events = vec![
         TimelineEvent::new("Project Started").with_description("Initial planning and setup"),
         TimelineEvent::new("Development").with_description("Building core features"),
         TimelineEvent::new("Testing").with_description("QA and bug fixes"),
         TimelineEvent::new("Launch"),
     ];
-    
+
     let kanban_columns = vec![
-        KanbanColumn::new("todo", "To Do")
-            .with_cards(vec![
-                KanbanCard::new("task1", "Design Homepage").with_tags(vec!["Design".to_string()]),
-                KanbanCard::new("task2", "Setup Database").with_tags(vec!["Backend".to_string()]),
-            ]),
-        KanbanColumn::new("inprogress", "In Progress")
-            .with_cards(vec![
-                KanbanCard::new("task3", "API Development")
-                    .with_tags(vec!["Backend".to_string(), "High".to_string()]),
-            ]),
+        KanbanColumn::new("todo", "To Do").with_cards(vec![
+            KanbanCard::new("task1", "Design Homepage").with_tags(vec!["Design".to_string()]),
+            KanbanCard::new("task2", "Setup Database").with_tags(vec!["Backend".to_string()]),
+        ]),
+        KanbanColumn::new("inprogress", "In Progress").with_cards(vec![KanbanCard::new(
+            "task3",
+            "API Development",
+        )
+        .with_tags(vec!["Backend".to_string(), "High".to_string()])]),
         KanbanColumn::new("done", "Done")
-            .with_cards(vec![
-                KanbanCard::new("task4", "Project Setup"),
-            ]),
+            .with_cards(vec![KanbanCard::new("task4", "Project Setup")]),
     ];
-    
+
     let tour_steps = vec![
         TourStep::new("step1", "Welcome", "Welcome to the Dioxus UI System tour!"),
         TourStep::new("step2", "Components", "Explore 85+ components"),
         TourStep::new("step3", "Themes", "Switch between 7 themes"),
     ];
-    
+
     rsx! {
         Card {
             overflow_hidden: false,
@@ -2093,7 +2189,7 @@ fn NewOrganismsShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Lg,
-                    
+
                     // Carousel Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2104,9 +2200,9 @@ fn NewOrganismsShowcase() -> Element {
                             show_dots: true,
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Calendar Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2117,9 +2213,9 @@ fn NewOrganismsShowcase() -> Element {
                             mode: CalendarMode::Single,
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Tree Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2132,9 +2228,9 @@ fn NewOrganismsShowcase() -> Element {
                             }
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Timeline Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2143,9 +2239,9 @@ fn NewOrganismsShowcase() -> Element {
                             events: timeline_events,
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Kanban Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2158,9 +2254,9 @@ fn NewOrganismsShowcase() -> Element {
                             }
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // RichText Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2170,9 +2266,9 @@ fn NewOrganismsShowcase() -> Element {
                             on_change: move |html| println!("HTML: {}", html),
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Resizable Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2182,7 +2278,7 @@ fn NewOrganismsShowcase() -> Element {
                             ResizablePanel {
                                 default_size: 30.0,
                                 min_size: 20.0,
-                                Box { 
+                                Box {
                                     style: "padding: 16px; background: #f3f4f6; border-radius: 8px; height: 100px;",
                                     "Sidebar (resize me)"
                                 }
@@ -2191,16 +2287,16 @@ fn NewOrganismsShowcase() -> Element {
                             ResizablePanel {
                                 default_size: 70.0,
                                 min_size: 30.0,
-                                Box { 
+                                Box {
                                     style: "padding: 16px; background: #e5e7eb; border-radius: 8px; height: 100px;",
                                     "Main Content"
                                 }
                             }
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Tour Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2213,7 +2309,7 @@ fn NewOrganismsShowcase() -> Element {
                 }
             }
         }
-        
+
         // Tour component
         Tour {
             steps: tour_steps,
@@ -2232,7 +2328,7 @@ fn NewComponentsShowcase() -> Element {
     let mut sonner = use_sonner();
     let toasts_sig = sonner.toasts_signal();
     let toasts_list = toasts_sig();
-    
+
     let frameworks = vec![
         SelectOption::new("react", "React"),
         SelectOption::new("vue", "Vue"),
@@ -2240,7 +2336,7 @@ fn NewComponentsShowcase() -> Element {
         SelectOption::new("svelte", "Svelte"),
         SelectOption::new("solid", "Solid"),
     ];
-    
+
     rsx! {
         Card {
             overflow_hidden: false,
@@ -2251,7 +2347,7 @@ fn NewComponentsShowcase() -> Element {
             CardContent {
                 VStack {
                     gap: SpacingSize::Lg,
-                    
+
                     // Sheet Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2272,9 +2368,9 @@ fn NewComponentsShowcase() -> Element {
                             }
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Sonner Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2287,9 +2383,9 @@ fn NewComponentsShowcase() -> Element {
                         }
                         // Sonner renders at page level in real usage
                     }
-                    
+
                     Separator {}
-                    
+
                     // MultiSelect Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2301,9 +2397,9 @@ fn NewComponentsShowcase() -> Element {
                             placeholder: "Select frameworks...",
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // ToggleGroup Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2317,9 +2413,9 @@ fn NewComponentsShowcase() -> Element {
                             ToggleItem { value: "underline", "U" }
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Collapsible Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2329,9 +2425,9 @@ fn NewComponentsShowcase() -> Element {
                             "This content is hidden by default and revealed when you click the trigger."
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // HoverCard Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2347,16 +2443,16 @@ fn NewComponentsShowcase() -> Element {
                             }
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // ContextMenu Demo
                     VStack {
                         gap: SpacingSize::Sm,
                         Label { size: TextSize::Small, "ContextMenu (Right-click)" }
                         ContextMenu {
                             ContextMenuTrigger {
-                                Box { 
+                                Box {
                                     style: "padding: 20px; background: #f3f4f6; border-radius: 8px; text-align: center; cursor: context-menu;",
                                     "Right-click here"
                                 }
@@ -2368,9 +2464,9 @@ fn NewComponentsShowcase() -> Element {
                             }
                         }
                     }
-                    
+
                     Separator {}
-                    
+
                     // Command Demo
                     VStack {
                         gap: SpacingSize::Sm,
@@ -2398,7 +2494,7 @@ fn NewComponentsShowcase() -> Element {
                 }
             }
         }
-        
+
         // Sonner rendered at page level
         Sonner {
             toasts: toasts_list.clone(),
@@ -2414,11 +2510,11 @@ fn ShowcaseFooter() -> Element {
     rsx! {
         footer {
             style: "margin-top: 48px; padding: 32px; text-align: center; border-top: 1px solid #e2e8f0;",
-            
+
             MutedText {
                 "Built with ❤️ using Dioxus UI System"
             }
-            
+
             div {
                 style: "margin-top: 8px;",
                 Label {
@@ -2448,7 +2544,7 @@ pub fn AppHeader() -> Element {
             active: false,
         },
     ];
-    
+
     rsx! {
         Header {
             brand_title: "Dioxus UI",

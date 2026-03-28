@@ -2,9 +2,9 @@
 //!
 //! A password input field with show/hide toggle and optional strength indicator.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Password strength levels
 #[derive(Clone, PartialEq, Debug)]
@@ -27,7 +27,7 @@ impl PasswordStrength {
     /// Get the color for the strength indicator
     pub fn color(&self) -> &'static str {
         match self {
-            PasswordStrength::Weak => "#ef4444", // red-500
+            PasswordStrength::Weak => "#ef4444",   // red-500
             PasswordStrength::Medium => "#f59e0b", // amber-500
             PasswordStrength::Strong => "#22c55e", // green-500
         }
@@ -37,21 +37,21 @@ impl PasswordStrength {
 /// Calculate password strength based on common criteria
 fn calculate_strength(password: &str) -> PasswordStrength {
     let length = password.len();
-    
+
     if length < 6 {
         return PasswordStrength::Weak;
     }
-    
+
     let has_lowercase = password.chars().any(|c| c.is_ascii_lowercase());
     let has_uppercase = password.chars().any(|c| c.is_ascii_uppercase());
     let has_digit = password.chars().any(|c| c.is_ascii_digit());
     let has_special = password.chars().any(|c| !c.is_alphanumeric());
-    
+
     let criteria_count = [has_lowercase, has_uppercase, has_digit, has_special]
         .iter()
         .filter(|&&x| x)
         .count();
-    
+
     match criteria_count {
         0..=1 => PasswordStrength::Weak,
         2 => PasswordStrength::Medium,
@@ -143,12 +143,7 @@ pub fn PasswordInput(props: PasswordInputProps) -> Element {
     });
 
     // Input wrapper style (for positioning the toggle button)
-    let wrapper_style = use_style(move |_t| {
-        Style::new()
-            .relative()
-            .w_full()
-            .build()
-    });
+    let wrapper_style = use_style(move |_t| Style::new().relative().w_full().build());
 
     // Input style
     let input_style = use_style(move |t| {
@@ -156,7 +151,14 @@ pub fn PasswordInput(props: PasswordInputProps) -> Element {
             .w_full()
             .h_px(40)
             .rounded(&t.radius, "md")
-            .border(1, if is_focused() { &t.colors.ring } else { &t.colors.border })
+            .border(
+                1,
+                if is_focused() {
+                    &t.colors.ring
+                } else {
+                    &t.colors.border
+                },
+            )
             .bg(&t.colors.background)
             .text_color(&t.colors.foreground)
             .px(&t.spacing, "md")
@@ -167,9 +169,7 @@ pub fn PasswordInput(props: PasswordInputProps) -> Element {
 
         // Disabled state
         let base = if disabled {
-            base.cursor("not-allowed")
-                .opacity(0.5)
-                .bg(&t.colors.muted)
+            base.cursor("not-allowed").opacity(0.5).bg(&t.colors.muted)
         } else {
             base.cursor("text")
         };
@@ -270,12 +270,8 @@ pub fn PasswordInput(props: PasswordInputProps) -> Element {
     };
 
     // Strength bar fill style
-    let strength_bar_fill_style = use_style(move |_t| {
-        Style::new()
-            .h_full()
-            .transition("all 300ms ease")
-            .build()
-    });
+    let strength_bar_fill_style =
+        use_style(move |_t| Style::new().h_full().transition("all 300ms ease").build());
 
     // Strength label style
     let strength_label_style = use_style(move |t| {
@@ -334,7 +330,7 @@ pub fn PasswordInput(props: PasswordInputProps) -> Element {
     rsx! {
         div {
             style: "{container_style}",
-            
+
             // Label
             if let Some(label_text) = &props.label {
                 label {
@@ -346,11 +342,11 @@ pub fn PasswordInput(props: PasswordInputProps) -> Element {
                     }
                 }
             }
-            
+
             // Input wrapper with toggle button
             div {
                 style: "{wrapper_style}",
-                
+
                 input {
                     r#type: "{input_type}",
                     style: "{final_input_style}",
@@ -370,7 +366,7 @@ pub fn PasswordInput(props: PasswordInputProps) -> Element {
                         props.on_change.call(e.value());
                     },
                 }
-                
+
                 // Toggle visibility button
                 button {
                     r#type: "button",
@@ -389,7 +385,7 @@ pub fn PasswordInput(props: PasswordInputProps) -> Element {
                     }
                 }
             }
-            
+
             // Error message
             if let Some(error_msg) = error_clone {
                 span {
@@ -397,12 +393,12 @@ pub fn PasswordInput(props: PasswordInputProps) -> Element {
                     "{error_msg}"
                 }
             }
-            
+
             // Strength indicator
             if props.strength_indicator && !value.is_empty() {
                 div {
                     style: "{strength_container_style}",
-                    
+
                     // Strength bar
                     div {
                         style: "{strength_bar_bg_style}",
@@ -410,7 +406,7 @@ pub fn PasswordInput(props: PasswordInputProps) -> Element {
                             style: "{strength_bar_fill_style} width: {strength_width}; background-color: {strength_color};",
                         }
                     }
-                    
+
                     // Strength label
                     span {
                         style: "{strength_label_style}",

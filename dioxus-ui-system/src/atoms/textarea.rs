@@ -2,9 +2,9 @@
 //!
 //! Displays a form textarea or a component that looks like a textarea.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// TextArea properties
 #[derive(Props, Clone, PartialEq)]
@@ -52,17 +52,24 @@ pub struct TextAreaProps {
 pub fn TextArea(props: TextAreaProps) -> Element {
     let _theme = use_theme();
     let mut is_focused = use_signal(|| false);
-    
+
     let disabled = props.disabled;
     let error = props.error;
-    
+
     let textarea_style = use_style(move |t| {
         let base = Style::new()
             .w_full()
             .px(&t.spacing, "md")
             .py(&t.spacing, "md")
             .rounded(&t.radius, "md")
-            .border(1, if error { &t.colors.destructive } else { &t.colors.border })
+            .border(
+                1,
+                if error {
+                    &t.colors.destructive
+                } else {
+                    &t.colors.border
+                },
+            )
             .bg(&t.colors.background)
             .text_color(&t.colors.foreground)
             .font_size(14)
@@ -70,49 +77,47 @@ pub fn TextArea(props: TextAreaProps) -> Element {
             .outline("none")
             .resize("vertical")
             .transition("all 150ms ease");
-        
+
         let base = if is_focused() {
             base.border_color(&t.colors.ring)
                 .shadow(&format!("0 0 0 1px {}", t.colors.ring.to_rgba()))
         } else {
             base
         };
-        
+
         let base = if disabled {
-            base.opacity(0.5)
-                .bg(&t.colors.muted)
-                .cursor("not-allowed")
+            base.opacity(0.5).bg(&t.colors.muted).cursor("not-allowed")
         } else {
             base
         };
-        
+
         base.build()
     });
-    
+
     let handle_input = move |e: Event<FormData>| {
         let data = e.data();
         let new_value = data.value();
-        
+
         // Enforce max_length
         if let Some(max) = props.max_length {
             if new_value.len() > max {
                 return;
             }
         }
-        
+
         if let Some(handler) = &props.onchange {
             handler.call(new_value);
         }
     };
-    
+
     let char_count = props.value.len();
     let show_count = props.max_length.is_some();
     let max_length = props.max_length.unwrap_or(0);
-    
+
     rsx! {
         div {
             style: "width: 100%;",
-            
+
             textarea {
                 value: "{props.value}",
                 placeholder: props.placeholder.as_deref().unwrap_or(""),
@@ -126,7 +131,7 @@ pub fn TextArea(props: TextAreaProps) -> Element {
                 onfocus: move |_| is_focused.set(true),
                 onblur: move |_| is_focused.set(false),
             }
-            
+
             // Error message or character count
             if error {
                 if let Some(err_msg) = props.error_message.clone() {
@@ -176,11 +181,11 @@ pub struct AutoResizeTextAreaProps {
 pub fn AutoResizeTextArea(props: AutoResizeTextAreaProps) -> Element {
     let _theme = use_theme();
     let mut is_focused = use_signal(|| false);
-    
+
     // Calculate rows based on content
     let line_count = props.value.lines().count().max(1);
     let rows = (line_count as u8).clamp(props.min_rows, props.max_rows);
-    
+
     let textarea_style = use_style(move |t| {
         Style::new()
             .w_full()
@@ -198,7 +203,7 @@ pub fn AutoResizeTextArea(props: AutoResizeTextAreaProps) -> Element {
             .transition("all 150ms ease")
             .build()
     });
-    
+
     let handle_input = move |e: Event<FormData>| {
         let data = e.data();
         let new_value = data.value();
@@ -206,7 +211,7 @@ pub fn AutoResizeTextArea(props: AutoResizeTextAreaProps) -> Element {
             handler.call(new_value);
         }
     };
-    
+
     rsx! {
         textarea {
             value: "{props.value}",

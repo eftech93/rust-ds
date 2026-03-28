@@ -2,10 +2,10 @@
 //!
 //! Displays rich content in a portal, triggered by a button.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
+use crate::atoms::{AlignItems, Box, HStack, JustifyContent, SpacingSize, VStack};
 use crate::styles::Style;
-use crate::atoms::{Box, VStack, HStack, JustifyContent, AlignItems, SpacingSize};
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Popover properties
 #[derive(Props, Clone, PartialEq)]
@@ -63,27 +63,31 @@ pub enum PopoverPlacement {
 pub fn Popover(props: PopoverProps) -> Element {
     let _theme = use_theme();
     let mut is_open = use_signal(|| props.open);
-    
+
     // Sync with props
     use_effect(move || {
         is_open.set(props.open);
     });
-    
+
     let position_style = match props.placement {
-        PopoverPlacement::Top => "bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);",
+        PopoverPlacement::Top => {
+            "bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);"
+        }
         PopoverPlacement::TopStart => "bottom: calc(100% + 8px); left: 0;",
         PopoverPlacement::TopEnd => "bottom: calc(100% + 8px); right: 0;",
         PopoverPlacement::Right => "left: calc(100% + 8px); top: 50%; transform: translateY(-50%);",
         PopoverPlacement::RightStart => "left: calc(100% + 8px); top: 0;",
         PopoverPlacement::RightEnd => "left: calc(100% + 8px); bottom: 0;",
-        PopoverPlacement::Bottom => "top: calc(100% + 8px); left: 50%; transform: translateX(-50%);",
+        PopoverPlacement::Bottom => {
+            "top: calc(100% + 8px); left: 50%; transform: translateX(-50%);"
+        }
         PopoverPlacement::BottomStart => "top: calc(100% + 8px); left: 0;",
         PopoverPlacement::BottomEnd => "top: calc(100% + 8px); right: 0;",
         PopoverPlacement::Left => "right: calc(100% + 8px); top: 50%; transform: translateY(-50%);",
         PopoverPlacement::LeftStart => "right: calc(100% + 8px); top: 0;",
         PopoverPlacement::LeftEnd => "right: calc(100% + 8px); bottom: 0;",
     };
-    
+
     let popover_style = use_style(|t| {
         Style::new()
             .absolute()
@@ -95,7 +99,7 @@ pub fn Popover(props: PopoverProps) -> Element {
             .z_index(50)
             .build()
     });
-    
+
     let mut toggle = move || {
         let new_open = !is_open();
         is_open.set(new_open);
@@ -103,19 +107,19 @@ pub fn Popover(props: PopoverProps) -> Element {
             handler.call(new_open);
         }
     };
-    
+
     let custom_style = props.style.clone().unwrap_or_default();
-    
+
     rsx! {
         div {
             style: "position: relative; display: inline-block;",
-            
+
             // Trigger
             div {
                 onclick: move |_| toggle(),
                 {props.trigger}
             }
-            
+
             // Content
             if is_open() {
                 // Overlay to close on outside click
@@ -128,11 +132,11 @@ pub fn Popover(props: PopoverProps) -> Element {
                         }
                     },
                 }
-                
+
                 div {
                     style: "{popover_style} {position_style} {custom_style}",
                     onclick: move |e: Event<MouseData>| e.stop_propagation(),
-                    
+
                     PopoverContent { children: props.children.clone() }
                 }
             }
@@ -148,13 +152,9 @@ struct PopoverContentProps {
 #[component]
 fn PopoverContent(props: PopoverContentProps) -> Element {
     let _theme = use_theme();
-    
-    let content_style = use_style(|t| {
-        Style::new()
-            .p(&t.spacing, "md")
-            .build()
-    });
-    
+
+    let content_style = use_style(|t| Style::new().p(&t.spacing, "md").build());
+
     rsx! {
         Box {
             style: "{content_style}",
@@ -176,7 +176,7 @@ pub struct PopoverHeaderProps {
 #[component]
 pub fn PopoverHeader(props: PopoverHeaderProps) -> Element {
     let _theme = use_theme();
-    
+
     let header_style = use_style(|t| {
         Style::new()
             .pb(&t.spacing, "md")
@@ -184,18 +184,18 @@ pub fn PopoverHeader(props: PopoverHeaderProps) -> Element {
             .border_bottom(1, &t.colors.border)
             .build()
     });
-    
+
     rsx! {
         VStack {
             style: "{header_style}",
             gap: SpacingSize::Xs,
             align: AlignItems::Stretch,
-            
+
             h4 {
                 style: "margin: 0; font-size: 16px; font-weight: 600;",
                 "{props.title}"
             }
-            
+
             if let Some(description) = props.description {
                 p {
                     style: "margin: 0; font-size: 13px; color: #64748b;",
@@ -216,7 +216,7 @@ pub struct PopoverFooterProps {
 #[component]
 pub fn PopoverFooter(props: PopoverFooterProps) -> Element {
     let _theme = use_theme();
-    
+
     let footer_style = use_style(|t| {
         Style::new()
             .pt(&t.spacing, "md")
@@ -224,7 +224,7 @@ pub fn PopoverFooter(props: PopoverFooterProps) -> Element {
             .border_top(1, &t.colors.border)
             .build()
     });
-    
+
     rsx! {
         HStack {
             style: "{footer_style}",

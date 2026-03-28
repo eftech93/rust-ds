@@ -6,8 +6,8 @@
 use dioxus::prelude::*;
 use std::time::Duration;
 
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
 
 /// Carousel orientation
 #[derive(Clone, PartialEq, Default, Debug)]
@@ -215,13 +215,8 @@ pub fn Carousel(props: CarouselProps) -> Element {
         is_paused,
     };
 
-    let container_style = use_style(move |_t| {
-        Style::new()
-            .relative()
-            .w_full()
-            .overflow_hidden()
-            .build()
-    });
+    let container_style =
+        use_style(move |_t| Style::new().relative().w_full().overflow_hidden().build());
 
     let handle_mouse_enter = move |_| {
         if opts.pause_on_hover {
@@ -268,7 +263,9 @@ pub fn CarouselContent(props: CarouselContentProps) -> Element {
 
     // Get current index for transform calculation
     let current_idx = carousel.as_ref().map_or(0, |ctx| *ctx.current_index.read());
-    
+
+    // Count children and update total_items
+    // This is done by rendering and letting CarouselItem update the count
     let content_style = use_style(move |_t| {
         Style::new()
             .flex()
@@ -302,18 +299,25 @@ pub struct CarouselItemProps {
 pub fn CarouselItem(props: CarouselItemProps) -> Element {
     let _theme = use_theme();
     let carousel = use_carousel();
+    let index = props.index;
 
-    let is_active = carousel.as_ref().map_or(false, |ctx| {
-        *ctx.current_index.read() == props.index
+    // Update total_items count when this item is mounted
+    let total_items_signal = carousel.as_ref().map(|ctx| ctx.total_items);
+    use_effect(move || {
+        if let Some(mut total_items) = total_items_signal {
+            total_items.with_mut(|count| {
+                if index >= *count {
+                    *count = index + 1;
+                }
+            });
+        }
     });
 
-    let item_style = use_style(move |_t| {
-        Style::new()
-            .min_w("100%")
-            .w_full()
-            .h_full()
-            .build()
-    });
+    let is_active = carousel
+        .as_ref()
+        .map_or(false, |ctx| *ctx.current_index.read() == props.index);
+
+    let item_style = use_style(move |_t| Style::new().min_w("100%").w_full().h_full().build());
 
     rsx! {
         div {
@@ -342,7 +346,9 @@ pub struct CarouselPreviousProps {
 pub fn CarouselPrevious(props: CarouselPreviousProps) -> Element {
     let carousel = use_carousel();
 
-    let can_go_prev = carousel.as_ref().map_or(false, |ctx| *ctx.can_go_prev.read());
+    let can_go_prev = carousel
+        .as_ref()
+        .map_or(false, |ctx| *ctx.can_go_prev.read());
     let go_prev = carousel.as_ref().map(|ctx| ctx.go_prev.clone());
 
     let button_style = use_style(move |t| {
@@ -359,7 +365,11 @@ pub fn CarouselPrevious(props: CarouselPreviousProps) -> Element {
             .justify_center()
             .bg(&t.colors.background)
             .border(1, &t.colors.border)
-            .cursor(if can_go_prev { "pointer" } else { "not-allowed" })
+            .cursor(if can_go_prev {
+                "pointer"
+            } else {
+                "not-allowed"
+            })
             .opacity(if can_go_prev { 1.0 } else { 0.5 })
             .shadow(&t.shadows.md)
             .transition("all 150ms ease")
@@ -404,7 +414,9 @@ pub struct CarouselNextProps {
 pub fn CarouselNext(props: CarouselNextProps) -> Element {
     let carousel = use_carousel();
 
-    let can_go_next = carousel.as_ref().map_or(false, |ctx| *ctx.can_go_next.read());
+    let can_go_next = carousel
+        .as_ref()
+        .map_or(false, |ctx| *ctx.can_go_next.read());
     let go_next = carousel.as_ref().map(|ctx| ctx.go_next.clone());
 
     let button_style = use_style(move |t| {
@@ -421,7 +433,11 @@ pub fn CarouselNext(props: CarouselNextProps) -> Element {
             .justify_center()
             .bg(&t.colors.background)
             .border(1, &t.colors.border)
-            .cursor(if can_go_next { "pointer" } else { "not-allowed" })
+            .cursor(if can_go_next {
+                "pointer"
+            } else {
+                "not-allowed"
+            })
             .opacity(if can_go_next { 1.0 } else { 0.5 })
             .shadow(&t.shadows.md)
             .transition("all 150ms ease")
@@ -452,6 +468,7 @@ pub fn CarouselNext(props: CarouselNextProps) -> Element {
 
 /// Chevron direction for navigation buttons
 #[derive(Clone, PartialEq)]
+#[allow(dead_code)]
 enum ChevronDirection {
     Left,
     Right,
@@ -515,9 +532,9 @@ pub struct CarouselDotsProps {
 pub fn CarouselDots(props: CarouselDotsProps) -> Element {
     let carousel = use_carousel();
 
-    let count = props.count.unwrap_or_else(|| {
-        carousel.as_ref().map_or(0, |ctx| *ctx.total_items.read())
-    });
+    let count = props
+        .count
+        .unwrap_or_else(|| carousel.as_ref().map_or(0, |ctx| *ctx.total_items.read()));
 
     let current_index = carousel.as_ref().map_or(0, |ctx| *ctx.current_index.read());
     let go_to = carousel.as_ref().map(|ctx| ctx.go_to.clone());
@@ -572,7 +589,11 @@ fn CarouselDot(props: CarouselDotProps) -> Element {
             .w_px(if is_active { 24 } else { 8 })
             .h_px(8)
             .rounded_full()
-            .bg(if is_active { &t.colors.primary } else { &t.colors.muted })
+            .bg(if is_active {
+                &t.colors.primary
+            } else {
+                &t.colors.muted
+            })
             .cursor("pointer")
             .transition("all 200ms ease")
             .border(0, &t.colors.border)
@@ -675,14 +696,14 @@ pub struct TouchCarouselProps {
 }
 
 /// Touch-enabled carousel with swipe support
-/// 
+///
 /// Note: Touch support is simplified. For full touch gesture support,
 /// implement platform-specific touch handling using the carousel context.
 #[component]
 pub fn TouchCarousel(props: TouchCarouselProps) -> Element {
     // Simplified touch carousel that wraps the base Carousel
     // Touch handling would require platform-specific implementation
-    
+
     rsx! {
         Carousel {
             opts: props.opts,

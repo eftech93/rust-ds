@@ -3,8 +3,8 @@
 //! Provides a context provider and hooks for accessing and modifying the theme
 //! throughout the component tree.
 
-use dioxus::prelude::*;
 use super::tokens::ThemeTokens;
+use dioxus::prelude::*;
 
 /// Theme context providing access to current theme and theme switching
 #[derive(Clone)]
@@ -92,7 +92,10 @@ fn load_theme_from_storage() -> Option<ThemeTokens> {
 /// Save theme to localStorage (web only)
 #[cfg(all(feature = "web", target_arch = "wasm32"))]
 fn save_theme_to_storage(theme_name: &str) {
-    if let Some(storage) = web_sys::window().and_then(|w| w.local_storage().ok()).flatten() {
+    if let Some(storage) = web_sys::window()
+        .and_then(|w| w.local_storage().ok())
+        .flatten()
+    {
         let _ = storage.set_item(THEME_STORAGE_KEY, theme_name);
     }
 }
@@ -136,10 +139,8 @@ fn save_theme_to_storage(_theme_name: &str) {}
 #[component]
 pub fn ThemeProvider(
     children: Element,
-    #[props(default)]
-    initial_theme: Option<ThemeTokens>,
-    #[props(default = false)]
-    persist_theme: bool,
+    #[props(default)] initial_theme: Option<ThemeTokens>,
+    #[props(default = false)] persist_theme: bool,
 ) -> Element {
     // Determine initial theme: explicit prop > localStorage (if enabled) > default light
     let initial = if persist_theme {
@@ -149,7 +150,7 @@ pub fn ThemeProvider(
     } else {
         initial_theme.unwrap_or_else(ThemeTokens::light)
     };
-    
+
     let mut tokens = use_signal(|| initial);
     let persist = use_signal(|| persist_theme);
 
@@ -235,9 +236,9 @@ pub fn ThemeSelector() -> Element {
     let theme = use_theme();
     let mut is_open = use_signal(|| false);
     let current_mode = use_style(|t| t.mode.clone());
-    
+
     let presets = ThemeTokens::presets();
-    
+
     let current_name = match current_mode() {
         super::tokens::ThemeMode::Light => "Light",
         super::tokens::ThemeMode::Dark => "Dark",
@@ -254,22 +255,22 @@ pub fn ThemeSelector() -> Element {
     rsx! {
         div {
             style: "position: relative; display: inline-block;",
-            
+
             // Trigger button
             button {
                 style: "display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;",
                 onclick: move |_| is_open.toggle(),
-                
+
                 span { "🎨" }
                 span { "{current_name}" }
                 span { "▼" }
             }
-            
+
             // Dropdown
             if is_open() {
                 div {
                     style: "position: absolute; top: calc(100% + 4px); right: 0; min-width: 150px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 100;",
-                    
+
                     for (name, _) in presets {
                         button {
                             style: "display: block; width: 100%; padding: 8px 12px; text-align: left; background: none; border: none; cursor: pointer; border-radius: 6px; margin: 2px;",
@@ -289,8 +290,8 @@ pub fn ThemeSelector() -> Element {
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::tokens::ThemeMode;
+    use super::*;
 
     #[test]
     fn test_theme_context_creation() {

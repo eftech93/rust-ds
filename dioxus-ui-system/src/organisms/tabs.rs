@@ -2,9 +2,9 @@
 //!
 //! A set of layered sections of content—known as tab panels—that are displayed one at a time.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Tab item definition
 #[derive(Clone, PartialEq)]
@@ -29,13 +29,13 @@ impl TabItem {
             disabled: false,
         }
     }
-    
+
     /// Add an icon
     pub fn with_icon(mut self, icon: impl Into<String>) -> Self {
         self.icon = Some(icon.into());
         self
     }
-    
+
     /// Set disabled state
     pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = disabled;
@@ -79,35 +79,29 @@ pub enum TabsVariant {
 pub fn Tabs(props: TabsProps) -> Element {
     let _theme = use_theme();
     let variant = props.variant.clone();
-    
-    let tabs_container_style = use_style(move |t| {
-        match variant {
-            TabsVariant::Default => Style::new()
-                .w_full()
-                .border_bottom(1, &t.colors.border)
-                .flex()
-                .gap(&t.spacing, "md")
-                .build(),
-            TabsVariant::Enclosed => Style::new()
-                .w_full()
-                .bg(&t.colors.muted)
-                .rounded(&t.radius, "md")
-                .p(&t.spacing, "xs")
-                .flex()
-                .gap(&t.spacing, "xs")
-                .build(),
-            TabsVariant::Soft => Style::new()
-                .w_full()
-                .flex()
-                .gap(&t.spacing, "sm")
-                .build(),
-        }
+
+    let tabs_container_style = use_style(move |t| match variant {
+        TabsVariant::Default => Style::new()
+            .w_full()
+            .border_bottom(1, &t.colors.border)
+            .flex()
+            .gap(&t.spacing, "md")
+            .build(),
+        TabsVariant::Enclosed => Style::new()
+            .w_full()
+            .bg(&t.colors.muted)
+            .rounded(&t.radius, "md")
+            .p(&t.spacing, "xs")
+            .flex()
+            .gap(&t.spacing, "xs")
+            .build(),
+        TabsVariant::Soft => Style::new().w_full().flex().gap(&t.spacing, "sm").build(),
     });
-    
+
     rsx! {
         div {
             style: "{tabs_container_style} {props.style.clone().unwrap_or_default()}",
-            
+
             for tab in props.tabs.clone() {
                 TabButton {
                     tab: tab.clone(),
@@ -132,11 +126,11 @@ struct TabButtonProps {
 fn TabButton(props: TabButtonProps) -> Element {
     let _theme = use_theme();
     let mut is_hovered = use_signal(|| false);
-    
+
     let is_active = props.is_active;
     let is_disabled = props.tab.disabled;
     let variant = props.variant.clone();
-    
+
     let button_style = use_style(move |t| {
         let base = Style::new()
             .inline_flex()
@@ -146,12 +140,16 @@ fn TabButton(props: TabButtonProps) -> Element {
             .py(&t.spacing, "sm")
             .text(&t.typography, "sm")
             .font_weight(500)
-            .cursor(if is_disabled { "not-allowed" } else { "pointer" })
+            .cursor(if is_disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .transition("all 150ms ease")
             .border(0, &t.colors.border)
             .bg_transparent()
             .outline("none");
-        
+
         match variant {
             TabsVariant::Default => {
                 let styled = if is_active {
@@ -161,12 +159,13 @@ fn TabButton(props: TabButtonProps) -> Element {
                 } else {
                     base.text_color(&t.colors.muted_foreground)
                 };
-                
+
                 if is_hovered() && !is_disabled && !is_active {
                     styled.text_color(&t.colors.foreground)
                 } else {
                     styled
-                }.build()
+                }
+                .build()
             }
             TabsVariant::Enclosed => {
                 if is_active {
@@ -198,15 +197,15 @@ fn TabButton(props: TabButtonProps) -> Element {
             }
         }
     });
-    
+
     let handle_click = move |_| {
         if !is_disabled {
             props.on_click.call(props.tab.id.clone());
         }
     };
-    
+
     let has_icon = props.tab.icon.is_some();
-    
+
     rsx! {
         button {
             style: "{button_style}",
@@ -214,11 +213,11 @@ fn TabButton(props: TabButtonProps) -> Element {
             onclick: handle_click,
             onmouseenter: move |_| if !is_disabled { is_hovered.set(true) },
             onmouseleave: move |_| is_hovered.set(false),
-            
+
             if has_icon {
                 TabIcon { name: props.tab.icon.clone().unwrap() }
             }
-            
+
             "{props.tab.label}"
         }
     }
@@ -240,7 +239,7 @@ fn TabIcon(props: TabIconProps) -> Element {
             stroke_linecap: "round",
             stroke_linejoin: "round",
             style: "width: 16px; height: 16px;",
-            
+
             match props.name.as_str() {
                 "settings" => rsx! {
                     path { d: "M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" }
@@ -268,14 +267,9 @@ pub struct TabPanelProps {
 #[component]
 pub fn TabPanel(props: TabPanelProps) -> Element {
     let _theme = use_theme();
-    
-    let panel_style = use_style(|t| {
-        Style::new()
-            .w_full()
-            .pt(&t.spacing, "md")
-            .build()
-    });
-    
+
+    let panel_style = use_style(|t| Style::new().w_full().pt(&t.spacing, "md").build());
+
     rsx! {
         div {
             role: "tabpanel",
@@ -303,14 +297,9 @@ pub struct VerticalTabsProps {
 #[component]
 pub fn VerticalTabs(props: VerticalTabsProps) -> Element {
     let _theme = use_theme();
-    
-    let container_style = use_style(|t| {
-        Style::new()
-            .flex()
-            .gap(&t.spacing, "lg")
-            .build()
-    });
-    
+
+    let container_style = use_style(|t| Style::new().flex().gap(&t.spacing, "lg").build());
+
     let sidebar_style = use_style(|t| {
         Style::new()
             .w_px(200)
@@ -319,14 +308,14 @@ pub fn VerticalTabs(props: VerticalTabsProps) -> Element {
             .gap(&t.spacing, "xs")
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
-            
+
             div {
                 style: "{sidebar_style}",
-                
+
                 for tab in props.tabs.clone() {
                     VerticalTabButton {
                         tab: tab.clone(),
@@ -350,10 +339,10 @@ struct VerticalTabButtonProps {
 fn VerticalTabButton(props: VerticalTabButtonProps) -> Element {
     let _theme = use_theme();
     let mut is_hovered = use_signal(|| false);
-    
+
     let is_active = props.is_active;
     let is_disabled = props.tab.disabled;
-    
+
     let button_style = use_style(move |t| {
         let base = Style::new()
             .w_full()
@@ -365,29 +354,33 @@ fn VerticalTabButton(props: VerticalTabButtonProps) -> Element {
             .rounded(&t.radius, "md")
             .text(&t.typography, "sm")
             .font_weight(500)
-            .cursor(if is_disabled { "not-allowed" } else { "pointer" })
+            .cursor(if is_disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .transition("all 150ms ease")
             .border(0, &t.colors.border)
             .bg_transparent()
             .text_align_left();
-        
+
         if is_active {
             base.bg(&t.colors.secondary)
                 .text_color(&t.colors.secondary_foreground)
         } else if is_hovered() && !is_disabled {
-            base.bg(&t.colors.muted)
-                .text_color(&t.colors.foreground)
+            base.bg(&t.colors.muted).text_color(&t.colors.foreground)
         } else {
             base.text_color(&t.colors.muted_foreground)
-        }.build()
+        }
+        .build()
     });
-    
+
     let handle_click = move |_| {
         if !is_disabled {
             props.on_click.call(props.tab.id.clone());
         }
     };
-    
+
     rsx! {
         button {
             style: "{button_style}",

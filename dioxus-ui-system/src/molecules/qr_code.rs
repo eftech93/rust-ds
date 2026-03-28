@@ -2,9 +2,9 @@
 //!
 //! A QR code generator display component.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// QR Code error correction level
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -82,17 +82,19 @@ pub struct QrCodeProps {
 /// ```
 #[component]
 pub fn QrCode(props: QrCodeProps) -> Element {
-    let theme = use_theme();
-    
-    let container_style = use_style(|_t| {
-        Style::new()
-            .inline_block()
-            .build()
-    });
-    
-    let fg = props.fg_color.clone().unwrap_or_else(|| "000000".to_string());
-    let bg = props.bg_color.clone().unwrap_or_else(|| "FFFFFF".to_string());
-    
+    let _theme = use_theme();
+
+    let container_style = use_style(|_t| Style::new().inline_block().build());
+
+    let fg = props
+        .fg_color
+        .clone()
+        .unwrap_or_else(|| "000000".to_string());
+    let bg = props
+        .bg_color
+        .clone()
+        .unwrap_or_else(|| "FFFFFF".to_string());
+
     // Generate QR code using Google Chart API
     // For a pure Rust solution, you'd use the `qrcode` crate
     let api_url = format!(
@@ -105,14 +107,17 @@ pub fn QrCode(props: QrCodeProps) -> Element {
         bg,
         if props.include_margin { 4 } else { 0 }
     );
-    
-    let alt_text = props.title.clone().unwrap_or_else(|| format!("QR Code: {}", props.value));
-    
+
+    let alt_text = props
+        .title
+        .clone()
+        .unwrap_or_else(|| format!("QR Code: {}", props.value));
+
     rsx! {
         div {
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
-            
+
             img {
                 src: "{api_url}",
                 width: "{props.size}",
@@ -140,35 +145,31 @@ pub struct QrCodeSvgProps {
 }
 
 /// QR Code SVG component using inline SVG
-/// Note: This is a simplified placeholder. For real QR codes, 
+/// Note: This is a simplified placeholder. For real QR codes,
 /// use the `qrcode` crate to generate the actual matrix.
 #[component]
 pub fn QrCodeSvg(props: QrCodeSvgProps) -> Element {
-    let theme = use_theme();
+    let _theme = use_theme();
     let module_count = 21; // Minimum QR version 1 size
-    let module_size = props.size / module_count as u32;
-    
+    let _module_size = props.size / module_count as u32;
+
     // Generate a pseudo-random pattern based on the value hash
     // In production, use the `qrcode` crate to generate the actual matrix
     let pattern = generate_placeholder_pattern(&props.value, module_count);
-    
-    let container_style = use_style(|_t| {
-        Style::new()
-            .inline_block()
-            .build()
-    });
-    
+
+    let container_style = use_style(|_t| Style::new().inline_block().build());
+
     rsx! {
         div {
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
-            
+
             svg {
                 width: "{props.size}",
                 height: "{props.size}",
                 view_box: "0 0 {module_count} {module_count}",
                 xmlns: "http://www.w3.org/2000/svg",
-                
+
                 // Background
                 rect {
                     x: "0",
@@ -177,7 +178,7 @@ pub fn QrCodeSvg(props: QrCodeSvgProps) -> Element {
                     height: "{module_count}",
                     fill: "white",
                 }
-                
+
                 // QR pattern modules
                 for (row_idx, row) in pattern.iter().enumerate() {
                     for (col_idx, &is_dark) in row.iter().enumerate() {
@@ -193,14 +194,14 @@ pub fn QrCodeSvg(props: QrCodeSvgProps) -> Element {
                         }
                     }
                 }
-                
+
                 // Position detection patterns (corners)
                 // Top-left
                 PositionPattern { x: 0, y: 0 }
                 // Top-right
-                PositionPattern { x: (module_count - 7), y: 0 }
+                PositionPattern { x: module_count - 7, y: 0 }
                 // Bottom-left
-                PositionPattern { x: 0, y: (module_count - 7) }
+                PositionPattern { x: 0, y: module_count - 7 }
             }
         }
     }
@@ -216,7 +217,7 @@ struct PositionPatternProps {
 fn PositionPattern(props: PositionPatternProps) -> Element {
     let x = props.x;
     let y = props.y;
-    
+
     rsx! {
         // Outer square
         rect { x: "{x}", y: "{y}", width: "7", height: "7", fill: "black" }
@@ -232,13 +233,13 @@ fn PositionPattern(props: PositionPatternProps) -> Element {
 fn generate_placeholder_pattern(value: &str, size: usize) -> Vec<Vec<bool>> {
     use std::collections::hash_map::DefaultHasher;
     use std::hash::{Hash, Hasher};
-    
+
     let mut hasher = DefaultHasher::new();
     value.hash(&mut hasher);
     let hash = hasher.finish();
-    
+
     let mut pattern = vec![vec![false; size]; size];
-    
+
     // Generate pattern based on hash
     for i in 0..size {
         for j in 0..size {
@@ -256,7 +257,7 @@ fn generate_placeholder_pattern(value: &str, size: usize) -> Vec<Vec<bool>> {
             pattern[i][j] = ((hash >> (idx % 64)) & 1) == 1;
         }
     }
-    
+
     pattern
 }
 

@@ -29,8 +29,8 @@
 
 use dioxus::prelude::*;
 
-use crate::theme::{use_theme, Color};
 use crate::styles::Style;
+use crate::theme::{use_theme, Color};
 
 /// Timeline position variant
 #[derive(Clone, Copy, PartialEq, Default, Debug)]
@@ -85,12 +85,7 @@ pub fn Timeline(props: TimelineProps) -> Element {
     // Provide context for child items
     use_context_provider(|| TimelineContext::new(props.position.clone()));
 
-    let timeline_style = Style::new()
-        .flex()
-        .flex_col()
-        .relative()
-        .py_px(16)
-        .w_full();
+    let timeline_style = Style::new().flex().flex_col().relative().py_px(16).w_full();
 
     rsx! {
         div {

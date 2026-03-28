@@ -47,9 +47,9 @@
 //! }
 //! ```
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 // ============================================================================
 // Context
@@ -65,7 +65,7 @@ struct CommandContext {
     /// Total number of selectable items
     item_count: Signal<usize>,
     /// Callback when item is selected via keyboard
-    on_select: Callback<()>,
+    _on_select: Callback<()>,
     /// Whether the command palette is focused
     focused: Signal<bool>,
     /// Callback when any item is selected (for closing the palette)
@@ -90,7 +90,7 @@ pub struct CommandProps {
 }
 
 /// Command container component
-/// 
+///
 /// The root component that provides context for all child command components.
 #[component]
 pub fn Command(props: CommandProps) -> Element {
@@ -99,13 +99,13 @@ pub fn Command(props: CommandProps) -> Element {
     let highlighted_index = use_signal(|| 0usize);
     let item_count = use_signal(|| 0usize);
     let focused = use_signal(|| false);
-    
+
     let on_item_select = props.on_select.clone();
     let context = CommandContext {
         value,
         highlighted_index,
         item_count,
-        on_select: Callback::new(move |()| {}),
+        _on_select: Callback::new(move |()| {}),
         focused,
         on_item_select: Callback::new(move |()| {
             if let Some(ref handler) = on_item_select {
@@ -113,11 +113,13 @@ pub fn Command(props: CommandProps) -> Element {
             }
         }),
     };
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let container_style = use_style(|t| {
         Style::new()
             .flex()
@@ -130,9 +132,9 @@ pub fn Command(props: CommandProps) -> Element {
             .overflow_hidden()
             .build()
     });
-    
+
     use_context_provider(|| context);
-    
+
     rsx! {
         div {
             class: "command{class_css}",
@@ -160,19 +162,19 @@ pub struct CommandInputProps {
 }
 
 /// Command input component
-/// 
+///
 /// Search input for filtering command items.
 #[component]
 pub fn CommandInput(props: CommandInputProps) -> Element {
     let theme = use_theme();
     let mut context: CommandContext = use_context();
     let value_ref = props.value.clone();
-    
+
     // Update context value when prop changes
     use_effect(move || {
         context.value.set(value_ref.clone());
     });
-    
+
     let input_style = use_style(|t| {
         Style::new()
             .w_full()
@@ -185,10 +187,10 @@ pub fn CommandInput(props: CommandInputProps) -> Element {
             .outline("none")
             .build()
     });
-    
+
     let handle_key_down = move |e: Event<dioxus::html::KeyboardData>| {
         use dioxus::html::input_data::keyboard_types::Key;
-        
+
         match e.key() {
             Key::ArrowDown => {
                 e.prevent_default();
@@ -212,22 +214,25 @@ pub fn CommandInput(props: CommandInputProps) -> Element {
             _ => {}
         }
     };
-    
-    let placeholder_text = props.placeholder.clone().unwrap_or_else(|| "Type a command or search...".to_string());
+
+    let placeholder_text = props
+        .placeholder
+        .clone()
+        .unwrap_or_else(|| "Type a command or search...".to_string());
     let value_for_input = props.value.clone();
-    
+
     rsx! {
         div {
             class: "command-input-wrapper",
             style: "position: relative; display: flex; align-items: center;",
-            
+
             // Search icon
             span {
                 class: "command-input-icon",
                 style: "position: absolute; left: 16px; font-size: 16px; color: {theme.tokens.read().colors.muted.to_rgba()}; pointer-events: none;",
                 "🔍"
             }
-            
+
             input {
                 class: "command-input",
                 style: "{input_style} padding-left: 44px;",
@@ -260,12 +265,12 @@ pub struct CommandListProps {
 }
 
 /// Command list component
-/// 
+///
 /// Scrollable container for command items.
 #[component]
 pub fn CommandList(props: CommandListProps) -> Element {
     let _theme = use_theme();
-    
+
     let list_style = use_style(|t| {
         Style::new()
             .flex()
@@ -276,7 +281,7 @@ pub fn CommandList(props: CommandListProps) -> Element {
             .gap(&t.spacing, "xs")
             .build()
     });
-    
+
     rsx! {
         div {
             class: "command-list",
@@ -301,12 +306,12 @@ pub struct CommandGroupProps {
 }
 
 /// Command group component
-/// 
+///
 /// Groups related command items with an optional heading.
 #[component]
 pub fn CommandGroup(props: CommandGroupProps) -> Element {
     let theme = use_theme();
-    
+
     let group_style = use_style(|t| {
         Style::new()
             .flex()
@@ -315,12 +320,12 @@ pub fn CommandGroup(props: CommandGroupProps) -> Element {
             .mb(&t.spacing, "sm")
             .build()
     });
-    
+
     rsx! {
         div {
             class: "command-group",
             style: "{group_style}",
-            
+
             if let Some(heading) = props.heading {
                 div {
                     class: "command-group-heading",
@@ -328,7 +333,7 @@ pub fn CommandGroup(props: CommandGroupProps) -> Element {
                     "{heading}"
                 }
             }
-            
+
             {props.children}
         }
     }
@@ -353,31 +358,31 @@ pub struct CommandItemProps {
 }
 
 /// Command item component
-/// 
+///
 /// Selectable item within a command group.
 #[component]
 pub fn CommandItem(props: CommandItemProps) -> Element {
     let theme = use_theme();
     let mut context: CommandContext = use_context();
-    
+
     // Register this item in the parent context
     let mut item_index = use_signal(|| 0usize);
-    
+
     use_hook(|| {
         let index = context.item_count.read().clone();
         item_index.set(index);
         let current_count = context.item_count.read().clone();
         context.item_count.set(current_count + 1);
     });
-    
+
     // Check if this item matches the current search
     let search_value = context.value.read().clone().to_lowercase();
     let item_value = props.value.to_lowercase();
     let is_match = search_value.is_empty() || item_value.contains(&search_value);
-    
+
     // Check if this item is currently highlighted
     let is_highlighted = context.highlighted_index.read().clone() == item_index.read().clone();
-    
+
     // Update highlighted index if this item is the only match
     let item_index_for_effect = item_index.read().clone();
     use_effect(move || {
@@ -385,23 +390,23 @@ pub fn CommandItem(props: CommandItemProps) -> Element {
             context.highlighted_index.set(item_index_for_effect);
         }
     });
-    
+
     if !is_match {
         return rsx! {};
     }
-    
+
     let bg_color = if is_highlighted && !props.disabled {
         theme.tokens.read().colors.accent.to_rgba()
     } else {
         "transparent".to_string()
     };
-    
+
     let text_color = if props.disabled {
         theme.tokens.read().colors.muted.to_rgba()
     } else {
         theme.tokens.read().colors.foreground.to_rgba()
     };
-    
+
     let is_disabled = props.disabled;
     let item_style = use_style(move |t| {
         Style::new()
@@ -411,31 +416,35 @@ pub fn CommandItem(props: CommandItemProps) -> Element {
             .px(&t.spacing, "sm")
             .py(&t.spacing, "sm")
             .rounded(&t.radius, "md")
-            .cursor(if is_disabled { "not-allowed" } else { "pointer" })
+            .cursor(if is_disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .opacity(if is_disabled { 0.5 } else { 1.0 })
             .build()
     });
-    
+
     let handle_click = move |_| {
         if !props.disabled {
             props.on_select.call(());
             context.on_item_select.call(());
         }
     };
-    
+
     let handle_mouse_enter = move |_| {
         if !props.disabled {
             context.highlighted_index.set(item_index.read().clone());
         }
     };
-    
+
     rsx! {
         div {
             class: "command-item",
             style: "{item_style} background: {bg_color}; color: {text_color};",
             onclick: handle_click,
             onmouseenter: handle_mouse_enter,
-            
+
             {props.children}
         }
     }
@@ -446,12 +455,12 @@ pub fn CommandItem(props: CommandItemProps) -> Element {
 // ============================================================================
 
 /// Command separator component
-/// 
+///
 /// Visual divider between command groups.
 #[component]
 pub fn CommandSeparator() -> Element {
     let _theme = use_theme();
-    
+
     let separator_style = use_style(|t| {
         Style::new()
             .h_px(1)
@@ -459,7 +468,7 @@ pub fn CommandSeparator() -> Element {
             .bg(&t.colors.border)
             .build()
     });
-    
+
     rsx! {
         div {
             class: "command-separator",
@@ -480,18 +489,18 @@ pub struct CommandEmptyProps {
 }
 
 /// Command empty component
-/// 
+///
 /// Displayed when no command items match the search.
 #[component]
 pub fn CommandEmpty(props: CommandEmptyProps) -> Element {
     let _theme = use_theme();
     let context: CommandContext = use_context();
-    
+
     // Only show if there are no matching items
-    // This is a simplified check - in a real implementation, 
+    // This is a simplified check - in a real implementation,
     // we'd count visible items from the context
     let _search_value = context.value.read().clone();
-    
+
     let empty_style = use_style(|t| {
         Style::new()
             .p(&t.spacing, "lg")
@@ -500,7 +509,7 @@ pub fn CommandEmpty(props: CommandEmptyProps) -> Element {
             .font_size(14)
             .build()
     });
-    
+
     rsx! {
         div {
             class: "command-empty",
@@ -522,12 +531,12 @@ pub struct CommandShortcutProps {
 }
 
 /// Command shortcut component
-/// 
+///
 /// Displays keyboard shortcuts for command items.
 #[component]
 pub fn CommandShortcut(props: CommandShortcutProps) -> Element {
     let _theme = use_theme();
-    
+
     let shortcut_style = use_style(|t| {
         Style::new()
             .pl(&t.spacing, "md")
@@ -535,7 +544,7 @@ pub fn CommandShortcut(props: CommandShortcutProps) -> Element {
             .text_color(&t.colors.muted)
             .build()
     });
-    
+
     rsx! {
         span {
             class: "command-shortcut",
@@ -550,12 +559,12 @@ pub fn CommandShortcut(props: CommandShortcutProps) -> Element {
 // ============================================================================
 
 /// Command loading component
-/// 
+///
 /// Displayed while command items are loading.
 #[component]
 pub fn CommandLoading() -> Element {
     let _theme = use_theme();
-    
+
     let loading_style = use_style(|t| {
         Style::new()
             .p(&t.spacing, "lg")
@@ -564,7 +573,7 @@ pub fn CommandLoading() -> Element {
             .font_size(14)
             .build()
     });
-    
+
     rsx! {
         div {
             class: "command-loading",

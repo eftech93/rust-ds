@@ -2,9 +2,9 @@
 //!
 //! A control that allows the user to toggle between checked and not checked.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Checkbox properties
 #[derive(Props, Clone, PartialEq)]
@@ -36,17 +36,17 @@ pub fn Checkbox(props: CheckboxProps) -> Element {
     let mut is_checked = use_signal(|| props.checked);
     let mut is_hovered = use_signal(|| false);
     let mut is_focused = use_signal(|| false);
-    
+
     // Sync with prop changes
     use_effect(move || {
         is_checked.set(props.checked);
     });
-    
+
     let checked = is_checked();
     let disabled = props.disabled;
     let cursor_style = if disabled { "not-allowed" } else { "pointer" };
     let opacity_style = if disabled { "0.5" } else { "1" };
-    
+
     let checkbox_style = use_style(move |t| {
         let base = Style::new()
             .w_px(20)
@@ -58,20 +58,19 @@ pub fn Checkbox(props: CheckboxProps) -> Element {
             .justify_center()
             .cursor("pointer")
             .transition("all 150ms ease");
-        
+
         let styled = if checked {
-            base.bg(&t.colors.primary)
-                .border_color(&t.colors.primary)
+            base.bg(&t.colors.primary).border_color(&t.colors.primary)
         } else {
             base.bg(&t.colors.background)
         };
-        
+
         let styled = if is_hovered() && !disabled && !checked {
             styled.border_color(&t.colors.primary)
         } else {
             styled
         };
-        
+
         let styled = if is_focused() && !disabled {
             Style {
                 box_shadow: Some(format!("0 0 0 2px {}", t.colors.ring.to_rgba())),
@@ -80,16 +79,16 @@ pub fn Checkbox(props: CheckboxProps) -> Element {
         } else {
             styled
         };
-        
+
         let styled = if disabled {
             styled.opacity(0.5)
         } else {
             styled
         };
-        
+
         styled.build()
     });
-    
+
     let checkmark_style = use_style(|t| {
         Style::new()
             .w_px(12)
@@ -97,7 +96,7 @@ pub fn Checkbox(props: CheckboxProps) -> Element {
             .text_color(&t.colors.primary_foreground)
             .build()
     });
-    
+
     let handle_click = move |_| {
         if !disabled {
             let new_checked = !is_checked();
@@ -107,7 +106,7 @@ pub fn Checkbox(props: CheckboxProps) -> Element {
             }
         }
     };
-    
+
     let checkbox_element = rsx! {
         button {
             r#type: "button",
@@ -121,7 +120,7 @@ pub fn Checkbox(props: CheckboxProps) -> Element {
             onmouseleave: move |_| is_hovered.set(false),
             onfocus: move |_| is_focused.set(true),
             onblur: move |_| is_focused.set(false),
-            
+
             if checked {
                 // Checkmark icon
                 svg {
@@ -137,7 +136,7 @@ pub fn Checkbox(props: CheckboxProps) -> Element {
             }
         }
     };
-    
+
     let label_element = if let Some(label_text) = props.label.clone() {
         rsx! {
             label {
@@ -149,7 +148,7 @@ pub fn Checkbox(props: CheckboxProps) -> Element {
     } else {
         checkbox_element
     };
-    
+
     rsx! {
         {label_element}
     }

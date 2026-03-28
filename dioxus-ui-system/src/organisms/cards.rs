@@ -4,13 +4,17 @@
 
 use dioxus::prelude::*;
 
-use crate::atoms::{Button, ButtonVariant, ButtonSize, Icon, IconSize, IconColor, Heading, HeadingLevel, Label, TextSize};
-use crate::molecules::{Card, CardVariant, CardHeader, CardContent, CardFooter, CardFooterJustify, Badge, BadgeVariant};
+use crate::atoms::{
+    Button, ButtonSize, ButtonVariant, Heading, HeadingLevel, Icon, IconColor, IconSize, Label,
+    TextSize,
+};
+use crate::molecules::{
+    Badge, BadgeVariant, Card, CardContent, CardFooter, CardFooterJustify, CardHeader, CardVariant,
+};
 
 /// ============================================================================
 /// 1. Single Action Card
 /// ============================================================================
-
 /// Card with a single primary action button
 #[derive(Props, Clone, PartialEq)]
 pub struct ActionCardProps {
@@ -39,15 +43,15 @@ pub fn ActionCard(props: ActionCardProps) -> Element {
         Card {
             variant: props.variant,
             full_width: true,
-            
+
             CardContent {
                 div {
                     style: "display: flex; flex-direction: column; gap: 12px;",
-                    
+
                     if let Some(icon) = props.icon.clone() {
                         div {
                             style: "width: 48px; height: 48px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center;",
-                            
+
                             Icon {
                                 name: icon,
                                 size: IconSize::Large,
@@ -55,24 +59,24 @@ pub fn ActionCard(props: ActionCardProps) -> Element {
                             }
                         }
                     }
-                    
+
                     if let Some(badge) = props.badge.clone() {
                         Badge {
                             variant: BadgeVariant::Secondary,
                             "{badge}"
                         }
                     }
-                    
+
                     Heading {
                         level: HeadingLevel::H4,
                         "{props.title}"
                     }
-                    
+
                     p {
                         style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
                         "{props.description}"
                     }
-                    
+
                     Button {
                         variant: ButtonVariant::Primary,
                         full_width: true,
@@ -88,7 +92,6 @@ pub fn ActionCard(props: ActionCardProps) -> Element {
 /// ============================================================================
 /// 2. Dual Action Card
 /// ============================================================================
-
 /// Card with two action buttons (primary and secondary)
 #[derive(Props, Clone, PartialEq)]
 pub struct DualActionCardProps {
@@ -115,15 +118,15 @@ pub fn DualActionCard(props: DualActionCardProps) -> Element {
         Card {
             variant: CardVariant::Default,
             full_width: true,
-            
+
             CardContent {
                 div {
                     style: "display: flex; flex-direction: column; gap: 12px;",
-                    
+
                     if let Some(icon) = props.icon.clone() {
                         div {
                             style: "width: 48px; height: 48px; background: #f1f5f9; border-radius: 12px; display: flex; align-items: center; justify-content: center;",
-                            
+
                             Icon {
                                 name: icon,
                                 size: IconSize::Large,
@@ -131,28 +134,28 @@ pub fn DualActionCard(props: DualActionCardProps) -> Element {
                             }
                         }
                     }
-                    
+
                     Heading {
                         level: HeadingLevel::H4,
                         "{props.title}"
                     }
-                    
+
                     p {
                         style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
                         "{props.description}"
                     }
                 }
             }
-            
+
             CardFooter {
                 justify: CardFooterJustify::Between,
-                
+
                 Button {
                     variant: ButtonVariant::Ghost,
                     onclick: move |_| props.on_secondary.call(()),
                     "{props.secondary_label}"
                 }
-                
+
                 Button {
                     variant: ButtonVariant::Primary,
                     onclick: move |_| props.on_primary.call(()),
@@ -166,7 +169,6 @@ pub fn DualActionCard(props: DualActionCardProps) -> Element {
 /// ============================================================================
 /// 3. Image Card
 /// ============================================================================
-
 /// Card with an image header
 #[derive(Props, Clone, PartialEq)]
 pub struct ImageCardProps {
@@ -197,32 +199,32 @@ pub fn ImageCard(props: ImageCardProps) -> Element {
             variant: CardVariant::Default,
             full_width: true,
             padding: Some("0".to_string()),
-            
+
             // Image
             div {
                 style: "width: 100%; aspect-ratio: {props.aspect_ratio}; overflow: hidden;",
-                
+
                 img {
                     src: "{props.image_url}",
                     alt: "{props.image_alt}",
                     style: "width: 100%; height: 100%; object-fit: cover;",
                 }
             }
-            
+
             CardContent {
                 div {
                     style: "display: flex; flex-direction: column; gap: 8px; padding: 4px 0;",
-                    
+
                     Heading {
                         level: HeadingLevel::H4,
                         "{props.title}"
                     }
-                    
+
                     p {
                         style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
                         "{props.description}"
                     }
-                    
+
                     if let Some(label) = props.action_label.clone() {
                         if let Some(handler) = props.on_action.clone() {
                             Button {
@@ -241,7 +243,6 @@ pub fn ImageCard(props: ImageCardProps) -> Element {
 /// ============================================================================
 /// 4. Image Card with Actions
 /// ============================================================================
-
 /// Card with image and action buttons overlay
 #[derive(Props, Clone, PartialEq)]
 pub struct ImageActionCardProps {
@@ -271,21 +272,21 @@ pub fn ImageActionCard(props: ImageActionCardProps) -> Element {
             variant: CardVariant::Default,
             full_width: true,
             padding: Some("0".to_string()),
-            
+
             // Image container with badge
             div {
                 style: "position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden;",
-                
+
                 img {
                     src: "{props.image_url}",
                     alt: "{props.title}",
                     style: "width: 100%; height: 100%; object-fit: cover;",
                 }
-                
+
                 if let Some(badge) = props.badge.clone() {
                     div {
                         style: "position: absolute; top: 12px; left: 12px;",
-                        
+
                         Badge {
                             variant: BadgeVariant::Success,
                             "{badge}"
@@ -293,32 +294,32 @@ pub fn ImageActionCard(props: ImageActionCardProps) -> Element {
                     }
                 }
             }
-            
+
             CardContent {
                 div {
                     style: "display: flex; flex-direction: column; gap: 12px; padding: 4px 0;",
-                    
+
                     Heading {
                         level: HeadingLevel::H4,
                         "{props.title}"
                     }
-                    
+
                     p {
                         style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
                         "{props.description}"
                     }
                 }
             }
-            
+
             CardFooter {
                 justify: CardFooterJustify::Between,
-                
+
                 Button {
                     variant: ButtonVariant::Secondary,
                     onclick: move |_| props.on_secondary.call(()),
                     "{props.secondary_label}"
                 }
-                
+
                 Button {
                     variant: ButtonVariant::Primary,
                     onclick: move |_| props.on_primary.call(()),
@@ -332,7 +333,6 @@ pub fn ImageActionCard(props: ImageActionCardProps) -> Element {
 /// ============================================================================
 /// 5. Profile Card
 /// ============================================================================
-
 /// Card showing user/profile information
 #[derive(Props, Clone, PartialEq)]
 pub struct ProfileCardProps {
@@ -369,16 +369,16 @@ pub fn ProfileCard(props: ProfileCardProps) -> Element {
         .chars()
         .take(2)
         .collect();
-    
+
     rsx! {
         Card {
             variant: CardVariant::Default,
             full_width: true,
-            
+
             CardContent {
                 div {
                     style: "display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center;",
-                    
+
                     // Avatar
                     if let Some(url) = props.avatar_url.clone() {
                         img {
@@ -392,14 +392,14 @@ pub fn ProfileCard(props: ProfileCardProps) -> Element {
                             "{initials}"
                         }
                     }
-                    
+
                     // Info
                     div {
                         Heading {
                             level: HeadingLevel::H4,
                             "{props.name}"
                         }
-                        
+
                         if let Some(role) = props.role.clone() {
                             Label {
                                 size: TextSize::Small,
@@ -408,28 +408,28 @@ pub fn ProfileCard(props: ProfileCardProps) -> Element {
                             }
                         }
                     }
-                    
+
                     if let Some(desc) = props.description.clone() {
                         p {
                             style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
                             "{desc}"
                         }
                     }
-                    
+
                     // Stats
                     if !props.stats.is_empty() {
                         div {
                             style: "display: flex; gap: 24px; justify-content: center; width: 100%; padding-top: 8px; border-top: 1px solid #e2e8f0;",
-                            
+
                             for (label, value) in props.stats.clone() {
                                 div {
                                     style: "text-align: center;",
-                                    
+
                                     div {
                                         style: "font-size: 18px; font-weight: 700; color: #0f172a;",
                                         "{value}"
                                     }
-                                    
+
                                     Label {
                                         size: TextSize::ExtraSmall,
                                         color: crate::atoms::TextColor::Muted,
@@ -439,7 +439,7 @@ pub fn ProfileCard(props: ProfileCardProps) -> Element {
                             }
                         }
                     }
-                    
+
                     // Action
                     if let Some(handler) = props.on_action.clone() {
                         Button {
@@ -458,7 +458,6 @@ pub fn ProfileCard(props: ProfileCardProps) -> Element {
 /// ============================================================================
 /// 6. Pricing Card
 /// ============================================================================
-
 /// Pricing plan card
 #[derive(Props, Clone, PartialEq)]
 pub struct PricingCardProps {
@@ -486,8 +485,6 @@ pub struct PricingCardProps {
 
 #[component]
 pub fn PricingCard(props: PricingCardProps) -> Element {
-
-    
     let action_element: Option<Element> = if props.recommended {
         Some(rsx! {
             Badge {
@@ -498,64 +495,64 @@ pub fn PricingCard(props: PricingCardProps) -> Element {
     } else {
         None
     };
-    
+
     rsx! {
         Card {
             variant: if props.recommended { CardVariant::Elevated } else { CardVariant::Default },
             full_width: true,
-            
+
             CardHeader {
                 title: props.plan.clone(),
                 action: action_element
             }
-            
+
             CardContent {
                 div {
                     style: "display: flex; flex-direction: column; gap: 16px;",
-                    
+
                     // Price
                     div {
                         style: "text-align: center;",
-                        
+
                         span {
                             style: "font-size: 36px; font-weight: 800; color: #0f172a;",
                             "{props.price}"
                         }
-                        
+
                         span {
                             style: "color: #64748b; font-size: 14px;",
                             "{props.period}"
                         }
                     }
-                    
+
                     if let Some(desc) = props.description.clone() {
                         p {
                             style: "margin: 0; color: #64748b; font-size: 14px; text-align: center;",
                             "{desc}"
                         }
                     }
-                    
+
                     // Features
                     ul {
                         style: "margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 8px;",
-                        
+
                         for feature in props.features.clone() {
                             li {
                                 style: "display: flex; align-items: center; gap: 8px; font-size: 14px;",
-                                
+
                                 Icon {
                                     name: "check".to_string(),
                                     size: IconSize::Small,
                                     color: IconColor::Success,
                                 }
-                                
+
                                 "{feature}"
                             }
                         }
                     }
                 }
             }
-            
+
             CardFooter {
                 Button {
                     variant: if props.recommended { ButtonVariant::Primary } else { ButtonVariant::Secondary },
@@ -571,7 +568,6 @@ pub fn PricingCard(props: PricingCardProps) -> Element {
 /// ============================================================================
 /// 7. Horizontal Card
 /// ============================================================================
-
 /// Card with horizontal layout (image left, content right)
 #[derive(Props, Clone, PartialEq)]
 pub struct HorizontalCardProps {
@@ -596,40 +592,40 @@ pub fn HorizontalCard(props: HorizontalCardProps) -> Element {
             variant: CardVariant::Default,
             full_width: true,
             padding: Some("0".to_string()),
-            
+
             div {
                 style: "display: flex; flex-direction: row;",
-                
+
                 // Image (left side)
                 div {
                     style: "width: 120px; min-height: 120px; flex-shrink: 0;",
-                    
+
                     img {
                         src: "{props.image_url}",
                         alt: "{props.title}",
                         style: "width: 100%; height: 100%; object-fit: cover; border-radius: 12px 0 0 12px;",
                     }
                 }
-                
+
                 // Content (right side)
                 div {
                     style: "flex: 1; padding: 16px; display: flex; flex-direction: column; justify-content: center;",
-                    
+
                     Heading {
                         level: HeadingLevel::H4,
                         "{props.title}"
                     }
-                    
+
                     p {
                         style: "margin: 4px 0 0 0; color: #64748b; font-size: 13px; line-height: 1.4;",
                         "{props.description}"
                     }
-                    
+
                     if let Some(label) = props.action_label.clone() {
                         if let Some(handler) = props.on_action.clone() {
                             div {
                                 style: "margin-top: 12px;",
-                                
+
                                 Button {
                                     variant: ButtonVariant::Ghost,
                                     size: ButtonSize::Sm,
@@ -648,7 +644,6 @@ pub fn HorizontalCard(props: HorizontalCardProps) -> Element {
 /// ============================================================================
 /// 8. Notification Card
 /// ============================================================================
-
 /// Card for notifications/alerts with dismiss action
 #[derive(Props, Clone, PartialEq)]
 pub struct NotificationCardProps {
@@ -688,42 +683,42 @@ pub fn NotificationCard(props: NotificationCardProps) -> Element {
         NotificationType::Warning => ("alert-triangle", IconColor::Warning, "#eab308"),
         NotificationType::Error => ("x-circle", IconColor::Destructive, "#ef4444"),
     };
-    
+
     let icon_name = props.icon.clone().unwrap_or_else(|| icon.to_string());
-    
+
     rsx! {
         Card {
             variant: CardVariant::Default,
             full_width: true,
             style: Some(format!("border-left: 4px solid {};", border_color)),
-            
+
             CardContent {
                 div {
                     style: "display: flex; gap: 12px;",
-                    
+
                     // Icon
                     div {
                         style: "flex-shrink: 0; padding-top: 2px;",
-                        
+
                         Icon {
                             name: icon_name,
                             size: IconSize::Medium,
                             color: icon_color,
                         }
                     }
-                    
+
                     // Content
                     div {
                         style: "flex: 1; min-width: 0;",
-                        
+
                         div {
                             style: "display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;",
-                            
+
                             Heading {
                                 level: HeadingLevel::H4,
                                 "{props.title}"
                             }
-                            
+
                             if let Some(handler) = props.on_dismiss.clone() {
                                 button {
                                     style: "background: none; border: none; cursor: pointer; padding: 4px; color: #94a3b8;",
@@ -732,12 +727,12 @@ pub fn NotificationCard(props: NotificationCardProps) -> Element {
                                 }
                             }
                         }
-                        
+
                         p {
                             style: "margin: 4px 0 0 0; color: #64748b; font-size: 14px; line-height: 1.5;",
                             "{props.message}"
                         }
-                        
+
                         if let Some(time) = props.timestamp.clone() {
                             Label {
                                 size: TextSize::ExtraSmall,
@@ -755,7 +750,6 @@ pub fn NotificationCard(props: NotificationCardProps) -> Element {
 /// ============================================================================
 /// 9. Stat Card
 /// ============================================================================
-
 /// Card for displaying statistics/metrics
 #[derive(Props, Clone, PartialEq)]
 pub struct StatCardProps {
@@ -781,16 +775,16 @@ pub struct StatCardProps {
 pub fn StatCard(props: StatCardProps) -> Element {
     let is_positive = props.change_positive.unwrap_or(true);
     let change_color = if is_positive { "#22c55e" } else { "#ef4444" };
-    
+
     rsx! {
         Card {
             variant: CardVariant::Default,
             full_width: true,
-            
+
             CardContent {
                 div {
                     style: "display: flex; align-items: flex-start; justify-content: space-between;",
-                    
+
                     // Text content
                     div {
                         Label {
@@ -798,15 +792,15 @@ pub fn StatCard(props: StatCardProps) -> Element {
                             color: crate::atoms::TextColor::Muted,
                             "{props.label}"
                         }
-                        
+
                         div {
                             style: "display: flex; align-items: baseline; gap: 8px; margin-top: 4px;",
-                            
+
                             span {
                                 style: "font-size: 28px; font-weight: 700; color: #0f172a;",
                                 "{props.value}"
                             }
-                            
+
                             if let Some(change) = props.change.clone() {
                                 span {
                                     style: "font-size: 13px; font-weight: 600; color: {change_color};",
@@ -815,12 +809,12 @@ pub fn StatCard(props: StatCardProps) -> Element {
                             }
                         }
                     }
-                    
+
                     // Icon
                     if let Some(icon) = props.icon.clone() {
                         div {
                             style: "width: 40px; height: 40px; background: {props.icon_bg}; border-radius: 10px; display: flex; align-items: center; justify-content: center;",
-                            
+
                             Icon {
                                 name: icon,
                                 size: IconSize::Medium,
@@ -837,7 +831,6 @@ pub fn StatCard(props: StatCardProps) -> Element {
 /// ============================================================================
 /// 10. Expandable Card
 /// ============================================================================
-
 /// Card that can expand/collapse to show more content
 #[derive(Props, Clone, PartialEq)]
 pub struct ExpandableCardProps {
@@ -855,21 +848,21 @@ pub struct ExpandableCardProps {
 #[component]
 pub fn ExpandableCard(props: ExpandableCardProps) -> Element {
     let mut is_expanded = use_signal(|| props.default_expanded);
-    
+
     rsx! {
         Card {
             variant: CardVariant::Default,
             full_width: true,
-            
+
             CardHeader {
                 title: props.title.clone(),
-                
+
                 action: rsx! {
                     button {
                         style: "background: none; border: none; cursor: pointer; padding: 4px; transition: transform 200ms;",
                         style: if is_expanded() { "transform: rotate(180deg);" } else { "" },
                         onclick: move |_| is_expanded.toggle(),
-                        
+
                         Icon {
                             name: "chevron-down".to_string(),
                             size: IconSize::Medium,
@@ -878,10 +871,10 @@ pub fn ExpandableCard(props: ExpandableCardProps) -> Element {
                     }
                 }
             }
-            
+
             CardContent {
                 {props.preview}
-                
+
                 if is_expanded() {
                     div {
                         style: "margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0; animation: fadeIn 200ms ease;",
@@ -896,7 +889,6 @@ pub fn ExpandableCard(props: ExpandableCardProps) -> Element {
 /// ============================================================================
 /// 11. Media Card (Bonus)
 /// ============================================================================
-
 /// Card optimized for media content with overlay controls
 #[derive(Props, Clone, PartialEq)]
 pub struct MediaCardProps {
@@ -940,33 +932,33 @@ pub fn MediaCard(props: MediaCardProps) -> Element {
         MediaType::Video => Some("play-circle"),
         MediaType::Audio => Some("play-circle"),
     };
-    
+
     rsx! {
         Card {
             variant: CardVariant::Default,
             full_width: true,
             padding: Some("0".to_string()),
-            
+
             // Media container
             div {
                 style: "position: relative; width: 100%; aspect-ratio: 16/9; overflow: hidden;",
-                
+
                 img {
                     src: "{props.media_url}",
                     alt: "{props.title}",
                     style: "width: 100%; height: 100%; object-fit: cover;",
                 }
-                
+
                 // Play overlay for video/audio
                 if let Some(icon) = overlay_icon {
                     if let Some(handler) = props.on_play.clone() {
                         div {
                             style: "position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); cursor: pointer;",
                             onclick: move |_| handler.call(()),
-                            
+
                             div {
                                 style: "width: 60px; height: 60px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center;",
-                                
+
                                 Icon {
                                     name: icon.to_string(),
                                     size: IconSize::Large,
@@ -976,7 +968,7 @@ pub fn MediaCard(props: MediaCardProps) -> Element {
                         }
                     }
                 }
-                
+
                 // Duration badge
                 if let Some(duration) = props.duration.clone() {
                     div {
@@ -985,20 +977,20 @@ pub fn MediaCard(props: MediaCardProps) -> Element {
                     }
                 }
             }
-            
+
             // Content
             CardContent {
                 div {
                     style: "display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;",
-                    
+
                     div {
                         style: "flex: 1; min-width: 0;",
-                        
+
                         Heading {
                             level: HeadingLevel::H4,
                             "{props.title}"
                         }
-                        
+
                         if let Some(creator) = props.creator.clone() {
                             Label {
                                 size: TextSize::Small,
@@ -1007,16 +999,16 @@ pub fn MediaCard(props: MediaCardProps) -> Element {
                             }
                         }
                     }
-                    
+
                     // Action buttons
                     div {
                         style: "display: flex; gap: 8px;",
-                        
+
                         if let Some(handler) = props.on_like.clone() {
                             button {
                                 style: "background: none; border: none; cursor: pointer; padding: 4px;",
                                 onclick: move |_| handler.call(()),
-                                
+
                                 Icon {
                                     name: "heart".to_string(),
                                     size: IconSize::Medium,
@@ -1024,12 +1016,12 @@ pub fn MediaCard(props: MediaCardProps) -> Element {
                                 }
                             }
                         }
-                        
+
                         if let Some(handler) = props.on_share.clone() {
                             button {
                                 style: "background: none; border: none; cursor: pointer; padding: 4px;",
                                 onclick: move |_| handler.call(()),
-                                
+
                                 Icon {
                                     name: "share".to_string(),
                                     size: IconSize::Medium,

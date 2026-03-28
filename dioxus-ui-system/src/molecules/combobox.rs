@@ -2,8 +2,8 @@
 //!
 //! Autocomplete input with dropdown suggestions.
 
-use dioxus::prelude::*;
 use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 /// Combobox option
 #[derive(Clone, PartialEq, Debug)]
@@ -21,7 +21,7 @@ impl ComboboxOption {
             disabled: false,
         }
     }
-    
+
     pub fn disabled(mut self) -> Self {
         self.disabled = true;
         self
@@ -73,29 +73,45 @@ pub fn Combobox(props: ComboboxProps) -> Element {
     let theme = use_theme();
     let mut is_open = use_signal(|| false);
     let mut input_value = use_signal(|| {
-        props.value.as_ref().and_then(|v| {
-            props.options.iter().find(|o| o.value == *v).map(|o| o.label.clone())
-        }).unwrap_or_default()
+        props
+            .value
+            .as_ref()
+            .and_then(|v| {
+                props
+                    .options
+                    .iter()
+                    .find(|o| o.value == *v)
+                    .map(|o| o.label.clone())
+            })
+            .unwrap_or_default()
     });
     let mut highlighted_index = use_signal(|| 0usize);
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     // Filter options based on input
-    let filtered_options: Vec<_> = props.options.iter()
+    let filtered_options: Vec<_> = props
+        .options
+        .iter()
         .filter(|o| {
             let input = input_value().to_lowercase();
             o.label.to_lowercase().contains(&input) || o.value.to_lowercase().contains(&input)
         })
         .cloned()
         .collect();
-    
+
     let _selected_label = props.value.as_ref().and_then(|v| {
-        props.options.iter().find(|o| o.value == *v).map(|o| o.label.clone())
+        props
+            .options
+            .iter()
+            .find(|o| o.value == *v)
+            .map(|o| o.label.clone())
     });
-    
+
     let border_color = if props.error.is_some() {
         theme.tokens.read().colors.destructive.to_rgba()
     } else if is_open() {
@@ -103,7 +119,7 @@ pub fn Combobox(props: ComboboxProps) -> Element {
     } else {
         theme.tokens.read().colors.border.to_rgba()
     };
-    
+
     let mut select_option = {
         let on_change = props.on_change.clone();
         move |option: ComboboxOption| {
@@ -112,7 +128,7 @@ pub fn Combobox(props: ComboboxProps) -> Element {
             is_open.set(false);
         }
     };
-    
+
     let filtered_options_for_keys = filtered_options.clone();
     let handle_key_down = move |e: Event<dioxus::html::KeyboardData>| {
         use dioxus::html::input_data::keyboard_types::Key;
@@ -147,12 +163,12 @@ pub fn Combobox(props: ComboboxProps) -> Element {
             _ => {}
         }
     };
-    
+
     rsx! {
         div {
             class: "combobox{class_css}",
             style: "position: relative; display: flex; flex-direction: column; gap: 6px;",
-            
+
             if let Some(label) = props.label {
                 label {
                     class: "combobox-label",
@@ -160,11 +176,11 @@ pub fn Combobox(props: ComboboxProps) -> Element {
                     "{label}"
                 }
             }
-            
+
             div {
                 class: "combobox-input-wrapper",
                 style: "position: relative;",
-                
+
                 input {
                     type: "text",
                     class: "combobox-input",
@@ -180,12 +196,12 @@ pub fn Combobox(props: ComboboxProps) -> Element {
                     },
                     onkeydown: handle_key_down,
                 }
-                
+
                 // Dropdown arrow / Clear button
                 div {
                     class: "combobox-controls",
                     style: "position: absolute; right: 12px; top: 50%; transform: translateY(-50%); display: flex; align-items: center; gap: 4px;",
-                    
+
                     if props.loading {
                         span {
                             style: "font-size: 12px; animation: spin 1s linear infinite;",
@@ -202,14 +218,14 @@ pub fn Combobox(props: ComboboxProps) -> Element {
                             "✕"
                         }
                     }
-                    
+
                     span {
                         style: "font-size: 12px; color: #9ca3af; transition: transform 0.2s;",
                         style: if is_open() { "transform: rotate(180deg);" } else { "" },
                         "▼"
                     }
                 }
-                
+
                 // Dropdown - uses absolute positioning with high z-index
                 // Parent should NOT have overflow:hidden for this to work
                 if is_open() && !props.disabled {
@@ -221,7 +237,7 @@ pub fn Combobox(props: ComboboxProps) -> Element {
                     div {
                         class: "combobox-dropdown",
                         style: "position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: white; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); max-height: 250px; overflow-y: auto; z-index: 9999;",
-                        
+
                         if filtered_options.is_empty() && !props.creatable {
                             div {
                                 style: "padding: 12px; text-align: center; color: #9ca3af; font-size: 14px;",
@@ -237,7 +253,7 @@ pub fn Combobox(props: ComboboxProps) -> Element {
                                     } else {
                                         "transparent".to_string()
                                     };
-                                    
+
                                     let text_color = if is_selected {
                                         theme.tokens.read().colors.primary.to_rgba()
                                     } else if option.disabled {
@@ -245,10 +261,10 @@ pub fn Combobox(props: ComboboxProps) -> Element {
                                     } else {
                                         theme.tokens.read().colors.foreground.to_rgba()
                                     };
-                                    
+
                                     let cursor = if option.disabled { "not-allowed" } else { "pointer" };
                                     let option_clone = option.clone();
-                                    
+
                                     rsx! {
                                         div {
                                             key: "{option.value}",
@@ -260,11 +276,11 @@ pub fn Combobox(props: ComboboxProps) -> Element {
                                                 }
                                             },
                                             onmouseenter: move |_| highlighted_index.set(index),
-                                            
+
                                             span {
                                                 "{option.label}"
                                             }
-                                            
+
                                             if is_selected {
                                                 span {
                                                     style: "color: {theme.tokens.read().colors.primary.to_rgba()};",
@@ -275,7 +291,7 @@ pub fn Combobox(props: ComboboxProps) -> Element {
                                     }
                                 }
                             }
-                            
+
                             // Create option
                             if props.creatable && !input_value().is_empty() && !filtered_options.iter().any(|o| o.label.to_lowercase() == input_value().to_lowercase()) {
                                 div {
@@ -294,7 +310,7 @@ pub fn Combobox(props: ComboboxProps) -> Element {
                     }
                 }
             }
-            
+
             if let Some(error) = props.error {
                 span {
                     class: "combobox-error",
@@ -303,7 +319,7 @@ pub fn Combobox(props: ComboboxProps) -> Element {
                 }
             }
         }
-        
+
 
     }
 }
@@ -338,21 +354,25 @@ pub fn MultiCombobox(props: MultiComboboxProps) -> Element {
     let theme = use_theme();
     let mut is_open = use_signal(|| false);
     let mut input_value = use_signal(|| String::new());
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
-    let selected_options: Vec<_> = props.options.iter()
+
+    let selected_options: Vec<_> = props
+        .options
+        .iter()
         .filter(|o| props.values.contains(&o.value))
         .cloned()
         .collect();
-    
+
     rsx! {
         div {
             class: "multi-combobox{class_css}",
             style: "position: relative; display: flex; flex-direction: column; gap: 6px;",
-            
+
             if let Some(label) = props.label {
                 label {
                     class: "multi-combobox-label",
@@ -360,12 +380,12 @@ pub fn MultiCombobox(props: MultiComboboxProps) -> Element {
                     "{label}"
                 }
             }
-            
+
             div {
                 class: "multi-combobox-input",
                 style: "min-height: 42px; padding: 6px; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px; background: white; display: flex; flex-wrap: wrap; gap: 6px; cursor: text;",
                 onclick: move |_| is_open.set(true),
-                
+
                 // Selected tags
                 for option in selected_options.clone() {
                     {
@@ -376,9 +396,9 @@ pub fn MultiCombobox(props: MultiComboboxProps) -> Element {
                             span {
                                 key: "{option.value}",
                                 style: "display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: {theme.tokens.read().colors.primary.to_rgba()}; color: white; border-radius: 9999px; font-size: 13px;",
-                                
+
                                 "{option.label}"
-                                
+
                                 button {
                                     type: "button",
                                     style: "background: none; border: none; cursor: pointer; color: white; font-size: 14px; padding: 0; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center;",
@@ -394,7 +414,7 @@ pub fn MultiCombobox(props: MultiComboboxProps) -> Element {
                         }
                     }
                 }
-                
+
                 // Input for searching
                 if props.values.len() < props.max {
                     input {
@@ -410,13 +430,13 @@ pub fn MultiCombobox(props: MultiComboboxProps) -> Element {
                     }
                 }
             }
-            
+
             // Dropdown
             if is_open() {
                 div {
                     class: "multi-combobox-dropdown",
                     style: "position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: white; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); max-height: 200px; overflow-y: auto; z-index: 50;",
-                    
+
                     for option in props.options.iter().filter(|o| !props.values.contains(&o.value)) {
                         {
                             let option = option.clone();

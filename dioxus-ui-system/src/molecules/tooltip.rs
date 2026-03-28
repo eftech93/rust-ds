@@ -2,10 +2,9 @@
 //!
 //! A popup that displays information related to an element when the element receives keyboard focus or the mouse hovers over it.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
-
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Tooltip properties
 #[derive(Props, Clone, PartialEq)]
@@ -61,22 +60,26 @@ pub fn Tooltip(props: TooltipProps) -> Element {
     let _theme = use_theme();
     let mut is_visible = use_signal(|| false);
     let show_timeout = use_signal(|| None::<i32>);
-    
+
     let position_style = match props.placement {
-        TooltipPlacement::Top => "bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);",
+        TooltipPlacement::Top => {
+            "bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%);"
+        }
         TooltipPlacement::TopStart => "bottom: calc(100% + 6px); left: 0;",
         TooltipPlacement::TopEnd => "bottom: calc(100% + 6px); right: 0;",
         TooltipPlacement::Right => "left: calc(100% + 6px); top: 50%; transform: translateY(-50%);",
         TooltipPlacement::RightStart => "left: calc(100% + 6px); top: 0;",
         TooltipPlacement::RightEnd => "left: calc(100% + 6px); bottom: 0;",
-        TooltipPlacement::Bottom => "top: calc(100% + 6px); left: 50%; transform: translateX(-50%);",
+        TooltipPlacement::Bottom => {
+            "top: calc(100% + 6px); left: 50%; transform: translateX(-50%);"
+        }
         TooltipPlacement::BottomStart => "top: calc(100% + 6px); left: 0;",
         TooltipPlacement::BottomEnd => "top: calc(100% + 6px); right: 0;",
         TooltipPlacement::Left => "right: calc(100% + 6px); top: 50%; transform: translateY(-50%);",
         TooltipPlacement::LeftStart => "right: calc(100% + 6px); top: 0;",
         TooltipPlacement::LeftEnd => "right: calc(100% + 6px); bottom: 0;",
     };
-    
+
     let tooltip_style = use_style(|t| {
         Style::new()
             .absolute()
@@ -91,14 +94,14 @@ pub fn Tooltip(props: TooltipProps) -> Element {
             .z_index(100)
             .build()
     });
-    
+
     let mut show_tooltip = move || {
         // Use set_timeout for delay (simplified)
         // In a real implementation, you'd use web_sys::set_timeout_with_callback
         // For now, we show immediately
         is_visible.set(true);
     };
-    
+
     let mut hide_tooltip = move || {
         if let Some(timeout) = show_timeout() {
             // Clear timeout would go here
@@ -106,7 +109,7 @@ pub fn Tooltip(props: TooltipProps) -> Element {
         }
         is_visible.set(false);
     };
-    
+
     rsx! {
         span {
             style: "position: relative; display: inline-block;",
@@ -114,9 +117,9 @@ pub fn Tooltip(props: TooltipProps) -> Element {
             onmouseleave: move |_| hide_tooltip(),
             onfocus: move |_| show_tooltip(),
             onblur: move |_| hide_tooltip(),
-            
+
             {props.children}
-            
+
             if is_visible() {
                 div {
                     role: "tooltip",

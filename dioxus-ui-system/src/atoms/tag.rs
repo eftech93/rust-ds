@@ -2,8 +2,8 @@
 //!
 //! Categorization, filtering, and selection tags.
 
-use dioxus::prelude::*;
 use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 /// Tag variant/style
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -72,36 +72,41 @@ pub struct TagProps {
 #[component]
 pub fn Tag(props: TagProps) -> Element {
     let theme = use_theme();
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let (bg_color, border_color, text_color) = if let Some(custom_color) = props.color.clone() {
-        let text = props.text_color.clone().unwrap_or_else(|| "white".to_string());
+        let text = props
+            .text_color
+            .clone()
+            .unwrap_or_else(|| "white".to_string());
         (custom_color.clone(), custom_color, text)
     } else {
         get_variant_colors(&props.variant, &props.selected, theme.clone())
     };
-    
+
     let padding = match props.size {
         TagSize::Sm => "2px 8px",
         TagSize::Md => "4px 12px",
         TagSize::Lg => "6px 16px",
     };
-    
+
     let font_size = match props.size {
         TagSize::Sm => "12px",
         TagSize::Md => "14px",
         TagSize::Lg => "16px",
     };
-    
+
     let border = if props.variant == TagVariant::Outline || props.selected {
         format!("1px solid {border_color}")
     } else {
         "1px solid transparent".to_string()
     };
-    
+
     let cursor = if props.disabled {
         "not-allowed"
     } else if props.selectable || props.on_click.is_some() {
@@ -109,14 +114,20 @@ pub fn Tag(props: TagProps) -> Element {
     } else {
         "default"
     };
-    
+
     let opacity = if props.disabled { "0.5" } else { "1" };
-    
+
     let variant_name = format!("{:?}", props.variant).to_lowercase();
-    let icon_size = match props.size { TagSize::Sm => 12, _ => 14 };
-    let remove_size = match props.size { TagSize::Sm => 10, _ => 12 };
+    let icon_size = match props.size {
+        TagSize::Sm => 12,
+        _ => 14,
+    };
+    let remove_size = match props.size {
+        TagSize::Sm => 10,
+        _ => 12,
+    };
     let on_click = props.on_click.clone();
-    
+
     rsx! {
         span {
             class: "tag tag-{variant_name}{class_css}",
@@ -126,7 +137,7 @@ pub fn Tag(props: TagProps) -> Element {
                     handler.call(());
                 }
             },
-            
+
             if let Some(icon) = props.icon {
                 span {
                     class: "tag-icon",
@@ -134,12 +145,12 @@ pub fn Tag(props: TagProps) -> Element {
                     "{icon}"
                 }
             }
-            
+
             span {
                 class: "tag-content",
                 {props.children}
             }
-            
+
             if props.removable {
                 button {
                     type: "button",
@@ -158,35 +169,59 @@ pub fn Tag(props: TagProps) -> Element {
     }
 }
 
-fn get_variant_colors(variant: &TagVariant, selected: &bool, theme: crate::theme::ThemeContext) -> (String, String, String) {
+fn get_variant_colors(
+    variant: &TagVariant,
+    selected: &bool,
+    theme: crate::theme::ThemeContext,
+) -> (String, String, String) {
     let tokens = theme.tokens.read();
-    
+
     match variant {
         TagVariant::Default => {
             if *selected {
-                (tokens.colors.primary.to_rgba(), tokens.colors.primary.to_rgba(), "white".to_string())
+                (
+                    tokens.colors.primary.to_rgba(),
+                    tokens.colors.primary.to_rgba(),
+                    "white".to_string(),
+                )
             } else {
-                (tokens.colors.muted.to_rgba(), tokens.colors.border.to_rgba(), tokens.colors.foreground.to_rgba())
+                (
+                    tokens.colors.muted.to_rgba(),
+                    tokens.colors.border.to_rgba(),
+                    tokens.colors.foreground.to_rgba(),
+                )
             }
         }
-        TagVariant::Primary => {
-            (tokens.colors.primary.to_rgba(), tokens.colors.primary.to_rgba(), "white".to_string())
-        }
-        TagVariant::Secondary => {
-            (tokens.colors.secondary.to_rgba(), tokens.colors.secondary.to_rgba(), "white".to_string())
-        }
-        TagVariant::Success => {
-            ("#dcfce7".to_string(), "#16a34a".to_string(), "#166534".to_string())
-        }
-        TagVariant::Warning => {
-            ("#fef9c3".to_string(), "#ca8a04".to_string(), "#854d0e".to_string())
-        }
-        TagVariant::Error => {
-            (tokens.colors.destructive.to_rgba(), tokens.colors.destructive.to_rgba(), "white".to_string())
-        }
-        TagVariant::Outline => {
-            ("transparent".to_string(), tokens.colors.border.to_rgba(), tokens.colors.foreground.to_rgba())
-        }
+        TagVariant::Primary => (
+            tokens.colors.primary.to_rgba(),
+            tokens.colors.primary.to_rgba(),
+            "white".to_string(),
+        ),
+        TagVariant::Secondary => (
+            tokens.colors.secondary.to_rgba(),
+            tokens.colors.secondary.to_rgba(),
+            "white".to_string(),
+        ),
+        TagVariant::Success => (
+            "#dcfce7".to_string(),
+            "#16a34a".to_string(),
+            "#166534".to_string(),
+        ),
+        TagVariant::Warning => (
+            "#fef9c3".to_string(),
+            "#ca8a04".to_string(),
+            "#854d0e".to_string(),
+        ),
+        TagVariant::Error => (
+            tokens.colors.destructive.to_rgba(),
+            tokens.colors.destructive.to_rgba(),
+            "white".to_string(),
+        ),
+        TagVariant::Outline => (
+            "transparent".to_string(),
+            tokens.colors.border.to_rgba(),
+            tokens.colors.foreground.to_rgba(),
+        ),
     }
 }
 
@@ -235,12 +270,12 @@ impl TagData {
             variant: None,
         }
     }
-    
+
     pub fn with_icon(mut self, icon: impl Into<String>) -> Self {
         self.icon = Some(icon.into());
         self
     }
-    
+
     pub fn with_variant(mut self, variant: TagVariant) -> Self {
         self.variant = Some(variant);
         self
@@ -250,22 +285,24 @@ impl TagData {
 /// Tag group component
 #[component]
 pub fn TagGroup(props: TagGroupProps) -> Element {
-    let class_css = props.class.as_ref()
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let selected = props.selected.clone();
-    
+
     rsx! {
         div {
             class: "tag-group{class_css}",
             style: "display: flex; flex-wrap: wrap; gap: 8px;",
-            
+
             for tag in props.tags.iter() {
                 {
                     let is_selected = selected.contains(&tag.id);
                     let variant = tag.variant.clone().unwrap_or(TagVariant::Default);
-                    
+
                     let on_click = {
                         let on_change = props.on_change.clone();
                         let tag_id = tag.id.clone();
@@ -284,7 +321,7 @@ pub fn TagGroup(props: TagGroupProps) -> Element {
                             on_change.call(new_selected);
                         }
                     };
-                    
+
                     let on_remove = props.on_remove.as_ref().map(|handler| {
                         let h = handler.clone();
                         let tag_id = tag.id.clone();
@@ -292,7 +329,7 @@ pub fn TagGroup(props: TagGroupProps) -> Element {
                             h.call(tag_id.clone());
                         })
                     });
-                    
+
                     rsx! {
                         Tag {
                             key: "{tag.id}",
@@ -304,7 +341,7 @@ pub fn TagGroup(props: TagGroupProps) -> Element {
                             removable: props.removable,
                             on_remove: on_remove,
                             icon: tag.icon.clone(),
-                            
+
                             "{tag.label}"
                         }
                     }
@@ -347,20 +384,26 @@ pub struct InputTagProps {
 pub fn InputTag(props: InputTagProps) -> Element {
     let mut input_value = use_signal(|| String::new());
     let mut is_focused = use_signal(|| false);
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let can_add = props.tags.len() < props.max_tags;
-    
-    let border_color = if is_focused() { "#3b82f6".to_string() } else { "#e2e8f0".to_string() };
-    
+
+    let border_color = if is_focused() {
+        "#3b82f6".to_string()
+    } else {
+        "#e2e8f0".to_string()
+    };
+
     rsx! {
         div {
             class: "input-tag{class_css}",
             style: "display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; border: 1px solid {border_color}; border-radius: 8px; background: white; min-height: 42px; align-items: center;",
-            
+
             for (i, tag) in props.tags.iter().enumerate() {
                 {
                     let tag_text = tag.clone();
@@ -373,7 +416,7 @@ pub fn InputTag(props: InputTagProps) -> Element {
                             on_change.call(new_tags);
                         }
                     };
-                    
+
                     rsx! {
                         Tag {
                             key: "{i}",
@@ -381,13 +424,13 @@ pub fn InputTag(props: InputTagProps) -> Element {
                             size: props.size.clone(),
                             removable: true,
                             on_remove: Callback::new(on_remove),
-                            
+
                             "{tag_text}"
                         }
                     }
                 }
             }
-            
+
             if can_add {
                 input {
                     type: "text",

@@ -4,7 +4,7 @@
 
 use dioxus::prelude::*;
 
-use crate::atoms::{Icon, IconSize, IconColor};
+use crate::atoms::{Icon, IconColor, IconSize};
 
 /// Step state
 #[derive(Clone, PartialEq, Default, Debug)]
@@ -117,17 +117,27 @@ pub struct StepIndicatorProps {
 #[component]
 pub fn StepIndicator(props: StepIndicatorProps) -> Element {
     let size = props.size.size_px();
-    let bg = props.bg_color.clone().unwrap_or_else(|| props.state.bg_color().to_string());
-    let color = props.text_color.clone().unwrap_or_else(|| props.state.text_color().to_string());
+    let bg = props
+        .bg_color
+        .clone()
+        .unwrap_or_else(|| props.state.bg_color().to_string());
+    let color = props
+        .text_color
+        .clone()
+        .unwrap_or_else(|| props.state.text_color().to_string());
     let border = if props.state == StepState::Active {
         "2px solid #3b82f6"
     } else {
         "none"
     };
-    
-    let cursor = if props.on_click.is_some() { "pointer" } else { "default" };
+
+    let cursor = if props.on_click.is_some() {
+        "pointer"
+    } else {
+        "default"
+    };
     let clickable = props.on_click.clone();
-    
+
     // Content based on state and icon
     let content: Element = if let Some(icon) = props.icon.clone() {
         rsx! {
@@ -174,9 +184,9 @@ pub fn StepIndicator(props: StepIndicatorProps) -> Element {
             _ => rsx! { "{props.step}" },
         }
     };
-    
+
     let font_size_val = props.size.font_size();
-    
+
     rsx! {
         div {
             style: "
@@ -202,7 +212,7 @@ pub fn StepIndicator(props: StepIndicatorProps) -> Element {
                     handler.call(());
                 }
             },
-            
+
             {content}
         }
     }
@@ -229,10 +239,14 @@ pub struct StepConnectorProps {
 #[component]
 pub fn StepConnector(props: StepConnectorProps) -> Element {
     let color = props.color.clone().unwrap_or_else(|| {
-        if props.completed { "#22c55e".to_string() } else { "#e2e8f0".to_string() }
+        if props.completed {
+            "#22c55e".to_string()
+        } else {
+            "#e2e8f0".to_string()
+        }
     });
     let thickness_val = props.thickness.clone();
-    
+
     if props.horizontal {
         rsx! {
             div {
@@ -284,7 +298,11 @@ pub struct StepLabelProps {
 /// Step label atom - displays step title and optional description
 #[component]
 pub fn StepLabel(props: StepLabelProps) -> Element {
-    let label_color = if props.state == StepState::Active { "#0f172a" } else { "#64748b" };
+    let label_color = if props.state == StepState::Active {
+        "#0f172a"
+    } else {
+        "#64748b"
+    };
     let font_size_val = match props.size {
         StepSize::Sm => "13px",
         StepSize::Md => "14px",
@@ -295,12 +313,16 @@ pub fn StepLabel(props: StepLabelProps) -> Element {
         StepSize::Md => "12px",
         StepSize::Lg => "13px",
     };
-    let weight_val = if props.state == StepState::Active { "600" } else { "500" };
-    
+    let weight_val = if props.state == StepState::Active {
+        "600"
+    } else {
+        "500"
+    };
+
     rsx! {
         div {
             style: "display: flex; flex-direction: column; gap: 2px;",
-            
+
             span {
                 style: "
                     font-size: {font_size_val}; 
@@ -310,7 +332,7 @@ pub fn StepLabel(props: StepLabelProps) -> Element {
                 ",
                 "{props.label}"
             }
-            
+
             if let Some(desc) = props.description.clone() {
                 span {
                     style: "

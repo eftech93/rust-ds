@@ -4,10 +4,10 @@
 //! borders, backgrounds, and flexbox utilities. Similar to a div but
 //! with theme-aware styling built-in.
 
-use dioxus::prelude::*;
-use crate::theme::use_style;
 use crate::styles::Style;
 use crate::theme::tokens::Color;
+use crate::theme::use_style;
+use dioxus::prelude::*;
 
 /// Box display type
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -554,10 +554,10 @@ pub fn Box(props: BoxProps) -> Element {
     let shadow = props.shadow.clone();
     let overflow = props.overflow.clone();
     let position = props.position.clone();
-    
+
     let style = use_style(move |t| {
         let mut style = Style::new();
-        
+
         // Display
         style = match display {
             BoxDisplay::Block => style.block(),
@@ -568,7 +568,7 @@ pub fn Box(props: BoxProps) -> Element {
             BoxDisplay::Inline => style,
             BoxDisplay::None => style.hidden(),
         };
-        
+
         // Flex properties (only apply if flex display)
         if display == BoxDisplay::Flex || display == BoxDisplay::InlineFlex {
             style = Style {
@@ -588,12 +588,16 @@ pub fn Box(props: BoxProps) -> Element {
                 ..style
             };
         }
-        
+
         // Gap
-        if gap != SpacingSize::None && (display == BoxDisplay::Flex || display == BoxDisplay::InlineFlex || display == BoxDisplay::Grid) {
+        if gap != SpacingSize::None
+            && (display == BoxDisplay::Flex
+                || display == BoxDisplay::InlineFlex
+                || display == BoxDisplay::Grid)
+        {
             style = style.gap(&t.spacing, gap.as_str());
         }
-        
+
         // Padding
         if padding != SpacingSize::None {
             style = style.p(&t.spacing, padding.as_str());
@@ -628,7 +632,7 @@ pub fn Box(props: BoxProps) -> Element {
                 style = style.pl(&t.spacing, pl_size.as_str());
             }
         }
-        
+
         // Margin
         if margin != SpacingSize::None {
             style = style.m(&t.spacing, margin.as_str());
@@ -663,7 +667,7 @@ pub fn Box(props: BoxProps) -> Element {
                 style = style.ml(&t.spacing, ml_size.as_str());
             }
         }
-        
+
         // Background color
         let bg_color = match &background {
             BackgroundColor::Primary => t.colors.primary.clone(),
@@ -681,10 +685,10 @@ pub fn Box(props: BoxProps) -> Element {
             BackgroundColor::Custom(c) => c.clone(),
         };
         style = style.bg(&bg_color);
-        
+
         // Border radius
         style = style.rounded(&t.radius, border_radius.as_str());
-        
+
         // Border
         if border != BorderWidth::None {
             let border_c = match &border_color {
@@ -705,40 +709,40 @@ pub fn Box(props: BoxProps) -> Element {
             };
             style = style.border(border.as_px(), &border_c);
         }
-        
+
         // Shadow
         if shadow != ShadowSize::None {
             style = style.shadow_themed(&t, shadow.as_str());
         }
-        
+
         // Overflow
         style = Style {
             overflow: Some(overflow.as_str().into()),
             ..style
         };
-        
+
         // Position
         style = Style {
             position: Some(position.as_str().into()),
             ..style
         };
-        
+
         // Opacity
         if let Some(op) = props.opacity {
             style = style.opacity(op.clamp(0.0, 1.0));
         }
-        
+
         // Cursor
         if let Some(c) = &props.cursor {
             style = style.cursor(c);
         }
-        
+
         style.build()
     });
-    
+
     // Build additional styles string
     let mut additional_styles = String::new();
-    
+
     // Width
     if let Some(w) = &props.width {
         additional_styles.push_str(&format!("width: {}; ", w));
@@ -780,17 +784,17 @@ pub fn Box(props: BoxProps) -> Element {
     if let Some(z) = props.z_index {
         additional_styles.push_str(&format!("z-index: {}; ", z));
     }
-    
+
     // Combine styles
     let final_style = if let Some(custom) = &props.style {
         format!("{} {}{}", style(), additional_styles, custom)
     } else {
         format!("{} {}", style(), additional_styles)
     };
-    
+
     let class = props.class.clone().unwrap_or_default();
     let id = props.id.clone().unwrap_or_default();
-    
+
     rsx! {
         div {
             style: "{final_style}",
@@ -822,24 +826,15 @@ pub fn Box(props: BoxProps) -> Element {
 #[component]
 pub fn VStack(
     children: Element,
-    #[props(default)]
-    gap: SpacingSize,
-    #[props(default)]
-    padding: SpacingSize,
-    #[props(default)]
-    align: AlignItems,
-    #[props(default)]
-    justify: JustifyContent,
-    #[props(default)]
-    background: BackgroundColor,
-    #[props(default)]
-    width: Option<String>,
-    #[props(default)]
-    height: Option<String>,
-    #[props(default)]
-    style: Option<String>,
-    #[props(default)]
-    class: Option<String>,
+    #[props(default)] gap: SpacingSize,
+    #[props(default)] padding: SpacingSize,
+    #[props(default)] align: AlignItems,
+    #[props(default)] justify: JustifyContent,
+    #[props(default)] background: BackgroundColor,
+    #[props(default)] width: Option<String>,
+    #[props(default)] height: Option<String>,
+    #[props(default)] style: Option<String>,
+    #[props(default)] class: Option<String>,
 ) -> Element {
     rsx! {
         Box {
@@ -865,24 +860,15 @@ pub fn VStack(
 #[component]
 pub fn HStack(
     children: Element,
-    #[props(default)]
-    gap: SpacingSize,
-    #[props(default)]
-    padding: SpacingSize,
-    #[props(default)]
-    align: AlignItems,
-    #[props(default)]
-    justify: JustifyContent,
-    #[props(default)]
-    background: BackgroundColor,
-    #[props(default)]
-    width: Option<String>,
-    #[props(default)]
-    height: Option<String>,
-    #[props(default)]
-    style: Option<String>,
-    #[props(default)]
-    class: Option<String>,
+    #[props(default)] gap: SpacingSize,
+    #[props(default)] padding: SpacingSize,
+    #[props(default)] align: AlignItems,
+    #[props(default)] justify: JustifyContent,
+    #[props(default)] background: BackgroundColor,
+    #[props(default)] width: Option<String>,
+    #[props(default)] height: Option<String>,
+    #[props(default)] style: Option<String>,
+    #[props(default)] class: Option<String>,
 ) -> Element {
     rsx! {
         Box {
@@ -908,18 +894,12 @@ pub fn HStack(
 #[component]
 pub fn Center(
     children: Element,
-    #[props(default)]
-    padding: SpacingSize,
-    #[props(default)]
-    background: BackgroundColor,
-    #[props(default)]
-    width: Option<String>,
-    #[props(default)]
-    height: Option<String>,
-    #[props(default)]
-    style: Option<String>,
-    #[props(default)]
-    class: Option<String>,
+    #[props(default)] padding: SpacingSize,
+    #[props(default)] background: BackgroundColor,
+    #[props(default)] width: Option<String>,
+    #[props(default)] height: Option<String>,
+    #[props(default)] style: Option<String>,
+    #[props(default)] class: Option<String>,
 ) -> Element {
     rsx! {
         Box {

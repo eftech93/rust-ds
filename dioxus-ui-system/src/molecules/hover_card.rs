@@ -3,9 +3,9 @@
 //! A card that appears when hovering over a trigger element.
 //! Similar to GitHub's user preview cards.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Side options for hover card placement
 #[derive(Default, Clone, PartialEq)]
@@ -72,31 +72,37 @@ pub struct HoverCardProps {
 pub fn HoverCard(props: HoverCardProps) -> Element {
     let _theme = use_theme();
     let mut is_visible = use_signal(|| false);
-    
+
     // Calculate position styles based on side and align
     let position_style = match (&props.side, &props.align) {
         (Side::Top, Align::Start) => "bottom: calc(100% + 8px); left: 0;",
-        (Side::Top, Align::Center) => "bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);",
+        (Side::Top, Align::Center) => {
+            "bottom: calc(100% + 8px); left: 50%; transform: translateX(-50%);"
+        }
         (Side::Top, Align::End) => "bottom: calc(100% + 8px); right: 0;",
         (Side::Right, Align::Start) => "left: calc(100% + 8px); top: 0;",
-        (Side::Right, Align::Center) => "left: calc(100% + 8px); top: 50%; transform: translateY(-50%);",
+        (Side::Right, Align::Center) => {
+            "left: calc(100% + 8px); top: 50%; transform: translateY(-50%);"
+        }
         (Side::Right, Align::End) => "left: calc(100% + 8px); bottom: 0;",
         (Side::Bottom, Align::Start) => "top: calc(100% + 8px); left: 0;",
-        (Side::Bottom, Align::Center) => "top: calc(100% + 8px); left: 50%; transform: translateX(-50%);",
+        (Side::Bottom, Align::Center) => {
+            "top: calc(100% + 8px); left: 50%; transform: translateX(-50%);"
+        }
         (Side::Bottom, Align::End) => "top: calc(100% + 8px); right: 0;",
         (Side::Left, Align::Start) => "right: calc(100% + 8px); top: 0;",
-        (Side::Left, Align::Center) => "right: calc(100% + 8px); top: 50%; transform: translateY(-50%);",
+        (Side::Left, Align::Center) => {
+            "right: calc(100% + 8px); top: 50%; transform: translateY(-50%);"
+        }
         (Side::Left, Align::End) => "right: calc(100% + 8px); bottom: 0;",
     };
-    
+
     // Card base styles with CSS-based hover delay
-    let open_delay_ms = props.open_delay;
-    let close_delay_ms = props.close_delay;
+    let _open_delay_ms = props.open_delay;
+    let _close_delay_ms = props.close_delay;
     let card_style = use_style(move |t| {
-        let transition = format!("opacity 200ms ease {}ms, transform 200ms ease {}ms", 
-            if is_visible() { 0 } else { close_delay_ms as i32 },
-            if is_visible() { 0 } else { close_delay_ms as i32 }
-        );
+        // Note: open_delay_ms is stored but CSS-based delay not implemented
+        let _ = _open_delay_ms; // Acknowledge the parameter
         Style::new()
             .absolute()
             .w_px(320)
@@ -105,10 +111,10 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
             .bg(&t.colors.popover)
             .shadow(&t.shadows.lg)
             .z_index(9999)
-            .transition(&transition)
+            .transition("opacity 200ms ease, transform 200ms ease")
             .build()
     });
-    
+
     // Arrow styles based on side
     let arrow_style = use_style(|t| {
         Style::new()
@@ -119,21 +125,21 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
             .border(1, &t.colors.border)
             .build()
     });
-    
+
     let arrow_position = match &props.side {
         Side::Top => "bottom: -4px; left: 50%; transform: translateX(-50%) rotate(45deg); border-top: none; border-left: none;",
         Side::Right => "left: -4px; top: 50%; transform: translateY(-50%) rotate(45deg); border-right: none; border-bottom: none;",
         Side::Bottom => "top: -4px; left: 50%; transform: translateX(-50%) rotate(45deg); border-bottom: none; border-right: none;",
         Side::Left => "right: -4px; top: 50%; transform: translateY(-50%) rotate(45deg); border-left: none; border-top: none;",
     };
-    
+
     // Visibility styles with animation
     let visibility_style = if is_visible() {
         "opacity: 1; pointer-events: auto;"
     } else {
         "opacity: 0; pointer-events: none;"
     };
-    
+
     let transform_style = match (&props.side, &props.align, is_visible()) {
         (Side::Top, Align::Center, true) => "transform: translateX(-50%) translateY(0);",
         (Side::Top, Align::Center, false) => "transform: translateX(-50%) translateY(4px);",
@@ -146,16 +152,16 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
         (_, _, true) => "transform: translateY(0);",
         (_, _, false) => "transform: translateY(4px);",
     };
-    
+
     // Handle keyboard events (Escape to close)
     let handle_keydown = move |e: Event<KeyboardData>| {
         if e.key() == Key::Escape && is_visible() {
             is_visible.set(false);
         }
     };
-    
+
     let custom_style = props.style.clone().unwrap_or_default();
-    
+
     rsx! {
         div {
             style: "position: relative; display: inline-block;",
@@ -166,13 +172,13 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
                 is_visible.set(false);
             },
             onkeydown: handle_keydown,
-            
+
             // Trigger
             div {
                 style: "display: inline-block;",
                 {props.trigger}
             }
-            
+
             // Card content - sibling to trigger, not child of overlay
             div {
                 style: "{card_style} {position_style} {visibility_style} {transform_style} {custom_style}",
@@ -182,12 +188,12 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
                 onmouseleave: move |_| {
                     is_visible.set(false);
                 },
-                
+
                 // Arrow
                 div {
                     style: "{arrow_style} {arrow_position}",
                 }
-                
+
                 // Content wrapper
                 div {
                     style: "position: relative; z-index: 1;",
@@ -211,7 +217,7 @@ pub struct HoverCardHeaderProps {
 #[component]
 pub fn HoverCardHeader(props: HoverCardHeaderProps) -> Element {
     let _theme = use_theme();
-    
+
     let header_style = use_style(|t| {
         Style::new()
             .pb(&t.spacing, "md")
@@ -219,16 +225,16 @@ pub fn HoverCardHeader(props: HoverCardHeaderProps) -> Element {
             .border_bottom(1, &t.colors.border)
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{header_style}",
-            
+
             h4 {
                 style: "margin: 0; font-size: 16px; font-weight: 600;",
                 "{props.title}"
             }
-            
+
             if let Some(description) = props.description {
                 p {
                     style: "margin: 4px 0 0 0; font-size: 13px; color: #64748b;",
@@ -249,13 +255,9 @@ pub struct HoverCardContentProps {
 #[component]
 pub fn HoverCardContent(props: HoverCardContentProps) -> Element {
     let _theme = use_theme();
-    
-    let content_style = use_style(|t| {
-        Style::new()
-            .p(&t.spacing, "md")
-            .build()
-    });
-    
+
+    let content_style = use_style(|t| Style::new().p(&t.spacing, "md").build());
+
     rsx! {
         div {
             style: "{content_style}",
@@ -274,7 +276,7 @@ pub struct HoverCardFooterProps {
 #[component]
 pub fn HoverCardFooter(props: HoverCardFooterProps) -> Element {
     let _theme = use_theme();
-    
+
     let footer_style = use_style(|t| {
         Style::new()
             .pt(&t.spacing, "md")
@@ -286,7 +288,7 @@ pub fn HoverCardFooter(props: HoverCardFooterProps) -> Element {
             .gap(&t.spacing, "sm")
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{footer_style}",
@@ -312,7 +314,7 @@ pub struct HoverCardAvatarProps {
 pub fn HoverCardAvatar(props: HoverCardAvatarProps) -> Element {
     let size = props.size;
     let alt = props.alt.clone().unwrap_or_default();
-    
+
     rsx! {
         img {
             src: "{props.src}",
@@ -343,7 +345,7 @@ pub struct HoverCardUserInfoProps {
 #[component]
 pub fn HoverCardUserInfo(props: HoverCardUserInfoProps) -> Element {
     let _theme = use_theme();
-    
+
     let container_style = use_style(|t| {
         Style::new()
             .flex()
@@ -351,11 +353,11 @@ pub fn HoverCardUserInfo(props: HoverCardUserInfoProps) -> Element {
             .gap(&t.spacing, "md")
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{container_style}",
-            
+
             if let Some(avatar_url) = props.avatar_url {
                 HoverCardAvatar {
                     src: avatar_url,
@@ -363,27 +365,27 @@ pub fn HoverCardUserInfo(props: HoverCardUserInfoProps) -> Element {
                     size: 48,
                 }
             }
-            
+
             div {
                 style: "flex: 1; min-width: 0;",
-                
+
                 div {
                     style: "font-weight: 600; font-size: 15px;",
                     "{props.name}"
                 }
-                
+
                 div {
                     style: "font-size: 13px; color: #64748b;",
                     "{props.handle}"
                 }
-                
+
                 if let Some(bio) = props.bio {
                     p {
                         style: "margin: 8px 0 0 0; font-size: 13px; line-height: 1.4;",
                         "{bio}"
                     }
                 }
-                
+
                 if let Some(stats) = props.stats {
                     div {
                         style: "margin-top: 8px; font-size: 12px; color: #64748b;",

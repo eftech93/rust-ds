@@ -3,9 +3,9 @@
 //! A configurable multi-digit code input with individual boxes for each character.
 //! Supports auto-focus navigation, paste functionality, and masking.
 
-use dioxus::prelude::*;
-use crate::theme::use_style;
 use crate::styles::Style;
+use crate::theme::use_style;
+use dioxus::prelude::*;
 
 /// OTP Input properties
 #[derive(Props, Clone, PartialEq)]
@@ -67,10 +67,10 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
     let error = props.error;
     let mask = props.mask;
     let auto_focus = props.auto_focus;
-    
+
     // Track which input is focused (for styling)
     let mut focused_index = use_signal(|| Option::<usize>::None);
-    
+
     // Container style
     let container_style = use_style(|_| {
         Style::new()
@@ -80,7 +80,7 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
             .justify_center()
             .build()
     });
-    
+
     // Individual input box style
     let input_style = use_style(move |t| {
         let base = Style::new()
@@ -88,7 +88,14 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
             .h_px(56)
             .min_w_px(40)
             .rounded(&t.radius, "md")
-            .border(1, if error { &t.colors.destructive } else { &t.colors.border })
+            .border(
+                1,
+                if error {
+                    &t.colors.destructive
+                } else {
+                    &t.colors.border
+                },
+            )
             .bg(&t.colors.background)
             .text_color(&t.colors.foreground)
             .text_center()
@@ -96,48 +103,54 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
             .font_weight(600)
             .transition("all 150ms cubic-bezier(0.4, 0, 0.2, 1)")
             .outline("none");
-        
+
         // Responsive sizing
         let base = base
             .w("calc(40px + 2vw)")
             .h("calc(48px + 1vh)")
             .min_w_px(36)
             .min_h_px(44);
-        
+
         // Disabled state
         let base = if disabled {
-            base.cursor("not-allowed")
-                .opacity(0.5)
-                .bg(&t.colors.muted)
+            base.cursor("not-allowed").opacity(0.5).bg(&t.colors.muted)
         } else {
             base.cursor("text")
         };
-        
+
         // Error state shadow
         if error {
             Style {
                 box_shadow: Some(format!("0 0 0 1px {}", t.colors.destructive.to_rgba())),
                 ..base
-            }.build()
+            }
+            .build()
         } else {
             base.build()
         }
     });
-    
+
     // Focus style (applied dynamically)
     let get_focus_style = use_style(move |t| {
         Style::new()
             .border_color(&t.colors.ring)
-            .shadow(&format!("0 0 0 2px {}", t.colors.ring.to_rgba().replace(')', ", 0.3)").replace("rgba", "rgb")))
+            .shadow(&format!(
+                "0 0 0 2px {}",
+                t.colors
+                    .ring
+                    .to_rgba()
+                    .replace(')', ", 0.3)")
+                    .replace("rgba", "rgb")
+            ))
             .build()
     });
-    
+
     let custom_style = props.style.clone().unwrap_or_default();
     let class = props.class.clone().unwrap_or_default();
     let on_change = props.on_change.clone();
     let on_complete = props.on_complete.clone();
     let current_value = props.value.clone();
-    
+
     // Helper to check if all digits are filled and call on_complete
     let check_complete = move |code: &str| {
         if code.len() == length && code.chars().all(|c| c.is_ascii_digit()) {
@@ -146,14 +159,14 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
             }
         }
     };
-    
+
     rsx! {
         div {
             style: "{container_style} {custom_style}",
             class: "{class}",
             role: "group",
             "aria-label": "One-time code input",
-            
+
             for index in 0..length {
                 {
                     let idx = index;
@@ -163,19 +176,19 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                     } else {
                         String::new()
                     };
-                    
+
                     let is_focused = focused_index() == Some(idx);
                     let focus_style = if is_focused && !disabled { get_focus_style() } else { String::new() };
                     let should_auto_focus = auto_focus && idx == 0;
-                    
+
                     let aria_label = format!("Digit {} of {}", idx + 1, length);
-                    
+
                     // Clone values for closures
                     let on_change_clone = on_change.clone();
                     let on_change_clone2 = on_change.clone();
                     let current_value_clone = current_value.clone();
                     let current_value_clone2 = current_value.clone();
-                    
+
                     rsx! {
                         input {
                             key: "otp-{idx}",
@@ -194,7 +207,7 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                             style: "{input_style} {focus_style}",
                             oninput: move |e| {
                                 let val = e.value();
-                                
+
                                 // Helper to update value at specific index
                                 let update_value_at = |index: usize, digit: char, base_value: &str| -> String {
                                     let mut current: Vec<char> = base_value.chars().collect();
@@ -206,17 +219,17 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                                     }
                                     current.iter().take(length).collect::<String>().trim().to_string()
                                 };
-                                
+
                                 // Handle paste of multiple digits
                                 let handle_paste = |start_index: usize, pasted: &str, base_value: &str| -> String {
                                     let digits: String = pasted.chars().filter(|c| c.is_ascii_digit()).collect();
-                                    
+
                                     if !digits.is_empty() {
                                         let mut current: Vec<char> = base_value.chars().collect();
                                         while current.len() < length {
                                             current.push(' ');
                                         }
-                                        
+
                                         // Fill from start index
                                         for (i, d) in digits.chars().enumerate() {
                                             let target_index = start_index + i;
@@ -224,13 +237,13 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                                                 current[target_index] = d;
                                             }
                                         }
-                                        
+
                                         current.iter().take(length).collect::<String>().trim().to_string()
                                     } else {
                                         base_value.to_string()
                                     }
                                 };
-                                
+
                                 // Check if it looks like a paste (multiple characters)
                                 let new_code = if val.len() > 1 {
                                     handle_paste(idx, &val, &current_value_clone)
@@ -243,13 +256,13 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                                         current_value_clone.clone()
                                     }
                                 };
-                                
+
                                 on_change_clone.call(new_code.clone());
                                 check_complete(&new_code);
                             },
                             onkeydown: move |e: Event<dioxus::html::KeyboardData>| {
                                 use dioxus::html::input_data::keyboard_types::Key;
-                                
+
                                 // Helper to clear value at specific index
                                 let clear_value_at = |index: usize, base_value: &str| -> String {
                                     let mut current: Vec<char> = base_value.chars().collect();
@@ -261,11 +274,11 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                                     }
                                     current.iter().take(length).collect::<String>().trim().to_string()
                                 };
-                                
+
                                 match e.key() {
                                     Key::Backspace => {
                                         let current_value_char = current_value_clone2.chars().nth(idx).unwrap_or(' ');
-                                        
+
                                         if current_value_char != ' ' && current_value_char != '\0' {
                                             // Clear current value
                                             let new_code = clear_value_at(idx, &current_value_clone2);

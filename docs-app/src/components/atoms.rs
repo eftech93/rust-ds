@@ -1,15 +1,14 @@
 //! Atom component documentation pages
 
+use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, PropsTable, Section};
 use dioxus::prelude::*;
-use dioxus_ui_system::prelude::*;
-use dioxus_ui_system::atoms::{StepIndicator, StepState, Box, VStack, HStack, 
-    Heading, HeadingLevel, Divider, DividerOrientation, Skeleton, SkeletonShape,
-    SkeletonText,
-    Progress, ProgressVariant, ProgressSize, Spinner, SpinnerVariant, SpinnerSize, Rating, Slider, SliderMark,
-    DatePicker, Tag, TagVariant, TagGroup, TagData
+use dioxus_ui_system::atoms::{
+    Box, DatePicker, Divider, DividerOrientation, HStack, Heading, HeadingLevel, Progress,
+    ProgressSize, ProgressVariant, Rating, Skeleton, SkeletonShape, SkeletonText, Slider,
+    SliderMark, Spinner, SpinnerSize, SpinnerVariant, StepIndicator, StepState, Tag, TagData,
+    TagGroup, TagVariant, VStack,
 };
-use crate::docs_ui::{DocPage, Section, ExampleBox, CodeBlock, PropsTable};
-
+use dioxus_ui_system::prelude::*;
 
 /// Atoms overview page
 #[component]
@@ -18,7 +17,7 @@ pub fn AtomsPage() -> Element {
         DocPage {
             title: "Atoms",
             description: "Basic building blocks of the design system. Atoms are the smallest UI components that cannot be broken down further.",
-            
+
             Section { title: "Overview",
                 p { "Atoms are the fundamental building blocks of the design system. They include:" }
                 ul {
@@ -39,7 +38,7 @@ pub fn AtomsPage() -> Element {
                     li { "PasswordInput - Password with show/hide toggle (New!)" }
                 }
             }
-            
+
             Section { title: "Usage",
                 p { "Import atoms from the prelude:" }
                 CodeBlock { code: "use dioxus_ui_system::prelude::*;".to_string() }
@@ -55,7 +54,7 @@ pub fn BoxPage() -> Element {
         DocPage {
             title: "Box",
             description: "A foundational layout primitive that provides consistent spacing, borders, backgrounds, and flexbox utilities.",
-            
+
             Section { title: "Basic Usage",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
@@ -75,7 +74,7 @@ pub fn BoxPage() -> Element {
     \"Your content here\"
 }}".to_string() }
             }
-            
+
             Section { title: "Flexbox Layout",
                 ExampleBox {
                     Box { display: BoxDisplay::Flex, gap: SpacingSize::Md, padding: SpacingSize::Md, background: BackgroundColor::Muted, border_radius: RadiusSize::Md,
@@ -91,7 +90,7 @@ pub fn BoxPage() -> Element {
     // ... children
 }}".to_string() }
             }
-            
+
             Section { title: "Convenience Components",
                 p { "Use VStack, HStack, and Center for common layouts:" }
                 ExampleBox {
@@ -112,7 +111,7 @@ pub fn BoxPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Spacing Options",
                 ExampleBox {
                     VStack { gap: SpacingSize::Sm,
@@ -125,7 +124,7 @@ pub fn BoxPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Background Colors",
                 ExampleBox {
                     div { style: "display: flex; flex-wrap: wrap; gap: 8px;",
@@ -151,7 +150,7 @@ pub fn ButtonPage() -> Element {
         DocPage {
             title: "Button",
             description: "Interactive button component with multiple variants and sizes.",
-            
+
             Section { title: "Variants",
                 ExampleBox {
                     HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap;",
@@ -164,7 +163,7 @@ pub fn ButtonPage() -> Element {
                 }
                 CodeBlock { code: "Button {{ variant: ButtonVariant::Primary, \"Click me\" }}".to_string() }
             }
-            
+
             Section { title: "Sizes",
                 ExampleBox {
                     HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap; align-items: center;",
@@ -175,7 +174,7 @@ pub fn ButtonPage() -> Element {
                 }
                 CodeBlock { code: "Button {{ size: ButtonSize::Md, \"Click me\" }}".to_string() }
             }
-            
+
             Section { title: "Props",
                 PropsTable { props: vec![
                     ("variant", "ButtonVariant", "Visual style variant"),
@@ -196,7 +195,7 @@ pub fn InputPage() -> Element {
         DocPage {
             title: "Input",
             description: "Text input field with support for various types and states.",
-            
+
             Section { title: "Basic Usage",
                 ExampleBox {
                     Box { style: "max-width: 400px;",
@@ -210,7 +209,7 @@ pub fn InputPage() -> Element {
                 }
                 CodeBlock { code: "InputGroup {{\n    label: \"Email\",\n    value: email(),\n    input_type: InputType::Email,\n    onchange: move |v| email.set(v),\n}}".to_string() }
             }
-            
+
             Section { title: "Input Types",
                 p { "Supported input types: Text, Email, Password, Number, Tel, Url, Search" }
             }
@@ -225,7 +224,7 @@ pub fn LabelPage() -> Element {
         DocPage {
             title: "Typography",
             description: "Text components for headings, labels, and body text.",
-            
+
             Section { title: "Headings",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
@@ -236,7 +235,7 @@ pub fn LabelPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Text Sizes",
                 ExampleBox {
                     VStack { gap: SpacingSize::Sm,
@@ -260,7 +259,7 @@ pub fn IconPage() -> Element {
         DocPage {
             title: "Icon",
             description: "Built-in icon library with 30+ icons.",
-            
+
             Section { title: "Available Icons",
                 HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap;",
                     IconItem { name: "home".to_string() }
@@ -273,7 +272,7 @@ pub fn IconPage() -> Element {
                     IconItem { name: "check".to_string() }
                 }
             }
-            
+
             Section { title: "Usage",
                 CodeBlock { code: "Icon {{\n    name: \"check\".to_string(),\n    size: IconSize::Medium,\n    color: IconColor::Success,\n}}".to_string() }
             }
@@ -295,12 +294,12 @@ fn IconItem(name: String) -> Element {
 #[component]
 pub fn CheckboxPage() -> Element {
     let mut checked = use_signal(|| false);
-    
+
     rsx! {
         DocPage {
             title: "Checkbox",
             description: "Binary selection control.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Checkbox {
@@ -319,12 +318,12 @@ pub fn CheckboxPage() -> Element {
 #[component]
 pub fn RadioPage() -> Element {
     let mut selected = use_signal(|| "option1".to_string());
-    
+
     rsx! {
         DocPage {
             title: "Radio",
             description: "Single selection from multiple options.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     VStack { gap: SpacingSize::Sm,
@@ -360,12 +359,12 @@ pub fn RadioPage() -> Element {
 #[component]
 pub fn SwitchPage() -> Element {
     let mut on = use_signal(|| true);
-    
+
     rsx! {
         DocPage {
             title: "Switch",
             description: "Toggle control for on/off states.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Switch {
@@ -391,7 +390,7 @@ pub fn SelectPage() -> Element {
         DocPage {
             title: "Select",
             description: "Dropdown selection component.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Box { style: "max-width: 300px;",
@@ -426,7 +425,7 @@ pub fn TextAreaPage() -> Element {
         DocPage {
             title: "TextArea",
             description: "Multi-line text input.",
-            
+
             Section { title: "Basic",
                 ExampleBox {
                     Box { style: "max-width: 400px;",
@@ -456,7 +455,7 @@ pub fn StepPage() -> Element {
         DocPage {
             title: "Step",
             description: "Step indicator for stepper components.",
-            
+
             Section { title: "States",
                 ExampleBox {
                     HStack { gap: SpacingSize::Xl,
@@ -483,8 +482,6 @@ pub fn StepPage() -> Element {
     }
 }
 
-
-
 /// Heading documentation page
 #[component]
 pub fn HeadingPage() -> Element {
@@ -492,7 +489,7 @@ pub fn HeadingPage() -> Element {
         DocPage {
             title: "Heading",
             description: "Typography headings for content hierarchy (H1-H6).",
-            
+
             Section { title: "Heading Levels",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
@@ -505,7 +502,7 @@ pub fn HeadingPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Usage",
                 CodeBlock { code: "Heading {{\n    level: HeadingLevel::H1,\n    \"Page Title\"\n}}".to_string() }
             }
@@ -520,7 +517,7 @@ pub fn DividerPage() -> Element {
         DocPage {
             title: "Divider",
             description: "Visual separators for content organization.",
-            
+
             Section { title: "Horizontal Divider",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
@@ -530,13 +527,13 @@ pub fn DividerPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "With Label",
                 ExampleBox {
                     Divider { label: Some("OR".to_string()), orientation: DividerOrientation::Horizontal, variant: DividerVariant::Solid }
                 }
             }
-            
+
             Section { title: "Vertical",
                 ExampleBox {
                     HStack { gap: SpacingSize::Md, style: "height: 40px;",
@@ -559,12 +556,12 @@ pub fn DividerPage() -> Element {
 #[component]
 pub fn ProgressPage() -> Element {
     let mut value = use_signal(|| 65.0);
-    
+
     rsx! {
         DocPage {
             title: "Progress",
             description: "Linear and circular progress indicators.",
-            
+
             Section { title: "Linear Progress",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
@@ -573,7 +570,7 @@ pub fn ProgressPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Circular Progress",
                 ExampleBox {
                     HStack { gap: SpacingSize::Lg,
@@ -582,7 +579,7 @@ pub fn ProgressPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Indeterminate",
                 ExampleBox {
                     Progress { value: None, indeterminate: true, variant: ProgressVariant::Linear, size: ProgressSize::Md }
@@ -606,7 +603,7 @@ pub fn SpinnerPage() -> Element {
         DocPage {
             title: "Spinner",
             description: "Loading spinners and indicators.",
-            
+
             Section { title: "Variants",
                 ExampleBox {
                     HStack { gap: SpacingSize::Lg, style: "align-items: center;",
@@ -617,7 +614,7 @@ pub fn SpinnerPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Sizes",
                 ExampleBox {
                     HStack { gap: SpacingSize::Md, style: "align-items: center;",
@@ -644,7 +641,7 @@ pub fn SkeletonAtomPage() -> Element {
         DocPage {
             title: "Skeleton",
             description: "Loading placeholders that mimic content structure.",
-            
+
             Section { title: "Basic Skeleton",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
@@ -654,7 +651,7 @@ pub fn SkeletonAtomPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Shapes",
                 ExampleBox {
                     HStack { gap: SpacingSize::Md,
@@ -664,7 +661,7 @@ pub fn SkeletonAtomPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Text Lines",
                 ExampleBox {
                     SkeletonText { lines: 4, line_height: 1.5, last_line_width: 80, animated: true }
@@ -683,12 +680,12 @@ pub fn SkeletonAtomPage() -> Element {
 #[component]
 pub fn RatingPage() -> Element {
     let mut rating = use_signal(|| 3.5);
-    
+
     rsx! {
         DocPage {
             title: "Rating",
             description: "Star rating display and input.",
-            
+
             Section { title: "Display Rating",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
@@ -698,7 +695,7 @@ pub fn RatingPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Interactive",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
@@ -722,12 +719,12 @@ pub fn RatingPage() -> Element {
 #[component]
 pub fn DatePickerPage() -> Element {
     let mut date = use_signal(|| None::<String>);
-    
+
     rsx! {
         DocPage {
             title: "DatePicker",
             description: "Date and date range selection input.",
-            
+
             Section { title: "Basic Date Picker",
                 div {
                     style: "padding: 24px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; min-height: 300px;",
@@ -738,7 +735,7 @@ pub fn DatePickerPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "With Constraints",
                 div {
                     style: "padding: 24px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; min-height: 300px;",
@@ -764,12 +761,12 @@ pub fn DatePickerPage() -> Element {
 #[component]
 pub fn SliderPage() -> Element {
     let mut value = use_signal(|| 50.0);
-    
+
     rsx! {
         DocPage {
             title: "Slider",
             description: "Range slider input for selecting numeric values.",
-            
+
             Section { title: "Basic Slider",
                 ExampleBox {
                     Slider {
@@ -779,7 +776,7 @@ pub fn SliderPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "With Marks",
                 ExampleBox {
                     Slider {
@@ -811,12 +808,12 @@ pub fn SliderPage() -> Element {
 #[component]
 pub fn TagPage() -> Element {
     let mut selected_tags = use_signal(|| vec!["rust".to_string()]);
-    
+
     rsx! {
         DocPage {
             title: "Tag",
             description: "Categorization, filtering, and selection tags.",
-            
+
             Section { title: "Tag Variants",
                 ExampleBox {
                     HStack { gap: SpacingSize::Sm, style: "flex-wrap: wrap;",
@@ -828,7 +825,7 @@ pub fn TagPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Selectable Tags",
                 ExampleBox {
                     TagGroup {
@@ -842,7 +839,7 @@ pub fn TagPage() -> Element {
                     }
                 }
             }
-            
+
             Section { title: "Removable Tags",
                 ExampleBox {
                     HStack { gap: SpacingSize::Sm, style: "flex-wrap: wrap;",
@@ -856,7 +853,7 @@ pub fn TagPage() -> Element {
     children: rsx! {{ \"Tag Label\" }}
 }}".to_string() }
             }
-            
+
             Section { title: "Tag Group",
                 ExampleBox {
                     HStack { gap: SpacingSize::Sm, style: "flex-wrap: wrap;",

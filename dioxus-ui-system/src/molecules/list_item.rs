@@ -2,8 +2,8 @@
 //!
 //! List row items with various configurations.
 
-use dioxus::prelude::*;
 use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 /// List item variant
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -53,13 +53,15 @@ pub struct ListItemProps {
 #[component]
 pub fn ListItem(props: ListItemProps) -> Element {
     let theme = use_theme();
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let padding = if props.dense { "8px 12px" } else { "12px 16px" };
-    
+
     let (bg_color, border_left) = match props.variant {
         ListItemVariant::Default => ("transparent".to_string(), "transparent".to_string()),
         ListItemVariant::Selected => {
@@ -67,25 +69,34 @@ pub fn ListItem(props: ListItemProps) -> Element {
             let border = bg.clone();
             (format!("{}15", bg.trim_start_matches('#')), border)
         }
-        ListItemVariant::Active => {
-            (theme.tokens.read().colors.muted.to_rgba(), "transparent".to_string())
-        }
+        ListItemVariant::Active => (
+            theme.tokens.read().colors.muted.to_rgba(),
+            "transparent".to_string(),
+        ),
         ListItemVariant::Disabled => ("transparent".to_string(), "transparent".to_string()),
     };
-    
-    let opacity = if props.variant == ListItemVariant::Disabled { "0.5" } else { "1" };
-    let cursor = if props.on_click.is_some() && props.variant != ListItemVariant::Disabled { "pointer" } else { "default" };
+
+    let opacity = if props.variant == ListItemVariant::Disabled {
+        "0.5"
+    } else {
+        "1"
+    };
+    let cursor = if props.on_click.is_some() && props.variant != ListItemVariant::Disabled {
+        "pointer"
+    } else {
+        "default"
+    };
     let _hover_bg = if props.hoverable && props.variant == ListItemVariant::Default {
         theme.tokens.read().colors.muted.to_rgba()
     } else {
         bg_color.clone()
     };
-    
+
     let on_click = props.on_click.clone();
-    
+
     let title_color = theme.tokens.read().colors.foreground.to_rgba();
     let desc_color = theme.tokens.read().colors.muted.to_rgba();
-    
+
     rsx! {
         div {
             class: "list-item{class_css}",
@@ -97,7 +108,7 @@ pub fn ListItem(props: ListItemProps) -> Element {
                     }
                 }
             },
-            
+
             if let Some(leading) = props.leading {
                 div {
                     class: "list-item-leading",
@@ -105,17 +116,17 @@ pub fn ListItem(props: ListItemProps) -> Element {
                     {leading}
                 }
             }
-            
+
             div {
                 class: "list-item-content",
                 style: "flex: 1; min-width: 0;",
-                
+
                 div {
                     class: "list-item-title",
                     style: "font-size: 14px; font-weight: 500; color: {title_color}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;",
                     "{props.title}"
                 }
-                
+
                 if let Some(description) = props.description {
                     div {
                         class: "list-item-description",
@@ -124,7 +135,7 @@ pub fn ListItem(props: ListItemProps) -> Element {
                     }
                 }
             }
-            
+
             if let Some(trailing) = props.trailing {
                 div {
                     class: "list-item-trailing",
@@ -133,7 +144,7 @@ pub fn ListItem(props: ListItemProps) -> Element {
                 }
             }
         }
-        
+
         if props.divider {
             div {
                 class: "list-item-divider",
@@ -163,28 +174,30 @@ pub struct ListGroupProps {
 #[component]
 pub fn ListGroup(props: ListGroupProps) -> Element {
     let theme = use_theme();
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     rsx! {
         div {
             class: "list-group{class_css}",
             style: "border-radius: 8px; overflow: hidden;",
-            
+
             if let Some(title) = props.title {
                 div {
                     class: "list-group-header",
                     style: if props.sticky { "position: sticky; top: 0; z-index: 10;" } else { "" },
-                    
+
                     h3 {
                         style: "margin: 0; padding: 12px 16px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: {theme.tokens.read().colors.muted.to_rgba()}; background: {theme.tokens.read().colors.background.to_rgba()};",
                         "{title}"
                     }
                 }
             }
-            
+
             div {
                 class: "list-group-items",
                 style: "background: white; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px;",
@@ -225,11 +238,13 @@ pub struct ActionListItemProps {
 #[component]
 pub fn ActionListItem(props: ActionListItemProps) -> Element {
     let theme = use_theme();
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     let text_color = if props.destructive {
         theme.tokens.read().colors.destructive.to_rgba()
     } else if props.disabled {
@@ -237,16 +252,29 @@ pub fn ActionListItem(props: ActionListItemProps) -> Element {
     } else {
         theme.tokens.read().colors.foreground.to_rgba()
     };
-    
+
     let _hover_bg = if props.destructive {
-        format!("{}15", theme.tokens.read().colors.destructive.to_rgba().trim_start_matches('#'))
+        format!(
+            "{}15",
+            theme
+                .tokens
+                .read()
+                .colors
+                .destructive
+                .to_rgba()
+                .trim_start_matches('#')
+        )
     } else {
         theme.tokens.read().colors.muted.to_rgba()
     };
-    
-    let cursor = if props.disabled { "not-allowed" } else { "pointer" };
+
+    let cursor = if props.disabled {
+        "not-allowed"
+    } else {
+        "pointer"
+    };
     let opacity = if props.disabled { "0.5" } else { "1" };
-    
+
     rsx! {
         button {
             type: "button",
@@ -254,7 +282,7 @@ pub fn ActionListItem(props: ActionListItemProps) -> Element {
             style: "display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 14px; background: transparent; border: none; text-align: left; cursor: {cursor}; opacity: {opacity}; border-radius: 6px; transition: background 0.15s ease;",
             disabled: props.disabled,
             onclick: move |_| props.on_click.call(()),
-            
+
             if let Some(icon) = props.icon {
                 span {
                     class: "action-list-item-icon",
@@ -262,17 +290,17 @@ pub fn ActionListItem(props: ActionListItemProps) -> Element {
                     "{icon}"
                 }
             }
-            
+
             div {
                 class: "action-list-item-content",
                 style: "flex: 1; min-width: 0;",
-                
+
                 div {
                     class: "action-list-item-label",
                     style: "font-size: 14px; color: {text_color}; font-weight: 500;",
                     "{props.label}"
                 }
-                
+
                 if let Some(description) = props.description {
                     div {
                         class: "action-list-item-description",
@@ -281,7 +309,7 @@ pub fn ActionListItem(props: ActionListItemProps) -> Element {
                     }
                 }
             }
-            
+
             if let Some(shortcut) = props.shortcut {
                 kbd {
                     class: "action-list-item-shortcut",
@@ -312,33 +340,35 @@ pub struct ExpandableListItemProps {
 #[component]
 pub fn ExpandableListItem(props: ExpandableListItemProps) -> Element {
     let mut is_expanded = use_signal(|| props.default_expanded);
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
+
     rsx! {
         div {
             class: "expandable-list-item{class_css}",
             style: "border-bottom: 1px solid #e2e8f0;",
-            
+
             button {
                 type: "button",
                 class: "expandable-list-item-header",
                 style: "display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 12px 16px; background: transparent; border: none; cursor: pointer;",
                 onclick: move |_| is_expanded.toggle(),
-                
+
                 div {
                     style: "flex: 1; text-align: left;",
                     {props.header}
                 }
-                
+
                 span {
                     style: format!("font-size: 12px; transition: transform 0.2s; transform: rotate({}deg);", if is_expanded() { 180 } else { 0 }),
                     "▼"
                 }
             }
-            
+
             if is_expanded() {
                 div {
                     class: "expandable-list-item-content",
@@ -347,7 +377,7 @@ pub fn ExpandableListItem(props: ExpandableListItemProps) -> Element {
                 }
             }
         }
-        
+
 
     }
 }

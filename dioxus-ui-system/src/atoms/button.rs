@@ -3,10 +3,10 @@
 //! A highly customizable button component with multiple variants and sizes.
 //! Uses Rust-native hover/active states (no CSS pseudo-classes).
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
 use crate::theme::tokens::Color;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Button variant styles
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -107,17 +107,17 @@ impl ButtonType {
 #[component]
 pub fn Button(props: ButtonProps) -> Element {
     let _theme = use_theme();
-    
+
     let variant = props.variant.clone();
     let size = props.size.clone();
     let disabled = props.disabled;
     let full_width = props.full_width;
-    
+
     // Interactive states
     let mut is_hovered = use_signal(|| false);
     let mut is_pressed = use_signal(|| false);
     let mut is_focused = use_signal(|| false);
-    
+
     // Memoized styles
     let style = use_style(move |t| {
         let base = Style::new()
@@ -133,21 +133,17 @@ pub fn Button(props: ButtonProps) -> Element {
             .select_none()
             .whitespace_nowrap()
             .cursor(if disabled { "not-allowed" } else { "pointer" });
-            
+
         // Apply opacity for disabled state
         let base = if disabled {
             base.opacity(0.5)
         } else {
             base.opacity(1.0)
         };
-        
+
         // Full width
-        let base = if full_width {
-            base.w_full()
-        } else {
-            base
-        };
-        
+        let base = if full_width { base.w_full() } else { base };
+
         // Size styles
         let sized = match size {
             ButtonSize::Sm => base.p(&t.spacing, "sm").h_px(32),
@@ -155,7 +151,7 @@ pub fn Button(props: ButtonProps) -> Element {
             ButtonSize::Lg => base.p(&t.spacing, "lg").h_px(48),
             ButtonSize::Icon => base.p(&t.spacing, "md").rounded(&t.radius, "md"),
         };
-        
+
         // Variant styles with hover states
         let (bg, fg, border, shadow) = match variant {
             ButtonVariant::Primary => {
@@ -177,7 +173,12 @@ pub fn Button(props: ButtonProps) -> Element {
                 } else {
                     t.colors.secondary.clone()
                 };
-                (bg, t.colors.secondary_foreground.clone(), None, String::new())
+                (
+                    bg,
+                    t.colors.secondary_foreground.clone(),
+                    None,
+                    String::new(),
+                )
             }
             ButtonVariant::Ghost => {
                 let bg = if is_hovered() && !disabled {
@@ -209,44 +210,42 @@ pub fn Button(props: ButtonProps) -> Element {
                 (Color::new_rgba(0, 0, 0, 0.0), fg, None, String::new())
             }
         };
-        
-        let mut final_style = sized
-            .bg(&bg)
-            .text_color(&fg);
-            
+
+        let mut final_style = sized.bg(&bg).text_color(&fg);
+
         if let Some(b) = border {
             final_style = Style {
                 border: Some(b),
                 ..final_style
             };
         }
-        
+
         if !shadow.is_empty() {
             final_style = Style {
                 box_shadow: Some(shadow),
                 ..final_style
             };
         }
-        
+
         final_style.build()
     });
-    
+
     // Transform for pressed state
     let transform = if is_pressed() && !disabled {
         "transform: scale(0.98);"
     } else {
         ""
     };
-    
+
     // Combine with custom styles
     let final_style = if let Some(custom) = &props.style {
         format!("{} {}{}", style(), custom, transform)
     } else {
         format!("{}{}", style(), transform)
     };
-    
+
     let class = props.class.clone().unwrap_or_default();
-    
+
     rsx! {
         button {
             r#type: props.button_type.as_str(),
@@ -275,14 +274,10 @@ pub fn Button(props: ButtonProps) -> Element {
 #[component]
 pub fn IconButton(
     icon: Element,
-    #[props(default)]
-    variant: ButtonVariant,
-    #[props(default)]
-    size: ButtonSize,
-    #[props(default)]
-    disabled: bool,
-    #[props(default)]
-    onclick: Option<EventHandler<MouseEvent>>,
+    #[props(default)] variant: ButtonVariant,
+    #[props(default)] size: ButtonSize,
+    #[props(default)] disabled: bool,
+    #[props(default)] onclick: Option<EventHandler<MouseEvent>>,
 ) -> Element {
     rsx! {
         Button {

@@ -2,10 +2,10 @@
 //!
 //! A flexible container for grouping related content.
 
-use dioxus::prelude::*;
-use crate::theme::use_style;
+use crate::atoms::{AlignItems, HStack, JustifyContent, SpacingSize, VStack};
 use crate::styles::Style;
-use crate::atoms::{VStack, HStack, JustifyContent, AlignItems, SpacingSize};
+use crate::theme::use_style;
+use dioxus::prelude::*;
 
 /// Card variants
 #[derive(Default, Clone, PartialEq)]
@@ -71,11 +71,11 @@ pub fn Card(props: CardProps) -> Element {
     let variant = props.variant.clone();
     let full_width = props.full_width;
     let has_onclick = props.onclick.is_some();
-    
+
     // Interactive states
     let mut is_hovered = use_signal(|| false);
     let mut is_pressed = use_signal(|| false);
-    
+
     let overflow_hidden = props.overflow_hidden;
     let style = use_style(move |t| {
         let base = Style::new()
@@ -83,35 +83,25 @@ pub fn Card(props: CardProps) -> Element {
             .bg(&t.colors.card)
             .text_color(&t.colors.card_foreground)
             .transition("all 150ms ease");
-        
+
         let base = if overflow_hidden {
             base.overflow_hidden()
         } else {
             base
         };
-            
+
         // Full width
-        let base = if full_width {
-            base.w_full()
-        } else {
-            base
-        };
-        
+        let base = if full_width { base.w_full() } else { base };
+
         // Apply variant styles
         let styled = match variant {
-            CardVariant::Default => base
-                .border(1, &t.colors.border),
-            CardVariant::Muted => base
-                .bg(&t.colors.muted)
-                .border(1, &t.colors.border),
-            CardVariant::Elevated => base
-                .shadow(&t.shadows.md)
-                .border(1, &t.colors.border),
-            CardVariant::Outlined => base
-                .border(2, &t.colors.border),
+            CardVariant::Default => base.border(1, &t.colors.border),
+            CardVariant::Muted => base.bg(&t.colors.muted).border(1, &t.colors.border),
+            CardVariant::Elevated => base.shadow(&t.shadows.md).border(1, &t.colors.border),
+            CardVariant::Outlined => base.border(2, &t.colors.border),
             CardVariant::Ghost => base,
         };
-        
+
         // Interactive states
         let styled = if has_onclick && !is_pressed() && is_hovered() {
             match variant {
@@ -124,7 +114,7 @@ pub fn Card(props: CardProps) -> Element {
         } else {
             styled
         };
-        
+
         // Apply padding if specified
         let styled = if let Some(ref p) = props.padding {
             Style {
@@ -134,34 +124,34 @@ pub fn Card(props: CardProps) -> Element {
         } else {
             styled
         };
-        
+
         // Cursor
         let styled = if has_onclick {
             styled.cursor_pointer()
         } else {
             styled
         };
-        
+
         styled.build()
     });
-    
+
     // Transform for pressed state
     let transform = if is_pressed() && has_onclick {
         "transform: scale(0.99);"
     } else {
         ""
     };
-    
+
     let final_style = if let Some(custom) = &props.style {
         format!("{} {}{}", style(), custom, transform)
     } else {
         format!("{}{}", style(), transform)
     };
-    
+
     let class = props.class.clone().unwrap_or_default();
-    
+
     let onclick_handler = props.onclick.clone();
-    
+
     rsx! {
         div {
             style: "{final_style}",
@@ -205,7 +195,7 @@ pub fn CardHeader(props: CardHeaderProps) -> Element {
             .gap(&t.spacing, "xs")
             .build()
     });
-    
+
     let content = if let Some(title) = props.title {
         let subtitle_element = props.subtitle.map(|s| {
             rsx! {
@@ -216,9 +206,9 @@ pub fn CardHeader(props: CardHeaderProps) -> Element {
                 }
             }
         });
-        
+
         let action_element = props.action.clone();
-        
+
         rsx! {
             HStack {
                 justify: JustifyContent::SpaceBetween,
@@ -237,7 +227,7 @@ pub fn CardHeader(props: CardHeaderProps) -> Element {
     } else {
         props.children
     };
-    
+
     rsx! {
         VStack { style: "{style}", {content} }
     }
@@ -263,13 +253,13 @@ pub fn CardContent(props: CardContentProps) -> Element {
             .gap(&t.spacing, "md")
             .build()
     });
-    
+
     let final_style = if let Some(padding) = props.padding {
         format!("padding: {};", padding)
     } else {
         style()
     };
-    
+
     rsx! {
         VStack { style: "{final_style}", {props.children} }
     }
@@ -304,7 +294,7 @@ pub fn CardFooter(props: CardFooterProps) -> Element {
         CardFooterJustify::End => JustifyContent::End,
         CardFooterJustify::Between => JustifyContent::SpaceBetween,
     };
-    
+
     let style = use_style(|t| {
         Style::new()
             .p(&t.spacing, "lg")
@@ -312,7 +302,7 @@ pub fn CardFooter(props: CardFooterProps) -> Element {
             .gap(&t.spacing, "sm")
             .build()
     });
-    
+
     rsx! {
         HStack {
             style: "{style}",

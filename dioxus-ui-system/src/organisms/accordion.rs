@@ -2,9 +2,9 @@
 //!
 //! A vertically stacked set of interactive headings that each reveal a section of content.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Accordion item definition
 #[derive(Clone, PartialEq)]
@@ -21,7 +21,11 @@ pub struct AccordionItem {
 
 impl AccordionItem {
     /// Create a new accordion item
-    pub fn new(id: impl Into<String>, title: impl Into<String>, content: impl Into<String>) -> Self {
+    pub fn new(
+        id: impl Into<String>,
+        title: impl Into<String>,
+        content: impl Into<String>,
+    ) -> Self {
         Self {
             id: id.into(),
             title: title.into(),
@@ -29,7 +33,7 @@ impl AccordionItem {
             disabled: false,
         }
     }
-    
+
     /// Set disabled state
     pub fn disabled(mut self, disabled: bool) -> Self {
         self.disabled = disabled;
@@ -61,7 +65,7 @@ pub struct AccordionProps {
 #[component]
 pub fn Accordion(props: AccordionProps) -> Element {
     let _theme = use_theme();
-    
+
     let accordion_style = use_style(|t| {
         Style::new()
             .w_full()
@@ -72,11 +76,11 @@ pub fn Accordion(props: AccordionProps) -> Element {
             .flex_col()
             .build()
     });
-    
+
     rsx! {
         div {
             style: "{accordion_style} {props.style.clone().unwrap_or_default()}",
-            
+
             for (index, item) in props.items.iter().enumerate() {
                 AccordionSection {
                     key: "{item.id}",
@@ -108,10 +112,10 @@ struct AccordionSectionProps {
 fn AccordionSection(props: AccordionSectionProps) -> Element {
     let _theme = use_theme();
     let mut is_hovered = use_signal(|| false);
-    
+
     let is_expanded = props.is_expanded;
     let is_disabled = props.item.disabled;
-    
+
     let trigger_style = use_style(move |t| {
         let base = Style::new()
             .w_full()
@@ -122,20 +126,25 @@ fn AccordionSection(props: AccordionSectionProps) -> Element {
             .py(&t.spacing, "md")
             .text(&t.typography, "base")
             .font_weight(500)
-            .cursor(if is_disabled { "not-allowed" } else { "pointer" })
+            .cursor(if is_disabled {
+                "not-allowed"
+            } else {
+                "pointer"
+            })
             .transition("all 150ms ease")
             .bg_transparent()
             .border(0, &t.colors.border)
             .outline("none")
             .text_color(&t.colors.foreground);
-        
+
         if !props.is_last || is_expanded {
             base.border_bottom(1, &t.colors.border)
         } else {
             base
-        }.build()
+        }
+        .build()
     });
-    
+
     let content_style = use_style(|t| {
         Style::new()
             .px(&t.spacing, "lg")
@@ -145,15 +154,15 @@ fn AccordionSection(props: AccordionSectionProps) -> Element {
             .line_height(1.6)
             .build()
     });
-    
+
     let handle_toggle = move |_| {
         if is_disabled {
             return;
         }
-        
+
         let mut new_expanded = props.all_expanded.clone();
         let item_id = props.item.id.clone();
-        
+
         if props.multiple {
             // Toggle in multiple mode
             if new_expanded.contains(&item_id) {
@@ -174,17 +183,21 @@ fn AccordionSection(props: AccordionSectionProps) -> Element {
                 new_expanded.push(item_id);
             }
         }
-        
+
         props.on_toggle.call(new_expanded);
     };
-    
-    let chevron_rotation = if is_expanded { "rotate(180deg)" } else { "rotate(0deg)" };
-    
+
+    let chevron_rotation = if is_expanded {
+        "rotate(180deg)"
+    } else {
+        "rotate(0deg)"
+    };
+
     rsx! {
         div {
             h3 {
                 style: "margin: 0;",
-                
+
                 button {
                     style: "{trigger_style}",
                     type: "button",
@@ -193,17 +206,17 @@ fn AccordionSection(props: AccordionSectionProps) -> Element {
                     onclick: handle_toggle,
                     onmouseenter: move |_| if !is_disabled { is_hovered.set(true) },
                     onmouseleave: move |_| is_hovered.set(false),
-                    
+
                     "{props.item.title}"
-                    
+
                     span {
                         style: "transform: {chevron_rotation}; transition: transform 200ms ease;",
-                        
+
                         AccordionChevron {}
                     }
                 }
             }
-            
+
             if is_expanded {
                 div {
                     style: "{content_style}",
@@ -251,7 +264,7 @@ pub fn AccordionItem2(props: AccordionItem2Props) -> Element {
     let _theme = use_theme();
     let mut is_expanded = use_signal(|| props.default_expanded);
     let mut is_hovered = use_signal(|| false);
-    
+
     let trigger_style = use_style(move |t| {
         Style::new()
             .w_full()
@@ -271,24 +284,28 @@ pub fn AccordionItem2(props: AccordionItem2Props) -> Element {
             .border_bottom(1, &t.colors.border)
             .build()
     });
-    
+
     let content_style = use_style(|t| {
         Style::new()
             .px(&t.spacing, "lg")
             .py(&t.spacing, "md")
             .build()
     });
-    
+
     let expanded = is_expanded();
-    let chevron_rotation = if expanded { "rotate(180deg)" } else { "rotate(0deg)" };
-    
+    let chevron_rotation = if expanded {
+        "rotate(180deg)"
+    } else {
+        "rotate(0deg)"
+    };
+
     rsx! {
         div {
             style: "{props.style.clone().unwrap_or_default()}",
-            
+
             h3 {
                 style: "margin: 0;",
-                
+
                 button {
                     style: "{trigger_style}",
                     type: "button",
@@ -296,16 +313,16 @@ pub fn AccordionItem2(props: AccordionItem2Props) -> Element {
                     onclick: move |_| is_expanded.toggle(),
                     onmouseenter: move |_| is_hovered.set(true),
                     onmouseleave: move |_| is_hovered.set(false),
-                    
+
                     "{props.title}"
-                    
+
                     span {
                         style: "transform: {chevron_rotation}; transition: transform 200ms ease;",
                         AccordionChevron {}
                     }
                 }
             }
-            
+
             if expanded {
                 div {
                     style: "{content_style}",

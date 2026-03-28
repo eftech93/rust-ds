@@ -2,10 +2,10 @@
 //!
 //! Displays a callout for user attention.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
-use crate::styles::Style;
 use crate::atoms::Box;
+use crate::styles::Style;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Alert variants
 #[derive(Default, Clone, PartialEq)]
@@ -56,20 +56,16 @@ pub struct AlertProps {
 pub fn Alert(props: AlertProps) -> Element {
     let _theme = use_theme();
     let mut is_visible = use_signal(|| true);
-    
+
     if !is_visible() {
         return rsx! {};
     }
-    
+
     let variant = props.variant.clone();
-    
+
     let alert_style = use_style(move |t| {
         let (bg_color, border_color, _text_color) = match variant {
-            AlertVariant::Default => (
-                &t.colors.background,
-                &t.colors.border,
-                &t.colors.foreground,
-            ),
+            AlertVariant::Default => (&t.colors.background, &t.colors.border, &t.colors.foreground),
             AlertVariant::Destructive => (
                 &t.colors.destructive.lighten(0.9),
                 &t.colors.destructive,
@@ -91,7 +87,7 @@ pub fn Alert(props: AlertProps) -> Element {
                 &t.colors.primary,
             ),
         };
-        
+
         Style::new()
             .w_full()
             .rounded(&t.radius, "lg")
@@ -100,22 +96,16 @@ pub fn Alert(props: AlertProps) -> Element {
             .p(&t.spacing, "md")
             .build()
     });
-    
-    let icon_style = use_style(|_t| {
-        Style::new()
-            .w_px(20)
-            .h_px(20)
-            .flex_shrink(0)
-            .build()
-    });
-    
+
+    let icon_style = use_style(|_t| Style::new().w_px(20).h_px(20).flex_shrink(0).build());
+
     let mut handle_dismiss = move || {
         is_visible.set(false);
         if let Some(handler) = &props.on_dismiss {
             handler.call(());
         }
     };
-    
+
     // Default icons based on variant
     let default_icon = match props.variant {
         AlertVariant::Default => None,
@@ -124,37 +114,37 @@ pub fn Alert(props: AlertProps) -> Element {
         AlertVariant::Warning => Some("alert-triangle"),
         AlertVariant::Info => Some("info"),
     };
-    
+
     let icon_name = props.icon.as_deref().or(default_icon);
     let custom_style = props.style.clone().unwrap_or_default();
     let custom_class = props.class.clone().unwrap_or_default();
-    
+
     rsx! {
         div {
             role: "alert",
             style: "{alert_style} {custom_style} display: flex; align-items: flex-start; gap: 12px;",
             class: "{custom_class}",
-            
+
             if let Some(icon) = icon_name {
                 AlertIcon { name: icon.to_string(), style: icon_style() }
             }
-            
+
             div {
                 style: "flex: 1;",
-                
+
                 if let Some(title) = props.title {
                     h5 {
                         style: "margin: 0 0 4px 0; font-size: 14px; font-weight: 600;",
                         "{title}"
                     }
                 }
-                
+
                 Box {
                     style: "font-size: 14px; line-height: 1.5;",
                     {props.children}
                 }
             }
-            
+
             if props.dismissible {
                 button {
                     style: "background: none; border: none; cursor: pointer; padding: 4px; opacity: 0.5; transition: opacity 150ms;",
@@ -218,8 +208,8 @@ fn AlertIcon(props: AlertIconProps) -> Element {
                 line { x1: "12", y1: "8", x2: "12.01", y2: "8" }
             }
         },
-        _ => rsx! {}
+        _ => rsx! {},
     };
-    
+
     svg_content
 }

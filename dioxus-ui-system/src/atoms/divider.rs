@@ -2,8 +2,8 @@
 //!
 //! Visual separators for content organization.
 
-use dioxus::prelude::*;
 use crate::theme::use_theme;
+use dioxus::prelude::*;
 
 /// Divider orientation
 #[derive(Default, Clone, PartialEq, Debug)]
@@ -57,29 +57,35 @@ pub struct DividerProps {
 #[component]
 pub fn Divider(props: DividerProps) -> Element {
     let theme = use_theme();
-    
-    let color = props.color.unwrap_or_else(|| {
-        theme.tokens.read().colors.border.to_rgba()
-    });
-    
+
+    let color = props
+        .color
+        .unwrap_or_else(|| theme.tokens.read().colors.border.to_rgba());
+
     let border_style = match props.variant {
         DividerVariant::Solid => "solid",
         DividerVariant::Dashed => "dashed",
         DividerVariant::Dotted => "dotted",
     };
-    
-    let class_css = props.class.as_ref()
+
+    let class_css = props
+        .class
+        .as_ref()
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
-    
-    let style_css = props.style.as_ref()
+
+    let style_css = props
+        .style
+        .as_ref()
         .map(|s| format!("{}", s))
         .unwrap_or_default();
-    
-    let length_css = props.length.as_ref()
+
+    let length_css = props
+        .length
+        .as_ref()
         .map(|l| format!("width: {};", l))
         .unwrap_or_else(|| "width: 100%;".to_string());
-    
+
     // With label - horizontal only
     if let Some(label) = props.label {
         let spacing = props.spacing;
@@ -88,23 +94,23 @@ pub fn Divider(props: DividerProps) -> Element {
             div {
                 class: "divider divider-with-label{class_css}",
                 style: "display: flex; align-items: center; margin: {spacing}px 0; {style_css}",
-                
+
                 div {
                     style: "flex: 1; height: {thickness}px; background: {color}; border-top: {thickness}px {border_style} {color};",
                 }
-                
+
                 span {
                     style: "padding: 0 16px; color: {theme.tokens.read().colors.muted.to_rgba()}; font-size: 14px; white-space: nowrap;",
                     "{label}"
                 }
-                
+
                 div {
                     style: "flex: 1; height: {thickness}px; background: {color}; border-top: {thickness}px {border_style} {color};",
                 }
             }
         };
     }
-    
+
     // Without label
     match props.orientation {
         DividerOrientation::Horizontal => {
@@ -118,12 +124,14 @@ pub fn Divider(props: DividerProps) -> Element {
             }
         }
         DividerOrientation::Vertical => {
-            let height = props.length.as_ref()
+            let height = props
+                .length
+                .as_ref()
                 .map(|l| format!("height: {};", l))
                 .unwrap_or_else(|| "height: 100%;".to_string());
             let thickness = props.thickness;
             let spacing = props.spacing;
-            
+
             rsx! {
                 div {
                     class: "divider divider-vertical{class_css}",
@@ -150,13 +158,13 @@ pub struct SpacerProps {
 /// Spacer size scale
 #[derive(Default, Clone, PartialEq, Debug)]
 pub enum SpacerSize {
-    Xs,   // 4px
-    Sm,   // 8px
+    Xs, // 4px
+    Sm, // 8px
     #[default]
-    Md,   // 16px
-    Lg,   // 24px
-    Xl,   // 32px
-    Xxl,  // 48px
+    Md, // 16px
+    Lg, // 24px
+    Xl, // 32px
+    Xxl, // 48px
     Xxxl, // 64px
 }
 
@@ -187,13 +195,13 @@ pub enum SpacerDirection {
 #[component]
 pub fn Spacer(props: SpacerProps) -> Element {
     let size = props.custom.unwrap_or_else(|| props.size.to_px());
-    
+
     let (width, height) = match props.direction {
         SpacerDirection::Both => (size, size),
         SpacerDirection::Horizontal => (size, 0),
         SpacerDirection::Vertical => (0, size),
     };
-    
+
     rsx! {
         div {
             style: "display: block; width: {width}px; height: {height}px; flex-shrink: 0;",

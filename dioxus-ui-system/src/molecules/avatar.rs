@@ -2,10 +2,10 @@
 //!
 //! An image element with a fallback for representing the user.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
+use crate::atoms::{AlignItems, Box, HStack};
 use crate::styles::Style;
-use crate::atoms::{Box, HStack, AlignItems};
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Avatar sizes
 #[derive(Clone, PartialEq)]
@@ -59,7 +59,7 @@ pub struct AvatarProps {
 pub fn Avatar(props: AvatarProps) -> Element {
     let _theme = use_theme();
     let mut image_error = use_signal(|| false);
-    
+
     let size_px = match props.size {
         AvatarSize::Xs => 24,
         AvatarSize::Sm => 32,
@@ -67,7 +67,7 @@ pub fn Avatar(props: AvatarProps) -> Element {
         AvatarSize::Lg => 48,
         AvatarSize::Xl => 64,
     };
-    
+
     let font_size = match props.size {
         AvatarSize::Xs => 10,
         AvatarSize::Sm => 12,
@@ -75,7 +75,7 @@ pub fn Avatar(props: AvatarProps) -> Element {
         AvatarSize::Lg => 16,
         AvatarSize::Xl => 20,
     };
-    
+
     let avatar_style = use_style(move |t| {
         Style::new()
             .w_px(size_px)
@@ -92,15 +92,15 @@ pub fn Avatar(props: AvatarProps) -> Element {
             .border(0, &t.colors.border)
             .build()
     });
-    
+
     let show_image = props.src.is_some() && !image_error();
     let src_clone = props.src.clone();
-    
+
     rsx! {
         Box {
             style: "{avatar_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
-            
+
             if show_image {
                 img {
                     src: "{src_clone.clone().unwrap()}",
@@ -136,7 +136,7 @@ fn AvatarFallbackInitials(props: AvatarFallbackInitialsProps) -> Element {
         .chars()
         .take(2)
         .collect();
-    
+
     rsx! {
         span {
             style: "font-size: {props.font_size}px; user-select: none;",
@@ -190,13 +190,13 @@ pub fn AvatarGroup(props: AvatarGroupProps) -> Element {
         AvatarSize::Lg => 48,
         AvatarSize::Xl => 64,
     };
-    
+
     let _overlap = _size_px / 4;
-    
+
     rsx! {
         HStack {
             align: AlignItems::Center,
-            
+
             HStack {
                 // Note: In a real implementation, we'd use context to manage the overlapping
                 // For now, this is a simplified version

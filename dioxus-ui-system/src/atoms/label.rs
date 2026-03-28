@@ -2,10 +2,10 @@
 //!
 //! Text label with typography and theming support.
 
-use dioxus::prelude::*;
-use crate::theme::{use_theme, use_style};
 use crate::styles::Style;
 use crate::theme::tokens::Color;
+use crate::theme::{use_style, use_theme};
+use dioxus::prelude::*;
 
 /// Text sizes (typography presets)
 #[derive(Default, Clone, PartialEq)]
@@ -141,14 +141,14 @@ impl TextAlign {
 #[component]
 pub fn Label(props: LabelProps) -> Element {
     let _theme = use_theme();
-    
+
     let size = props.size.clone();
     let weight = props.weight.clone();
     let color = props.color.clone();
     let align = props.align.clone();
     let truncate = props.truncate;
     let line_clamp = props.line_clamp;
-    
+
     // Memoized styles
     let style = use_style(move |t| {
         let typography_size = match size {
@@ -162,11 +162,11 @@ pub fn Label(props: LabelProps) -> Element {
             TextSize::H3 => "h3",
             TextSize::H4 => "h4",
         };
-        
+
         let base = Style::new()
             .text(&t.typography, typography_size)
             .text_align(align.as_str());
-            
+
         // Apply weight override if different from typography default
         let base = match weight {
             TextWeight::Normal => base.font_weight(400),
@@ -174,7 +174,7 @@ pub fn Label(props: LabelProps) -> Element {
             TextWeight::Semibold => base.font_weight(600),
             TextWeight::Bold => base.font_weight(700),
         };
-        
+
         // Apply color
         let base = match &color {
             TextColor::Default => base.text_color(&t.colors.foreground),
@@ -187,7 +187,7 @@ pub fn Label(props: LabelProps) -> Element {
             TextColor::Inverse => base.text_color(&t.colors.background),
             TextColor::Custom(c) => base.text_color(c),
         };
-        
+
         // Truncate
         let base = if truncate {
             Style {
@@ -199,7 +199,7 @@ pub fn Label(props: LabelProps) -> Element {
         } else {
             base
         };
-        
+
         // Line clamp
         let base = if let Some(_clamp) = line_clamp {
             Style {
@@ -209,20 +209,20 @@ pub fn Label(props: LabelProps) -> Element {
         } else {
             base
         };
-        
+
         base.build()
     });
-    
+
     // Combine with custom styles
     let final_style = if let Some(custom) = &props.style {
         format!("{} {}", style(), custom)
     } else {
         style()
     };
-    
+
     let class = props.class.clone().unwrap_or_default();
     let html_for = props.html_for.clone();
-    
+
     // Render the appropriate element
     match props.as_element {
         LabelElement::Span => rsx! {
@@ -271,12 +271,9 @@ pub fn Label(props: LabelProps) -> Element {
 #[component]
 pub fn Heading(
     children: Element,
-    #[props(default)]
-    level: HeadingLevel,
-    #[props(default)]
-    weight: TextWeight,
-    #[props(default)]
-    color: TextColor,
+    #[props(default)] level: HeadingLevel,
+    #[props(default)] weight: TextWeight,
+    #[props(default)] color: TextColor,
 ) -> Element {
     let size = match level {
         HeadingLevel::H1 => TextSize::H1,
@@ -284,14 +281,14 @@ pub fn Heading(
         HeadingLevel::H3 => TextSize::H3,
         HeadingLevel::H4 => TextSize::H4,
     };
-    
+
     let element = match level {
         HeadingLevel::H1 => LabelElement::H1,
         HeadingLevel::H2 => LabelElement::H2,
         HeadingLevel::H3 => LabelElement::H3,
         HeadingLevel::H4 => LabelElement::H4,
     };
-    
+
     rsx! {
         Label {
             size: size,
@@ -315,11 +312,7 @@ pub enum HeadingLevel {
 
 /// Convenience component for muted/secondary text
 #[component]
-pub fn MutedText(
-    children: Element,
-    #[props(default)]
-    size: TextSize,
-) -> Element {
+pub fn MutedText(children: Element, #[props(default)] size: TextSize) -> Element {
     rsx! {
         Label {
             size: size,
