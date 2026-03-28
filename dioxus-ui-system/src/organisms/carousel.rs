@@ -264,6 +264,8 @@ pub fn CarouselContent(props: CarouselContentProps) -> Element {
     // Get current index for transform calculation
     let current_idx = carousel.as_ref().map_or(0, |ctx| *ctx.current_index.read());
 
+    // Count children and update total_items
+    // This is done by rendering and letting CarouselItem update the count
     let content_style = use_style(move |_t| {
         Style::new()
             .flex()
@@ -297,6 +299,19 @@ pub struct CarouselItemProps {
 pub fn CarouselItem(props: CarouselItemProps) -> Element {
     let _theme = use_theme();
     let carousel = use_carousel();
+    let index = props.index;
+
+    // Update total_items count when this item is mounted
+    let total_items_signal = carousel.as_ref().map(|ctx| ctx.total_items);
+    use_effect(move || {
+        if let Some(mut total_items) = total_items_signal {
+            total_items.with_mut(|count| {
+                if index >= *count {
+                    *count = index + 1;
+                }
+            });
+        }
+    });
 
     let is_active = carousel
         .as_ref()

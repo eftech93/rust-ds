@@ -5,6 +5,29 @@
 use crate::theme::use_theme;
 use dioxus::prelude::*;
 
+/// CSS keyframes for spinner animations
+const SPINNER_STYLES: &str = r#"
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-25%); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.9); }
+}
+
+@keyframes bars {
+    0%, 100% { transform: scaleY(0.3); }
+    50% { transform: scaleY(1); }
+}
+"#;
+
 pub fn default_loading_label() -> String {
     "Loading".to_string()
 }
@@ -89,6 +112,8 @@ pub fn Spinner(props: SpinnerProps) -> Element {
             let circumference = 2.0 * std::f32::consts::PI * radius as f32;
 
             rsx! {
+                style { dangerous_inner_html: "{SPINNER_STYLES}" }
+
                 span {
                     class: "spinner spinner-circular{class_css}",
                     role: "status",
@@ -119,8 +144,6 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                         "{props.label}"
                     }
                 }
-
-
             }
         }
         SpinnerVariant::Dots => {
@@ -128,6 +151,8 @@ pub fn Spinner(props: SpinnerProps) -> Element {
             let gap = dot_size / 2;
 
             rsx! {
+                style { dangerous_inner_html: "{SPINNER_STYLES}" }
+
                 span {
                     class: "spinner spinner-dots{class_css}",
                     role: "status",
@@ -147,12 +172,12 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                         "{props.label}"
                     }
                 }
-
-
             }
         }
         SpinnerVariant::Pulse => {
             rsx! {
+                style { dangerous_inner_html: "{SPINNER_STYLES}" }
+
                 span {
                     class: "spinner spinner-pulse{class_css}",
                     role: "status",
@@ -168,8 +193,6 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                         "{props.label}"
                     }
                 }
-
-
             }
         }
         SpinnerVariant::Bars => {
@@ -177,6 +200,8 @@ pub fn Spinner(props: SpinnerProps) -> Element {
             let bar_height = size;
 
             rsx! {
+                style { dangerous_inner_html: "{SPINNER_STYLES}" }
+
                 span {
                     class: "spinner spinner-bars{class_css}",
                     role: "status",
@@ -196,8 +221,6 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                         "{props.label}"
                     }
                 }
-
-
             }
         }
     }

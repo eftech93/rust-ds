@@ -616,22 +616,6 @@ fn format_file_size(size: usize) -> String {
     format!("{:.1} {}", size, UNITS[unit_index])
 }
 
-// Placeholder for js_sys when not targeting wasm
-#[cfg(not(target_arch = "wasm32"))]
-mod js_sys {
-    #[allow(dead_code)]
-    pub struct Date;
-    impl Date {
-        #[allow(dead_code)]
-        pub fn now() -> f64 {
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_millis() as f64
-        }
-    }
-}
-
 /// Get current timestamp in milliseconds (platform-agnostic)
 fn now_millis() -> u64 {
     std::time::SystemTime::now()

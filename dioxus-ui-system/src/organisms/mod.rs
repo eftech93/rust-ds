@@ -59,7 +59,7 @@ pub use data_table::{
 pub use date_range_picker::{
     default_presets, DateRangePicker, DateRangePickerProps, DateRangePreset,
 };
-pub use file_upload::{FileUpload, FileUploadProps, UploadedFile};
+pub use file_upload::{FileType, FileUpload, FileUploadProps, UploadedFile};
 pub use footer::{
     Footer, FooterLink, FooterLinkGroup, FooterProps, FooterVariant, SimpleFooter,
     SimpleFooterProps,

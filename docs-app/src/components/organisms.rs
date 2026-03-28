@@ -6,6 +6,7 @@ use dioxus_ui_system::atoms::{Box, HStack, VStack};
 use dioxus_ui_system::molecules::ToastVariant;
 use dioxus_ui_system::organisms::FooterVariant;
 use dioxus_ui_system::organisms::*;
+use dioxus_ui_system::organisms::file_upload::{FileType, UploadedFile};
 use dioxus_ui_system::prelude::*;
 
 #[component]
@@ -1398,46 +1399,345 @@ pub fn HeroPage() -> Element {
 /// File Upload documentation page
 #[component]
 pub fn FileUploadPage() -> Element {
+    // State for tracking selected files in each example
+    let mut single_file = use_signal(|| Vec::<UploadedFile>::new());
+    let mut multiple_files = use_signal(|| Vec::<UploadedFile>::new());
+    let mut image_files = use_signal(|| Vec::<UploadedFile>::new());
+    let mut doc_files = use_signal(|| Vec::<UploadedFile>::new());
+
     rsx! {
         DocPage {
             title: "File Upload",
-            description: "Drag-and-drop file upload with progress and preview.",
+            description: "Drag-and-drop file upload with file name, type, and size display. Supports single/multiple files, file type filtering, and size limits.",
 
-            Section { title: "Basic File Upload",
+            Section { title: "Single File Upload",
+                p { "Upload a single file with type and size validation:" }
                 ExampleBox {
-                    FileUpload {
-                        on_upload: EventHandler::new(move |_files: Vec<UploadedFile>| {}),
-                        label: Some("Upload Documents".to_string()),
-                        helper_text: Some("PDF, PNG, JPG up to 10MB".to_string()),
-                        accept: Some(".pdf,.png,.jpg".to_string()),
-                        multiple: false, max_files: 1, loading: false, disabled: false
+                    VStack { gap: SpacingSize::Md,
+                        FileUpload {
+                            on_upload: EventHandler::new(move |files: Vec<UploadedFile>| {
+                                single_file.set(files);
+                            }),
+                            on_change: Some(EventHandler::new(move |files: Vec<UploadedFile>| {
+                                single_file.set(files);
+                            })),
+                            single: true,
+                            max_size_mb: Some(5.0),
+                            accept: Some(".pdf,.doc,.docx".to_string()),
+                            label: Some("Upload Document".to_string()),
+                            show_file_list: true,
+                        }
+
+                        // Display selected file info
+                        if !single_file().is_empty() {
+                            div {
+                                style: "padding: 12px; background: rgb(241,245,249); border-radius: 8px; margin-top: 8px;",
+                                h4 { style: "margin: 0 0 8px 0; font-size: 14px;", "Selected File:" }
+                                FileInfoDisplay { file: single_file()[0].clone() }
+                            }
+                        }
                     }
+                }
+                CodeBlock { code: "// Single file with validation
+let mut files = use_signal(|| Vec::<UploadedFile>::new());
+
+FileUpload {{
+    on_upload: EventHandler::new(move |f| files.set(f)),
+    on_change: Some(EventHandler::new(move |f| files.set(f))),
+    single: true,                              // Single file only
+    max_size_mb: Some(5.0),                   // 5MB limit
+    accept: Some(\".pdf,.doc,.docx\".to_string()), // Document types only
+    label: Some(\"Upload Document\".to_string()),
+}}".to_string() }
+            }
+
+            Section { title: "Multiple Files Upload",
+                p { "Upload multiple files with individual file info display:" }
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md,
+                        FileUpload {
+                            on_upload: EventHandler::new(move |files: Vec<UploadedFile>| {
+                                multiple_files.set(files);
+                            }),
+                            on_change: Some(EventHandler::new(move |files: Vec<UploadedFile>| {
+                                multiple_files.set(files);
+                            })),
+                            multiple: true,
+                            max_files: 5,
+                            max_size_mb: Some(10.0),
+                            label: Some("Upload Files".to_string()),
+                            show_file_list: true,
+                        }
+
+                        // Display all selected files
+                        if !multiple_files().is_empty() {
+                            div {
+                                style: "padding: 12px; background: rgb(241,245,249); border-radius: 8px; margin-top: 8px;",
+                                h4 { style: "margin: 0 0 12px 0; font-size: 14px;", "Selected Files ({multiple_files().len()}):" }
+                                VStack { gap: SpacingSize::Sm,
+                                    for file in multiple_files().iter().cloned() {
+                                        FileInfoDisplay { file: file.clone() }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                CodeBlock { code: "// Multiple files with limits
+FileUpload {{
+    on_upload: EventHandler::new(move |f| files.set(f)),
+    on_change: Some(EventHandler::new(move |f| files.set(f))),
+    multiple: true,                           // Allow multiple
+    max_files: 5,                             // Max 5 files
+    max_size_mb: Some(10.0),                  // 10MB each
+    label: Some(\"Upload Files\".to_string()),
+    show_file_list: true,                     // Show file list
+}}".to_string() }
+            }
+
+            Section { title: "Images Only",
+                p { "Restrict to image files with previews:" }
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md,
+                        FileUpload {
+                            on_upload: EventHandler::new(move |files: Vec<UploadedFile>| {
+                                image_files.set(files);
+                            }),
+                            on_change: Some(EventHandler::new(move |files: Vec<UploadedFile>| {
+                                image_files.set(files);
+                            })),
+                            multiple: true,
+                            max_files: 3,
+                            max_size_mb: Some(2.0),
+                            accept: Some("image/*".to_string()),
+                            label: Some("Upload Images".to_string()),
+                            helper_text: Some("JPG, PNG, GIF up to 2MB each".to_string()),
+                            show_file_list: true,
+                        }
+
+                        if !image_files().is_empty() {
+                            div {
+                                style: "padding: 12px; background: rgb(241,245,249); border-radius: 8px; margin-top: 8px;",
+                                h4 { style: "margin: 0 0 12px 0; font-size: 14px;", "Selected Images:" }
+                                div {
+                                    style: "display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;",
+                                    for file in image_files().iter().cloned() {
+                                        ImageFileCard { file: file.clone() }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                CodeBlock { code: "// Image uploads only
+FileUpload {{
+    accept: Some(\"image/*\".to_string()),   // Images only
+    max_size_mb: Some(2.0),                  // 2MB limit
+    max_files: 3,                            // Max 3 images
+    label: Some(\"Upload Images\".to_string()),
+}}".to_string() }
+            }
+
+            Section { title: "Documents with Type Filter",
+                p { "Accept only specific document types:" }
+                ExampleBox {
+                    VStack { gap: SpacingSize::Md,
+                        FileUpload {
+                            on_upload: EventHandler::new(move |files: Vec<UploadedFile>| {
+                                doc_files.set(files);
+                            }),
+                            on_change: Some(EventHandler::new(move |files: Vec<UploadedFile>| {
+                                doc_files.set(files);
+                            })),
+                            multiple: true,
+                            max_files: 4,
+                            max_size_mb: Some(20.0),
+                            accept: Some(".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx".to_string()),
+                            label: Some("Upload Documents".to_string()),
+                            helper_text: Some("Office documents up to 20MB".to_string()),
+                            show_file_list: true,
+                        }
+
+                        if !doc_files().is_empty() {
+                            div {
+                                style: "padding: 12px; background: rgb(241,245,249); border-radius: 8px; margin-top: 8px;",
+                                h4 { style: "margin: 0 0 12px 0; font-size: 14px;", "Selected Documents:" }
+                                VStack { gap: SpacingSize::Sm,
+                                    for file in doc_files().iter().cloned() {
+                                        DocumentFileCard { file: file.clone() }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                CodeBlock { code: "// Specific document types
+FileUpload {{
+    accept: Some(\".pdf,.doc,.docx,.xls,.xlsx\".to_string()),
+    max_size_mb: Some(20.0),
+    max_files: 4,
+    label: Some(\"Upload Documents\".to_string()),
+    helper_text: Some(\"Office documents up to 20MB\".to_string()),
+}}".to_string() }
+            }
+
+            Section { title: "Configuration Options",
+                p { "Available properties for the FileUpload component:" }
+                ul {
+                    li { code { "on_upload" }, " - Callback when files are uploaded" }
+                    li { code { "on_change" }, " - Callback when file selection changes" }
+                    li { code { "single" }, " - Allow only single file (default: false)" }
+                    li { code { "multiple" }, " - Allow multiple files (default: false)" }
+                    li { code { "max_files" }, " - Maximum number of files allowed" }
+                    li { code { "max_size_mb" }, " - Maximum file size in MB" }
+                    li { code { "accept" }, " - Accepted file types (MIME or extensions)" }
+                    li { code { "label" }, " - Label text for the upload area" }
+                    li { code { "helper_text" }, " - Helper text shown below label" }
+                    li { code { "show_file_list" }, " - Show selected files list (default: true)" }
+                    li { code { "disabled" }, " - Disable the upload component" }
+                    li { code { "loading" }, " - Show loading state" }
                 }
             }
 
-            Section { title: "Multiple Files",
+            Section { title: "File Type Icons",
+                p { "The component automatically detects and displays icons for different file types:" }
                 ExampleBox {
-                    FileUpload {
-                        on_upload: EventHandler::new(move |_files: Vec<UploadedFile>| {}),
-                        multiple: true,
-                        max_files: 5,
-                        label: Some("Upload Images".to_string()),
-                        loading: false, disabled: false
+                    VStack { gap: SpacingSize::Md,
+                        HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap;",
+                            FileTypeBadge { icon: "🖼️", label: "Images", types: ".jpg, .png, .gif, .svg" }
+                            FileTypeBadge { icon: "📄", label: "Documents", types: ".pdf, .doc, .txt" }
+                            FileTypeBadge { icon: "🎬", label: "Videos", types: ".mp4, .mov, .avi" }
+                            FileTypeBadge { icon: "🎵", label: "Audio", types: ".mp3, .wav, .aac" }
+                            FileTypeBadge { icon: "📦", label: "Archives", types: ".zip, .rar, .7z" }
+                            FileTypeBadge { icon: "📎", label: "Other", types: "Any other type" }
+                        }
                     }
                 }
-                CodeBlock { code: "FileUpload {{
-    on_upload: EventHandler::new(move |files| {{
-        // Handle uploaded files
-    }}),
-    label: Some(\"Upload Documents\".to_string()),
-    helper_text: Some(\"PDF, PNG, JPG up to 10MB\".to_string()),
-    accept: Some(\".pdf,.png,.jpg\".to_string()),
-    multiple: true,
-    max_files: 5,
-}}".to_string() }
             }
         }
     }
+}
+
+/// File info display component
+#[component]
+fn FileInfoDisplay(file: UploadedFile) -> Element {
+    let size_text = format_file_size(file.size);
+    let file_type = FileType::from_file_name(&file.name);
+
+    rsx! {
+        div {
+            style: "display: flex; align-items: center; gap: 12px; padding: 8px 12px; background: white; border-radius: 6px; border: 1px solid rgb(226,232,240);",
+
+            // File type icon
+            div {
+                style: "font-size: 24px;",
+                "{file_type.icon()}"
+            }
+
+            // File details
+            div {
+                style: "flex: 1;",
+                p {
+                    style: "margin: 0; font-size: 14px; font-weight: 500; color: rgb(15,23,42); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;",
+                    "{file.name}"
+                }
+                p {
+                    style: "margin: 4px 0 0 0; font-size: 12px; color: rgb(100,116,139);",
+                    "{file.file_type} • {size_text}"
+                }
+            }
+        }
+    }
+}
+
+/// Image file card with preview
+#[component]
+fn ImageFileCard(file: UploadedFile) -> Element {
+    let size_text = format_file_size(file.size);
+
+    rsx! {
+        div {
+            style: "padding: 12px; background: white; border-radius: 8px; border: 1px solid rgb(226,232,240);",
+
+            // Image placeholder/icon
+            div {
+                style: "height: 80px; background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 8px;",
+                "🖼️"
+            }
+
+            // File info
+            p {
+                style: "margin: 0; font-size: 13px; font-weight: 500; color: rgb(15,23,42); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;",
+                "{file.name}"
+            }
+            p {
+                style: "margin: 4px 0 0 0; font-size: 11px; color: rgb(100,116,139);",
+                "{file.file_type} • {size_text}"
+            }
+        }
+    }
+}
+
+/// Document file card
+#[component]
+fn DocumentFileCard(file: UploadedFile) -> Element {
+    let size_text = format_file_size(file.size);
+    let file_type = FileType::from_file_name(&file.name);
+    let color = file_type.color();
+
+    rsx! {
+        div {
+            style: "display: flex; align-items: center; gap: 12px; padding: 12px; background: white; border-radius: 8px; border: 1px solid rgb(226,232,240);",
+
+            // Icon with color
+            div {
+                style: "width: 40px; height: 40px; border-radius: 8px; background: {color}20; display: flex; align-items: center; justify-content: center; font-size: 20px;",
+                "{file_type.icon()}"
+            }
+
+            // File info
+            div {
+                style: "flex: 1;",
+                p {
+                    style: "margin: 0; font-size: 14px; font-weight: 500; color: rgb(15,23,42); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;",
+                    "{file.name}"
+                }
+                p {
+                    style: "margin: 4px 0 0 0; font-size: 12px; color: rgb(100,116,139);",
+                    "{file.file_type} • {size_text}"
+                }
+            }
+        }
+    }
+}
+
+/// File type badge for documentation
+#[component]
+fn FileTypeBadge(icon: String, label: String, types: String) -> Element {
+    rsx! {
+        div {
+            style: "display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: rgb(248,250,252); border-radius: 8px; border: 1px solid rgb(226,232,240);",
+            span { style: "font-size: 20px;", "{icon}" }
+            div {
+                p { style: "margin: 0; font-size: 13px; font-weight: 500; color: rgb(15,23,42);", "{label}" }
+                p { style: "margin: 2px 0 0 0; font-size: 11px; color: rgb(100,116,139);", "{types}" }
+            }
+        }
+    }
+}
+
+/// Format file size helper
+fn format_file_size(size: u64) -> String {
+    const UNITS: &[&str] = &["B", "KB", "MB", "GB"];
+    let mut size = size as f64;
+    let mut unit_index = 0;
+
+    while size >= 1024.0 && unit_index < UNITS.len() - 1 {
+        size /= 1024.0;
+        unit_index += 1;
+    }
+
+    format!("{:.1} {}", size, UNITS[unit_index])
 }
 
 /// Confirmation Dialog documentation page
