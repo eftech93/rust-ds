@@ -35,6 +35,12 @@ pub struct MultiSelectProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// MultiSelect molecule component
@@ -361,6 +367,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "multi-select{class_css}",
             style: "position: relative;",
 
@@ -379,9 +386,10 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                     {
                         let label = get_label.call(value.clone());
                         let value_clone = value.clone();
+                        let value_key = value.clone();
                         rsx! {
                             span {
-                                key: "{value_clone}",
+                                key: "{value_key}",
                                 class: "multi-select-tag",
                                 style: "{tag_style}",
 
@@ -556,7 +564,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                     if props.max_selected.is_some() || has_selection() {
                         div {
                             class: "multi-select-footer",
-                            style: "padding: 8px 12px; border-top: 1px solid {border_color}; font-size: 12px; color: {muted_color}; text-align: center;",
+                            style: "padding: 8px 12px; border-top: 1px solid {border_color}; font-size: 12px; color: {muted_color}; text-align: center; {props.style.clone().unwrap_or_default()}",
 
                             if let Some(max) = props.max_selected {
                                 "{selected_values().len()} / {max} selected"
@@ -585,6 +593,15 @@ struct MultiSelectOptionItemProps {
     on_toggle: Callback<String>,
     set_highlighted_index: Callback<usize>,
     index: usize,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -611,6 +628,7 @@ fn MultiSelectOptionItem(props: MultiSelectOptionItemProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "multi-select-option",
             style: "{props.item_style_base}; background: {bg_color}; opacity: {opacity};",
             onclick: move |_| {
@@ -640,8 +658,8 @@ fn MultiSelectOptionItem(props: MultiSelectOptionItemProps) -> Element {
             }
 
             span {
-                class: "multi-select-option-label",
-                style: "flex: 1; font-size: 14px; color: {props.foreground_color};",
+                class: "multi-select-option-label {props.class.clone().unwrap_or_default()}",
+                style: "flex: 1; font-size: 14px; color: {props.foreground_color}; {props.style.clone().unwrap_or_default()}",
                 "{props.option.label}"
             }
         }
@@ -658,6 +676,15 @@ struct MultiSelectCreateOptionItemProps {
     border_color: String,
     on_create: Callback<()>,
     set_highlighted_index: Callback<()>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -670,13 +697,14 @@ fn MultiSelectCreateOptionItem(props: MultiSelectCreateOptionItemProps) -> Eleme
 
     rsx! {
         div {
-            class: "multi-select-create",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "multi-select-create {props.class.clone().unwrap_or_default()}",
             style: "{props.item_style_base}; background: {bg_color}; border-top: 1px solid {props.border_color};",
             onclick: move |_| props.on_create.call(()),
             onmouseenter: move |_| props.set_highlighted_index.call(()),
 
             span {
-                style: "font-size: 14px; color: {props.primary_color};",
+                style: "font-size: 14px; color: {props.primary_color}; {props.style.clone().unwrap_or_default()}",
                 "+ Create \"{props.search_value}\""
             }
         }

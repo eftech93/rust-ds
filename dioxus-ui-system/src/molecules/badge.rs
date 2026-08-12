@@ -62,6 +62,9 @@ pub struct BadgeProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Badge molecule component
@@ -182,8 +185,11 @@ pub fn Badge(props: BadgeProps) -> Element {
     let icon_element = props.icon.clone();
     let onclick_handler = props.onclick.clone();
 
+    let id = props.id.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
             style: "{final_style} display: inline-flex; align-items: center; gap: 4px;",
             class: "{class}",
             onmouseenter: move |_| if has_onclick { is_hovered.set(true) },
@@ -228,6 +234,15 @@ pub struct StatusBadgeProps {
     /// Status type
     #[props(default)]
     pub status_type: StatusType,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Status types
@@ -254,6 +269,9 @@ pub fn StatusBadge(props: StatusBadgeProps) -> Element {
 
     rsx! {
         Badge {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{props.style.clone().unwrap_or_default()}",
             variant: variant,
             icon: icon,
             "{props.status}"

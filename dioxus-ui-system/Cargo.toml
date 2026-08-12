@@ -1,21 +1,23 @@
 [package]
 name = "dioxus-ui-system"
-version = "0.0.6"
-edition = "2021"
-authors = ["Esteban Puello <eftech93@gmail.com>"]
+version = "0.0.7"
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+keywords.workspace = true
+categories.workspace = true
+rust-version.workspace = true
 description = "A pure Rust design system for Dioxus with Atomic Design principles"
-license = "MIT OR Apache-2.0"
-repository = "https://github.com/eftech93/rust-ds"
-keywords = ["dioxus", "ui", "design-system", "components", "rust"]
-categories = ["gui", "web-programming", "wasm"]
-rust-version = "1.76"
 readme = "README.md"
 
 [dependencies]
-dioxus = { version = "0.7", default-features = false, features = ["signals", "macro", "hooks", "html"] }
-dioxus-router = { version = "0.7", optional = true }
+dioxus = { version = "0.6", default-features = false, features = ["signals", "macro", "hooks", "html"] }
+dioxus-router = { version = "0.6", optional = true }
 serde = { version = "1.0", features = ["derive"] }
-web-sys = { version = "0.3", features = ["Storage", "Window"], optional = true }
+web-sys = { version = "0.3", features = ["Storage", "Window", "Document", "Element", "HtmlInputElement", "FileList", "File", "Blob", "Url"], optional = true }
 wasm-bindgen = { version = "0.2", optional = true }
 wasm-bindgen-futures = { version = "0.4", optional = true }
 js-sys = { version = "0.3", optional = true }

@@ -22,6 +22,12 @@ pub struct TooltipProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Tooltip placement options
@@ -112,6 +118,8 @@ pub fn Tooltip(props: TooltipProps) -> Element {
 
     rsx! {
         span {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "position: relative; display: inline-block;",
             onmouseenter: move |_| show_tooltip(),
             onmouseleave: move |_| hide_tooltip(),
@@ -141,6 +149,15 @@ pub struct SimpleTooltipProps {
     /// Tooltip placement
     #[props(default)]
     pub placement: TooltipPlacement,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Simple tooltip wrapper
@@ -148,6 +165,9 @@ pub struct SimpleTooltipProps {
 pub fn SimpleTooltip(props: SimpleTooltipProps) -> Element {
     rsx! {
         Tooltip {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{props.style.clone().unwrap_or_default()}",
             content: props.text,
             placement: props.placement,
             {props.children}

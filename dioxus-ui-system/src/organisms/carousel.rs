@@ -127,6 +127,12 @@ pub struct CarouselProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Carousel container component
@@ -234,6 +240,8 @@ pub fn Carousel(props: CarouselProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             role: "region",
             aria_roledescription: "carousel",
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
@@ -252,6 +260,12 @@ pub struct CarouselContentProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Carousel content wrapper
@@ -276,6 +290,8 @@ pub fn CarouselContent(props: CarouselContentProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{content_style} {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
@@ -292,6 +308,12 @@ pub struct CarouselItemProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Individual carousel slide/item
@@ -321,6 +343,8 @@ pub fn CarouselItem(props: CarouselItemProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             role: "group",
             aria_roledescription: "slide",
             aria_hidden: "{!is_active}",
@@ -339,6 +363,9 @@ pub struct CarouselPreviousProps {
     /// Custom class
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Previous slide button
@@ -387,6 +414,7 @@ pub fn CarouselPrevious(props: CarouselPreviousProps) -> Element {
 
     rsx! {
         button {
+            id: "{props.id.clone().unwrap_or_default()}",
             r#type: "button",
             aria_label: "Previous slide",
             style: "{button_style} {props.style.clone().unwrap_or_default()}",
@@ -407,6 +435,9 @@ pub struct CarouselNextProps {
     /// Custom class
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Next slide button
@@ -455,6 +486,7 @@ pub fn CarouselNext(props: CarouselNextProps) -> Element {
 
     rsx! {
         button {
+            id: "{props.id.clone().unwrap_or_default()}",
             r#type: "button",
             aria_label: "Next slide",
             style: "{button_style} {props.style.clone().unwrap_or_default()}",
@@ -525,6 +557,12 @@ pub struct CarouselDotsProps {
     /// Number of dots to show (if None, uses carousel item count)
     #[props(default)]
     pub count: Option<usize>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Pagination dots indicator
@@ -553,6 +591,8 @@ pub fn CarouselDots(props: CarouselDotsProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             role: "tablist",
             aria_label: "Slide navigation",
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
@@ -641,6 +681,12 @@ pub struct SimpleCarouselProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Simple carousel with built-in controls
@@ -650,6 +696,9 @@ pub fn SimpleCarousel(props: SimpleCarouselProps) -> Element {
 
     rsx! {
         Carousel {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             opts: props.opts.clone(),
             orientation: props.orientation.clone(),
             on_index_change: props.on_index_change.clone(),
@@ -693,6 +742,12 @@ pub struct TouchCarouselProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Touch-enabled carousel with swipe support
@@ -706,6 +761,8 @@ pub fn TouchCarousel(props: TouchCarouselProps) -> Element {
 
     rsx! {
         Carousel {
+            id: props.id.clone(),
+            class: props.class.clone(),
             opts: props.opts,
             orientation: props.orientation,
             on_index_change: props.on_index_change,

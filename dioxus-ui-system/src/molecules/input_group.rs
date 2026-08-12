@@ -35,7 +35,7 @@ pub struct InputGroupProps {
     pub disabled: bool,
     /// Change handler
     #[props(default)]
-    pub onchange: Option<EventHandler<String>>,
+    pub on_change: Option<EventHandler<String>>,
     /// Optional icon before input
     #[props(default)]
     pub leading_icon: Option<Element>,
@@ -45,6 +45,12 @@ pub struct InputGroupProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Input Group molecule component
@@ -61,7 +67,7 @@ pub struct InputGroupProps {
 ///         value: email(),
 ///         placeholder: "you@example.com",
 ///         hint: "We'll never share your email.",
-///         onchange: move |v| email.set(v),
+///         on_change: move |v| email.set(v),
 ///     }
 /// }
 /// ```
@@ -83,6 +89,9 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
     let label_element = if required {
         rsx! {
             Label {
+                id: "{props.id.clone().unwrap_or_default()}",
+                class: "{props.class.clone().unwrap_or_default()}",
+                style: "{props.style.clone().unwrap_or_default()}",
                 size: TextSize::Small,
                 weight: crate::atoms::label::TextWeight::Medium,
                 "{label}"
@@ -150,7 +159,7 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
                         placeholder: placeholder,
                         input_type: input_type,
                         disabled: disabled,
-                        onchange: props.onchange.clone(),
+                        on_change: props.on_change.clone(),
                     }
 
                     if props.trailing_icon.is_some() {

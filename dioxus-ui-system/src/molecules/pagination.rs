@@ -39,6 +39,12 @@ pub struct PaginationProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Pagination component
@@ -64,6 +70,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
 
     rsx! {
         nav {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "pagination{class_css}",
             style: "display: flex; align-items: center; gap: 4px;",
             aria_label: "Pagination",
@@ -176,7 +183,7 @@ pub fn Pagination(props: PaginationProps) -> Element {
                     button {
                         type: "button",
                         class: "pagination-next",
-                        style: format!("padding: 8px 12px; font-size: 14px; background: white; color: {text_color}; border: 1px solid {border_color}; border-radius: 6px; cursor: pointer; opacity: {}; min-width: 36px;", if current == props.total_pages { "0.5" } else { "1" }),
+                        style: format!("{} {}", format!("padding: 8px 12px; font-size: 14px; background: white; color: {text_color}; border: 1px solid {border_color}; border-radius: 6px; cursor: pointer; opacity: {}; min-width: 36px;", if current == props.total_pages { "0.5" } else { "1" }), props.style.clone().unwrap_or_default()),
                         disabled: current == props.total_pages,
                         onclick: move |_| {
                             if current < props.total_pages {
@@ -275,6 +282,12 @@ pub struct PageSizeSelectorProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Page size selector component
@@ -288,6 +301,7 @@ pub fn PageSizeSelector(props: PageSizeSelectorProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "page-size-selector{class_css}",
             style: "display: flex; align-items: center; gap: 8px; font-size: 14px;",
 
@@ -299,7 +313,7 @@ pub fn PageSizeSelector(props: PageSizeSelectorProps) -> Element {
 
             select {
                 class: "page-size-select",
-                style: "padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: white; cursor: pointer;",
+                style: "padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: white; cursor: pointer; {props.style.clone().unwrap_or_default()}",
                 onchange: move |e: Event<FormData>| {
                     if let Ok(val) = e.value().parse::<u32>() {
                         props.on_change.call(val);
@@ -337,6 +351,12 @@ pub struct PaginationInfoProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Pagination info (showing X-Y of Z results)
@@ -357,8 +377,9 @@ pub fn PaginationInfo(props: PaginationInfoProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "pagination-info{class_css}",
-            style: "font-size: 14px; color: {muted_color};",
+            style: "font-size: 14px; color: {muted_color}; {props.style.clone().unwrap_or_default()}",
             "Showing {start}–{end} of {total_items} results"
         }
     }

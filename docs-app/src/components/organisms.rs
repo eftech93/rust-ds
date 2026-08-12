@@ -1,6 +1,6 @@
 //! Organism component documentation pages
 
-use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, Section};
+use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, PropsTable, Section};
 use dioxus::prelude::*;
 use dioxus_ui_system::atoms::{Box, HStack, VStack};
 use dioxus_ui_system::molecules::ToastVariant;
@@ -27,6 +27,7 @@ pub fn OrganismsPage() -> Element {
                     li { "DataTable - Data display" }
                     li { "Stepper Wizard - Multi-step forms" }
                     li { "Charts - Data visualization (Bar, Line, Pie, Sparkline)" }
+                    li { "ThreeView - 3D viewer with Three.js (dioxus-three v0.0.2) - Now with Web support!" }
                     li { "Calendar - Full calendar view (New!)" }
                     li { "DateRangePicker - Date range selection (New!)" }
                     li { "Carousel - Image/content slider (New!)" }
@@ -75,6 +76,54 @@ pub fn HeaderPage() -> Element {
     actions: rsx! {{ Button {{ \"Sign In\" }} }},
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                h4 { "HeaderProps" }
+                PropsTable { props: vec![
+                    ("brand", "Option", "Brand/logo element"),
+                    ("brand_title", "Option", "Brand title text (alternative to brand element)"),
+                    ("nav_items", "Vec", "Navigation items"),
+                    ("actions", "Option", "Right-side actions"),
+                    ("sticky", "bool", "Whether header is sticky"),
+                    ("bordered", "bool", "Whether to show border"),
+                    ("style", "Option", "Custom inline styles"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes")
+                ] }
+                h4 { "HeaderNavLinkProps" }
+                PropsTable { props: vec![
+                    ("item", "NavItem", ""),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+                h4 { "UserMenuProps" }
+                PropsTable { props: vec![
+                    ("name", "String", "User name"),
+                    ("email", "Option", "User email"),
+                    ("avatar", "Option", "User avatar URL"),
+                    ("menu_items", "Vec", "Menu items"),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+                h4 { "UserMenuDropdownProps" }
+                PropsTable { props: vec![
+                    ("items", "Vec", ""),
+                    ("on_close", "EventHandler", ""),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+                h4 { "UserMenuItemViewProps" }
+                PropsTable { props: vec![
+                    ("item", "UserMenuItem", ""),
+                    ("on_close", "EventHandler", ""),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+            }
         }
     }
 }
@@ -121,6 +170,25 @@ pub fn LayoutPage() -> Element {
     collapsible: true,
     // Content goes here
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                h4 { "LayoutProps" }
+                PropsTable { props: vec![
+                    ("layout_type", "LayoutType", "Layout type"),
+                    ("nav_items", "Vec", "Navigation items"),
+                    ("brand", "Option", "Brand element (logo/title)"),
+                    ("title", "Option", "Page title"),
+                    ("children", "Element", "Main content"),
+                    ("actions", "Option", "Right-side actions"),
+                    ("collapsible", "bool", "Whether sidebar is collapsible"),
+                    ("sidebar_collapsed", "bool", "Initial sidebar collapsed state"),
+                    ("sidebar_width", "u16", "Sidebar width (default: 260px)"),
+                    ("header_height", "u16", "Header height (default: 64px)"),
+                    ("class", "Option", "Custom class name"),
+                    ("id", "Option", "Element id"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
             }
         }
     }
@@ -178,6 +246,36 @@ Tabs {{
     }}
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                h4 { "TabsProps" }
+                PropsTable { props: vec![
+                    ("tabs", "Vec", "Tab items"),
+                    ("active_tab", "String", "Currently active tab ID"),
+                    ("on_change", "EventHandler", "Callback when tab changes"),
+                    ("children", "Element", "Tab content (rendered based on active tab)"),
+                    ("variant", "TabsVariant", "Tabs variant"),
+                    ("style", "Option", "Custom inline styles"),
+                    ("id", "Option", ""),
+                    ("class", "Option", "")
+                ] }
+                h4 { "TabPanelProps" }
+                PropsTable { props: vec![
+                    ("children", "Element", "Panel content"),
+                    ("style", "Option", "Custom inline styles"),
+                    ("id", "Option", ""),
+                    ("class", "Option", "")
+                ] }
+                h4 { "VerticalTabsProps" }
+                PropsTable { props: vec![
+                    ("tabs", "Vec", "Tab items"),
+                    ("active_tab", "String", "Currently active tab ID"),
+                    ("on_change", "EventHandler", "Callback when tab changes"),
+                    ("style", "Option", "Custom inline styles"),
+                    ("id", "Option", ""),
+                    ("class", "Option", "")
+                ] }
+            }
         }
     }
 }
@@ -230,6 +328,29 @@ Accordion {{
     on_change: move |ids| expanded.set(ids),
     multiple: true,
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                h4 { "AccordionProps" }
+                PropsTable { props: vec![
+                    ("items", "Vec", "Accordion items"),
+                    ("expanded", "Vec", "Currently expanded item IDs (for single: one item, for multiple: many)"),
+                    ("on_change", "EventHandler<Vec>", "Callback when expanded items change"),
+                    ("multiple", "bool", "Whether multiple items can be expanded"),
+                    ("collapsible", "bool", "Whether items can be collapsed"),
+                    ("style", "Option", "Custom inline styles"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes")
+                ] }
+                h4 { "AccordionItem2Props" }
+                PropsTable { props: vec![
+                    ("title", "String", "Item title"),
+                    ("children", "Element", "Item content"),
+                    ("default_expanded", "bool", "Whether item is expanded"),
+                    ("style", "Option", "Custom inline styles"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes")
+                ] }
             }
         }
     }
@@ -305,6 +426,148 @@ pub fn CardsPage() -> Element {
     on_action: move |_| {{}},
     icon: Some(\"rocket\".to_string()),
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                h4 { "ActionCardProps" }
+                PropsTable { props: vec![
+                    ("title", "String", "Card title"),
+                    ("description", "String", "Card description"),
+                    ("action_label", "String", "Action button text"),
+                    ("on_action", "EventHandler", "Action button callback"),
+                    ("icon", "Option", "Optional icon name"),
+                    ("variant", "CardVariant", "Card variant"),
+                    ("badge", "Option", "Optional badge"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "DualActionCardProps" }
+                PropsTable { props: vec![
+                    ("title", "String", "Card title"),
+                    ("description", "String", "Card description"),
+                    ("primary_label", "String", "Primary action label"),
+                    ("secondary_label", "String", "Secondary action label"),
+                    ("on_primary", "EventHandler", "Primary action callback"),
+                    ("on_secondary", "EventHandler", "Secondary action callback"),
+                    ("icon", "Option", "Optional icon"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "ImageCardProps" }
+                PropsTable { props: vec![
+                    ("image_url", "String", "Image URL"),
+                    ("image_alt", "String", "Image alt text"),
+                    ("title", "String", "Card title"),
+                    ("description", "String", "Card description"),
+                    ("action_label", "Option", "Optional action"),
+                    ("on_action", "Option<EventHandler>", "Action callback"),
+                    ("aspect_ratio", "String", "Image aspect ratio (default: 16/9)"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "ImageActionCardProps" }
+                PropsTable { props: vec![
+                    ("image_url", "String", "Image URL"),
+                    ("title", "String", "Card title"),
+                    ("description", "String", "Card description"),
+                    ("primary_label", "String", "Primary action"),
+                    ("secondary_label", "String", "Secondary action"),
+                    ("on_primary", "EventHandler", "Primary callback"),
+                    ("on_secondary", "EventHandler", "Secondary callback"),
+                    ("badge", "Option", "Optional badge on image"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "ProfileCardProps" }
+                PropsTable { props: vec![
+                    ("avatar_url", "Option", "Avatar URL"),
+                    ("name", "String", "User name"),
+                    ("role", "Option", "User role/title"),
+                    ("description", "Option", "User description"),
+                    ("action_label", "String", "Follow/Connect button label"),
+                    ("on_action", "Option<EventHandler>", "Action callback"),
+                    ("stats", "Vec", "Show social stats"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "PricingCardProps" }
+                PropsTable { props: vec![
+                    ("plan", "String", "Plan name"),
+                    ("price", "String", "Price (e.g., \"$29\")"),
+                    ("period", "String", "Billing period (e.g., \"/month\")"),
+                    ("description", "Option", "Plan description"),
+                    ("features", "Vec", "List of features"),
+                    ("cta_label", "String", "CTA button label"),
+                    ("on_cta", "EventHandler", "CTA callback"),
+                    ("recommended", "bool", "Is this the recommended plan"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "HorizontalCardProps" }
+                PropsTable { props: vec![
+                    ("image_url", "String", "Image URL"),
+                    ("title", "String", "Card title"),
+                    ("description", "String", "Card description"),
+                    ("action_label", "Option", "Optional action"),
+                    ("on_action", "Option<EventHandler>", "Action callback"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "NotificationCardProps" }
+                PropsTable { props: vec![
+                    ("title", "String", "Notification title"),
+                    ("message", "String", "Notification message"),
+                    ("notification_type", "NotificationType", "Notification type"),
+                    ("timestamp", "Option", "Timestamp"),
+                    ("on_dismiss", "Option<EventHandler>", "Dismiss callback"),
+                    ("icon", "Option", "Icon name (auto-selected based on type if not provided)"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "StatCardProps" }
+                PropsTable { props: vec![
+                    ("label", "String", "Stat label"),
+                    ("value", "String", "Stat value"),
+                    ("change", "Option", "Change indicator (e.g., \"+12%\")"),
+                    ("change_positive", "Option", "Is the change positive"),
+                    ("icon", "Option", "Icon name"),
+                    ("icon_bg", "String", "Icon background color"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "ExpandableCardProps" }
+                PropsTable { props: vec![
+                    ("title", "String", "Card title"),
+                    ("preview", "Element", "Preview content (always visible)"),
+                    ("expanded_content", "Element", "Expanded content (shown when expanded)"),
+                    ("default_expanded", "bool", "Initial expanded state"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "MediaCardProps" }
+                PropsTable { props: vec![
+                    ("media_url", "String", "Media URL (image or video thumbnail)"),
+                    ("media_type", "MediaType", "Media type indicator"),
+                    ("title", "String", "Card title"),
+                    ("creator", "Option", "Creator/Author"),
+                    ("duration", "Option", "Duration (for video/audio)"),
+                    ("on_like", "Option<EventHandler>", "Like callback"),
+                    ("on_share", "Option<EventHandler>", "Share callback"),
+                    ("on_play", "Option<EventHandler>", "Play callback"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
             }
         }
     }
@@ -694,6 +957,86 @@ DataTable {{
                     }
                 }
             }
+
+            Section { title: "Props",
+                h4 { "DataTableProps" }
+                PropsTable { props: vec![
+                    ("columns", "Vec", "Column definitions"),
+                    ("data", "Vec", "Table data"),
+                    ("key_extractor", "fn", "Unique key extractor for rows"),
+                    ("selectable", "bool", "Row selection enabled"),
+                    ("selected_keys", "Vec", "Selected row keys"),
+                    ("on_selection_change", "Option<EventHandler>", "Selection change handler"),
+                    ("on_row_click", "Option<EventHandler>", "Row click handler"),
+                    ("empty_message", "&'static str", "Empty state message"),
+                    ("loading", "bool", "Loading state"),
+                    ("style", "Option", "Custom inline styles"),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "CSS class"),
+                    ("search_placeholder", "&'static str", "Search placeholder text"),
+                    ("search_query", "Option", "Search query for filtering"),
+                    ("on_search_change", "Option<EventHandler>", "Search change handler"),
+                    ("filters", "Vec", "Custom filter definitions"),
+                    ("active_filters", "HashMap", "Active filter values"),
+                    ("on_filter_change", "Option<EventHandler>", "Filter change handler"),
+                    ("show_search", "bool", "Show search input"),
+                    ("show_filters", "bool", "Show filter controls")
+                ] }
+                h4 { "DataTableHeaderProps" }
+                PropsTable { props: vec![
+                    ("columns", "Vec", "Column definitions"),
+                    ("selectable", "bool", ""),
+                    ("selected_count", "usize", ""),
+                    ("total_count", "usize", ""),
+                    ("on_select_all", "Option<EventHandler>", ""),
+                    ("all_keys", "Vec", ""),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+                h4 { "DataTableRowProps" }
+                PropsTable { props: vec![
+                    ("row", "T", ""),
+                    ("columns", "Vec", ""),
+                    ("key_extractor", "fn", ""),
+                    ("selectable", "bool", ""),
+                    ("is_selected", "bool", ""),
+                    ("on_select", "Option<EventHandler>", ""),
+                    ("on_click", "Option<EventHandler>", ""),
+                    ("selected_keys", "Vec", ""),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+                h4 { "DataTableCellProps" }
+                PropsTable { props: vec![
+                    ("row", "T", ""),
+                    ("column", "TableColumn", ""),
+                    ("base_style", "String", ""),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+                h4 { "DataTableFilterProps" }
+                PropsTable { props: vec![
+                    ("filter", "TableFilter", ""),
+                    ("active_value", "String", ""),
+                    ("on_change", "Option<EventHandler>", ""),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+                h4 { "PaginationProps" }
+                PropsTable { props: vec![
+                    ("current_page", "usize", ""),
+                    ("total_pages", "usize", ""),
+                    ("on_page_change", "EventHandler", ""),
+                    ("show_first_last", "bool", ""),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+            }
         }
     }
 }
@@ -747,16 +1090,16 @@ pub fn StepperWizardPage() -> Element {
                                     HStack { gap: SpacingSize::Sm,
                                         Box { style: "flex: 1;",
                                             Label { "First Name" }
-                                            Input { value: "Alice".to_string(), onchange: move |_| {} }
+                                            Input { value: "Alice".to_string(), on_change: move |_| {} }
                                         }
                                         Box { style: "flex: 1;",
                                             Label { "Last Name" }
-                                            Input { value: "Johnson".to_string(), onchange: move |_| {} }
+                                            Input { value: "Johnson".to_string(), on_change: move |_| {} }
                                         }
                                     }
                                     Box {
                                         Label { "Email" }
-                                        Input { value: "alice@example.com".to_string(), onchange: move |_| {} }
+                                        Input { value: "alice@example.com".to_string(), on_change: move |_| {} }
                                     }
                                 }
                             }
@@ -767,11 +1110,11 @@ pub fn StepperWizardPage() -> Element {
                                 VStack { gap: SpacingSize::Md,
                                     Box {
                                         Label { "Username" }
-                                        Input { value: "alice_j".to_string(), onchange: move |_| {} }
+                                        Input { value: "alice_j".to_string(), on_change: move |_| {} }
                                     }
                                     Box {
                                         Label { "Password" }
-                                        Input { input_type: InputType::Password, value: "".to_string(), onchange: move |_| {} }
+                                        Input { input_type: InputType::Password, value: "".to_string(), on_change: move |_| {} }
                                     }
                                 }
                             }
@@ -847,6 +1190,60 @@ Wizard {{
                         }
                     }
                 }
+            }
+
+            Section { title: "Props",
+                h4 { "StepperProps" }
+                PropsTable { props: vec![
+                    ("steps", "Vec", "List of steps"),
+                    ("active_step", "usize", "Current active step index"),
+                    ("variant", "StepperVariant", "Stepper variant"),
+                    ("size", "StepSize", "Step size"),
+                    ("title", "Option", "Optional title"),
+                    ("description", "Option", "Optional description"),
+                    ("on_step_change", "Option<EventHandler>", "Step change callback"),
+                    ("show_numbers", "bool", "Show step numbers"),
+                    ("allow_back_navigation", "bool", "Allow clicking on completed steps"),
+                    ("show_content", "bool", "Show content area"),
+                    ("children", "Element", "Content elements for each step"),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+                h4 { "CompactStepperProps" }
+                PropsTable { props: vec![
+                    ("steps", "Vec", "List of steps"),
+                    ("active_step", "usize", "Current active step"),
+                    ("size", "StepSize", "Step size"),
+                    ("on_step_click", "Option<EventHandler>", "Click handler"),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+                h4 { "WizardProps" }
+                PropsTable { props: vec![
+                    ("steps", "Vec", "List of steps"),
+                    ("active_step", "usize", "Current active step"),
+                    ("on_step_change", "EventHandler", "Step change callback"),
+                    ("on_finish", "EventHandler", "Finish callback"),
+                    ("on_cancel", "Option<EventHandler>", "Cancel callback"),
+                    ("title", "Option", "Wizard title"),
+                    ("show_progress", "bool", "Show progress summary"),
+                    ("validate", "bool", "Enable validation"),
+                    ("children", "Element", "Step content"),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+                h4 { "StepSummaryProps" }
+                PropsTable { props: vec![
+                    ("steps", "Vec", "Steps data"),
+                    ("editable", "bool", "Show edit buttons"),
+                    ("on_edit", "Option<EventHandler>", "Edit callback"),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
             }
         }
     }
@@ -1235,6 +1632,98 @@ ChartTooltip {{
     ..Default::default()
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                h4 { "BarChartProps" }
+                PropsTable { props: vec![
+                    ("title", "Option", "Chart title"),
+                    ("data", "Option<Vec>", "Single series data (for simple charts)"),
+                    ("series", "Option<Vec>", "Multiple series data (for complex charts)"),
+                    ("width", "String", "Chart width (e.g., \"100%\", \"600px\")"),
+                    ("height", "String", "Chart height"),
+                    ("variant", "BarChartVariant", "Chart variant"),
+                    ("margin", "ChartMargin", "Chart margins"),
+                    ("x_axis", "ChartAxis", "X-axis configuration"),
+                    ("y_axis", "ChartAxis", "Y-axis configuration"),
+                    ("bar_color", "Option", "Bar color (for single series)"),
+                    ("bar_radius", "u8", "Bar corner radius"),
+                    ("bar_gap", "f32", "Gap between bars (0.0 - 1.0, as percentage of bar width)"),
+                    ("show_values", "bool", "Show values on bars"),
+                    ("value_format", "Option String>", "Value formatter"),
+                    ("legend_position", "LegendPosition", "Legend position"),
+                    ("tooltip", "ChartTooltip", "Tooltip configuration"),
+                    ("animation", "ChartAnimation", "Animation configuration"),
+                    ("on_bar_click", "Option<EventHandler>", "Click handler for bars"),
+                    ("style", "Option", "Custom styles"),
+                    ("id", "Option", ""),
+                    ("class", "Option", "")
+                ] }
+                h4 { "LineChartProps" }
+                PropsTable { props: vec![
+                    ("title", "Option", "Chart title"),
+                    ("data", "Option<Vec>", "Single series data"),
+                    ("series", "Option<Vec>", "Multiple series data"),
+                    ("width", "String", "Chart width"),
+                    ("height", "String", "Chart height"),
+                    ("variant", "LineChartVariant", "Chart variant"),
+                    ("margin", "ChartMargin", "Chart margins"),
+                    ("x_axis", "ChartAxis", "X-axis configuration"),
+                    ("y_axis", "ChartAxis", "Y-axis configuration"),
+                    ("line_color", "Option", "Line color (for single series)"),
+                    ("line_width", "u8", "Line width"),
+                    ("show_points", "bool", "Show data points"),
+                    ("point_radius", "u8", "Point radius"),
+                    ("show_values", "bool", "Show values on points"),
+                    ("value_format", "Option String>", "Value formatter"),
+                    ("legend_position", "LegendPosition", "Legend position"),
+                    ("tooltip", "ChartTooltip", "Tooltip configuration"),
+                    ("animation", "ChartAnimation", "Animation configuration"),
+                    ("on_point_click", "Option<EventHandler>", "Click handler for points"),
+                    ("style", "Option", "Custom styles"),
+                    ("id", "Option", ""),
+                    ("class", "Option", "")
+                ] }
+                h4 { "PieChartProps" }
+                PropsTable { props: vec![
+                    ("title", "Option", "Chart title"),
+                    ("data", "Vec", "Data points"),
+                    ("width", "String", "Chart width"),
+                    ("height", "String", "Chart height"),
+                    ("variant", "PieChartVariant", "Chart variant"),
+                    ("inner_radius_pct", "f32", "Inner radius (for donut, as percentage of outer radius)"),
+                    ("start_angle", "f32", "Start angle (in degrees, 0 = 3 o'clock)"),
+                    ("corner_radius", "u8", "Corner radius for slices"),
+                    ("slice_gap", "f32", "Gap between slices (in degrees)"),
+                    ("show_labels", "bool", "Show labels on slices"),
+                    ("show_percentages", "bool", "Show percentage labels"),
+                    ("label_format", "Option String>", "Label formatter"),
+                    ("legend_position", "LegendPosition", "Legend position"),
+                    ("tooltip", "ChartTooltip", "Tooltip configuration"),
+                    ("animation", "ChartAnimation", "Animation configuration"),
+                    ("on_slice_click", "Option<EventHandler>", "Click handler for slices"),
+                    ("style", "Option", "Custom styles"),
+                    ("colors", "Option<Vec>", "Colors for slices (uses theme colors if not provided)"),
+                    ("id", "Option", ""),
+                    ("class", "Option", "")
+                ] }
+                h4 { "SparklineProps" }
+                PropsTable { props: vec![
+                    ("data", "Vec", "Data values"),
+                    ("width", "String", "Chart width"),
+                    ("height", "String", "Chart height"),
+                    ("variant", "SparklineVariant", "Sparkline variant"),
+                    ("color", "Option", "Line/bar color"),
+                    ("fill_color", "Option", "Fill color for area (uses color with opacity if not set)"),
+                    ("line_width", "f32", "Line width"),
+                    ("show_last_point", "bool", "Show current value indicator"),
+                    ("show_min_max", "bool", "Show min/max indicators"),
+                    ("animation", "ChartAnimation", "Animation configuration"),
+                    ("onclick", "Option<EventHandler>", "Click handler"),
+                    ("style", "Option", "Custom styles"),
+                    ("id", "Option", ""),
+                    ("class", "Option", "")
+                ] }
+            }
         }
     }
 }
@@ -1292,6 +1781,31 @@ pub fn FooterPage() -> Element {
     copyright: Some(\"© 2024\".to_string()),
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                h4 { "FooterProps" }
+                PropsTable { props: vec![
+                    ("brand", "Option", "Brand/logo element"),
+                    ("description", "Option", "Brand description"),
+                    ("link_groups", "Vec", "Link groups"),
+                    ("social_links", "Vec, // (icon, url)", "Social links"),
+                    ("bottom_content", "Option", "Bottom bar content"),
+                    ("copyright", "Option", "Copyright text"),
+                    ("variant", "FooterVariant", "Variant"),
+                    ("class", "Option", "Additional CSS classes"),
+                    ("id", "Option", "Element id"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "SimpleFooterProps" }
+                PropsTable { props: vec![
+                    ("brand", "Option", "Logo/brand element"),
+                    ("links", "Vec", "Links"),
+                    ("copyright", "String", "Copyright text"),
+                    ("class", "Option", "Additional CSS classes"),
+                    ("id", "Option", "Element id"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+            }
         }
     }
 }
@@ -1331,6 +1845,33 @@ pub fn NotificationCenterPage() -> Element {
     ],
     unread_count: 1,
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                h4 { "NotificationCenterProps" }
+                PropsTable { props: vec![
+                    ("notifications", "Vec", "Notifications list"),
+                    ("unread_count", "usize", "Unread count"),
+                    ("on_mark_read", "Option<EventHandler>", "On mark as read"),
+                    ("on_mark_all_read", "Option<EventHandler>", "On mark all read"),
+                    ("on_dismiss", "Option<EventHandler>", "On dismiss"),
+                    ("on_action", "Option<EventHandler>", "On action click"),
+                    ("class", "Option", "Additional CSS classes"),
+                    ("id", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+                h4 { "BannerAlertProps" }
+                PropsTable { props: vec![
+                    ("message", "String", "Alert message"),
+                    ("variant", "ToastVariant", "Alert variant"),
+                    ("dismissible", "bool", "Dismissible"),
+                    ("on_dismiss", "Option<EventHandler>", "On dismiss"),
+                    ("action", "Option", "Action button text"),
+                    ("on_action", "Option<EventHandler>", "On action"),
+                    ("class", "Option", "Additional CSS classes"),
+                    ("id", "Option", ""),
+                    ("style", "Option", "")
+                ] }
             }
         }
     }
@@ -1391,6 +1932,41 @@ pub fn HeroPage() -> Element {
     align: HeroAlign::Center,
     size: HeroSize::Lg,
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                h4 { "HeroProps" }
+                PropsTable { props: vec![
+                    ("title", "String", "Main headline"),
+                    ("subtitle", "Option", "Subtitle/description"),
+                    ("background", "Option", "Background element (image, gradient, video)"),
+                    ("primary_cta", "Option", "Primary CTA button"),
+                    ("secondary_cta", "Option", "Secondary CTA button"),
+                    ("social_proof", "Option", "Social proof element"),
+                    ("features", "Vec", "Feature highlights"),
+                    ("align", "HeroAlign", "Alignment"),
+                    ("size", "HeroSize", "Size variant"),
+                    ("class", "Option", "Additional CSS classes"),
+                    ("id", "Option", "Element id"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "HeroWithImageProps" }
+                PropsTable { props: vec![
+                    ("children", "Element", "Hero content"),
+                    ("image", "Element", "Image element"),
+                    ("image_position", "ImagePosition", "Image position"),
+                    ("class", "Option", "Additional CSS classes"),
+                    ("id", "Option", "Element id"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "SocialProofBarProps" }
+                PropsTable { props: vec![
+                    ("text", "String", "Text (e.g., \"Trusted by 10,000+ companies\")"),
+                    ("items", "Vec", "Logos or avatars"),
+                    ("class", "Option", "Additional CSS classes"),
+                    ("id", "Option", "Element id"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
             }
         }
     }
@@ -1614,6 +2190,36 @@ FileUpload {{
                     }
                 }
             }
+
+            Section { title: "Props",
+                h4 { "FileUploadProps" }
+                PropsTable { props: vec![
+                    ("accept", "Option", "Accepted file types (MIME types or extensions, e.g., \"image/*\", \".pdf\")"),
+                    ("max_size_mb", "Option", "Maximum file size in MB"),
+                    ("max_files", "usize", "Maximum number of files"),
+                    ("multiple", "bool", "Multiple files allowed"),
+                    ("single", "bool", "Single file mode (alias for !multiple)"),
+                    ("on_upload", "EventHandler<Vec>", "Upload handler"),
+                    ("on_change", "Option<EventHandler<Vec>>", "Change handler (called when files are selected)"),
+                    ("label", "Option", "Label"),
+                    ("helper_text", "Option", "Helper text"),
+                    ("error", "Option", "Error message"),
+                    ("loading", "bool", "Loading state"),
+                    ("disabled", "bool", "Disabled state"),
+                    ("class", "Option", "Additional CSS classes"),
+                    ("id", "Option", "Element id"),
+                    ("style", "Option", "Custom inline styles"),
+                    ("show_file_list", "bool", "Show file list")
+                ] }
+                h4 { "FileUploadItemProps" }
+                PropsTable { props: vec![
+                    ("file", "UploadedFile", ""),
+                    ("on_remove", "EventHandler", ""),
+                    ("id", "Option", ""),
+                    ("class", "Option", ""),
+                    ("style", "Option", "")
+                ] }
+            }
         }
     }
 }
@@ -1807,6 +2413,56 @@ DeleteConfirmDialog {{
     }}),
     loading: false,
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                h4 { "ConfirmationDialogProps" }
+                PropsTable { props: vec![
+                    ("open", "bool", "Whether the dialog is open"),
+                    ("on_close", "EventHandler", "On close handler"),
+                    ("title", "String", "Dialog title"),
+                    ("message", "String", "Confirmation message"),
+                    ("confirm_text", "Option", "Confirm button text"),
+                    ("cancel_text", "Option", "Cancel button text"),
+                    ("variant", "ConfirmVariant", "Confirm button variant"),
+                    ("icon", "Option", "Icon"),
+                    ("on_confirm", "EventHandler", "On confirm handler"),
+                    ("loading", "bool", "Loading state"),
+                    ("class", "Option", "Additional CSS classes"),
+                    ("id", "Option", "Element id"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "DeleteConfirmDialogProps" }
+                PropsTable { props: vec![
+                    ("open", "bool", ""),
+                    ("on_close", "EventHandler", ""),
+                    ("title", "Option", ""),
+                    ("item_name", "String", ""),
+                    ("on_confirm", "EventHandler", ""),
+                    ("loading", "bool", ""),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "UnsavedChangesDialogProps" }
+                PropsTable { props: vec![
+                    ("open", "bool", ""),
+                    ("on_close", "EventHandler", ""),
+                    ("on_save", "EventHandler", ""),
+                    ("on_discard", "EventHandler", ""),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
+                h4 { "SignOutDialogProps" }
+                PropsTable { props: vec![
+                    ("open", "bool", ""),
+                    ("on_close", "EventHandler", ""),
+                    ("on_confirm", "EventHandler", ""),
+                    ("id", "Option", "Element id"),
+                    ("class", "Option", "Custom CSS classes"),
+                    ("style", "Option", "Custom inline styles")
+                ] }
             }
         }
     }

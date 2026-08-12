@@ -68,6 +68,12 @@ pub struct DateRangePickerProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Date range picker component
@@ -215,10 +221,14 @@ pub fn DateRangePicker(props: DateRangePickerProps) -> Element {
         }
     };
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
             class: "date-range-picker{class_css}",
-            style: "display: flex; flex-direction: column; gap: 6px; position: relative;",
+            style: "display: flex; flex-direction: column; gap: 6px; position: relative; {style}",
 
             div {
                 style: "position: relative;",
@@ -299,6 +309,12 @@ pub struct DateRangePickerDropdownProps {
     pub on_select: EventHandler<String>,
     pub on_preset_select: EventHandler<(String, String)>,
     pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -431,16 +447,27 @@ fn get_dropdown_style() -> String {
 pub struct DateRangePresetsProps {
     pub presets: Vec<DateRangePreset>,
     pub on_preset_select: EventHandler<(String, String)>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 fn DateRangePresets(props: DateRangePresetsProps) -> Element {
     let theme = use_theme();
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            class: "date-range-picker-presets",
-            style: "display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid {theme.tokens.read().colors.border.to_rgba()};",
+            id: "{id}",
+            class: "date-range-picker-presets {class}",
+            style: "display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid {theme.tokens.read().colors.border.to_rgba()}; {style}",
 
             for preset in props.presets.clone() {
                 PresetButton {
@@ -457,6 +484,12 @@ fn DateRangePresets(props: DateRangePresetsProps) -> Element {
 pub struct PresetButtonProps {
     pub preset: DateRangePreset,
     pub on_preset_select: EventHandler<(String, String)>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -464,10 +497,16 @@ fn PresetButton(props: PresetButtonProps) -> Element {
     let theme = use_theme();
     let preset = props.preset.clone();
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         button {
+            id: "{id}",
+            class: "{class}",
             type: "button",
-            style: "padding: 6px 12px; font-size: 12px; font-weight: 500; color: {theme.tokens.read().colors.primary.to_rgba()}; background: {theme.tokens.read().colors.primary.to_rgba()}15; border: none; border-radius: 6px; cursor: pointer; transition: all 0.15s ease;",
+            style: "padding: 6px 12px; font-size: 12px; font-weight: 500; color: {theme.tokens.read().colors.primary.to_rgba()}; background: {theme.tokens.read().colors.primary.to_rgba()}15; border: none; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; {style}",
             onclick: move |_| {
                 let (start, end) = (preset.get_range)();
                 props.on_preset_select.call((start, end));
@@ -770,12 +809,51 @@ fn month_name(month: u8) -> &'static str {
     }
 }
 
+#[cfg(all(feature = "web", target_arch = "wasm32"))]
 fn get_today() -> Date {
-    // Simplified - in a real app, use the system date
+    let js_date = js_sys::Date::new_0();
     Date {
-        year: 2024,
-        month: 3,
-        day: 19,
+        year: js_date.get_full_year() as i32,
+        month: (js_date.get_month() + 1) as u8,
+        day: js_date.get_date() as u8,
+    }
+}
+
+#[cfg(not(all(feature = "web", target_arch = "wasm32")))]
+fn get_today() -> Date {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let secs = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs() as i64;
+    let mut days = secs / 86400;
+    let mut year = 1970i32;
+    loop {
+        let days_in_year = if is_leap_year(year) { 366 } else { 365 };
+        if days < days_in_year as i64 {
+            break;
+        }
+        days -= days_in_year as i64;
+        year += 1;
+    }
+    let month_days = [
+        31,
+        if is_leap_year(year) { 29 } else { 28 },
+        31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
+    ];
+    let mut month = 1u8;
+    for (i, md) in month_days.iter().enumerate() {
+        if days < *md as i64 {
+            month = (i + 1) as u8;
+            break;
+        }
+        days -= *md as i64;
+        month = (i + 2) as u8;
+    }
+    Date {
+        year,
+        month,
+        day: (days + 1) as u8,
     }
 }
 

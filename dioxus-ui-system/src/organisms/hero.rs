@@ -37,6 +37,12 @@ pub struct HeroProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Hero CTA configuration
@@ -115,11 +121,14 @@ pub fn Hero(props: HeroProps) -> Element {
     };
 
     let padding = props.size.to_padding();
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
 
     rsx! {
         section {
+            id: "{id}",
             class: "hero{class_css}",
-            style: "position: relative; padding: {padding}; display: flex; flex-direction: column; align-items: {align_items}; text-align: {text_align}; overflow: hidden;",
+            style: "position: relative; padding: {padding}; display: flex; flex-direction: column; align-items: {align_items}; text-align: {text_align}; overflow: hidden; {style}",
 
             // Background
             if let Some(background) = props.background {
@@ -267,6 +276,12 @@ pub struct HeroWithImageProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Image position
@@ -291,10 +306,14 @@ pub fn HeroWithImage(props: HeroWithImageProps) -> Element {
         ImagePosition::Right => (1, 2),
     };
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         section {
+            id: "{id}",
             class: "hero-split{class_css}",
-            style: "padding: 80px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; max-width: 1200px; margin: 0 auto;",
+            style: "padding: 80px 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; max-width: 1200px; margin: 0 auto; {style}",
 
             div {
                 class: "hero-split-content",
@@ -321,6 +340,12 @@ pub struct SocialProofBarProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Social proof bar component
@@ -334,10 +359,14 @@ pub fn SocialProofBar(props: SocialProofBarProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
             class: "social-proof-bar{class_css}",
-            style: "display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 16px;",
+            style: "display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 16px; {style}",
 
             if !props.items.is_empty() {
                 div {

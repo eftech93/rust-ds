@@ -60,6 +60,10 @@ pub struct SparklineProps {
     /// Custom styles
     #[props(default)]
     pub style: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Sparkline component
@@ -71,6 +75,8 @@ pub fn Sparkline(props: SparklineProps) -> Element {
     if props.data.is_empty() {
         return rsx! {
             Box {
+                id: props.id.clone(),
+                class: props.class.clone(),
                 width: Some(props.width.clone()),
                 height: Some(props.height.clone()),
             }
@@ -227,8 +233,13 @@ pub fn Sparkline(props: SparklineProps) -> Element {
         vec![]
     };
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+
     rsx! {
         Box {
+            id: Some(id),
+            class: Some(class),
             width: Some(props.width.clone()),
             height: Some(props.height.clone()),
             display: crate::atoms::BoxDisplay::InlineBlock,

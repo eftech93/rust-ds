@@ -56,6 +56,12 @@ pub struct CalendarProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Calendar organism component
@@ -211,6 +217,8 @@ pub fn Calendar(props: CalendarProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
 
             // Header with navigation
@@ -752,13 +760,51 @@ fn parse_month_year(s: &str) -> Option<(i32, u8)> {
 }
 
 /// Get today's date
+#[cfg(all(feature = "web", target_arch = "wasm32"))]
 fn get_today() -> Date {
-    // In a real implementation, use system time
-    // For now, return a fixed date
+    let js_date = js_sys::Date::new_0();
     Date {
-        year: 2024,
-        month: 3,
-        day: 19,
+        year: js_date.get_full_year() as i32,
+        month: (js_date.get_month() + 1) as u8,
+        day: js_date.get_date() as u8,
+    }
+}
+
+#[cfg(not(all(feature = "web", target_arch = "wasm32")))]
+fn get_today() -> Date {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let secs = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs() as i64;
+    let mut days = secs / 86400;
+    let mut year = 1970i32;
+    loop {
+        let days_in_year = if is_leap_year(year) { 366 } else { 365 };
+        if days < days_in_year as i64 {
+            break;
+        }
+        days -= days_in_year as i64;
+        year += 1;
+    }
+    let month_days = [
+        31,
+        if is_leap_year(year) { 29 } else { 28 },
+        31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
+    ];
+    let mut month = 1u8;
+    for (i, md) in month_days.iter().enumerate() {
+        if days < *md as i64 {
+            month = (i + 1) as u8;
+            break;
+        }
+        days -= *md as i64;
+        month = (i + 2) as u8;
+    }
+    Date {
+        year,
+        month,
+        day: (days + 1) as u8,
     }
 }
 

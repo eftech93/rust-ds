@@ -12,6 +12,15 @@ use dioxus::prelude::*;
 pub struct ContextMenuProps {
     /// Child elements (should include ContextMenuTrigger and ContextMenuContent)
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Context menu container component
@@ -31,7 +40,9 @@ pub fn ContextMenu(props: ContextMenuProps) -> Element {
 
     rsx! {
         div {
-            style: "display: inline-block;",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "display: inline-block; {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
     }
@@ -50,6 +61,15 @@ struct ContextMenuContext {
 pub struct ContextMenuTriggerProps {
     /// Child element that triggers the context menu on right-click
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Context menu trigger component
@@ -81,6 +101,9 @@ pub fn ContextMenuTrigger(props: ContextMenuTriggerProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{props.style.clone().unwrap_or_default()}",
             oncontextmenu: handle_context_menu,
             {props.children}
         }
@@ -92,6 +115,15 @@ pub fn ContextMenuTrigger(props: ContextMenuTriggerProps) -> Element {
 pub struct ContextMenuContentProps {
     /// Menu items and content
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Context menu content component
@@ -151,7 +183,9 @@ pub fn ContextMenuContent(props: ContextMenuContentProps) -> Element {
 
             // Menu content
             div {
-                style: "{menu_base_style} {position_style}",
+                id: "{props.id.clone().unwrap_or_default()}",
+                class: "{props.class.clone().unwrap_or_default()}",
+                style: "{menu_base_style} {position_style} {props.style.clone().unwrap_or_default()}",
                 tabindex: "0",
                 role: "menu",
                 onkeydown: handle_keydown,
@@ -179,6 +213,15 @@ pub struct ContextMenuItemProps {
     /// Optional icon element
     #[props(default)]
     pub icon: Option<Element>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Context menu item component
@@ -234,7 +277,9 @@ pub fn ContextMenuItem(props: ContextMenuItemProps) -> Element {
 
     rsx! {
         div {
-            style: "{item_style} user-select: none;",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{item_style} user-select: none; {props.style.clone().unwrap_or_default()}",
             role: "menuitem",
             aria_disabled: props.disabled,
             onmouseenter: move |_| is_hovered.set(true),
@@ -253,7 +298,7 @@ pub fn ContextMenuItem(props: ContextMenuItemProps) -> Element {
             // Right section: shortcut
             if let Some(shortcut) = &props.shortcut {
                 span {
-                    style: "{shortcut_style} margin-left: auto;",
+                    style: "{shortcut_style} margin-left: auto; {props.style.clone().unwrap_or_default()}",
                     "{shortcut}"
                 }
             }
@@ -290,6 +335,15 @@ pub fn ContextMenuSeparator() -> Element {
 pub struct ContextMenuLabelProps {
     /// Label text content
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Context menu label component
@@ -311,7 +365,9 @@ pub fn ContextMenuLabel(props: ContextMenuLabelProps) -> Element {
 
     rsx! {
         div {
-            style: "{label_style} user-select: none;",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{label_style} user-select: none; {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
     }
@@ -334,6 +390,15 @@ pub struct ContextMenuCheckboxItemProps {
     /// Optional keyboard shortcut display
     #[props(default)]
     pub shortcut: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Context menu checkbox item component
@@ -407,7 +472,9 @@ pub fn ContextMenuCheckboxItem(props: ContextMenuCheckboxItemProps) -> Element {
 
     rsx! {
         div {
-            style: "{item_style} user-select: none;",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{item_style} user-select: none; {props.style.clone().unwrap_or_default()}",
             role: "menuitemcheckbox",
             aria_checked: props.checked,
             aria_disabled: props.disabled,
@@ -436,7 +503,7 @@ pub fn ContextMenuCheckboxItem(props: ContextMenuCheckboxItemProps) -> Element {
             // Right section: shortcut
             if let Some(shortcut) = &props.shortcut {
                 span {
-                    style: "{shortcut_style} margin-left: auto;",
+                    style: "{shortcut_style} margin-left: auto; {props.style.clone().unwrap_or_default()}",
                     "{shortcut}"
                 }
             }
@@ -451,6 +518,15 @@ pub struct ContextMenuSubProps {
     pub trigger: Element,
     /// Submenu content
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Context menu submenu component
@@ -479,6 +555,8 @@ pub fn ContextMenuSub(props: ContextMenuSubProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "position: relative;",
 
             // Trigger with hover handling
@@ -504,7 +582,7 @@ pub fn ContextMenuSub(props: ContextMenuSubProps) -> Element {
 
                     // Submenu
                     div {
-                        style: "{submenu_style} position: fixed; left: {menu_position.read().0}px; top: {menu_position.read().1}px;",
+                        style: "{submenu_style} position: fixed; left: {menu_position.read().0}px; top: {menu_position.read().1}px; {props.style.clone().unwrap_or_default()}",
                         role: "menu",
                         onclick: move |e| e.stop_propagation(),
                         {props.children}
@@ -526,6 +604,15 @@ pub struct ContextMenuSubTriggerProps {
     /// Optional keyboard shortcut display
     #[props(default)]
     pub shortcut: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Context menu sub trigger component
@@ -574,7 +661,9 @@ pub fn ContextMenuSubTrigger(props: ContextMenuSubTriggerProps) -> Element {
 
     rsx! {
         div {
-            style: "{item_style} user-select: none;",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{item_style} user-select: none; {props.style.clone().unwrap_or_default()}",
             role: "menuitem",
             aria_disabled: props.disabled,
             aria_haspopup: "menu",

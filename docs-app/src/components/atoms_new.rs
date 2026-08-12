@@ -1,6 +1,6 @@
 //! New Atom component documentation pages (Phase 1-4)
 
-use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, Section};
+use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, PropsTable, Section};
 use dioxus::prelude::*;
 use dioxus_ui_system::atoms::{
     AspectRatio, AspectRatios, NumberInput, PasswordInput, Toggle, ToggleSize, ToggleVariant,
@@ -52,6 +52,20 @@ Toggle {
                         Toggle { pressed: true, size: ToggleSize::Lg, "Large" }
                     }
                 }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("children", "Element", "Toggle content"),
+                    ("pressed", "bool", "Whether the toggle is pressed/activated"),
+                    ("on_pressed_change", "Option<EventHandler<bool>>", "Callback when pressed state changes"),
+                    ("variant", "ToggleVariant", "Visual variant (Default, Outline, Ghost)"),
+                    ("size", "ToggleSize", "Toggle size (Sm, Md, Lg)"),
+                    ("disabled", "bool", "Disabled state"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
             }
         }
     }
@@ -110,6 +124,25 @@ NumberInput {
                     }
                 }
             }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("value", "f64", "Current value"),
+                    ("on_change", "EventHandler<f64>", "Callback when value changes"),
+                    ("min", "Option<f64>", "Minimum value"),
+                    ("max", "Option<f64>", "Maximum value"),
+                    ("step", "f64", "Step increment (default: 1.0)"),
+                    ("precision", "Option<usize>", "Decimal precision"),
+                    ("placeholder", "Option<String>", "Placeholder text"),
+                    ("disabled", "bool", "Disabled state"),
+                    ("label", "Option<String>", "Label text"),
+                    ("error", "Option<String>", "Error message"),
+                    ("show_buttons", "bool", "Show increment/decrement buttons (default: true)"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
+            }
         }
     }
 }
@@ -158,6 +191,16 @@ pub fn AspectRatioPage() -> Element {
                         }
                     }
                 }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("ratio", "f64", "The aspect ratio (width / height), e.g., 16.0/9.0 (default: 1.0)"),
+                    ("children", "Element", "Content to display"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
             }
         }
     }
@@ -212,6 +255,24 @@ pub fn PasswordInputPage() -> Element {
                         }
                     }
                 }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("value", "String", "Current value"),
+                    ("on_change", "EventHandler<String>", "Callback when value changes"),
+                    ("placeholder", "Option<String>", "Placeholder text"),
+                    ("disabled", "bool", "Disabled state"),
+                    ("error", "Option<String>", "Error message to display"),
+                    ("label", "Option<String>", "Label text"),
+                    ("required", "bool", "Required field indicator"),
+                    ("strength_indicator", "bool", "Show password strength indicator"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("name", "Option<String>", "Input name attribute"),
+                    ("id", "Option<String>", "Input id attribute"),
+                    ("autofocus", "bool", "Autofocus on mount"),
+                ]}
             }
         }
     }

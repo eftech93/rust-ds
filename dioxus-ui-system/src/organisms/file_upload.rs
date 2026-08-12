@@ -121,6 +121,12 @@ pub struct FileUploadProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
     /// Show file list
     #[props(default = true)]
     pub show_file_list: bool,
@@ -366,10 +372,14 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
     let file_count = files().len();
     let at_max_files = file_count >= props.max_files;
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
             class: "file-upload{class_css}",
-            style: "display: flex; flex-direction: column; gap: 12px;",
+            style: "display: flex; flex-direction: column; gap: 12px; {style}",
 
             // Drop zone (only show if not at max files)
             if !at_max_files {
@@ -578,6 +588,12 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
 pub struct FileUploadItemProps {
     pub file: UploadedFile,
     pub on_remove: EventHandler<()>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// File upload item component
@@ -589,10 +605,15 @@ fn FileUploadItem(props: FileUploadItemProps) -> Element {
     let file_icon = file_type.icon();
     let size_text = format_file_size(props.file.size);
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            class: "file-upload-item",
-            style: "display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px; background: {theme.tokens.read().colors.background.to_rgba()};",
+            id: "{id}",
+            class: "file-upload-item {class}",
+            style: "display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px; background: {theme.tokens.read().colors.background.to_rgba()}; {style}",
 
             // Icon
             div {

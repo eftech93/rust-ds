@@ -59,6 +59,9 @@ pub struct ToggleProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Toggle atom component
@@ -237,6 +240,7 @@ pub fn Toggle(props: ToggleProps) -> Element {
             disabled: disabled,
             style: "{final_style}",
             class: "{class}",
+            id: "{props.id.clone().unwrap_or_default()}",
             onclick: handle_click,
             onmouseenter: move |_| if !disabled { is_hovered.set(true) },
             onmouseleave: move |_| is_hovered.set(false),

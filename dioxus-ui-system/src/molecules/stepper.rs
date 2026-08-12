@@ -93,6 +93,15 @@ pub struct StepItemProps {
     /// Click handler
     #[props(default)]
     pub on_click: Option<EventHandler<usize>>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Step item molecule - displays a single step with indicator, label, and optional connector
@@ -105,6 +114,9 @@ pub fn StepItemComponent(props: StepItemProps) -> Element {
 
     let indicator = rsx! {
         StepIndicator {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{props.style.clone().unwrap_or_default()}",
             step: (props.index + 1) as u32,
             state: step.state.clone(),
             size: props.size.clone(),
@@ -205,6 +217,15 @@ pub struct HorizontalStepperProps {
     /// Allow clicking completed steps
     #[props(default = true)]
     pub allow_click_completed: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Horizontal stepper - steps arranged horizontally
@@ -212,7 +233,9 @@ pub struct HorizontalStepperProps {
 pub fn HorizontalStepper(props: HorizontalStepperProps) -> Element {
     rsx! {
         div {
-            style: "display: flex; align-items: flex-start; width: 100%;",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "display: flex; align-items: flex-start; width: 100%; {props.style.clone().unwrap_or_default()}",
             role: "tablist",
             aria_label: Some("Progress steps"),
 
@@ -245,6 +268,15 @@ pub struct VerticalStepperProps {
     /// Optional click handler for steps
     #[props(default)]
     pub on_step_click: Option<EventHandler<usize>>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Vertical stepper - steps arranged vertically
@@ -252,11 +284,13 @@ pub struct VerticalStepperProps {
 pub fn VerticalStepper(props: VerticalStepperProps) -> Element {
     rsx! {
         VStack {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             gap: SpacingSize::None,
             align: AlignItems::Stretch,
 
             div {
-                style: "display: flex; flex-direction: column; gap: 0;",
+                style: "display: flex; flex-direction: column; gap: 0; {props.style.clone().unwrap_or_default()}",
                 role: "tablist",
                 aria_label: Some("Progress steps"),
                 aria_orientation: "vertical",
@@ -287,6 +321,15 @@ pub struct StepContentProps {
     pub step_index: usize,
     /// Content to display
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Step content panel - shows content only when step is active
@@ -294,12 +337,17 @@ pub struct StepContentProps {
 pub fn StepContent(props: StepContentProps) -> Element {
     let is_active = props.active_step == props.step_index;
 
+    let custom_style = props.style.clone().unwrap_or_default();
+    let custom_class = props.class.clone().unwrap_or_default();
+    let id = props.id.clone().unwrap_or_else(|| format!("step-content-{}", props.step_index));
+
     rsx! {
         if is_active {
             div {
-                style: "animation: fadeIn 200ms ease;",
+                style: "animation: fadeIn 200ms ease; {custom_style}",
                 role: "tabpanel",
-                id: "step-content-{props.step_index}",
+                id: "{id}",
+                class: "{custom_class}",
                 aria_labelledby: "step-{props.step_index}",
 
                 {props.children}
@@ -348,6 +396,15 @@ pub struct StepperActionsProps {
     /// Alignment
     #[props(default = StepperActionsAlign::End)]
     pub align: StepperActionsAlign,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Stepper actions alignment
@@ -373,7 +430,9 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
 
     rsx! {
         HStack {
-            style: "margin-top: 24px; padding-top: 24px; border-top: 1px solid #e2e8f0;",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "margin-top: 24px; padding-top: 24px; border-top: 1px solid #e2e8f0; {props.style.clone().unwrap_or_default()}",
             justify: justify_content,
             align: AlignItems::Center,
             gap: SpacingSize::Md,

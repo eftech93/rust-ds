@@ -59,6 +59,12 @@ pub struct AccordionProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Accordion organism component
@@ -79,6 +85,8 @@ pub fn Accordion(props: AccordionProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{accordion_style} {props.style.clone().unwrap_or_default()}",
 
             for (index, item) in props.items.iter().enumerate() {
@@ -256,6 +264,12 @@ pub struct AccordionItem2Props {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Single accordion item that manages its own state
@@ -301,6 +315,8 @@ pub fn AccordionItem2(props: AccordionItem2Props) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{props.style.clone().unwrap_or_default()}",
 
             h3 {

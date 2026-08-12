@@ -20,6 +20,9 @@ pub struct AspectRatioProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Aspect ratio container component
@@ -62,6 +65,7 @@ pub fn AspectRatio(props: AspectRatioProps) -> Element {
         div {
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
+            id: "{props.id.clone().unwrap_or_default()}",
 
             div { style: "{spacer_style}" }
 

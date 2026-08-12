@@ -65,6 +65,12 @@ pub struct ComboboxProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Combobox component (autocomplete dropdown)
@@ -166,6 +172,7 @@ pub fn Combobox(props: ComboboxProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "combobox{class_css}",
             style: "position: relative; display: flex; flex-direction: column; gap: 6px;",
 
@@ -314,7 +321,7 @@ pub fn Combobox(props: ComboboxProps) -> Element {
             if let Some(error) = props.error {
                 span {
                     class: "combobox-error",
-                    style: "font-size: 12px; color: {theme.tokens.read().colors.destructive.to_rgba()};",
+                    style: "font-size: 12px; color: {theme.tokens.read().colors.destructive.to_rgba()}; {props.style.clone().unwrap_or_default()}",
                     "{error}"
                 }
             }
@@ -346,6 +353,12 @@ pub struct MultiComboboxProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Multi-select combobox component
@@ -370,6 +383,7 @@ pub fn MultiCombobox(props: MultiComboboxProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "multi-combobox{class_css}",
             style: "position: relative; display: flex; flex-direction: column; gap: 6px;",
 
@@ -440,13 +454,14 @@ pub fn MultiCombobox(props: MultiComboboxProps) -> Element {
                     for option in props.options.iter().filter(|o| !props.values.contains(&o.value)) {
                         {
                             let option = option.clone();
+                            let option_value = option.value.clone();
                             let values = props.values.clone();
                             let on_change = props.on_change.clone();
                             rsx! {
                                 div {
-                                    key: "{option.value}",
+                                    key: "{option_value}",
                                     class: "multi-combobox-option",
-                                    style: "padding: 10px 14px; font-size: 14px; cursor: pointer;",
+                                    style: "padding: 10px 14px; font-size: 14px; cursor: pointer; {props.style.clone().unwrap_or_default()}",
                                     onclick: move |_| {
                                         let mut new_values = values.clone();
                                         new_values.push(option.value.clone());

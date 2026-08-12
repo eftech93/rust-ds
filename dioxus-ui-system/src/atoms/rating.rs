@@ -35,6 +35,12 @@ pub struct RatingProps {
     /// Show rating value text
     #[props(default = false)]
     pub show_value: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Rating component (star display/input)
@@ -53,12 +59,21 @@ pub fn Rating(props: RatingProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     let value = props.value.clamp(0.0, props.max as f32);
 
     rsx! {
         span {
             class: "rating{class_css}",
-            style: "display: inline-flex; align-items: center; gap: 4px;",
+            style: "display: inline-flex; align-items: center; gap: 4px;{style_css}",
+            id: "{id_css}",
 
             div {
                 style: "display: inline-flex; gap: 2px;",
@@ -139,6 +154,12 @@ pub struct RatingInputProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Rating input component (interactive)
@@ -154,10 +175,19 @@ pub fn RatingInput(props: RatingInputProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         div {
             class: "rating-input{class_css}",
-            style: "display: flex; flex-direction: column; gap: 8px;",
+            style: "display: flex; flex-direction: column; gap: 8px;{style_css}",
+            id: "{id_css}",
 
             if let Some(label) = props.label {
                 label {
@@ -261,17 +291,29 @@ pub struct ReviewSummaryProps {
     /// Write review handler
     #[props(default)]
     pub on_write_review: Option<EventHandler<()>>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
+    /// Additional CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Review summary component
 #[component]
 pub fn ReviewSummary(props: ReviewSummaryProps) -> Element {
-    let class_css = "";
+    let class_css = props.class.clone().unwrap_or_default();
+    let style_css = props.style.clone().unwrap_or_default();
+    let id_css = props.id.clone().unwrap_or_default();
 
     rsx! {
         div {
-            class: "review-summary{class_css}",
-            style: "display: flex; flex-direction: column; gap: 16px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px; background: white;",
+            class: "review-summary {class_css}",
+            style: "display: flex; flex-direction: column; gap: 16px; padding: 20px; border: 1px solid #e5e7eb; border-radius: 12px; background: white;{style_css}",
+            id: "{id_css}",
 
             div {
                 style: "display: flex; align-items: center; gap: 16px;",

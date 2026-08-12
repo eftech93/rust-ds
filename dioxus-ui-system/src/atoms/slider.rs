@@ -46,6 +46,12 @@ pub struct SliderProps {
     /// Marks/ticks on the slider
     #[props(default)]
     pub marks: Vec<SliderMark>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Slider size
@@ -97,6 +103,14 @@ pub fn Slider(props: SliderProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     let range = props.max - props.min;
     let percentage = if range > 0.0 {
         ((props.value - props.min) / range * 100.0).clamp(0.0, 100.0)
@@ -124,7 +138,8 @@ pub fn Slider(props: SliderProps) -> Element {
     rsx! {
         div {
             class: "slider{class_css}",
-            style: "display: flex; flex-direction: column; gap: 8px; {disabled_css}",
+            style: "display: flex; flex-direction: column; gap: 8px; {disabled_css}{style_css}",
+            id: "{id_css}",
 
             // Label row
             if props.label.is_some() || props.show_value {
@@ -251,6 +266,12 @@ pub struct RangeSliderProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Range slider component (dual handle)
@@ -264,6 +285,14 @@ pub fn RangeSlider(props: RangeSliderProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     let range = props.max - props.min;
     let min_pct = ((props.min_value - props.min) / range * 100.0).clamp(0.0, 100.0);
     let max_pct = ((props.max_value - props.min) / range * 100.0).clamp(0.0, 100.0);
@@ -274,7 +303,8 @@ pub fn RangeSlider(props: RangeSliderProps) -> Element {
     rsx! {
         div {
             class: "range-slider{class_css}",
-            style: "display: flex; flex-direction: column; gap: 8px;",
+            style: "display: flex; flex-direction: column; gap: 8px;{style_css}",
+            id: "{id_css}",
 
             if let Some(label) = props.label {
                 label {

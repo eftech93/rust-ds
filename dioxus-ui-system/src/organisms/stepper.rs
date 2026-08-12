@@ -56,6 +56,12 @@ pub struct StepperProps {
     /// Content elements for each step
     #[props(default)]
     pub children: Element,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Stepper organism - complete stepper component
@@ -79,8 +85,15 @@ pub fn Stepper(props: StepperProps) -> Element {
         })
         .collect();
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         Card {
+            id: Some(id),
+            class: Some(class),
+            style: Some(style),
             variant: CardVariant::Default,
             full_width: true,
 
@@ -168,13 +181,25 @@ pub struct CompactStepperProps {
     /// Click handler
     #[props(default)]
     pub on_step_click: Option<EventHandler<usize>>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 pub fn CompactStepper(props: CompactStepperProps) -> Element {
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: "display: flex; align-items: center; justify-content: center; gap: 8px;",
+            id: "{id}",
+            class: "{class}",
+            style: "display: flex; align-items: center; justify-content: center; gap: 8px; {style}",
 
             for (index, step) in props.steps.iter().enumerate() {
                 div {
@@ -227,6 +252,12 @@ pub struct WizardProps {
     pub validate: bool,
     /// Step content
     pub children: Element,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Wizard step with validation
@@ -310,8 +341,15 @@ pub fn Wizard(props: WizardProps) -> Element {
 
     let progress = ((current + 1) as f32 / total_steps as f32 * 100.0) as u32;
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         Card {
+            id: Some(id),
+            class: Some(class),
+            style: Some(style),
             variant: CardVariant::Elevated,
             full_width: true,
 
@@ -417,6 +455,12 @@ pub struct StepSummaryProps {
     /// Edit callback
     #[props(default)]
     pub on_edit: Option<EventHandler<usize>>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Step summary item
@@ -444,9 +488,15 @@ impl StepSummaryItem {
 /// Step summary - review all steps before final submission
 #[component]
 pub fn StepSummary(props: StepSummaryProps) -> Element {
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: "display: flex; flex-direction: column; gap: 16px;",
+            id: "{id}",
+            class: "{class}",
+            style: "display: flex; flex-direction: column; gap: 16px; {style}",
 
             for (index, item) in props.steps.iter().enumerate() {
                 div {

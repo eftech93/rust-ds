@@ -85,6 +85,12 @@ pub struct SpinnerProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Spinner loading indicator component
@@ -105,6 +111,14 @@ pub fn Spinner(props: SpinnerProps) -> Element {
 
     let animation_duration = format!("{:.2}s", 1.0 / props.speed);
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     match props.variant {
         SpinnerVariant::Circular => {
             let stroke_width = size / 8;
@@ -116,6 +130,8 @@ pub fn Spinner(props: SpinnerProps) -> Element {
 
                 span {
                     class: "spinner spinner-circular{class_css}",
+                    style: "display: inline-flex; align-items: center; justify-content: center;{style_css}",
+                    id: "{id_css}",
                     role: "status",
                     aria_label: "{props.label}",
 
@@ -157,7 +173,8 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                     class: "spinner spinner-dots{class_css}",
                     role: "status",
                     aria_label: "{props.label}",
-                    style: "display: inline-flex; align-items: center; gap: {gap}px;",
+                    style: "display: inline-flex; align-items: center; gap: {gap}px;{style_css}",
+                    id: "{id_css}",
 
                     for i in 0..3 {
                         span {
@@ -180,6 +197,8 @@ pub fn Spinner(props: SpinnerProps) -> Element {
 
                 span {
                     class: "spinner spinner-pulse{class_css}",
+                    style: "display: inline-flex; align-items: center; justify-content: center;{style_css}",
+                    id: "{id_css}",
                     role: "status",
                     aria_label: "{props.label}",
 
@@ -206,7 +225,8 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                     class: "spinner spinner-bars{class_css}",
                     role: "status",
                     aria_label: "{props.label}",
-                    style: "display: inline-flex; align-items: center; gap: 2px; height: {bar_height}px;",
+                    style: "display: inline-flex; align-items: center; gap: 2px; height: {bar_height}px;{style_css}",
+                    id: "{id_css}",
 
                     for i in 0..5 {
                         span {
@@ -245,6 +265,12 @@ pub struct LoadingOverlayProps {
     pub class: Option<String>,
     /// Children elements (content that gets overlaid)
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Loading overlay component
@@ -271,10 +297,19 @@ pub fn LoadingOverlay(props: LoadingOverlayProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         div {
             class: "loading-overlay-container{class_css}",
-            style: "position: relative;",
+            style: "position: relative;{style_css}",
+            id: "{id_css}",
 
             {props.children}
 

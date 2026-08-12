@@ -58,6 +58,9 @@ pub struct BreadcrumbProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Breadcrumb molecule component
@@ -68,8 +71,11 @@ pub fn Breadcrumb(props: BreadcrumbProps) -> Element {
     let separator = props.separator.unwrap_or_else(|| "›".to_string());
     let items_count = props.items.len();
 
+    let id = props.id.clone().unwrap_or_default();
+
     rsx! {
         nav {
+            id: "{id}",
             aria_label: "breadcrumb",
             style: props.style.clone().unwrap_or_default(),
             class: "{props.class.clone().unwrap_or_default()}",
@@ -107,6 +113,15 @@ pub fn Breadcrumb(props: BreadcrumbProps) -> Element {
 struct BreadcrumbLinkProps {
     item: BreadcrumbItem,
     is_last: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -133,7 +148,9 @@ fn BreadcrumbLink(props: BreadcrumbLinkProps) -> Element {
     if props.is_last || props.item.href.is_none() {
         rsx! {
             span {
-                style: "{link_style} cursor: default;",
+                id: "{props.id.clone().unwrap_or_default()}",
+                class: "{props.class.clone().unwrap_or_default()}",
+                style: "{link_style} cursor: default; {props.style.clone().unwrap_or_default()}",
                 aria_current: "page",
 
                 if has_icon {
@@ -166,19 +183,30 @@ fn BreadcrumbLink(props: BreadcrumbLinkProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 struct BreadcrumbIconProps {
     name: String,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 fn BreadcrumbIcon(props: BreadcrumbIconProps) -> Element {
     rsx! {
         svg {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             view_box: "0 0 24 24",
             fill: "none",
             stroke: "currentColor",
             stroke_width: "2",
             stroke_linecap: "round",
             stroke_linejoin: "round",
-            style: "width: 16px; height: 16px;",
+            style: "width: 16px; height: 16px; {props.style.clone().unwrap_or_default()}",
 
             match props.name.as_str() {
                 "home" => rsx! {

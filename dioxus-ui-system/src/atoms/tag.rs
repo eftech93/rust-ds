@@ -66,6 +66,12 @@ pub struct TagProps {
     /// Disabled state
     #[props(default = false)]
     pub disabled: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Tag component
@@ -128,10 +134,14 @@ pub fn Tag(props: TagProps) -> Element {
     };
     let on_click = props.on_click.clone();
 
+    let style_css = props.style.clone().unwrap_or_default();
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         span {
             class: "tag tag-{variant_name}{class_css}",
-            style: "display: inline-flex; align-items: center; gap: 4px; padding: {padding}; font-size: {font_size}; font-weight: 500; background: {bg_color}; color: {text_color}; border: {border}; border-radius: 9999px; cursor: {cursor}; opacity: {opacity}; transition: all 0.15s ease; user-select: none;",
+            style: "display: inline-flex; align-items: center; gap: 4px; padding: {padding}; font-size: {font_size}; font-weight: 500; background: {bg_color}; color: {text_color}; border: {border}; border-radius: 9999px; cursor: {cursor}; opacity: {opacity}; transition: all 0.15s ease; user-select: none;{style_css}",
+            id: "{id_css}",
             onclick: move |_| {
                 if let Some(handler) = &on_click {
                     handler.call(());
@@ -250,6 +260,12 @@ pub struct TagGroupProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Tag data for TagGroup
@@ -293,10 +309,14 @@ pub fn TagGroup(props: TagGroupProps) -> Element {
 
     let selected = props.selected.clone();
 
+    let style_css = props.style.clone().unwrap_or_default();
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         div {
             class: "tag-group{class_css}",
-            style: "display: flex; flex-wrap: wrap; gap: 8px;",
+            style: "display: flex; flex-wrap: wrap; gap: 8px;{style_css}",
+            id: "{id_css}",
 
             for tag in props.tags.iter() {
                 {
@@ -377,6 +397,12 @@ pub struct InputTagProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Input tag component (tag input)
@@ -399,10 +425,14 @@ pub fn InputTag(props: InputTagProps) -> Element {
         "#e2e8f0".to_string()
     };
 
+    let style_css = props.style.clone().unwrap_or_default();
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         div {
             class: "input-tag{class_css}",
-            style: "display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; border: 1px solid {border_color}; border-radius: 8px; background: white; min-height: 42px; align-items: center;",
+            style: "display: flex; flex-wrap: wrap; gap: 8px; padding: 8px; border: 1px solid {border_color}; border-radius: 8px; background: white; min-height: 42px; align-items: center;{style_css}",
+            id: "{id_css}",
 
             for (i, tag) in props.tags.iter().enumerate() {
                 {

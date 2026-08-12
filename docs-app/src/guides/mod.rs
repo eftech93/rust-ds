@@ -107,7 +107,7 @@ pub fn FormsPage() -> Element {
                             label: "Name",
                             value: name(),
                             required: true,
-                            onchange: move |v| name.set(v),
+                            on_change: move |v| name.set(v),
                         }
 
                         InputGroup {
@@ -115,7 +115,7 @@ pub fn FormsPage() -> Element {
                             value: email(),
                             input_type: InputType::Email,
                             required: true,
-                            onchange: move |v| email.set(v),
+                            on_change: move |v| email.set(v),
                         }
 
                         Button {

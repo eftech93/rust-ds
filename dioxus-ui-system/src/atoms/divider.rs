@@ -51,6 +51,9 @@ pub struct DividerProps {
     /// Additional inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Divider component for visual separation
@@ -80,6 +83,8 @@ pub fn Divider(props: DividerProps) -> Element {
         .map(|s| format!("{}", s))
         .unwrap_or_default();
 
+    let id_css = props.id.clone().unwrap_or_default();
+
     let length_css = props
         .length
         .as_ref()
@@ -94,6 +99,7 @@ pub fn Divider(props: DividerProps) -> Element {
             div {
                 class: "divider divider-with-label{class_css}",
                 style: "display: flex; align-items: center; margin: {spacing}px 0; {style_css}",
+                id: "{id_css}",
 
                 div {
                     style: "flex: 1; height: {thickness}px; background: {color}; border-top: {thickness}px {border_style} {color};",
@@ -120,6 +126,7 @@ pub fn Divider(props: DividerProps) -> Element {
                 hr {
                     class: "divider divider-horizontal{class_css}",
                     style: "border: none; border-top: {thickness}px {border_style} {color}; margin: {spacing}px 0; {length_css} {style_css}",
+                    id: "{id_css}",
                 }
             }
         }
@@ -136,6 +143,7 @@ pub fn Divider(props: DividerProps) -> Element {
                 div {
                     class: "divider divider-vertical{class_css}",
                     style: "display: inline-block; width: {thickness}px; border-left: {thickness}px {border_style} {color}; margin: 0 {spacing}px; {height} {style_css}",
+                    id: "{id_css}",
                 }
             }
         }

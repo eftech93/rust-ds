@@ -109,6 +109,12 @@ pub struct ImageUploaderProps {
     /// Custom CSS class
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
     /// Placeholder text for dropzone
     #[props(default = "Drag and drop images here, or click to browse".to_string())]
     pub placeholder: String,
@@ -178,8 +184,10 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
         Ok(())
     };
 
+    let input_id = use_hook(|| format!("image-uploader-input-{}", now_millis()));
+
     // Handle file selection
-    let _handle_files = {
+    let mut _handle_files = {
         let on_change = props.on_change.clone();
         move |new_files: Vec<(String, String, usize)>| {
             validation_error.set(None);
@@ -267,10 +275,14 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
             .build()
     });
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
             class: "image-uploader {props.class.clone().unwrap_or_default()}",
-            style: "{container_style}",
+            style: "{container_style} {style}",
 
             // Label
             if let Some(label) = props.label.clone() {
@@ -343,14 +355,41 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
                     "Browse files"
 
                     input {
+                        id: "{input_id}",
                         r#type: "file",
                         style: "display: none;",
                         accept: "{accept_string}",
                         multiple: props.multiple,
                         disabled: props.disabled,
                         onchange: move |_e: Event<FormData>| {
-                            // Note: File reading is platform-specific
-                            // This would typically use web_sys or native file APIs
+                            #[cfg(all(feature = "web", target_arch = "wasm32"))]
+                            {
+                                use wasm_bindgen::JsCast;
+                                if let Some(window) = web_sys::window() {
+                                    if let Some(document) = window.document() {
+                                        if let Some(el) = document.get_element_by_id(&input_id) {
+                                            if let Ok(input) = el.dyn_into::<web_sys::HtmlInputElement>() {
+                                                if let Some(files) = input.files() {
+                                                    let mut new_files: Vec<(String, String, usize)> = Vec::new();
+                                                    let file_count = files.length();
+                                                    for i in 0..file_count {
+                                                        if let Some(file) = files.item(i) {
+                                                            let name = file.name();
+                                                            let size = file.size() as usize;
+                                                            let preview_url = web_sys::Url::create_object_url_with_blob(&file).unwrap_or_default();
+                                                            new_files.push((name, preview_url, size));
+                                                        }
+                                                    }
+                                                    if !new_files.is_empty() {
+                                                        _handle_files(new_files);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            let _ = _e;
                         },
                     }
                 }
@@ -423,6 +462,12 @@ pub struct ImagePreviewItemProps {
     pub index: usize,
     /// Remove callback
     pub on_remove: EventHandler<()>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Image preview thumbnail component
@@ -447,10 +492,15 @@ fn ImagePreviewItem(props: ImagePreviewItemProps) -> Element {
         UploadStatus::Error(_) => ("✕", theme.tokens.read().colors.destructive.to_rgba()),
     };
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            class: "image-preview-item",
-            style: "{container_style} aspect-ratio: 1;",
+            id: "{id}",
+            class: "image-preview-item {class}",
+            style: "{container_style} aspect-ratio: 1; {style}",
 
             // Image thumbnail
             img {
@@ -510,6 +560,12 @@ pub struct ImageListItemProps {
     pub image: UploadedImage,
     /// Remove callback
     pub on_remove: EventHandler<()>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Image list item component (compact view)
@@ -546,10 +602,15 @@ fn ImageListItem(props: ImageListItemProps) -> Element {
 
     let size_text = format_file_size(image.size);
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            class: "image-list-item",
-            style: "{container_style}",
+            id: "{id}",
+            class: "image-list-item {class}",
+            style: "{container_style} {style}",
 
             // Status icon
             div {

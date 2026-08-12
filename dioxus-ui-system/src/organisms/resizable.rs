@@ -123,6 +123,10 @@ pub struct ResizablePanelGroupProps {
     /// Optional CSS class
     #[props(default)]
     pub class: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Container component for resizable panels
@@ -149,11 +153,14 @@ pub fn ResizablePanelGroup(props: ResizablePanelGroupProps) -> Element {
     });
 
     let class = props.class.unwrap_or_default();
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
 
     rsx! {
         div {
+            id: "{id}",
             class: "resizable-panel-group {class}",
-            style: "{container_style}",
+            style: "{container_style} {style}",
             {props.children}
         }
     }
@@ -173,6 +180,12 @@ pub struct ResizablePanelProps {
     pub max_size: Option<f32>,
     /// Panel content
     pub children: Element,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Individual resizable panel component
@@ -210,11 +223,16 @@ pub fn ResizablePanel(props: ResizablePanelProps) -> Element {
     let is_dragging = use_memo(move || *ctx.dragging.read());
     let direction = use_memo(move || *ctx.direction.read());
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            class: "resizable-panel",
+            id: "{id}",
+            class: "resizable-panel {class}",
             style: format!(
-                "overflow:auto;{};{};{}",
+                "overflow:auto;{};{};{} {}",
                 match *direction.read() {
                     Direction::Horizontal => format!("width:{}%", size.read()),
                     Direction::Vertical => "width:100%".to_string(),
@@ -223,7 +241,8 @@ pub fn ResizablePanel(props: ResizablePanelProps) -> Element {
                     Direction::Horizontal => "height:100%",
                     Direction::Vertical => &format!("height:{}%", size.read()),
                 },
-                if *is_dragging.read() { "pointer-events:none;" } else { "" }
+                if *is_dragging.read() { "pointer-events:none;" } else { "" },
+                style
             ),
             {props.children}
         }
@@ -236,6 +255,12 @@ pub struct ResizableHandleProps {
     /// Whether the handle is disabled
     #[props(default = false)]
     pub disabled: bool,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Draggable resize handle component
@@ -381,10 +406,15 @@ pub fn ResizableHandle(props: ResizableHandleProps) -> Element {
         }
     };
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            class: "resizable-handle",
-            style: "{handle_style} {indicator_style}",
+            id: "{id}",
+            class: "resizable-handle {class}",
+            style: "{handle_style} {indicator_style} {style}",
             onmousedown: move |evt: MouseEvent| {
                 if disabled {
                     return;

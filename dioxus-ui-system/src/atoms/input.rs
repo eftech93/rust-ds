@@ -71,7 +71,7 @@ pub struct InputProps {
     pub autofocus: bool,
     /// Change handler
     #[props(default)]
-    pub onchange: Option<EventHandler<String>>,
+    pub on_change: Option<EventHandler<String>>,
     /// Focus handler
     #[props(default)]
     pub onfocus: Option<EventHandler<FocusEvent>>,
@@ -107,7 +107,7 @@ pub struct InputProps {
 ///     Input {
 ///         value: value(),
 ///         placeholder: "Enter text...",
-///         onchange: move |v| value.set(v),
+///         on_change: move |v| value.set(v),
 ///     }
 /// }
 /// ```
@@ -220,7 +220,7 @@ pub fn Input(props: InputProps) -> Element {
                 }
             },
             onchange: move |e| {
-                if let Some(handler) = &props.onchange {
+                if let Some(handler) = &props.on_change {
                     handler.call(e.value());
                 }
             },

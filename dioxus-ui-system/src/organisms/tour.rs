@@ -90,6 +90,12 @@ pub struct TourProps {
     /// Allow clicking highlighted element
     #[props(default)]
     pub allow_interaction: bool,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Tour component for product walkthroughs
@@ -182,6 +188,10 @@ pub fn Tour(props: TourProps) -> Element {
     let is_first = current_step == 0;
     let is_last = current_step == total_steps - 1;
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         // Backdrop
         div {
@@ -191,7 +201,9 @@ pub fn Tour(props: TourProps) -> Element {
 
         // Popover (positioned via CSS/data attributes)
         div {
-            style: "{popover_style} background: {bg_color}; border-radius: {radius_md}; box-shadow: {shadow_xl};",
+            id: "{id}",
+            class: "{class}",
+            style: "{popover_style} background: {bg_color}; border-radius: {radius_md}; box-shadow: {shadow_xl}; {style}",
             "data-placement": "{step.placement:?}",
 
             // Header

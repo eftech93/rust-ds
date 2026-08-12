@@ -26,6 +26,12 @@ pub struct PopoverProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Popover placement options
@@ -112,6 +118,8 @@ pub fn Popover(props: PopoverProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "position: relative; display: inline-block;",
 
             // Trigger
@@ -147,6 +155,15 @@ pub fn Popover(props: PopoverProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 struct PopoverContentProps {
     children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -157,7 +174,9 @@ fn PopoverContent(props: PopoverContentProps) -> Element {
 
     rsx! {
         Box {
-            style: "{content_style}",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{content_style} {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
     }
@@ -171,6 +190,15 @@ pub struct PopoverHeaderProps {
     /// Optional description
     #[props(default)]
     pub description: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -187,6 +215,8 @@ pub fn PopoverHeader(props: PopoverHeaderProps) -> Element {
 
     rsx! {
         VStack {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{header_style}",
             gap: SpacingSize::Xs,
             align: AlignItems::Stretch,
@@ -198,7 +228,7 @@ pub fn PopoverHeader(props: PopoverHeaderProps) -> Element {
 
             if let Some(description) = props.description {
                 p {
-                    style: "margin: 0; font-size: 13px; color: #64748b;",
+                    style: "margin: 0; font-size: 13px; color: #64748b; {props.style.clone().unwrap_or_default()}",
                     "{description}"
                 }
             }
@@ -211,6 +241,15 @@ pub fn PopoverHeader(props: PopoverHeaderProps) -> Element {
 pub struct PopoverFooterProps {
     /// Footer content
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -227,7 +266,9 @@ pub fn PopoverFooter(props: PopoverFooterProps) -> Element {
 
     rsx! {
         HStack {
-            style: "{footer_style}",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{footer_style} {props.style.clone().unwrap_or_default()}",
             justify: JustifyContent::End,
             align: AlignItems::Center,
             gap: SpacingSize::Sm,

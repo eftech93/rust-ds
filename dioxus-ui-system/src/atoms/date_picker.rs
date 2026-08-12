@@ -41,6 +41,12 @@ pub struct DatePickerProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Date picker size
@@ -82,6 +88,12 @@ pub fn DatePicker(props: DatePickerProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
     let border_color = if props.error.is_some() {
         theme.tokens.read().colors.destructive.to_rgba()
     } else {
@@ -107,7 +119,8 @@ pub fn DatePicker(props: DatePickerProps) -> Element {
     rsx! {
         div {
             class: "date-picker{class_css}",
-            style: "display: flex; flex-direction: column; gap: 6px; position: relative;",
+            style: "display: flex; flex-direction: column; gap: 6px; position: relative;{style_css}",
+            id: "{props.id.clone().unwrap_or_default()}",
 
             if let Some(label) = props.label {
                 label {
@@ -386,12 +399,51 @@ fn parse_date(s: &str) -> Option<Date> {
     Some(Date { year, month, day })
 }
 
+#[cfg(all(feature = "web", target_arch = "wasm32"))]
 fn get_today() -> Date {
-    // Simplified - in a real app, use the system date
+    let js_date = js_sys::Date::new_0();
     Date {
-        year: 2024,
-        month: 3,
-        day: 19,
+        year: js_date.get_full_year() as i32,
+        month: (js_date.get_month() + 1) as u8,
+        day: js_date.get_date() as u8,
+    }
+}
+
+#[cfg(not(all(feature = "web", target_arch = "wasm32")))]
+fn get_today() -> Date {
+    use std::time::{SystemTime, UNIX_EPOCH};
+    let secs = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_secs() as i64;
+    let mut days = secs / 86400;
+    let mut year = 1970i32;
+    loop {
+        let days_in_year = if is_leap_year(year) { 366 } else { 365 };
+        if days < days_in_year as i64 {
+            break;
+        }
+        days -= days_in_year as i64;
+        year += 1;
+    }
+    let month_days = [
+        31,
+        if is_leap_year(year) { 29 } else { 28 },
+        31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
+    ];
+    let mut month = 1u8;
+    for (i, md) in month_days.iter().enumerate() {
+        if days < *md as i64 {
+            month = (i + 1) as u8;
+            break;
+        }
+        days -= *md as i64;
+        month = (i + 2) as u8;
+    }
+    Date {
+        year,
+        month,
+        day: (days + 1) as u8,
     }
 }
 

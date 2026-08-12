@@ -41,6 +41,12 @@ pub struct SkeletonProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Skeleton animation type
@@ -72,6 +78,14 @@ pub fn Skeleton(props: SkeletonProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     let border_radius = match props.shape {
         SkeletonShape::Circle => "50%",
         SkeletonShape::Rounded => "8px",
@@ -101,7 +115,8 @@ pub fn Skeleton(props: SkeletonProps) -> Element {
     rsx! {
         div {
             class: "skeleton{class_css}",
-            style: "width: {width}; height: {height}; border-radius: {border_radius}; {animation_css}",
+            style: "width: {width}; height: {height}; border-radius: {border_radius}; {animation_css}{style_css}",
+            id: "{id_css}",
         }
 
 
@@ -126,6 +141,12 @@ pub struct SkeletonTextProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Skeleton text loader (multiple lines)
@@ -137,10 +158,19 @@ pub fn SkeletonText(props: SkeletonTextProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         div {
             class: "skeleton-text{class_css}",
-            style: "display: flex; flex-direction: column; gap: 8px;",
+            style: "display: flex; flex-direction: column; gap: 8px;{style_css}",
+            id: "{id_css}",
 
             for i in 0..props.lines {
                 {
@@ -183,6 +213,12 @@ pub struct SkeletonCardProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Skeleton card loader
@@ -194,10 +230,19 @@ pub fn SkeletonCard(props: SkeletonCardProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         div {
             class: "skeleton-card{class_css}",
-            style: "border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: white;",
+            style: "border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: white;{style_css}",
+            id: "{id_css}",
 
             if props.show_image {
                 Skeleton {
@@ -249,6 +294,15 @@ pub struct SkeletonAvatarProps {
     /// Enable animation
     #[props(default = true)]
     pub animated: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
+    /// Additional CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Avatar size
@@ -292,6 +346,9 @@ pub fn SkeletonAvatar(props: SkeletonAvatarProps) -> Element {
             width: "{size}px",
             height: "{size}px",
             animated: props.animated,
+            id: props.id.clone(),
+            style: props.style.clone(),
+            class: props.class.clone(),
         }
     }
 }
@@ -314,6 +371,12 @@ pub struct SkeletonListProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Skeleton list loader
@@ -325,10 +388,19 @@ pub fn SkeletonList(props: SkeletonListProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         div {
             class: "skeleton-list{class_css}",
-            style: "display: flex; flex-direction: column;",
+            style: "display: flex; flex-direction: column;{style_css}",
+            id: "{id_css}",
 
             for i in 0..props.items {
                 div {

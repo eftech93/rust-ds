@@ -1,10 +1,21 @@
 # Dioxus UI System
 
-A pure Rust design system for Dioxus with Atomic Design principles. Build beautiful, type-safe user interfaces without touching CSS or JavaScript.
-
+![Tests](https://github.com/eftech93/rust-ds/actions/workflows/ci.yml/badge.svg)
 [![Crates.io](https://img.shields.io/crates/v/dioxus-ui-system)](https://crates.io/crates/dioxus-ui-system)
 [![Documentation](https://docs.rs/dioxus-ui-system/badge.svg)](https://docs.rs/dioxus-ui-system)
 [![License](https://img.shields.io/crates/l/dioxus-ui-system)](LICENSE)
+
+A pure Rust design system for Dioxus with Atomic Design principles. Build beautiful, type-safe user interfaces without touching CSS or JavaScript.
+
+## Visual Proof
+
+> 📸 **Component Gallery:** Screenshots of button variants, form inputs, and theme toggling.
+>
+> *Place screenshots in `docs/images/` and embed them here.*
+>
+> | Buttons | Forms | Theme Toggle |
+> |---------|-------|--------------|
+> | ![Buttons](docs/images/buttons.png) | ![Forms](docs/images/forms.png) | ![Theme](docs/images/theme.png) |
 
 ## Features
 

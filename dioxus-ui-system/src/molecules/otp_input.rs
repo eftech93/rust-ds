@@ -39,6 +39,9 @@ pub struct OtpInputProps {
     /// Callback when input is completed (all digits filled)
     #[props(default)]
     pub on_complete: Option<EventHandler<String>>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// OTP Input molecule component
@@ -160,8 +163,11 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
         }
     };
 
+    let id = props.id.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
             style: "{container_style} {custom_style}",
             class: "{class}",
             role: "group",

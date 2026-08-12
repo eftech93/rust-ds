@@ -71,6 +71,12 @@ pub struct TimelineProps {
     /// Position of timeline content
     #[props(default)]
     pub position: TimelinePosition,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Timeline organism - container for chronological events
@@ -87,9 +93,15 @@ pub fn Timeline(props: TimelineProps) -> Element {
 
     let timeline_style = Style::new().flex().flex_col().relative().py_px(16).w_full();
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: timeline_style.build(),
+            id: "{id}",
+            class: "{class}",
+            style: format!("{} {}", timeline_style.build(), style),
 
             // Central vertical line (for alternate position)
             if props.position == TimelinePosition::Alternate {
@@ -128,6 +140,12 @@ pub struct TimelineItemProps {
     /// Whether this is the last item (no connector line after)
     #[props(default = false)]
     pub last: bool,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Individual timeline item component
@@ -176,9 +194,15 @@ pub fn TimelineItem(props: TimelineItemProps) -> Element {
         ),
     };
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: item_style,
+            id: "{id}",
+            class: "{class}",
+            style: format!("{} {}", item_style, style),
 
             // Content area
             div {
@@ -223,6 +247,12 @@ pub struct TimelineSeparatorProps {
     /// Line color
     #[props(default)]
     pub line_color: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Timeline separator component
@@ -283,6 +313,12 @@ pub struct TimelineDotProps {
     /// Dot size
     #[props(default = TimelineDotSize::Md)]
     pub size: TimelineDotSize,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Timeline dot size
@@ -398,6 +434,12 @@ pub struct TimelineContentProps {
     /// Content alignment
     #[props(default)]
     pub align: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Timeline content component
@@ -454,6 +496,12 @@ pub struct TimelineOppositeContentProps {
     /// Text alignment
     #[props(default)]
     pub align: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Timeline opposite content component
@@ -541,6 +589,12 @@ pub struct SimpleTimelineProps {
     /// Timeline position
     #[props(default)]
     pub position: TimelinePosition,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Simple timeline builder component

@@ -78,6 +78,10 @@ pub struct PieChartProps {
     /// Colors for slices (uses theme colors if not provided)
     #[props(default)]
     pub colors: Option<Vec<Color>>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Pie/Donut chart component
@@ -92,6 +96,8 @@ pub fn PieChart(props: PieChartProps) -> Element {
     if props.data.is_empty() {
         return rsx! {
             Box {
+                id: props.id.clone(),
+                class: props.class.clone(),
                 width: Some(props.width.clone()),
                 height: Some(props.height.clone()),
                 display: crate::atoms::BoxDisplay::Flex,
@@ -108,6 +114,8 @@ pub fn PieChart(props: PieChartProps) -> Element {
     if total == 0.0 {
         return rsx! {
             Box {
+                id: props.id.clone(),
+                class: props.class.clone(),
                 width: Some(props.width.clone()),
                 height: Some(props.height.clone()),
                 display: crate::atoms::BoxDisplay::Flex,

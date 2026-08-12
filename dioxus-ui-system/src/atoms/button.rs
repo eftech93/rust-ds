@@ -67,6 +67,9 @@ pub struct ButtonProps {
     /// Button type
     #[props(default)]
     pub button_type: ButtonType,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// HTML button type
@@ -251,6 +254,7 @@ pub fn Button(props: ButtonProps) -> Element {
             r#type: props.button_type.as_str(),
             style: "{final_style}",
             class: "{class}",
+            id: "{props.id.clone().unwrap_or_default()}",
             disabled: disabled,
             onmouseenter: move |_| if !disabled { is_hovered.set(true) },
             onmouseleave: move |_| { is_hovered.set(false); is_pressed.set(false); },

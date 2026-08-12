@@ -139,6 +139,58 @@ pub fn BoxPage() -> Element {
                     }
                 }
             }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("children", "Element", "Box content"),
+                    ("display", "BoxDisplay", "Display type"),
+                    ("flex_direction", "FlexDirection", "Flex direction (when display is flex)"),
+                    ("flex_wrap", "FlexWrap", "Flex wrap"),
+                    ("justify_content", "JustifyContent", "Justify content"),
+                    ("align_items", "AlignItems", "Align items"),
+                    ("padding", "SpacingSize", "Padding (all sides)"),
+                    ("px", "Option<SpacingSize>", "Padding X (horizontal)"),
+                    ("py", "Option<SpacingSize>", "Padding Y (vertical)"),
+                    ("pt", "Option<SpacingSize>", "Padding top"),
+                    ("pr", "Option<SpacingSize>", "Padding right"),
+                    ("pb", "Option<SpacingSize>", "Padding bottom"),
+                    ("pl", "Option<SpacingSize>", "Padding left"),
+                    ("margin", "SpacingSize", "Margin (all sides)"),
+                    ("mx", "Option<SpacingSize>", "Margin X (horizontal)"),
+                    ("my", "Option<SpacingSize>", "Margin Y (vertical)"),
+                    ("mt", "Option<SpacingSize>", "Margin top"),
+                    ("mr", "Option<SpacingSize>", "Margin right"),
+                    ("mb", "Option<SpacingSize>", "Margin bottom"),
+                    ("ml", "Option<SpacingSize>", "Margin left"),
+                    ("gap", "SpacingSize", "Gap between children (for flex/grid)"),
+                    ("background", "BackgroundColor", "Background color"),
+                    ("border_radius", "RadiusSize", "Border radius"),
+                    ("border", "BorderWidth", "Border width"),
+                    ("border_color", "Option<BackgroundColor>", "Border color"),
+                    ("shadow", "ShadowSize", "Box shadow"),
+                    ("width", "Option<String>", "Width (e.g., '100%', '200px')"),
+                    ("height", "Option<String>", "Height (e.g., '100%', '200px')"),
+                    ("min_width", "Option<String>", "Minimum width"),
+                    ("min_height", "Option<String>", "Minimum height"),
+                    ("max_width", "Option<String>", "Maximum width"),
+                    ("max_height", "Option<String>", "Maximum height"),
+                    ("overflow", "Overflow", "Overflow behavior"),
+                    ("position", "Position", "Position type"),
+                    ("top", "Option<String>", "Top position"),
+                    ("right", "Option<String>", "Right position"),
+                    ("bottom", "Option<String>", "Bottom position"),
+                    ("left", "Option<String>", "Left position"),
+                    ("z_index", "Option<i16>", "Z-index"),
+                    ("opacity", "Option<f32>", "Opacity (0.0 - 1.0)"),
+                    ("cursor", "Option<String>", "Cursor style"),
+                    ("onclick", "Option<EventHandler<MouseEvent>>", "Click handler"),
+                    ("onmouseenter", "Option<EventHandler<MouseEvent>>", "Mouse enter handler"),
+                    ("onmouseleave", "Option<EventHandler<MouseEvent>>", "Mouse leave handler"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
+            }
         }
     }
 }
@@ -203,7 +255,7 @@ pub fn InputPage() -> Element {
                             label: "Email",
                             value: "user@example.com".to_string(),
                             input_type: InputType::Email,
-                            onchange: move |_| {},
+                            on_change: move |_| {},
                         }
                     }
                 }
@@ -212,6 +264,26 @@ pub fn InputPage() -> Element {
 
             Section { title: "Input Types",
                 p { "Supported input types: Text, Email, Password, Number, Tel, Url, Search" }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("value", "String", "Current value"),
+                    ("placeholder", "Option<String>", "Placeholder text"),
+                    ("input_type", "InputType", "Input type"),
+                    ("disabled", "bool", "Disabled state"),
+                    ("readonly", "bool", "Read-only state"),
+                    ("required", "bool", "Required field"),
+                    ("autofocus", "bool", "Autofocus on mount"),
+                    ("on_change", "Option<EventHandler<String>>", "Change handler"),
+                    ("onfocus", "Option<EventHandler<FocusEvent>>", "Focus handler"),
+                    ("onblur", "Option<EventHandler<FocusEvent>>", "Blur handler"),
+                    ("oninput", "Option<EventHandler<FormEvent>>", "Input handler (real-time)"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("name", "Option<String>", "Input name attribute"),
+                    ("id", "Option<String>", "Input id attribute"),
+                ]}
             }
         }
     }
@@ -248,6 +320,23 @@ pub fn LabelPage() -> Element {
                 }
                 CodeBlock { code: "Label {{ size: TextSize::Large, \"Large Text\" }}".to_string() }
             }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("children", "Element", "Text content"),
+                    ("size", "TextSize", "Typography size"),
+                    ("weight", "TextWeight", "Font weight"),
+                    ("color", "TextColor", "Text color"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("as_element", "LabelElement", "HTML element to render (defaults to span)"),
+                    ("align", "TextAlign", "Text alignment"),
+                    ("truncate", "bool", "Truncate with ellipsis"),
+                    ("html_for", "Option<String>", "Associates label with form input"),
+                    ("line_clamp", "Option<u8>", "Line clamp (number of lines)"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
+            }
         }
     }
 }
@@ -275,6 +364,21 @@ pub fn IconPage() -> Element {
 
             Section { title: "Usage",
                 CodeBlock { code: "Icon {{\n    name: \"check\".to_string(),\n    size: IconSize::Medium,\n    color: IconColor::Success,\n}}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("name", "String", "SVG path data or icon name"),
+                    ("size", "IconSize", "Icon size"),
+                    ("color", "IconColor", "Icon color"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("aria_label", "Option<String>", "Accessibility label"),
+                    ("flip_h", "bool", "Flip horizontally"),
+                    ("flip_v", "bool", "Flip vertically"),
+                    ("rotate", "u16", "Rotate degrees (0, 90, 180, 270)"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
             }
         }
     }
@@ -305,10 +409,22 @@ pub fn CheckboxPage() -> Element {
                     Checkbox {
                         checked: checked(),
                         label: Some("Accept terms and conditions".to_string()),
-                        onchange: move |v| checked.set(v),
+                        on_change: move |v| checked.set(v),
                     }
                 }
                 CodeBlock { code: "Checkbox {{\n    checked: checked(),\n    label: Some(\"Accept terms\".to_string()),\n    onchange: move |v| checked.set(v),\n}}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("checked", "bool", "Whether the checkbox is checked"),
+                    ("on_change", "Option<EventHandler<bool>>", "Callback when checked state changes"),
+                    ("disabled", "bool", "Whether the checkbox is disabled"),
+                    ("label", "Option<String>", "Checkbox label"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
             }
         }
     }
@@ -332,14 +448,14 @@ pub fn RadioPage() -> Element {
                             value: "option1".to_string(),
                             checked: selected() == "option1",
                             label: Some("Option 1".to_string()),
-                            onchange: move |_| selected.set("option1".to_string()),
+                            on_change: move |_| selected.set("option1".to_string()),
                         }
                         Radio {
                             name: "radio".to_string(),
                             value: "option2".to_string(),
                             checked: selected() == "option2",
                             label: Some("Option 2".to_string()),
-                            onchange: move |_| selected.set("option2".to_string()),
+                            on_change: move |_| selected.set("option2".to_string()),
                         }
                     }
                 }
@@ -350,6 +466,30 @@ pub fn RadioPage() -> Element {
     label: Some(\"Option 1\".to_string()),
     onchange: move |_| selected.set(\"option1\".to_string()),
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("checked", "bool", "Whether the radio is selected"),
+                    ("on_change", "Option<EventHandler<()>>", "Callback when selected state changes"),
+                    ("disabled", "bool", "Whether the radio is disabled"),
+                    ("label", "Option<String>", "Radio label"),
+                    ("value", "String", "Radio value"),
+                    ("name", "String", "Name for grouping radios"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
+            }
+
+            Section { title: "RadioGroup Props",
+                PropsTable { props: vec![
+                    ("name", "String", "Radio group name"),
+                    ("value", "String", "Currently selected value"),
+                    ("on_change", "EventHandler<String>", "Callback when selection changes"),
+                    ("children", "Element", "Radio group children (Radio components)"),
+                    ("direction", "RadioDirection", "Layout direction (Horizontal/Vertical)"),
+                ]}
             }
         }
     }
@@ -370,7 +510,7 @@ pub fn SwitchPage() -> Element {
                     Switch {
                         checked: on(),
                         label: Some(if on() { "Enabled".to_string() } else { "Disabled".to_string() }),
-                        onchange: move |v| on.set(v),
+                        on_change: move |v| on.set(v),
                     }
                 }
                 CodeBlock { code: "Switch {{
@@ -378,6 +518,19 @@ pub fn SwitchPage() -> Element {
     label: Some(\"Enable notifications\".to_string()),
     onchange: move |v| enabled.set(v),
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("checked", "bool", "Whether the switch is checked"),
+                    ("on_change", "Option<EventHandler<bool>>", "Callback when checked state changes"),
+                    ("disabled", "bool", "Whether the switch is disabled"),
+                    ("label", "Option<String>", "Switch label"),
+                    ("size", "SwitchSize", "Switch size (Sm, Md, Lg)"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
             }
         }
     }
@@ -401,7 +554,7 @@ pub fn SelectPage() -> Element {
                                 SelectOption::new("option1", "Option 1"),
                                 SelectOption::new("option2", "Option 2"),
                             ],
-                            onchange: move |_| {},
+                            on_change: move |_| {},
                         }
                     }
                 }
@@ -413,6 +566,31 @@ pub fn SelectPage() -> Element {
     ],
     onchange: move |v| selected.set(v),
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("value", "String", "Currently selected value"),
+                    ("on_change", "Option<EventHandler<String>>", "Callback when selection changes"),
+                    ("options", "Vec<SelectOption>", "Available options"),
+                    ("placeholder", "Option<String>", "Placeholder text when no value selected"),
+                    ("disabled", "bool", "Whether the select is disabled"),
+                    ("error", "bool", "Whether the select has an error"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
+            }
+
+            Section { title: "MultiSelect Props",
+                PropsTable { props: vec![
+                    ("values", "Vec<String>", "Currently selected values"),
+                    ("on_change", "Option<EventHandler<Vec<String>>>", "Callback when selection changes"),
+                    ("options", "Vec<SelectOption>", "Available options"),
+                    ("placeholder", "Option<String>", "Placeholder text"),
+                    ("disabled", "bool", "Whether the select is disabled"),
+                    ("max_selections", "Option<usize>", "Maximum number of selections"),
+                ]}
             }
         }
     }
@@ -433,7 +611,7 @@ pub fn TextAreaPage() -> Element {
                         TextArea {
                             value: "Enter your description here...".to_string(),
                             rows: 4,
-                            onchange: move |_| {},
+                            on_change: move |_| {},
                         }
                     }
                 }
@@ -443,6 +621,38 @@ pub fn TextAreaPage() -> Element {
     placeholder: Some(\"Enter description...\".to_string()),
     onchange: move |v| description.set(v),
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("value", "String", "Current value"),
+                    ("on_change", "Option<EventHandler<String>>", "Callback when value changes"),
+                    ("placeholder", "Option<String>", "Placeholder text"),
+                    ("rows", "u8", "Number of rows (default: 3)"),
+                    ("disabled", "bool", "Whether the textarea is disabled"),
+                    ("readonly", "bool", "Whether the textarea is read-only"),
+                    ("error", "bool", "Whether the textarea has an error"),
+                    ("error_message", "Option<String>", "Error message"),
+                    ("required", "bool", "Whether the field is required"),
+                    ("max_length", "Option<usize>", "Maximum number of characters"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
+            }
+
+            Section { title: "AutoResizeTextArea Props",
+                PropsTable { props: vec![
+                    ("value", "String", "Current value"),
+                    ("on_change", "Option<EventHandler<String>>", "Callback when value changes"),
+                    ("placeholder", "Option<String>", "Placeholder text"),
+                    ("min_rows", "u8", "Minimum number of rows (default: 2)"),
+                    ("max_rows", "u8", "Maximum number of rows (default: 10)"),
+                    ("disabled", "bool", "Whether the textarea is disabled"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
             }
         }
     }
@@ -478,6 +688,46 @@ pub fn StepPage() -> Element {
     state: StepState::Completed,
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("step", "u32", "Step number (1-indexed, default: 1)"),
+                    ("state", "StepState", "Step state (Pending, Active, Completed, Error)"),
+                    ("size", "StepSize", "Step size (Sm, Md, Lg)"),
+                    ("icon", "Option<String>", "Optional icon to replace number"),
+                    ("bg_color", "Option<String>", "Custom background color (overrides state color)"),
+                    ("text_color", "Option<String>", "Custom text color"),
+                    ("on_click", "Option<EventHandler<()>>", "Optional click handler"),
+                    ("aria_label", "Option<String>", "Optional aria label"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
+
+            Section { title: "StepConnector Props",
+                PropsTable { props: vec![
+                    ("horizontal", "bool", "Connector orientation (default: true)"),
+                    ("completed", "bool", "Whether the connector represents completed progress"),
+                    ("color", "Option<String>", "Connector color (overrides default)"),
+                    ("thickness", "String", "Connector thickness (default: '2px')"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
+
+            Section { title: "StepLabel Props",
+                PropsTable { props: vec![
+                    ("label", "String", "Label text"),
+                    ("description", "Option<String>", "Optional description/subtitle"),
+                    ("state", "StepState", "Step state (affects color)"),
+                    ("size", "StepSize", "Text size"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
         }
     }
 }
@@ -505,6 +755,57 @@ pub fn HeadingPage() -> Element {
 
             Section { title: "Usage",
                 CodeBlock { code: "Heading {{\n    level: HeadingLevel::H1,\n    \"Page Title\"\n}}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("level", "HeadingLevel", "The heading level (H1-H6, default: H1)"),
+                    ("size", "Option<u16>", "Custom font size (overrides default for level)"),
+                    ("weight", "u16", "Font weight (default: 600)"),
+                    ("color", "Option<String>", "Color override"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("style", "Option<String>", "Additional inline styles"),
+                    ("align", "Option<String>", "Text alignment"),
+                    ("id", "Option<String>", "Element id"),
+                    ("children", "Element", "Children elements"),
+                ]}
+            }
+
+            Section { title: "Paragraph Props",
+                PropsTable { props: vec![
+                    ("size", "u16", "Font size (default: 16)"),
+                    ("line_height", "f32", "Line height (default: 1.6)"),
+                    ("color", "Option<String>", "Color override"),
+                    ("align", "Option<String>", "Text alignment"),
+                    ("max_chars", "u16", "Maximum width for readability in characters (default: 75)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("style", "Option<String>", "Additional inline styles"),
+                    ("id", "Option<String>", "Element id"),
+                    ("children", "Element", "Children elements"),
+                ]}
+            }
+
+            Section { title: "Caption Props",
+                PropsTable { props: vec![
+                    ("size", "u8", "Font size (default: 12)"),
+                    ("color", "CaptionColor", "Color variant (default: Muted)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("id", "Option<String>", "Element id"),
+                    ("children", "Element", "Children elements"),
+                ]}
+            }
+
+            Section { title: "Blockquote Props",
+                PropsTable { props: vec![
+                    ("border_color", "Option<String>", "Border color"),
+                    ("background", "Option<String>", "Background color"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("cite", "Option<String>", "Citation/attribution"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("id", "Option<String>", "Element id"),
+                    ("children", "Element", "Children elements (quote content)"),
+                ]}
             }
         }
     }
@@ -547,6 +848,21 @@ pub fn DividerPage() -> Element {
     orientation: DividerOrientation::Horizontal,
     variant: DividerVariant::Solid,
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("orientation", "DividerOrientation", "Orientation (horizontal or vertical, default: Horizontal)"),
+                    ("variant", "DividerVariant", "Visual style variant (Solid, Dashed, Dotted, default: Solid)"),
+                    ("color", "Option<String>", "Color override"),
+                    ("thickness", "u8", "Thickness in pixels (default: 1)"),
+                    ("spacing", "u16", "Spacing before and after divider (default: 16)"),
+                    ("length", "Option<String>", "Width (horizontal) or height (vertical)"),
+                    ("label", "Option<String>", "Optional label/text in the middle"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("style", "Option<String>", "Additional inline styles"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
             }
         }
     }
@@ -592,6 +908,24 @@ pub fn ProgressPage() -> Element {
     size: ProgressSize::Md,
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("value", "Option<f32>", "Current progress value (0-100)"),
+                    ("max", "f32", "Maximum value (default: 100)"),
+                    ("variant", "ProgressVariant", "Variant (Linear or Circular, default: Linear)"),
+                    ("size", "ProgressSize", "Size variant (Sm, Md, Lg, default: Md)"),
+                    ("color", "Option<String>", "Color for the progress bar/track"),
+                    ("track_color", "Option<String>", "Background track color"),
+                    ("show_label", "bool", "Show percentage label (default: false)"),
+                    ("label_position", "LabelPosition", "Label position (default: Right)"),
+                    ("width", "String", "Width for linear progress (default: '100%')"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("indeterminate", "bool", "Indeterminate state (default: false)"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
         }
     }
 }
@@ -629,6 +963,19 @@ pub fn SpinnerPage() -> Element {
     variant: SpinnerVariant::Circular,
     size: SpinnerSize::Lg,
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("variant", "SpinnerVariant", "Spinner variant/style (default: Circular)"),
+                    ("size", "SpinnerSize", "Size variant (Xs, Sm, Md, Lg, Xl, default: Md)"),
+                    ("color", "Option<String>", "Color override"),
+                    ("label", "String", "Accessibility label (default: 'Loading')"),
+                    ("speed", "f32", "Speed multiplier (default: 1.0)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
             }
         }
     }
@@ -672,6 +1019,46 @@ pub fn SkeletonAtomPage() -> Element {
     animated: true,
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("shape", "SkeletonShape", "Shape variant (default: Rectangle)"),
+                    ("width", "Option<String>", "Width (CSS value or 'auto')"),
+                    ("height", "Option<String>", "Height (CSS value or 'auto')"),
+                    ("animated", "bool", "Enable animation (default: true)"),
+                    ("animation", "SkeletonAnimation", "Animation variant (default: Shimmer)"),
+                    ("color", "Option<String>", "Base color"),
+                    ("highlight_color", "Option<String>", "Highlight color for animation"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
+
+            Section { title: "SkeletonCard Props",
+                PropsTable { props: vec![
+                    ("show_image", "bool", "Show image area (default: true)"),
+                    ("image_height", "Option<String>", "Image height"),
+                    ("text_lines", "u8", "Number of text lines (default: 3)"),
+                    ("show_actions", "bool", "Show action buttons (default: true)"),
+                    ("animated", "bool", "Enable animation (default: true)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
+
+            Section { title: "SkeletonText Props",
+                PropsTable { props: vec![
+                    ("lines", "u8", "Number of lines (default: 3)"),
+                    ("line_height", "f32", "Line height (default: 1.5)"),
+                    ("animated", "bool", "Enable animation (default: true)"),
+                    ("last_line_width", "u8", "Last line width as percentage (default: 80)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
         }
     }
 }
@@ -710,6 +1097,38 @@ pub fn RatingPage() -> Element {
     max: 5,
     size: 24,
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("value", "f32", "Current rating value"),
+                    ("max", "u8", "Maximum rating (default: 5)"),
+                    ("allow_half", "bool", "Allow half stars (default: true)"),
+                    ("interactive", "bool", "Interactive (clickable) (default: false)"),
+                    ("size", "u16", "Size in pixels (default: 20)"),
+                    ("fill_color", "Option<String>", "Color for filled stars"),
+                    ("empty_color", "Option<String>", "Color for empty stars"),
+                    ("on_change", "Option<EventHandler<f32>>", "Change handler (only used when interactive)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("show_value", "bool", "Show rating value text (default: false)"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
+
+            Section { title: "RatingInput Props",
+                PropsTable { props: vec![
+                    ("value", "f32", "Current rating value (default: 0.0)"),
+                    ("max", "u8", "Maximum rating (default: 5)"),
+                    ("allow_half", "bool", "Allow half stars (default: false)"),
+                    ("size", "u16", "Size in pixels (default: 24)"),
+                    ("on_change", "EventHandler<f32>", "Change handler"),
+                    ("label", "Option<String>", "Label"),
+                    ("clearable", "bool", "Show clear button (default: false)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
             }
         }
     }
@@ -752,6 +1171,24 @@ pub fn DatePickerPage() -> Element {
     min: Some(\"2024-01-01\".to_string()),
     max: Some(\"2024-12-31\".to_string()),
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("value", "Option<String>", "Selected date (YYYY-MM-DD format)"),
+                    ("on_change", "Option<EventHandler<String>>", "Change handler"),
+                    ("min", "Option<String>", "Minimum date (YYYY-MM-DD)"),
+                    ("max", "Option<String>", "Maximum date (YYYY-MM-DD)"),
+                    ("placeholder", "Option<String>", "Placeholder text"),
+                    ("label", "Option<String>", "Label"),
+                    ("required", "bool", "Whether the field is required (default: false)"),
+                    ("disabled", "bool", "Whether the field is disabled (default: false)"),
+                    ("error", "Option<String>", "Error message"),
+                    ("size", "DatePickerSize", "Size variant (default: Md)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
             }
         }
     }
@@ -799,6 +1236,41 @@ pub fn SliderPage() -> Element {
         SliderMark {{ value: 100.0, label: Some(\"100%\".to_string()) }},
     ],
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("value", "f64", "Current value (default: 0.0)"),
+                    ("min", "f64", "Minimum value (default: 0.0)"),
+                    ("max", "f64", "Maximum value (default: 100.0)"),
+                    ("step", "f64", "Step increment (default: 1.0)"),
+                    ("on_change", "EventHandler<f64>", "Change handler"),
+                    ("label", "Option<String>", "Label"),
+                    ("disabled", "bool", "Whether the slider is disabled (default: false)"),
+                    ("show_value", "bool", "Show current value (default: true)"),
+                    ("format_value", "Option<fn(f64) -> String>", "Format function for value display"),
+                    ("color", "Option<String>", "Color for the slider track/fill"),
+                    ("size", "SliderSize", "Size variant (default: Md)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("marks", "Vec<SliderMark>", "Marks/ticks on the slider"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
+
+            Section { title: "RangeSlider Props",
+                PropsTable { props: vec![
+                    ("min_value", "f64", "Lower value"),
+                    ("max_value", "f64", "Upper value"),
+                    ("min", "f64", "Overall minimum (default: 0.0)"),
+                    ("max", "f64", "Overall maximum (default: 100.0)"),
+                    ("step", "f64", "Step increment (default: 1.0)"),
+                    ("on_change", "EventHandler<(f64, f64)>", "Change handler"),
+                    ("label", "Option<String>", "Label"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
             }
         }
     }
@@ -861,6 +1333,56 @@ pub fn TagPage() -> Element {
                         Tag { variant: TagVariant::Primary, removable: true, on_remove: Some(EventHandler::new(move |_| {})), children: rsx! { "Tag" } }
                     }
                 }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("children", "Element", "Tag content/label"),
+                    ("variant", "TagVariant", "Visual variant (default: Default)"),
+                    ("size", "TagSize", "Size variant (default: Md)"),
+                    ("selected", "bool", "Whether the tag is selected/active (default: false)"),
+                    ("selectable", "bool", "Whether the tag is selectable (clickable) (default: false)"),
+                    ("on_click", "Option<EventHandler<()>>", "Click handler"),
+                    ("removable", "bool", "Removable (shows close button) (default: false)"),
+                    ("on_remove", "Option<EventHandler<()>>", "Remove handler"),
+                    ("icon", "Option<String>", "Icon (emoji or icon name)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("color", "Option<String>", "Custom background color"),
+                    ("text_color", "Option<String>", "Custom text color"),
+                    ("disabled", "bool", "Disabled state (default: false)"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
+
+            Section { title: "TagGroup Props",
+                PropsTable { props: vec![
+                    ("tags", "Vec<TagData>", "Tags to display"),
+                    ("multiple", "bool", "Whether multiple tags can be selected (default: false)"),
+                    ("selected", "Vec<String>", "Currently selected tag(s)"),
+                    ("on_change", "EventHandler<Vec<String>>", "Selection change handler"),
+                    ("removable", "bool", "Whether tags are removable (default: false)"),
+                    ("on_remove", "Option<EventHandler<String>>", "Remove handler"),
+                    ("size", "TagSize", "Size variant (default: Md)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
+
+            Section { title: "InputTag Props",
+                PropsTable { props: vec![
+                    ("tags", "Vec<String>", "Current tags"),
+                    ("on_change", "EventHandler<Vec<String>>", "Change handler"),
+                    ("placeholder", "Option<String>", "Placeholder text"),
+                    ("max_tags", "usize", "Maximum number of tags (default: MAX)"),
+                    ("allow_duplicates", "bool", "Whether duplicates are allowed (default: false)"),
+                    ("tag_variant", "TagVariant", "Tag variant (default: Default)"),
+                    ("size", "TagSize", "Size variant (default: Md)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
             }
         }
     }

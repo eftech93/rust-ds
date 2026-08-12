@@ -86,6 +86,12 @@ pub struct DataTableProps<T: Clone + PartialEq + 'static> {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// CSS class
+    #[props(default)]
+    pub class: Option<String>,
     /// Search placeholder text
     #[props(default = "Search...")]
     pub search_placeholder: &'static str,
@@ -208,9 +214,14 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
         || (props.show_filters && !props.filters.is_empty() && props.on_filter_change.is_some());
 
     // Loading state (without toolbar)
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+
     if props.loading {
         return rsx! {
             div {
+                id: "{id}",
+                class: "{class}",
                 style: "{final_style}",
                 div {
                     style: "padding: 48px; text-align: center;",
@@ -228,6 +239,8 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
     if props.data.is_empty() {
         return rsx! {
             div {
+                id: "{id}",
+                class: "{class}",
                 style: "{final_style}",
                 div {
                     style: "padding: 48px; text-align: center;",
@@ -249,6 +262,8 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
 
     rsx! {
         div {
+            id: "{id}",
+            class: "{class}",
             style: "{final_style}",
 
             if show_toolbar {
@@ -317,6 +332,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
                     selected_count: selected_keys.len(),
                     total_count: data.len(),
                     on_select_all: props.on_selection_change.clone(),
+                    all_keys: data.iter().map(|r| (props.key_extractor)(r)).collect(),
                 }
 
                 tbody {
@@ -329,6 +345,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
                             is_selected: selected_keys.contains(&(props.key_extractor)(&row)),
                             on_select: props.on_selection_change.clone(),
                             on_click: props.on_row_click.clone(),
+                            selected_keys: selected_keys.clone(),
                         }
                     }
                 }
@@ -343,6 +360,12 @@ pub struct DataTableFilterProps {
     pub filter: TableFilter,
     pub active_value: String,
     pub on_change: Option<EventHandler<(String, String)>>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -351,8 +374,14 @@ pub fn DataTableFilter(props: DataTableFilterProps) -> Element {
     let active_value = props.active_value.clone();
     let has_value = !active_value.is_empty();
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let _style = props.style.clone().unwrap_or_default();
+
     rsx! {
         select {
+            id: "{id}",
+            class: "{class}",
             style: if has_value {
                 "padding: 8px 12px; border: 1px solid rgb(59,130,246); border-radius: 6px; font-size: 14px; background: white; cursor: pointer; outline: none; color: rgb(15,23,42);"
             } else {
@@ -387,6 +416,14 @@ pub struct DataTableHeaderProps<T: Clone + PartialEq + 'static> {
     pub selected_count: usize,
     pub total_count: usize,
     pub on_select_all: Option<EventHandler<Vec<String>>>,
+    #[props(default)]
+    pub all_keys: Vec<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -410,10 +447,18 @@ pub fn DataTableHeader<T: Clone + PartialEq>(props: DataTableHeaderProps<T>) -> 
     });
 
     let all_selected = props.selected_count == props.total_count && props.total_count > 0;
+    let on_select_all_handler = props.on_select_all;
+    let all_keys = props.all_keys.clone();
+
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
 
     rsx! {
         thead {
-            style: "{header_style}",
+            id: "{id}",
+            class: "{class}",
+            style: "{header_style} {style}",
 
             tr {
                 if props.selectable {
@@ -423,7 +468,13 @@ pub fn DataTableHeader<T: Clone + PartialEq>(props: DataTableHeaderProps<T>) -> 
                             r#type: "checkbox",
                             checked: all_selected,
                             onchange: move |_| {
-                                // Toggle select all logic would go here
+                                if let Some(handler) = &on_select_all_handler {
+                                    if all_selected {
+                                        handler.call(Vec::new());
+                                    } else {
+                                        handler.call(all_keys.clone());
+                                    }
+                                }
                             },
                         }
                     }
@@ -463,6 +514,14 @@ pub struct DataTableRowProps<T: Clone + PartialEq + 'static> {
     pub is_selected: bool,
     pub on_select: Option<EventHandler<Vec<String>>>,
     pub on_click: Option<EventHandler<T>>,
+    #[props(default)]
+    pub selected_keys: Vec<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -491,17 +550,27 @@ pub fn DataTableRow<T: Clone + PartialEq + 'static>(props: DataTableRowProps<T>)
 
     let td_style = use_style(|t| Style::new().p(&t.spacing, "md").build());
 
-    let row_data = props.row.clone();
+    let on_select_handler = props.on_select;
+    let key_extractor = props.key_extractor;
+    let row_data_for_click = props.row.clone();
+    let row_data_for_select = props.row.clone();
+    let selected_keys = props.selected_keys.clone();
     let onclick_handler = props.on_click.clone();
+
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
 
     rsx! {
         tr {
-            style: "{row_style}",
+            id: "{id}",
+            class: "{class}",
+            style: "{row_style} {style}",
             onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
             onclick: move |_| {
                 if let Some(handler) = &onclick_handler {
-                    handler.call(row_data.clone());
+                    handler.call(row_data_for_click.clone());
                 }
             },
 
@@ -512,7 +581,16 @@ pub fn DataTableRow<T: Clone + PartialEq + 'static>(props: DataTableRowProps<T>)
                         r#type: "checkbox",
                         checked: is_selected,
                         onchange: move |_| {
-                            // Selection toggle logic
+                            if let Some(handler) = &on_select_handler {
+                                let key = (key_extractor)(&row_data_for_select);
+                                let mut new_selection = selected_keys.clone();
+                                if is_selected {
+                                    new_selection.retain(|k| k != &key);
+                                } else {
+                                    new_selection.push(key);
+                                }
+                                handler.call(new_selection);
+                            }
                         },
                     }
                 }
@@ -535,6 +613,12 @@ pub struct DataTableCellProps<T: Clone + PartialEq + 'static> {
     pub row: T,
     pub column: TableColumn<T>,
     pub base_style: String,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -556,9 +640,15 @@ pub fn DataTableCell<T: Clone + PartialEq>(props: DataTableCellProps<T>) -> Elem
         }
     };
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         td {
-            style: "{props.base_style} text-align: {align};",
+            id: "{id}",
+            class: "{class}",
+            style: "{props.base_style} text-align: {align}; {style}",
             {cell_content}
         }
     }
@@ -572,6 +662,12 @@ pub struct PaginationProps {
     pub on_page_change: EventHandler<usize>,
     #[props(default)]
     pub show_first_last: bool,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -597,9 +693,19 @@ pub fn Pagination(props: PaginationProps) -> Element {
             .build()
     });
 
+    let pagination_id = props.id.clone().unwrap_or_default();
+    let pagination_class = props.class.clone().unwrap_or_default();
+    let pagination_style = if let Some(custom) = &props.style {
+        format!("{} {}", container_style(), custom)
+    } else {
+        container_style()
+    };
+
     rsx! {
         div {
-            style: "{container_style}",
+            id: "{pagination_id}",
+            class: "{pagination_class}",
+            style: "{pagination_style}",
 
             div {
                 style: "{info_style}",

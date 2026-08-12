@@ -69,6 +69,12 @@ pub struct DropdownMenuProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Dropdown alignment
@@ -146,6 +152,8 @@ pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "position: relative; display: inline-block;",
 
             // Trigger
@@ -187,6 +195,15 @@ struct DropdownMenuItemViewProps {
     item: DropdownMenuItem,
     on_select: EventHandler<String>,
     on_close: EventHandler<()>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -225,6 +242,8 @@ fn DropdownMenuItemView(props: DropdownMenuItemViewProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{item_style}",
             onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
@@ -247,7 +266,7 @@ fn DropdownMenuItemView(props: DropdownMenuItemViewProps) -> Element {
             // Shortcut
             if let Some(shortcut) = &props.item.shortcut {
                 span {
-                    style: "font-size: 12px; color: rgb(148,163,184); margin-left: 24px;",
+                    style: "font-size: 12px; color: rgb(148,163,184); margin-left: 24px; {props.style.clone().unwrap_or_default()}",
                     "{shortcut}"
                 }
             }
@@ -280,13 +299,24 @@ pub fn DropdownMenuSeparator() -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct DropdownMenuLabelProps {
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 pub fn DropdownMenuLabel(props: DropdownMenuLabelProps) -> Element {
     rsx! {
         div {
-            style: "padding: 6px 8px; font-size: 12px; font-weight: 500; color: #64748b;",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "padding: 6px 8px; font-size: 12px; font-weight: 500; color: #64748b; {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
     }

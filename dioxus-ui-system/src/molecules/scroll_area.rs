@@ -46,6 +46,9 @@ pub struct ScrollAreaProps {
     /// Whether to auto-hide scrollbar when not scrolling
     #[props(default)]
     pub auto_hide: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// ScrollArea molecule component
@@ -201,11 +204,14 @@ pub fn ScrollArea(props: ScrollAreaProps) -> Element {
     let custom_class = props.class.clone().unwrap_or_default();
     let custom_style = props.style.clone().unwrap_or_default();
 
+    let id = props.id.clone().unwrap_or_default();
+
     rsx! {
         // Inject WebKit scrollbar styles
         style { "{webkit_styles}" }
 
         div {
+            id: "{id}",
             class: "scroll-area {custom_class}",
             style: "{container_style} {custom_style}",
             {props.children}
@@ -227,6 +233,9 @@ pub struct ScrollViewportProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Scroll viewport component
@@ -248,6 +257,7 @@ pub fn ScrollViewport(props: ScrollViewportProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "scroll-viewport {custom_class}",
             style: "{viewport_style} {custom_style}",
             {props.children}
@@ -275,6 +285,9 @@ pub struct HorizontalScrollProps {
     /// Whether to show scrollbar
     #[props(default = true)]
     pub show_scrollbar: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Horizontal scroll component
@@ -285,6 +298,7 @@ pub struct HorizontalScrollProps {
 pub fn HorizontalScroll(props: HorizontalScrollProps) -> Element {
     rsx! {
         ScrollArea {
+            id: "{props.id.clone().unwrap_or_default()}",
             orientation: ScrollOrientation::Horizontal,
             class: props.class.clone(),
             style: props.style.clone(),
@@ -315,6 +329,9 @@ pub struct VerticalScrollProps {
     /// Whether to auto-hide scrollbar
     #[props(default)]
     pub auto_hide: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Vertical scroll component
@@ -325,6 +342,7 @@ pub struct VerticalScrollProps {
 pub fn VerticalScroll(props: VerticalScrollProps) -> Element {
     rsx! {
         ScrollArea {
+            id: "{props.id.clone().unwrap_or_default()}",
             orientation: ScrollOrientation::Vertical,
             class: props.class.clone(),
             style: props.style.clone(),

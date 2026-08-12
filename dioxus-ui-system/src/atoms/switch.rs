@@ -14,7 +14,7 @@ pub struct SwitchProps {
     pub checked: bool,
     /// Callback when checked state changes
     #[props(default)]
-    pub onchange: Option<EventHandler<bool>>,
+    pub on_change: Option<EventHandler<bool>>,
     /// Whether the switch is disabled
     #[props(default)]
     pub disabled: bool,
@@ -30,6 +30,9 @@ pub struct SwitchProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Switch sizes
@@ -114,13 +117,12 @@ pub fn Switch(props: SwitchProps) -> Element {
         styled.build()
     });
 
-    let _thumb_offset = if checked { width - height + 2 } else { 2 };
-
     let thumb_style = use_style(move |t| {
+        let thumb_offset = if is_checked() { width - height + 2 } else { 2 };
         Style::new()
             .absolute()
             .top("2px")
-            .left("{thumb_offset}px")
+            .left(&format!("{}px", thumb_offset))
             .w_px(thumb_size)
             .h_px(thumb_size)
             .rounded_full()
@@ -134,7 +136,7 @@ pub fn Switch(props: SwitchProps) -> Element {
         if !disabled {
             let new_checked = !is_checked();
             is_checked.set(new_checked);
-            if let Some(handler) = &props.onchange {
+            if let Some(handler) = &props.on_change {
                 handler.call(new_checked);
             }
         }
@@ -148,6 +150,7 @@ pub fn Switch(props: SwitchProps) -> Element {
             disabled: disabled,
             style: "{switch_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
+            id: "{props.id.clone().unwrap_or_default()}",
             onclick: handle_click,
             onmouseenter: move |_| if !disabled { is_hovered.set(true) },
             onmouseleave: move |_| is_hovered.set(false),

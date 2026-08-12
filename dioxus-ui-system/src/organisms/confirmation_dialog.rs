@@ -37,6 +37,12 @@ pub struct ConfirmationDialogProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Confirmation variant
@@ -87,6 +93,9 @@ pub fn ConfirmationDialog(props: ConfirmationDialogProps) -> Element {
 
     rsx! {
         Dialog {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             open: props.open,
             on_close: props.on_close.clone(),
             title: props.title.clone(),
@@ -157,6 +166,15 @@ pub struct DeleteConfirmDialogProps {
     pub on_confirm: EventHandler<()>,
     #[props(default = false)]
     pub loading: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Delete confirmation dialog
@@ -164,6 +182,9 @@ pub struct DeleteConfirmDialogProps {
 pub fn DeleteConfirmDialog(props: DeleteConfirmDialogProps) -> Element {
     rsx! {
         ConfirmationDialog {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             open: props.open,
             on_close: props.on_close,
             title: props.title.unwrap_or_else(|| "Delete item".to_string()),
@@ -185,6 +206,15 @@ pub struct UnsavedChangesDialogProps {
     pub on_close: EventHandler<()>,
     pub on_save: EventHandler<()>,
     pub on_discard: EventHandler<()>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Unsaved changes confirmation dialog
@@ -194,6 +224,9 @@ pub fn UnsavedChangesDialog(props: UnsavedChangesDialogProps) -> Element {
 
     rsx! {
         Dialog {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             open: props.open,
             on_close: props.on_close,
             title: "Unsaved changes",
@@ -246,6 +279,15 @@ pub struct SignOutDialogProps {
     pub open: bool,
     pub on_close: EventHandler<()>,
     pub on_confirm: EventHandler<()>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Sign out confirmation dialog
@@ -253,6 +295,9 @@ pub struct SignOutDialogProps {
 pub fn SignOutDialog(props: SignOutDialogProps) -> Element {
     rsx! {
         ConfirmationDialog {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             open: props.open,
             on_close: props.on_close,
             title: "Sign out",

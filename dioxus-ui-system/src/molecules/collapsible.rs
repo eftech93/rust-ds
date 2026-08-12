@@ -44,6 +44,12 @@ pub struct CollapsibleProps {
     /// Transition duration in milliseconds
     #[props(default = 200)]
     pub transition_duration: u16,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Collapsible molecule component
@@ -171,6 +177,7 @@ pub fn Collapsible(props: CollapsibleProps) -> Element {
 
     rsx! {
         div {
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
             id: "{collapsible_id}",
 
@@ -267,6 +274,15 @@ pub struct SimpleCollapsibleProps {
     /// Whether the collapsible is disabled
     #[props(default)]
     pub disabled: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Simple collapsible with text trigger
@@ -274,6 +290,9 @@ pub struct SimpleCollapsibleProps {
 pub fn SimpleCollapsible(props: SimpleCollapsibleProps) -> Element {
     rsx! {
         Collapsible {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{props.style.clone().unwrap_or_default()}",
             open: props.open,
             on_open_change: props.on_open_change,
             default_open: props.default_open,
@@ -298,6 +317,12 @@ pub struct CollapsibleGroupProps {
     /// Gap between collapsible items
     #[props(default)]
     pub gap: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Group container for multiple collapsibles
@@ -309,6 +334,8 @@ pub fn CollapsibleGroup(props: CollapsibleGroupProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "display: flex; flex-direction: column; gap: {gap_style}; {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
@@ -335,6 +362,8 @@ mod tests {
             content_style: None,
             disabled: false,
             transition_duration: 200,
+            id: None,
+            class: None,
         };
     }
 
@@ -347,6 +376,9 @@ mod tests {
             on_open_change: None,
             default_open: false,
             disabled: false,
+            id: None,
+            class: None,
+            style: None,
         };
     }
 

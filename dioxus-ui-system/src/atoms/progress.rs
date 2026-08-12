@@ -85,6 +85,12 @@ pub struct ProgressProps {
     /// Indeterminate state (loading without specific progress)
     #[props(default = false)]
     pub indeterminate: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Label position
@@ -115,6 +121,14 @@ pub fn Progress(props: ProgressProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     // Calculate percentage
     let percentage = if props.indeterminate || props.value.is_none() {
         0.0
@@ -137,7 +151,8 @@ pub fn Progress(props: ProgressProps) -> Element {
             rsx! {
                 div {
                     class: "progress progress-linear{class_css}",
-                    style: "display: flex; align-items: center; gap: 8px; width: {props.width};",
+                    style: "display: flex; align-items: center; gap: 8px; width: {props.width};{style_css}",
+                    id: "{id_css}",
 
                     div {
                         style: "flex: 1; height: {height}px; background: {track_color}; border-radius: 9999px; overflow: hidden;",
@@ -185,7 +200,8 @@ pub fn Progress(props: ProgressProps) -> Element {
             rsx! {
                 div {
                     class: "progress progress-circular{class_css}",
-                    style: "display: inline-flex; align-items: center; justify-content: center; position: relative;",
+                    style: "display: inline-flex; align-items: center; justify-content: center; position: relative;{style_css}",
+                    id: "{id_css}",
 
                     svg {
                         width: "{diameter}px",

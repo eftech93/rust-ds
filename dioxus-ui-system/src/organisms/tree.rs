@@ -87,6 +87,10 @@ pub struct TreeProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Tree organism component
@@ -133,8 +137,13 @@ pub fn Tree(props: TreeProps) -> Element {
             .build()
     });
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
+            class: "{class}",
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
             role: "tree",
             aria_multiselectable: "false",
@@ -421,6 +430,12 @@ pub struct TreeNodeBuilderProps {
     /// Callback when tree data changes
     #[props(default)]
     pub on_change: Option<EventHandler<Vec<TreeNodeData>>>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Stateful tree component with built-in state management
@@ -470,13 +485,15 @@ pub fn TreeWithState(props: TreeProps) -> Element {
 
     rsx! {
         Tree {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             data: props.data.clone(),
             selected_id: selected_id,
             on_select: on_select,
             expanded_ids: expanded_ids,
             on_toggle_expand: on_toggle_expand,
             show_lines: props.show_lines,
-            style: props.style.clone(),
         }
     }
 }

@@ -835,6 +835,7 @@ pub fn VStack(
     #[props(default)] height: Option<String>,
     #[props(default)] style: Option<String>,
     #[props(default)] class: Option<String>,
+    #[props(default)] id: Option<String>,
 ) -> Element {
     rsx! {
         Box {
@@ -845,6 +846,7 @@ pub fn VStack(
             gap: gap,
             padding: padding,
             background: background,
+            id: id,
             width: width,
             height: height,
             style: style,
@@ -869,6 +871,7 @@ pub fn HStack(
     #[props(default)] height: Option<String>,
     #[props(default)] style: Option<String>,
     #[props(default)] class: Option<String>,
+    #[props(default)] id: Option<String>,
 ) -> Element {
     rsx! {
         Box {
@@ -879,6 +882,7 @@ pub fn HStack(
             gap: gap,
             padding: padding,
             background: background,
+            id: id,
             width: width,
             height: height,
             style: style,

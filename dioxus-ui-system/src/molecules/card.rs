@@ -49,6 +49,9 @@ pub struct CardProps {
     /// Whether to hide overflow (default: true)
     #[props(default = true)]
     pub overflow_hidden: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Card molecule component
@@ -154,6 +157,7 @@ pub fn Card(props: CardProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             style: "{final_style}",
             class: "{class}",
             onmouseenter: move |_| if has_onclick { is_hovered.set(true) },
@@ -184,6 +188,15 @@ pub struct CardHeaderProps {
     /// Optional action element
     #[props(default)]
     pub action: Option<Element>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Card Header component
@@ -200,6 +213,9 @@ pub fn CardHeader(props: CardHeaderProps) -> Element {
         let subtitle_element = props.subtitle.map(|s| {
             rsx! {
                 crate::atoms::Label {
+                    id: "{props.id.clone().unwrap_or_default()}",
+                    class: "{props.class.clone().unwrap_or_default()}",
+                    style: "{props.style.clone().unwrap_or_default()}",
                     size: crate::atoms::TextSize::Small,
                     color: crate::atoms::TextColor::Muted,
                     "{s}"
@@ -228,8 +244,17 @@ pub fn CardHeader(props: CardHeaderProps) -> Element {
         props.children
     };
 
+    let custom_style = props.style.clone().unwrap_or_default();
+    let custom_class = props.class.clone().unwrap_or_default();
+    let id = props.id.clone().unwrap_or_default();
+
     rsx! {
-        VStack { style: "{style}", {content} }
+        VStack {
+            id: "{id}",
+            style: "{style} {custom_style}",
+            class: "{custom_class}",
+            {content}
+        }
     }
 }
 
@@ -241,6 +266,15 @@ pub struct CardContentProps {
     /// Custom padding
     #[props(default)]
     pub padding: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Card Content component
@@ -260,8 +294,17 @@ pub fn CardContent(props: CardContentProps) -> Element {
         style()
     };
 
+    let custom_style = props.style.clone().unwrap_or_default();
+    let custom_class = props.class.clone().unwrap_or_default();
+    let id = props.id.clone().unwrap_or_default();
+
     rsx! {
-        VStack { style: "{final_style}", {props.children} }
+        VStack {
+            id: "{id}",
+            style: "{final_style} {custom_style}",
+            class: "{custom_class}",
+            {props.children}
+        }
     }
 }
 
@@ -273,6 +316,15 @@ pub struct CardFooterProps {
     /// Justify content: start, center, end, between
     #[props(default)]
     pub justify: CardFooterJustify,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Card footer justify options
@@ -303,9 +355,15 @@ pub fn CardFooter(props: CardFooterProps) -> Element {
             .build()
     });
 
+    let custom_style = props.style.clone().unwrap_or_default();
+    let custom_class = props.class.clone().unwrap_or_default();
+    let id = props.id.clone().unwrap_or_default();
+
     rsx! {
         HStack {
-            style: "{style}",
+            id: "{id}",
+            style: "{style} {custom_style}",
+            class: "{custom_class}",
             justify: justify,
             align: AlignItems::Center,
             {props.children}

@@ -38,12 +38,18 @@ pub struct NumberInputProps {
     /// Error message
     #[props(default)]
     pub error: Option<String>,
+    /// Show increment/decrement buttons
+    #[props(default = true)]
+    pub show_buttons: bool,
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Number input component with increment/decrement buttons
@@ -51,7 +57,9 @@ pub struct NumberInputProps {
 pub fn NumberInput(props: NumberInputProps) -> Element {
     let _theme = use_theme();
 
-    let container_style = use_style(|_t| Style::new().flex().flex_col().w_full().build());
+    let container_style = use_style(|_t| Style::new().build());
+    
+    let container_style_with_buttons = use_style(|_t| Style::new().flex().flex_col().w_full().build());
 
     let input_wrapper_style = use_style(|t| {
         Style::new()
@@ -61,6 +69,14 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
             .rounded(&t.radius, "md")
             .bg(&t.colors.background)
             .overflow_hidden()
+            .build()
+    });
+    
+    let input_wrapper_style_no_buttons = use_style(|t| {
+        Style::new()
+            .flex()
+            .items_center()
+            .bg(&t.colors.background)
             .build()
     });
 
@@ -87,6 +103,20 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
             .text_color(&t.colors.foreground)
             .font_size(14)
             .text_align("center")
+            .bg(&t.colors.background)
+            .build()
+    });
+    
+    let input_style_no_buttons = use_style(|t| {
+        Style::new()
+            .min_w_px(60)
+            .p(&t.spacing, "sm")
+            .text_color(&t.colors.foreground)
+            .font_size(14)
+            .text_align("center")
+            .bg(&t.colors.background)
+            .border(1, &t.colors.border)
+            .rounded(&t.radius, "md")
             .build()
     });
 
@@ -118,8 +148,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
         } else {
             new_value
         };
-        let formatted = format_value(clamped, props.precision);
-        props.on_change.call(formatted);
+        props.on_change.call(clamped);
     };
 
     let handle_decrement = move |_| {
@@ -132,8 +161,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
         } else {
             new_value
         };
-        let formatted = format_value(clamped, props.precision);
-        props.on_change.call(formatted);
+        props.on_change.call(clamped);
     };
 
     let handle_input = move |e: Event<FormData>| {
@@ -142,8 +170,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
         }
         if let Ok(val) = e.value().parse::<f64>() {
             let clamped = clamp_value(val, props.min, props.max);
-            let formatted = format_value(clamped, props.precision);
-            props.on_change.call(formatted);
+            props.on_change.call(clamped);
         }
     };
 
@@ -151,8 +178,9 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
 
     rsx! {
         div {
-            style: "{container_style} {props.style.clone().unwrap_or_default()}",
+            style: if props.show_buttons { "{container_style_with_buttons} {props.style.clone().unwrap_or_default()}" } else { "{container_style} {props.style.clone().unwrap_or_default()}" },
             class: "{props.class.clone().unwrap_or_default()}",
+            id: "{props.id.clone().unwrap_or_default()}",
 
             if let Some(label) = props.label.clone() {
                 label {
@@ -162,19 +190,21 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
             }
 
             div {
-                style: "{input_wrapper_style}",
+                style: if props.show_buttons { "{input_wrapper_style}" } else { "{input_wrapper_style_no_buttons}" },
                 opacity: if props.disabled { "0.5" } else { "1" },
                 pointer_events: if props.disabled { "none" } else { "auto" },
 
-                button {
-                    style: "{button_style}",
-                    onclick: handle_decrement,
-                    disabled: props.disabled,
-                    "−"
+                if props.show_buttons {
+                    button {
+                        style: "{button_style}",
+                        onclick: handle_decrement,
+                        disabled: props.disabled,
+                        "−"
+                    }
                 }
 
                 input {
-                    style: "{input_style}",
+                    style: if props.show_buttons { "{input_style}" } else { "{input_style_no_buttons}" },
                     r#type: "number",
                     value: "{display_value}",
                     placeholder: props.placeholder.clone().unwrap_or_default(),
@@ -185,11 +215,13 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
                     oninput: handle_input,
                 }
 
-                button {
-                    style: "{button_style}",
-                    onclick: handle_increment,
-                    disabled: props.disabled,
-                    "+"
+                if props.show_buttons {
+                    button {
+                        style: "{button_style}",
+                        onclick: handle_increment,
+                        disabled: props.disabled,
+                        "+"
+                    }
                 }
             }
 
@@ -214,12 +246,9 @@ fn clamp_value(value: f64, min: Option<f64>, max: Option<f64>) -> f64 {
     result
 }
 
-fn format_value(value: f64, precision: Option<usize>) -> f64 {
+fn format_value(value: f64, precision: Option<usize>) -> String {
     match precision {
-        Some(p) => {
-            let multiplier = 10f64.powi(p as i32);
-            (value * multiplier).round() / multiplier
-        }
-        None => value,
+        Some(p) => format!("{:.1$}", value, p),
+        None => value.to_string(),
     }
 }

@@ -55,6 +55,12 @@ pub struct HoverCardProps {
     /// Custom inline styles for the card
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Hover Card component
@@ -164,6 +170,8 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "position: relative; display: inline-block;",
             onmouseenter: move |_| {
                 is_visible.set(true);
@@ -212,6 +220,15 @@ pub struct HoverCardHeaderProps {
     /// Optional description
     #[props(default)]
     pub description: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -228,6 +245,8 @@ pub fn HoverCardHeader(props: HoverCardHeaderProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{header_style}",
 
             h4 {
@@ -237,7 +256,7 @@ pub fn HoverCardHeader(props: HoverCardHeaderProps) -> Element {
 
             if let Some(description) = props.description {
                 p {
-                    style: "margin: 4px 0 0 0; font-size: 13px; color: #64748b;",
+                    style: "margin: 4px 0 0 0; font-size: 13px; color: #64748b; {props.style.clone().unwrap_or_default()}",
                     "{description}"
                 }
             }
@@ -250,6 +269,15 @@ pub fn HoverCardHeader(props: HoverCardHeaderProps) -> Element {
 pub struct HoverCardContentProps {
     /// Content to display
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -260,7 +288,9 @@ pub fn HoverCardContent(props: HoverCardContentProps) -> Element {
 
     rsx! {
         div {
-            style: "{content_style}",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{content_style} {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
     }
@@ -271,6 +301,15 @@ pub fn HoverCardContent(props: HoverCardContentProps) -> Element {
 pub struct HoverCardFooterProps {
     /// Footer content
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -291,7 +330,9 @@ pub fn HoverCardFooter(props: HoverCardFooterProps) -> Element {
 
     rsx! {
         div {
-            style: "{footer_style}",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{footer_style} {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
     }
@@ -308,6 +349,15 @@ pub struct HoverCardAvatarProps {
     /// Avatar size in pixels
     #[props(default = 40)]
     pub size: u16,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -317,9 +367,11 @@ pub fn HoverCardAvatar(props: HoverCardAvatarProps) -> Element {
 
     rsx! {
         img {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             src: "{props.src}",
             alt: "{alt}",
-            style: "width: {size}px; height: {size}px; border-radius: 50%; object-fit: cover;",
+            style: "width: {size}px; height: {size}px; border-radius: 50%; object-fit: cover; {props.style.clone().unwrap_or_default()}",
         }
     }
 }
@@ -340,6 +392,15 @@ pub struct HoverCardUserInfoProps {
     /// Optional stats (e.g., "10 repos · 50 followers")
     #[props(default)]
     pub stats: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -356,6 +417,8 @@ pub fn HoverCardUserInfo(props: HoverCardUserInfoProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{container_style}",
 
             if let Some(avatar_url) = props.avatar_url {
@@ -388,7 +451,7 @@ pub fn HoverCardUserInfo(props: HoverCardUserInfoProps) -> Element {
 
                 if let Some(stats) = props.stats {
                     div {
-                        style: "margin-top: 8px; font-size: 12px; color: #64748b;",
+                        style: "margin-top: 8px; font-size: 12px; color: #64748b; {props.style.clone().unwrap_or_default()}",
                         "{stats}"
                     }
                 }

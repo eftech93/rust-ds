@@ -148,10 +148,18 @@ pub enum Route {
     CollapsiblePage {},
     #[route("/molecules/toggle-group")]
     ToggleGroupPage {},
+    #[route("/molecules/breadcrumb")]
+    BreadcrumbPage {},
+    #[route("/molecules/input-group")]
+    InputGroupPage {},
+    #[route("/molecules/scroll-area")]
+    ScrollAreaPage {},
 
     // Organisms
     #[route("/organisms")]
     OrganismsPage {},
+    #[route("/organisms/three-view")]
+    ThreeViewPage {},
     #[route("/organisms/header")]
     HeaderPage {},
     #[route("/organisms/layout")]
@@ -196,6 +204,10 @@ pub enum Route {
     KanbanPage {},
     #[route("/organisms/image-uploader")]
     ImageUploaderPage {},
+    #[route("/organisms/rich-text")]
+    RichTextPage {},
+    #[route("/organisms/tour")]
+    TourPage {},
 
     // Themes
     #[route("/themes")]
@@ -389,7 +401,10 @@ fn TopNav(current_route: Route) -> Element {
                                 ("Card", Route::CardPage {}),
                                 ("Badge", Route::BadgePage {}),
                                 ("Alert", Route::AlertPage {}),
+                                ("Breadcrumb", Route::BreadcrumbPage {}),
                                 ("Dialog", Route::DialogPage {}),
+                                ("InputGroup", Route::InputGroupPage {}),
+                                ("ScrollArea", Route::ScrollAreaPage {}),
                             ],
                             current_route: current_route.clone(),
                         }
@@ -401,7 +416,9 @@ fn TopNav(current_route: Route) -> Element {
                                 ("Overview", Route::OrganismsPage {}),
                                 ("Header", Route::HeaderPage {}),
                                 ("Layout", Route::LayoutPage {}),
+                                ("RichText", Route::RichTextPage {}),
                                 ("Tabs", Route::TabsPage {}),
+                                ("Tour", Route::TourPage {}),
                                 ("Accordion", Route::AccordionPage {}),
                             ],
                             current_route: current_route.clone(),
@@ -435,7 +452,7 @@ fn TopNavSection(
     current_route: Route,
 ) -> Element {
     let mut expanded = use_signal(|| true);
-    let is_active_section = items.iter().any(|(_, r)| *r == current_route);
+    let _is_active_section = items.iter().any(|(_, r)| *r == current_route);
 
     rsx! {
         div {
@@ -446,11 +463,7 @@ fn TopNavSection(
                 onclick: move |_| expanded.set(!expanded()),
 
                 h3 {
-                    style: if is_active_section {
-                        "margin: 0; font-size: 12px; font-weight: 600; color: var(--sb-text); text-transform: uppercase; letter-spacing: 0.05em;"
-                    } else {
-                        "margin: 0; font-size: 12px; font-weight: 600; color: var(--sb-muted); text-transform: uppercase; letter-spacing: 0.05em;"
-                    },
+                    style: "margin: 0; font-size: 12px; font-weight: 600; color: var(--sb-text); text-transform: uppercase; letter-spacing: 0.05em;",
                     "{title}"
                 }
 
@@ -560,6 +573,7 @@ fn Sidebar(current_route: Route) -> Element {
                     ("Alert", Route::AlertPage {}),
                     ("Avatar", Route::AvatarPage {}),
                     ("Badge", Route::BadgePage {}),
+                    ("Breadcrumb", Route::BreadcrumbPage {}),
                     ("Card", Route::CardPage {}),
                     ("Collapsible", Route::CollapsiblePage {}),
                     ("Combobox", Route::ComboboxPage {}),
@@ -568,12 +582,14 @@ fn Sidebar(current_route: Route) -> Element {
                     ("Dialog", Route::DialogPage {}),
                     ("Dropdown", Route::DropdownPage {}),
                     ("HoverCard", Route::HoverCardPage {}),
+                    ("InputGroup", Route::InputGroupPage {}),
                     ("List Item", Route::ListItemPage {}),
                     ("Media Object", Route::MediaObjectPage {}),
                     ("MultiSelect", Route::MultiSelectPage {}),
                     ("OTP Input", Route::OtpInputPage {}),
                     ("Pagination", Route::PaginationPage {}),
                     ("QR Code", Route::QrCodePage {}),
+                    ("ScrollArea", Route::ScrollAreaPage {}),
                     ("Separator", Route::SeparatorPage {}),
                     ("Sheet", Route::SheetPage {}),
                     ("Skeleton", Route::SkeletonPage {}),
@@ -588,6 +604,7 @@ fn Sidebar(current_route: Route) -> Element {
                 // Organisms
                 NavSection { title: "Organisms", current_route: current_route.clone(), items: vec![
                     ("Overview", Route::OrganismsPage {}),
+                    ("ThreeView (3D)", Route::ThreeViewPage {}),
                     ("Accordion", Route::AccordionPage {}),
                     ("Calendar", Route::CalendarPage {}),
                     ("Cards", Route::CardsPage {}),
@@ -606,9 +623,11 @@ fn Sidebar(current_route: Route) -> Element {
                     ("Menubar", Route::MenubarPage {}),
                     ("Notification Center", Route::NotificationCenterPage {}),
                     ("Resizable", Route::ResizablePage {}),
+                    ("RichText", Route::RichTextPage {}),
                     ("Stepper Wizard", Route::StepperWizardPage {}),
                     ("Tabs", Route::TabsPage {}),
                     ("Timeline", Route::TimelinePage {}),
+                    ("Tour", Route::TourPage {}),
                     ("Tree", Route::TreePage {}),
                 ]}
 
@@ -635,7 +654,7 @@ fn Sidebar(current_route: Route) -> Element {
 #[component]
 fn NavSection(title: String, current_route: Route, items: Vec<(&'static str, Route)>) -> Element {
     let mut expanded = use_signal(|| true);
-    let is_active_section = items.iter().any(|(_, r)| *r == current_route);
+    let _is_active_section = items.iter().any(|(_, r)| *r == current_route);
 
     rsx! {
         div {
@@ -646,11 +665,7 @@ fn NavSection(title: String, current_route: Route, items: Vec<(&'static str, Rou
                 onclick: move |_| expanded.set(!expanded()),
 
                 h3 {
-                    style: if is_active_section {
-                        "margin: 0; font-size: 12px; font-weight: 600; color: var(--sb-text); text-transform: uppercase; letter-spacing: 0.05em;"
-                    } else {
-                        "margin: 0; font-size: 12px; font-weight: 600; color: var(--sb-muted); text-transform: uppercase; letter-spacing: 0.05em;"
-                    },
+                    style: "margin: 0; font-size: 12px; font-weight: 600; color: var(--sb-text); text-transform: uppercase; letter-spacing: 0.05em;",
                     "{title}"
                 }
 
@@ -1025,8 +1040,24 @@ fn CollapsiblePage() -> Element {
 fn ToggleGroupPage() -> Element {
     components::molecules_new::ToggleGroupPage()
 }
+#[component]
+fn BreadcrumbPage() -> Element {
+    components::molecules_new::BreadcrumbPage()
+}
+#[component]
+fn InputGroupPage() -> Element {
+    components::molecules_new::InputGroupPage()
+}
+#[component]
+fn ScrollAreaPage() -> Element {
+    components::molecules_new::ScrollAreaPage()
+}
 
 // New Organisms (Phase 1-4)
+#[component]
+fn ThreeViewPage() -> Element {
+    components::organisms_new::ThreeViewPage()
+}
 #[component]
 fn CalendarPage() -> Element {
     components::organisms_new::CalendarPage()
@@ -1062,6 +1093,14 @@ fn KanbanPage() -> Element {
 #[component]
 fn ImageUploaderPage() -> Element {
     components::organisms_new::ImageUploaderPage()
+}
+#[component]
+fn RichTextPage() -> Element {
+    components::organisms_new::RichTextPage()
+}
+#[component]
+fn TourPage() -> Element {
+    components::organisms_new::TourPage()
 }
 
 // Themes

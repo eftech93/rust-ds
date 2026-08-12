@@ -10,8 +10,20 @@ members = [
 ]
 resolver = "2"
 
+[workspace.package]
+version = "0.0.7"
+edition = "2021"
+authors = ["Esteban Puello <eftech93@gmail.com>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/eftech93/rust-ds"
+homepage = "https://github.com/eftech93/rust-ds"
+documentation = "https://docs.rs/dioxus-ui-system"
+keywords = ["dioxus", "rust", "design-system", "ui-components", "atomic-design"]
+categories = ["gui", "web-programming", "wasm"]
+rust-version = "1.76"
+
 [workspace.dependencies]
-dioxus = { version = "0.7", features = ["router"] }
+dioxus = { version = "0.6", features = ["router"] }
 serde = { version = "1.0", features = ["derive"] }
 
 # Profile for release builds - strip debug info to avoid wasm-opt DWARF issues

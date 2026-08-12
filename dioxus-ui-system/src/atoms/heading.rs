@@ -66,6 +66,9 @@ pub struct HeadingProps {
     /// Text alignment
     #[props(default)]
     pub align: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
     /// Children elements
     pub children: Element,
 }
@@ -108,25 +111,26 @@ pub fn Heading(props: HeadingProps) -> Element {
         "font-size: {}px; font-weight: {}; color: {}; margin: 0; line-height: 1.2;{}{}",
         font_size, weight, color, align_css, style_css
     );
+    let id_css = props.id.clone().unwrap_or_default();
 
     match props.level {
         HeadingLevel::H1 => rsx! {
-            h1 { class: "heading heading-h1{class_css}", style: "{style}", {props.children} }
+            h1 { class: "heading heading-h1{class_css}", style: "{style}", id: "{id_css}", {props.children} }
         },
         HeadingLevel::H2 => rsx! {
-            h2 { class: "heading heading-h2{class_css}", style: "{style}", {props.children} }
+            h2 { class: "heading heading-h2{class_css}", style: "{style}", id: "{id_css}", {props.children} }
         },
         HeadingLevel::H3 => rsx! {
-            h3 { class: "heading heading-h3{class_css}", style: "{style}", {props.children} }
+            h3 { class: "heading heading-h3{class_css}", style: "{style}", id: "{id_css}", {props.children} }
         },
         HeadingLevel::H4 => rsx! {
-            h4 { class: "heading heading-h4{class_css}", style: "{style}", {props.children} }
+            h4 { class: "heading heading-h4{class_css}", style: "{style}", id: "{id_css}", {props.children} }
         },
         HeadingLevel::H5 => rsx! {
-            h5 { class: "heading heading-h5{class_css}", style: "{style}", {props.children} }
+            h5 { class: "heading heading-h5{class_css}", style: "{style}", id: "{id_css}", {props.children} }
         },
         HeadingLevel::H6 => rsx! {
-            h6 { class: "heading heading-h6{class_css}", style: "{style}", {props.children} }
+            h6 { class: "heading heading-h6{class_css}", style: "{style}", id: "{id_css}", {props.children} }
         },
     }
 }
@@ -154,6 +158,9 @@ pub struct ParagraphProps {
     /// Additional inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
     /// Children elements
     pub children: Element,
 }
@@ -193,11 +200,13 @@ pub fn Paragraph(props: ParagraphProps) -> Element {
     let max_width = format!("max-width: {}ch;", props.max_chars);
 
     let line_height = props.line_height;
+    let id_css = props.id.clone().unwrap_or_default();
 
     rsx! {
         p {
             class: "paragraph{class_css}",
             style: "font-size: {props.size}px; line-height: {line_height}; color: {color}; margin: 0; {max_width} {align_css}{style_css}",
+            id: "{id_css}",
             {props.children}
         }
     }
@@ -215,6 +224,12 @@ pub struct CaptionProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
     /// Children elements
     pub children: Element,
 }
@@ -261,10 +276,19 @@ pub fn Caption(props: CaptionProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         span {
             class: "caption{class_css}",
-            style: "font-size: {props.size}px; color: {color}; line-height: 1.4;",
+            style: "font-size: {props.size}px; color: {color}; line-height: 1.4;{style_css}",
+            id: "{id_css}",
             {props.children}
         }
     }
@@ -283,6 +307,12 @@ pub struct BlockquoteProps {
     /// Citation/attribution
     #[props(default)]
     pub cite: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
     /// Children elements (quote content)
     pub children: Element,
 }
@@ -314,10 +344,19 @@ pub fn Blockquote(props: BlockquoteProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let style_css = props
+        .style
+        .as_ref()
+        .map(|s| format!(" {}", s))
+        .unwrap_or_default();
+
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         blockquote {
             class: "blockquote{class_css}",
-            style: "margin: 0; padding: 16px 20px; border-left: 4px solid {border_color}; background: {background}; border-radius: 0 8px 8px 0;",
+            style: "margin: 0; padding: 16px 20px; border-left: 4px solid {border_color}; background: {background}; border-radius: 0 8px 8px 0;{style_css}",
+            id: "{id_css}",
             {props.children}
 
             if let Some(cite) = props.cite {

@@ -35,12 +35,24 @@ pub struct ActionCardProps {
     /// Optional badge
     #[props(default)]
     pub badge: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 pub fn ActionCard(props: ActionCardProps) -> Element {
     rsx! {
         Card {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             variant: props.variant,
             full_width: true,
 
@@ -110,12 +122,24 @@ pub struct DualActionCardProps {
     /// Optional icon
     #[props(default)]
     pub icon: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 pub fn DualActionCard(props: DualActionCardProps) -> Element {
     rsx! {
         Card {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             variant: CardVariant::Default,
             full_width: true,
 
@@ -190,12 +214,24 @@ pub struct ImageCardProps {
     /// Image aspect ratio (default: 16/9)
     #[props(default = "16/9".to_string())]
     pub aspect_ratio: String,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 pub fn ImageCard(props: ImageCardProps) -> Element {
     rsx! {
         Card {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             variant: CardVariant::Default,
             full_width: true,
             padding: Some("0".to_string()),
@@ -263,12 +299,24 @@ pub struct ImageActionCardProps {
     /// Optional badge on image
     #[props(default)]
     pub badge: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 pub fn ImageActionCard(props: ImageActionCardProps) -> Element {
     rsx! {
         Card {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             variant: CardVariant::Default,
             full_width: true,
             padding: Some("0".to_string()),
@@ -356,6 +404,15 @@ pub struct ProfileCardProps {
     /// Show social stats
     #[props(default)]
     pub stats: Vec<(String, String)>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -372,6 +429,9 @@ pub fn ProfileCard(props: ProfileCardProps) -> Element {
 
     rsx! {
         Card {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             variant: CardVariant::Default,
             full_width: true,
 
@@ -481,6 +541,15 @@ pub struct PricingCardProps {
     /// Is this the recommended plan
     #[props(default)]
     pub recommended: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -498,6 +567,9 @@ pub fn PricingCard(props: PricingCardProps) -> Element {
 
     rsx! {
         Card {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             variant: if props.recommended { CardVariant::Elevated } else { CardVariant::Default },
             full_width: true,
 
@@ -583,12 +655,24 @@ pub struct HorizontalCardProps {
     /// Action callback
     #[props(default)]
     pub on_action: Option<EventHandler<()>>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 pub fn HorizontalCard(props: HorizontalCardProps) -> Element {
     rsx! {
         Card {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             variant: CardVariant::Default,
             full_width: true,
             padding: Some("0".to_string()),
@@ -663,6 +747,15 @@ pub struct NotificationCardProps {
     /// Icon name (auto-selected based on type if not provided)
     #[props(default)]
     pub icon: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Notification type variants
@@ -686,11 +779,17 @@ pub fn NotificationCard(props: NotificationCardProps) -> Element {
 
     let icon_name = props.icon.clone().unwrap_or_else(|| icon.to_string());
 
+    let card_style = if let Some(ref custom) = props.style {
+        format!("border-left: 4px solid {}; {}", border_color, custom)
+    } else {
+        format!("border-left: 4px solid {};", border_color)
+    };
+
     rsx! {
         Card {
-            variant: CardVariant::Default,
-            full_width: true,
-            style: Some(format!("border-left: 4px solid {};", border_color)),
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: Some(card_style),
 
             CardContent {
                 div {
@@ -769,6 +868,15 @@ pub struct StatCardProps {
     /// Icon background color
     #[props(default = "#f1f5f9".to_string())]
     pub icon_bg: String,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -778,6 +886,9 @@ pub fn StatCard(props: StatCardProps) -> Element {
 
     rsx! {
         Card {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             variant: CardVariant::Default,
             full_width: true,
 
@@ -843,6 +954,15 @@ pub struct ExpandableCardProps {
     /// Initial expanded state
     #[props(default)]
     pub default_expanded: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -851,6 +971,9 @@ pub fn ExpandableCard(props: ExpandableCardProps) -> Element {
 
     rsx! {
         Card {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             variant: CardVariant::Default,
             full_width: true,
 
@@ -914,6 +1037,15 @@ pub struct MediaCardProps {
     /// Play callback
     #[props(default)]
     pub on_play: Option<EventHandler<()>>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Media type
@@ -935,6 +1067,9 @@ pub fn MediaCard(props: MediaCardProps) -> Element {
 
     rsx! {
         Card {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             variant: CardVariant::Default,
             full_width: true,
             padding: Some("0".to_string()),

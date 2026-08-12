@@ -31,6 +31,15 @@ pub struct DialogProps {
     /// Custom inline styles for the content
     #[props(default)]
     pub content_style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Dialog molecule component
@@ -81,6 +90,8 @@ pub fn Dialog(props: DialogProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{overlay_style}",
             onclick: handle_overlay_click,
 
@@ -104,7 +115,7 @@ pub fn Dialog(props: DialogProps) -> Element {
 
                 // Content
                 Box {
-                    style: "padding: 0 24px 24px 24px; overflow-y: auto;",
+                    style: "padding: 0 24px 24px 24px; overflow-y: auto; {props.style.clone().unwrap_or_default()}",
                     {props.children}
                 }
             }
@@ -119,6 +130,15 @@ struct DialogHeaderProps {
     title: Option<String>,
     show_close_button: bool,
     on_close: EventHandler<()>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -137,11 +157,13 @@ fn DialogHeader(props: DialogHeaderProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{header_style}",
 
             if let Some(title) = props.title {
                 h2 {
-                    style: "margin: 0; font-size: 18px; font-weight: 600;",
+                    style: "margin: 0; font-size: 18px; font-weight: 600; {props.style.clone().unwrap_or_default()}",
                     "{title}"
                 }
             } else {
@@ -162,13 +184,24 @@ fn DialogHeader(props: DialogHeaderProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 struct DialogDescriptionProps {
     description: String,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 fn DialogDescription(props: DialogDescriptionProps) -> Element {
     rsx! {
         p {
-            style: "margin: 0; padding: 16px 24px 0 24px; font-size: 14px; color: #64748b;",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "margin: 0; padding: 16px 24px 0 24px; font-size: 14px; color: #64748b; {props.style.clone().unwrap_or_default()}",
             "{props.description}"
         }
     }
@@ -182,6 +215,15 @@ pub struct DialogFooterProps {
     /// Align content
     #[props(default)]
     pub align: DialogFooterAlign,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Dialog footer alignment
@@ -222,7 +264,9 @@ pub fn DialogFooter(props: DialogFooterProps) -> Element {
 
     rsx! {
         div {
-            style: "{footer_style} justify-content: {justify};",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{footer_style} justify-content: {justify}; {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
     }
@@ -250,6 +294,15 @@ pub struct AlertDialogProps {
     /// Whether the action is destructive
     #[props(default)]
     pub destructive: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Alert dialog component
@@ -263,6 +316,8 @@ pub fn AlertDialog(props: AlertDialogProps) -> Element {
 
     rsx! {
         Dialog {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             open: props.open,
             on_close: props.on_close.clone(),
             title: props.title.clone(),
@@ -270,7 +325,7 @@ pub fn AlertDialog(props: AlertDialogProps) -> Element {
             close_on_overlay_click: false,
 
             p {
-                style: "margin: 0 0 24px 0; font-size: 14px; color: #64748b; line-height: 1.5;",
+                style: "margin: 0 0 24px 0; font-size: 14px; color: #64748b; line-height: 1.5; {props.style.clone().unwrap_or_default()}",
                 "{props.description}"
             }
 

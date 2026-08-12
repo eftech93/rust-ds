@@ -52,6 +52,9 @@ pub struct AvatarProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Avatar molecule component
@@ -96,8 +99,11 @@ pub fn Avatar(props: AvatarProps) -> Element {
     let show_image = props.src.is_some() && !image_error();
     let src_clone = props.src.clone();
 
+    let id = props.id.clone().unwrap_or_default();
+
     rsx! {
         Box {
+            id: "{id}",
             style: "{avatar_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
 
@@ -123,6 +129,15 @@ pub fn Avatar(props: AvatarProps) -> Element {
 struct AvatarFallbackInitialsProps {
     name: String,
     font_size: u16,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -139,7 +154,9 @@ fn AvatarFallbackInitials(props: AvatarFallbackInitialsProps) -> Element {
 
     rsx! {
         span {
-            style: "font-size: {props.font_size}px; user-select: none;",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "font-size: {props.font_size}px; user-select: none; {props.style.clone().unwrap_or_default()}",
             "{initials}"
         }
     }
@@ -148,19 +165,30 @@ fn AvatarFallbackInitials(props: AvatarFallbackInitialsProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 struct AvatarFallbackIconProps {
     size: u16,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 fn AvatarFallbackIcon(props: AvatarFallbackIconProps) -> Element {
     rsx! {
         svg {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             view_box: "0 0 24 24",
             fill: "none",
             stroke: "currentColor",
             stroke_width: "2",
             stroke_linecap: "round",
             stroke_linejoin: "round",
-            style: "width: {props.size}px; height: {props.size}px;",
+            style: "width: {props.size}px; height: {props.size}px; {props.style.clone().unwrap_or_default()}",
             path { d: "M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" }
             circle { cx: "12", cy: "7", r: "4" }
         }
@@ -178,6 +206,15 @@ pub struct AvatarGroupProps {
     pub size: AvatarSize,
     /// Avatar children
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Avatar group component
@@ -195,6 +232,9 @@ pub fn AvatarGroup(props: AvatarGroupProps) -> Element {
 
     rsx! {
         HStack {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{props.style.clone().unwrap_or_default()}",
             align: AlignItems::Center,
 
             HStack {

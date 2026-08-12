@@ -50,6 +50,12 @@ pub struct MenubarProps {
     /// Whether to loop navigation (cycle through menus), default: true
     #[props(default = true)]
     pub loop_navigation: bool,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Menubar container component
@@ -101,9 +107,15 @@ pub fn Menubar(props: MenubarProps) -> Element {
             .build()
     });
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: "{bar_style}",
+            id: "{id}",
+            class: "{class}",
+            style: "{bar_style} {style}",
             role: "menubar",
             {props.children}
         }
@@ -119,6 +131,12 @@ pub fn Menubar(props: MenubarProps) -> Element {
 pub struct MenubarMenuProps {
     /// Child elements (MenubarTrigger and MenubarContent)
     pub children: Element,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Menubar menu component
@@ -136,9 +154,15 @@ pub fn MenubarMenu(props: MenubarMenuProps) -> Element {
 
     use_context_provider(|| MenuContext { index });
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: "position: relative; display: inline-block;",
+            id: "{id}",
+            class: "{class}",
+            style: "position: relative; display: inline-block; {style}",
             role: "none",
             {props.children}
         }
@@ -157,6 +181,12 @@ pub struct MenubarTriggerProps {
     /// Whether this trigger is disabled
     #[props(default = false)]
     pub disabled: bool,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Menubar trigger component
@@ -269,6 +299,12 @@ pub struct MenubarContentProps {
     /// Optional alignment
     #[props(default)]
     pub align: MenubarAlign,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Menubar content alignment
@@ -418,6 +454,12 @@ pub struct MenubarItemProps {
     /// Optional icon element
     #[props(default)]
     pub icon: Option<Element>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Menubar item component
@@ -543,6 +585,12 @@ pub fn MenubarSeparator() -> Element {
 pub struct MenubarSubProps {
     /// Child elements (MenubarSubTrigger and MenubarSubContent)
     pub children: Element,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Menubar submenu component
@@ -554,9 +602,15 @@ pub fn MenubarSub(props: MenubarSubProps) -> Element {
 
     use_context_provider(|| SubmenuContext { is_open });
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: "position: relative;",
+            id: "{id}",
+            class: "{class}",
+            style: "position: relative; {style}",
             role: "none",
             {props.children}
         }
@@ -578,6 +632,12 @@ pub struct MenubarSubTriggerProps {
     /// Optional keyboard shortcut display
     #[props(default)]
     pub shortcut: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Menubar submenu trigger component
@@ -675,6 +735,12 @@ pub fn MenubarSubTrigger(props: MenubarSubTriggerProps) -> Element {
 pub struct MenubarSubContentProps {
     /// Submenu content
     pub children: Element,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Menubar submenu content component
@@ -739,6 +805,12 @@ pub fn MenubarSubContent(props: MenubarSubContentProps) -> Element {
 pub struct MenubarLabelProps {
     /// Label text content
     pub children: Element,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Menubar label component
@@ -758,9 +830,15 @@ pub fn MenubarLabel(props: MenubarLabelProps) -> Element {
             .build()
     });
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: "{label_style} user-select: none;",
+            id: "{id}",
+            class: "{class}",
+            style: "{label_style} user-select: none; {style}",
             {props.children}
         }
     }
@@ -786,6 +864,12 @@ pub struct MenubarCheckboxItemProps {
     /// Optional keyboard shortcut display
     #[props(default)]
     pub shortcut: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Menubar checkbox item component

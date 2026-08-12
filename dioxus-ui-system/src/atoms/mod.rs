@@ -48,7 +48,7 @@ pub use heading::{
     Blockquote, BlockquoteProps, Caption, CaptionColor, CaptionProps, Heading, HeadingLevel,
     HeadingProps, Paragraph, ParagraphProps,
 };
-pub use icon::{Icon, IconButton as IconBtn, IconColor, IconProps, IconSize};
+pub use icon::{Icon, IconButton as IconBtn, IconButtonProps, IconColor, IconProps, IconSize};
 pub use input::{Input, InputProps, InputType};
 pub use label::{Label, LabelElement, LabelProps, MutedText, TextColor, TextSize, TextWeight};
 pub use number_input::{NumberInput, NumberInputProps};

@@ -14,7 +14,7 @@ pub struct RadioProps {
     pub checked: bool,
     /// Callback when selected state changes
     #[props(default)]
-    pub onchange: Option<EventHandler<()>>,
+    pub on_change: Option<EventHandler<()>>,
     /// Whether the radio is disabled
     #[props(default)]
     pub disabled: bool,
@@ -33,6 +33,9 @@ pub struct RadioProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Radio atom component
@@ -100,9 +103,12 @@ pub fn Radio(props: RadioProps) -> Element {
         rsx! {}
     };
 
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         label {
             style: "display: flex; align-items: center; gap: 8px; cursor: {cursor_style}; position: relative;",
+            id: "{id_css}",
 
             input {
                 r#type: "radio",
@@ -113,7 +119,7 @@ pub fn Radio(props: RadioProps) -> Element {
                 style: "position: absolute; opacity: 0; width: 0; height: 0;",
                 onchange: move |_| {
                     if !disabled && !checked {
-                        if let Some(handler) = &props.onchange {
+                        if let Some(handler) = &props.on_change {
                             handler.call(());
                         }
                     }
@@ -140,7 +146,7 @@ pub struct RadioGroupProps {
     /// Currently selected value
     pub value: String,
     /// Callback when selection changes
-    pub onchange: EventHandler<String>,
+    pub on_change: EventHandler<String>,
     /// Radio group children (Radio components)
     pub children: Element,
     /// Layout direction

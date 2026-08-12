@@ -39,6 +39,12 @@ pub struct MediaObjectProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Media object component (image + text layout)
@@ -73,6 +79,7 @@ pub fn MediaObject(props: MediaObjectProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "media-object{class_css}",
             style: "display: flex; flex-direction: {flex_direction}; align-items: {align_items}; gap: {gap}px;",
 
@@ -84,7 +91,7 @@ pub fn MediaObject(props: MediaObjectProps) -> Element {
 
             div {
                 class: "media-object-content",
-                style: "flex: 1; min-width: 0;",
+                style: "flex: 1; min-width: 0; {props.style.clone().unwrap_or_default()}",
                 {props.children}
             }
         }
@@ -115,6 +122,15 @@ pub struct MediaContentProps {
     /// Actions (buttons, links)
     #[props(default)]
     pub actions: Option<Element>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Media content component (structured text content)
@@ -137,6 +153,7 @@ pub fn MediaContent(props: MediaContentProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "media-content",
             style: "display: flex; flex-direction: column; gap: 8px;",
 
@@ -176,8 +193,8 @@ pub fn MediaContent(props: MediaContentProps) -> Element {
 
             if let Some(actions) = props.actions {
                 div {
-                    class: "media-content-actions",
-                    style: "display: flex; gap: 8px; margin-top: 4px;",
+                    class: "media-content-actions {props.class.clone().unwrap_or_default()}",
+                    style: "display: flex; gap: 8px; margin-top: 4px; {props.style.clone().unwrap_or_default()}",
                     {actions}
                 }
             }
@@ -215,6 +232,12 @@ pub struct CommentProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Comment component (nested discussion)
@@ -237,7 +260,9 @@ pub fn Comment(props: CommentProps) -> Element {
     let avatar_element = props.avatar.unwrap_or_else(|| {
         rsx! {
             div {
-                style: "width: 40px; height: 40px; border-radius: 50%; background: {theme.tokens.read().colors.muted.to_rgba()}; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: {theme.tokens.read().colors.foreground.to_rgba()};",
+                id: "{props.id.clone().unwrap_or_default()}",
+                class: "{props.class.clone().unwrap_or_default()}",
+                style: "width: 40px; height: 40px; border-radius: 50%; background: {theme.tokens.read().colors.muted.to_rgba()}; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 600; color: {theme.tokens.read().colors.foreground.to_rgba()}; {props.style.clone().unwrap_or_default()}",
                 "{props.author.chars().next().unwrap_or('?').to_uppercase()}"
             }
         }

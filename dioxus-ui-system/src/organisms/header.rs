@@ -42,6 +42,12 @@ pub struct HeaderProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Header organism component
@@ -154,8 +160,13 @@ pub fn Header(props: HeaderProps) -> Element {
         rsx! {}
     };
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+
     rsx! {
         header {
+            id: "{id}",
+            class: "{class}",
             style: "{final_style}",
 
             // Left section: Brand + Nav
@@ -182,6 +193,12 @@ pub fn Header(props: HeaderProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct HeaderNavLinkProps {
     pub item: NavItem,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -213,9 +230,15 @@ pub fn HeaderNavLink(props: HeaderNavLinkProps) -> Element {
     let href = item.href.clone();
     let has_icon = item.icon.is_some();
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let custom_style = props.style.clone().unwrap_or_default();
+
     rsx! {
         a {
-            style: "{style}",
+            id: "{id}",
+            class: "{class}",
+            style: "{style} {custom_style}",
             href: "{href}",
 
             if has_icon {
@@ -275,6 +298,12 @@ pub struct UserMenuProps {
     /// Menu items
     #[props(default)]
     pub menu_items: Vec<UserMenuItem>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// User menu item
@@ -330,9 +359,15 @@ pub fn UserMenu(props: UserMenuProps) -> Element {
         }
     };
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: "position: relative;",
+            id: "{id}",
+            class: "{class}",
+            style: "position: relative; {style}",
 
             Button {
                 variant: ButtonVariant::Ghost,
@@ -364,6 +399,12 @@ pub fn UserMenu(props: UserMenuProps) -> Element {
 pub struct UserMenuDropdownProps {
     pub items: Vec<UserMenuItem>,
     pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -384,9 +425,15 @@ pub fn UserMenuDropdown(props: UserMenuDropdownProps) -> Element {
             .build()
     });
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let custom_style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: "{style}",
+            id: "{id}",
+            class: "{class}",
+            style: "{style} {custom_style}",
 
             for item in props.items {
                 UserMenuItemView {
@@ -402,6 +449,12 @@ pub fn UserMenuDropdown(props: UserMenuDropdownProps) -> Element {
 pub struct UserMenuItemViewProps {
     pub item: UserMenuItem,
     pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -424,9 +477,15 @@ pub fn UserMenuItemView(props: UserMenuItemViewProps) -> Element {
 
     let has_icon = item.icon.is_some();
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let custom_style = props.style.clone().unwrap_or_default();
+
     rsx! {
         button {
-            style: "{style} background: transparent; border: none; text-align: left; color: inherit;",
+            id: "{id}",
+            class: "{class}",
+            style: "{style} background: transparent; border: none; text-align: left; color: inherit; {custom_style}",
             onclick: move |_| {
                 if let Some(handler) = &item.onclick {
                     handler.call(());

@@ -76,6 +76,12 @@ pub struct FooterProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Footer variant
@@ -134,10 +140,14 @@ pub fn Footer(props: FooterProps) -> Element {
         "auto"
     };
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         footer {
+            id: "{id}",
             class: "footer footer-{variant_name}{class_css}",
-            style: "background: {bg_color}; color: {text_color}; border-top: 1px solid {border_color};",
+            style: "background: {bg_color}; color: {text_color}; border-top: 1px solid {border_color}; {style}",
 
             // Main footer content
             if props.brand.is_some() || !props.link_groups.is_empty() {
@@ -262,6 +272,12 @@ pub struct SimpleFooterProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Simple footer (minimal version)
@@ -275,10 +291,14 @@ pub fn SimpleFooter(props: SimpleFooterProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let simple_id = props.id.clone().unwrap_or_default();
+    let simple_style = props.style.clone().unwrap_or_default();
+
     rsx! {
         footer {
+            id: "{simple_id}",
             class: "simple-footer{class_css}",
-            style: "padding: 24px; border-top: 1px solid {theme.tokens.read().colors.border.to_rgba()};",
+            style: "padding: 24px; border-top: 1px solid {theme.tokens.read().colors.border.to_rgba()}; {simple_style}",
 
             div {
                 style: "max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;",

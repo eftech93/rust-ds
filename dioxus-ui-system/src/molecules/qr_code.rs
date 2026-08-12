@@ -60,6 +60,9 @@ pub struct QrCodeProps {
     /// Title/alt text for accessibility
     #[props(default)]
     pub title: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// QR Code display component
@@ -115,6 +118,7 @@ pub fn QrCode(props: QrCodeProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
 
@@ -142,6 +146,9 @@ pub struct QrCodeSvgProps {
     pub style: Option<String>,
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// QR Code SVG component using inline SVG
@@ -161,6 +168,7 @@ pub fn QrCodeSvg(props: QrCodeSvgProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
 
@@ -211,6 +219,15 @@ pub fn QrCodeSvg(props: QrCodeSvgProps) -> Element {
 struct PositionPatternProps {
     x: usize,
     y: usize,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -220,7 +237,16 @@ fn PositionPattern(props: PositionPatternProps) -> Element {
 
     rsx! {
         // Outer square
-        rect { x: "{x}", y: "{y}", width: "7", height: "7", fill: "black" }
+        rect {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{props.style.clone().unwrap_or_default()}",
+            x: "{x}",
+            y: "{y}",
+            width: "7",
+            height: "7",
+            fill: "black"
+        }
         // White border
         rect { x: "{x + 1}", y: "{y + 1}", width: "5", height: "5", fill: "white" }
         // Inner square

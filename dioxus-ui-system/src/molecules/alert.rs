@@ -49,6 +49,9 @@ pub struct AlertProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Alert molecule component
@@ -118,9 +121,11 @@ pub fn Alert(props: AlertProps) -> Element {
     let icon_name = props.icon.as_deref().or(default_icon);
     let custom_style = props.style.clone().unwrap_or_default();
     let custom_class = props.class.clone().unwrap_or_default();
+    let id = props.id.clone().unwrap_or_default();
 
     rsx! {
         div {
+            id: "{id}",
             role: "alert",
             style: "{alert_style} {custom_style} display: flex; align-items: flex-start; gap: 12px;",
             class: "{custom_class}",
@@ -161,6 +166,12 @@ pub fn Alert(props: AlertProps) -> Element {
 struct AlertIconProps {
     name: String,
     style: String,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 #[component]
@@ -169,6 +180,8 @@ fn AlertIcon(props: AlertIconProps) -> Element {
     let svg_content = match props.name.as_str() {
         "alert-triangle" => rsx! {
             svg {
+                id: "{props.id.clone().unwrap_or_default()}",
+                class: "{props.class.clone().unwrap_or_default()}",
                 view_box: "0 0 24 24",
                 fill: "none",
                 stroke: "currentColor",

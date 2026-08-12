@@ -56,6 +56,12 @@ pub struct LayoutProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Navigation item for layouts
@@ -115,6 +121,8 @@ pub fn Layout(props: LayoutProps) -> Element {
                 sidebar_width: props.sidebar_width,
                 header_height: props.header_height,
                 class: props.class.clone(),
+                id: props.id.clone(),
+                style: props.style.clone(),
             }
         },
         LayoutType::TopNav => rsx! {
@@ -126,6 +134,8 @@ pub fn Layout(props: LayoutProps) -> Element {
                 actions: props.actions.clone(),
                 header_height: props.header_height,
                 class: props.class.clone(),
+                id: props.id.clone(),
+                style: props.style.clone(),
             }
         },
         LayoutType::Drawer => rsx! {
@@ -138,12 +148,16 @@ pub fn Layout(props: LayoutProps) -> Element {
                 sidebar_width: props.sidebar_width,
                 header_height: props.header_height,
                 class: props.class.clone(),
+                id: props.id.clone(),
+                style: props.style.clone(),
             }
         },
         LayoutType::FullWidth => rsx! {
             FullWidthLayoutRenderer {
                 children: props.children.clone(),
                 class: props.class.clone(),
+                id: props.id.clone(),
+                style: props.style.clone(),
             }
         },
     }
@@ -162,6 +176,8 @@ pub struct SidebarLayoutProps {
     sidebar_width: u16,
     header_height: u16,
     class: Option<String>,
+    id: Option<String>,
+    style: Option<String>,
 }
 
 #[component]
@@ -190,11 +206,16 @@ fn SidebarLayoutRenderer(props: SidebarLayoutProps) -> Element {
 
     let _content_style = "flex: 1; padding: 24px; overflow: auto;";
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         Box {
             display: crate::atoms::BoxDisplay::Flex,
             height: Some("100vh".to_string()),
             class: props.class.clone(),
+            id: Some(id),
+            style: Some(style),
 
             // Sidebar
             aside {
@@ -289,6 +310,8 @@ pub struct TopNavLayoutProps {
     actions: Option<Element>,
     header_height: u16,
     class: Option<String>,
+    id: Option<String>,
+    style: Option<String>,
 }
 
 #[component]
@@ -303,11 +326,15 @@ fn TopNavLayoutRenderer(props: TopNavLayoutProps) -> Element {
         props.header_height
     );
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         VStack {
             height: Some("100vh".to_string()),
             class: props.class.clone(),
-            style: Some("min-height: 100vh;".to_string()),
+            id: Some(id),
+            style: Some(format!("min-height: 100vh; {}", style)),
 
             // Header with navigation
             header {
@@ -359,6 +386,8 @@ pub struct DrawerLayoutProps {
     sidebar_width: u16,
     header_height: u16,
     class: Option<String>,
+    id: Option<String>,
+    style: Option<String>,
 }
 
 #[component]
@@ -382,11 +411,15 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
         props.sidebar_width
     );
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         VStack {
             height: Some("100vh".to_string()),
             class: props.class.clone(),
-            style: Some("min-height: 100vh;".to_string()),
+            id: Some(id),
+            style: Some(format!("min-height: 100vh; {}", style)),
 
             // Header
             header {
@@ -496,6 +529,8 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
 pub struct FullWidthLayoutProps {
     children: Element,
     class: Option<String>,
+    id: Option<String>,
+    style: Option<String>,
 }
 
 #[component]
@@ -508,11 +543,16 @@ fn FullWidthLayoutRenderer(props: FullWidthLayoutProps) -> Element {
             .build()
     });
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         Box {
             width: Some("100%".to_string()),
             min_height: Some("100vh".to_string()),
             class: props.class.clone(),
+            id: Some(id),
+            style: Some(style),
             {props.children}
         }
     }

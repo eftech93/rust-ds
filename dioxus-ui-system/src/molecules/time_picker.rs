@@ -39,6 +39,12 @@ pub struct TimePickerProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Parsed time components
@@ -239,6 +245,7 @@ pub fn TimePicker(props: TimePickerProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "time-picker{class_css}",
             style: "display: flex; flex-direction: column; gap: 6px; position: relative;",
 
@@ -304,7 +311,7 @@ pub fn TimePicker(props: TimePickerProps) -> Element {
             if let Some(error) = props.error.clone() {
                 span {
                     class: "time-picker-error",
-                    style: "font-size: 12px; color: {theme.tokens.read().colors.destructive.to_rgba()};",
+                    style: "font-size: 12px; color: {theme.tokens.read().colors.destructive.to_rgba()}; {props.style.clone().unwrap_or_default()}",
                     "{error}"
                 }
             }
@@ -321,6 +328,15 @@ struct TimePickerDropdownProps {
     minute_step: u32,
     on_select: EventHandler<TimeValue>,
     on_close: EventHandler<()>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -442,8 +458,9 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
     rsx! {
         // Backdrop to close on outside click - high z-index to capture clicks but below dropdown
         div {
-            class: "time-picker-backdrop",
-            style: "position: fixed; inset: 0; z-index: 9998;",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "time-picker-backdrop {props.class.clone().unwrap_or_default()}",
+            style: "position: fixed; inset: 0; z-index: 9998; {props.style.clone().unwrap_or_default()}",
             onclick: move |_| props.on_close.call(()),
         }
 
@@ -663,6 +680,15 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 struct TimePickerNowButtonProps {
     on_click: EventHandler<()>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -678,11 +704,13 @@ fn TimePickerNowButton(props: TimePickerNowButtonProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "display: flex; justify-content: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid {theme.tokens.read().colors.border.to_rgba()};",
 
             button {
                 type: "button",
-                style: "font-size: 13px; font-weight: 500; color: {theme.tokens.read().colors.primary.to_rgba()}; background: {bg_color}; border: none; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 100ms ease;",
+                style: "font-size: 13px; font-weight: 500; color: {theme.tokens.read().colors.primary.to_rgba()}; background: {bg_color}; border: none; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 100ms ease; {props.style.clone().unwrap_or_default()}",
                 onmouseenter: move |_| is_hovered.set(true),
                 onmouseleave: move |_| is_hovered.set(false),
                 onclick: move |_| props.on_click.call(()),
@@ -715,6 +743,12 @@ pub struct TimeInputProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Time input component with manual text entry
@@ -787,9 +821,10 @@ pub fn TimeInput(props: TimeInputProps) -> Element {
 
     rsx! {
         input {
+            id: "{props.id.clone().unwrap_or_default()}",
             r#type: "text",
             class: "time-input{class_css}",
-            style: "{input_style}",
+            style: "{input_style} {props.style.clone().unwrap_or_default()}",
             placeholder: "{placeholder}",
             value: "{input_value}",
             disabled: props.disabled,

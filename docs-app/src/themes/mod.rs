@@ -1238,7 +1238,7 @@ fn ThemePreview() -> Element {
                         label: "Example Input",
                         value: "Hello World".to_string(),
                         placeholder: Some("Type something...".to_string()),
-                        onchange: move |_| {},
+                        on_change: move |_| {},
                     }
                 }
 

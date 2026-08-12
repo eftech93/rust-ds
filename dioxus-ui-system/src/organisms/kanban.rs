@@ -120,6 +120,12 @@ pub struct KanbanProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
     /// Column width (default: 280px)
     #[props(default = "280px".to_string())]
     pub column_width: String,
@@ -184,14 +190,19 @@ pub fn Kanban(props: KanbanProps) -> Element {
     let columns = props.columns.clone();
     let column_width = props.column_width.clone();
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
+            class: "{class}",
             style: "{final_style}",
 
-            for column in columns {
+            for column in &columns {
                 KanbanColumnView {
                     key: "{column.id}",
-                    column: column,
+                    column: column.clone(),
                     width: column_width.clone(),
                     on_card_click: props.on_card_click,
                     on_add_card: props.on_add_card,
@@ -218,6 +229,12 @@ pub struct KanbanColumnViewProps {
     pub on_add_card: Option<EventHandler<String>>,
     pub show_card_count: bool,
     pub card_hover: bool,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -273,9 +290,15 @@ pub fn KanbanColumnView(props: KanbanColumnViewProps) -> Element {
     let accent_color = column.color.clone();
     let column_id = column.id.clone();
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: "{column_style}",
+            id: "{id}",
+            class: "{class}",
+            style: "{column_style} {style}",
 
             // Column Header
             div {
@@ -318,10 +341,10 @@ pub fn KanbanColumnView(props: KanbanColumnViewProps) -> Element {
             div {
                 style: "{cards_container_style}",
 
-                for card in column.cards {
+                for card in &column.cards {
                     KanbanCardView {
                         key: "{card.id}",
-                        card: card,
+                        card: card.clone(),
                         on_click: props.on_card_click.clone(),
                         hover: props.card_hover,
                     }
@@ -357,6 +380,12 @@ pub struct KanbanCardViewProps {
     pub card: KanbanCard,
     pub on_click: Option<EventHandler<String>>,
     pub hover: bool,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -416,9 +445,15 @@ pub fn KanbanCardView(props: KanbanCardViewProps) -> Element {
     let card_id = card.id.clone();
     let onclick_handler = props.on_click.clone();
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: "{card_style}",
+            id: "{id}",
+            class: "{class}",
+            style: "{card_style} {style}",
             onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
             onclick: move |_| {
@@ -465,10 +500,10 @@ pub fn KanbanCardView(props: KanbanCardViewProps) -> Element {
                 div {
                     style: "{tags_style}",
 
-                    for tag in card.tags {
+                    for tag in &card.tags {
                         KanbanTag {
                             key: "{tag}",
-                            label: tag,
+                            label: tag.clone(),
                         }
                     }
                 }
@@ -526,6 +561,12 @@ pub fn KanbanCardView(props: KanbanCardViewProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct KanbanTagProps {
     pub label: String,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -539,9 +580,15 @@ pub fn KanbanTag(props: KanbanTagProps) -> Element {
     let bg_color = format!("hsl({}, 70%, 90%)", hue);
     let text_color = format!("hsl({}, 70%, 30%)", hue);
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         span {
-            style: "display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: {bg_color}; color: {text_color}; white-space: nowrap;",
+            id: "{id}",
+            class: "{class}",
+            style: "display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: {bg_color}; color: {text_color}; white-space: nowrap; {style}",
             "{props.label}"
         }
     }
@@ -551,6 +598,12 @@ pub fn KanbanTag(props: KanbanTagProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct AddColumnButtonProps {
     pub on_add_column: Option<EventHandler<()>>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -582,9 +635,15 @@ pub fn AddColumnButton(props: AddColumnButtonProps) -> Element {
 
     let onclick_handler = props.on_add_column.clone();
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: "{button_style}",
+            id: "{id}",
+            class: "{class}",
+            style: "{button_style} {style}",
             onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
             onclick: move |_| {
@@ -617,12 +676,21 @@ pub struct SimpleKanbanProps {
     pub on_card_click: Option<EventHandler<String>>,
     #[props(default = "100%".to_string())]
     pub height: String,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 pub fn SimpleKanban(props: SimpleKanbanProps) -> Element {
     rsx! {
         Kanban {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             columns: props.columns.clone(),
             on_card_click: props.on_card_click.clone(),
             height: props.height.clone(),

@@ -8,6 +8,10 @@ use crate::styles::Style;
 use crate::theme::tokens::Color;
 use crate::theme::{use_style, use_theme};
 use dioxus::prelude::*;
+#[cfg(all(feature = "web", target_arch = "wasm32"))]
+use std::cell::RefCell;
+#[cfg(all(feature = "web", target_arch = "wasm32"))]
+use std::rc::Rc;
 
 #[cfg(all(feature = "web", target_arch = "wasm32"))]
 use wasm_bindgen::prelude::*;
@@ -81,6 +85,15 @@ pub struct SheetProps {
     /// Whether clicking the overlay closes the sheet
     #[props(default = true)]
     pub close_on_overlay_click: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Sheet molecule component
@@ -118,34 +131,56 @@ pub fn Sheet(props: SheetProps) -> Element {
     let side_for_transform = props.side.clone();
 
     // Handle escape key
-    use_effect(move || {
-        if !props.open {
-            return;
-        }
+    #[cfg(all(feature = "web", target_arch = "wasm32"))]
+    let keydown_func: Rc<RefCell<Option<js_sys::Function>>> =
+        use_hook(|| Rc::new(RefCell::new(None)));
+    #[cfg(all(feature = "web", target_arch = "wasm32"))]
+    {
+        let func_for_effect = (*keydown_func).clone();
+        let func_for_drop = (*keydown_func).clone();
 
-        // Register keyboard event listener
-        #[cfg(all(feature = "web", target_arch = "wasm32"))]
-        {
+        use_effect(move || {
+            if !props.open {
+                if let Some(ref f) = *func_for_effect.borrow() {
+                    if let Some(window) = web_sys::window() {
+                        let _ = window.remove_event_listener_with_callback("keydown", f);
+                    }
+                }
+                *func_for_effect.borrow_mut() = None;
+                return;
+            }
+
             let on_close = props.on_open_change.clone();
             let closure = Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
                 if event.key() == "Escape" {
                     on_close.call(false);
                 }
             }) as Box<dyn FnMut(_)>);
+            let func: js_sys::Function = closure.as_ref().unchecked_ref::<js_sys::Function>().clone();
             if let Some(window) = web_sys::window() {
                 window
-                    .add_event_listener_with_callback("keydown", closure.as_ref().unchecked_ref())
+                    .add_event_listener_with_callback("keydown", &func)
                     .unwrap();
             }
-            closure.forget(); // Keep the closure alive
-        }
+            *func_for_effect.borrow_mut() = Some(func);
+            closure.forget();
+        });
 
-        #[cfg(not(all(feature = "web", target_arch = "wasm32")))]
-        {
-            // Keyboard handling not implemented for non-web targets
+        use_drop(move || {
+            if let Some(ref f) = *func_for_drop.borrow() {
+                if let Some(window) = web_sys::window() {
+                    let _ = window.remove_event_listener_with_callback("keydown", f);
+                }
+            }
+        });
+    }
+
+    #[cfg(not(all(feature = "web", target_arch = "wasm32")))]
+    {
+        use_effect(move || {
             let _ = props.on_open_change;
-        }
-    });
+        });
+    }
 
     if !props.open {
         return rsx! {};
@@ -232,7 +267,9 @@ pub fn Sheet(props: SheetProps) -> Element {
     rsx! {
         // Overlay - separate element at root level
         div {
-            style: "{overlay_style} opacity: {overlay_opacity}; {overlay_transition}",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{overlay_style} opacity: {overlay_opacity}; {overlay_transition} {props.style.clone().unwrap_or_default()}",
             onclick: handle_overlay_click,
         }
 
@@ -266,6 +303,15 @@ struct SheetHeaderProps {
     description: Option<String>,
     show_close_button: bool,
     on_close: EventHandler<bool>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
@@ -286,6 +332,8 @@ fn SheetHeader(props: SheetHeaderProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{header_style}",
 
             if props.title.is_some() || props.description.is_some() {
@@ -301,7 +349,7 @@ fn SheetHeader(props: SheetHeaderProps) -> Element {
 
                     if let Some(description) = props.description {
                         p {
-                            style: "margin: 0; font-size: 14px; color: #64748b;",
+                            style: "margin: 0; font-size: 14px; color: #64748b; {props.style.clone().unwrap_or_default()}",
                             "{description}"
                         }
                     }
@@ -329,6 +377,15 @@ pub struct SheetFooterProps {
     /// Align content
     #[props(default)]
     pub align: SheetFooterAlign,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Sheet footer alignment
@@ -369,7 +426,9 @@ pub fn SheetFooter(props: SheetFooterProps) -> Element {
 
     rsx! {
         div {
-            style: "{footer_style} justify-content: {justify};",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            style: "{footer_style} justify-content: {justify}; {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
     }

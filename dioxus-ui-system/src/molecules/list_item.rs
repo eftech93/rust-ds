@@ -47,6 +47,12 @@ pub struct ListItemProps {
     /// Hover effect
     #[props(default = true)]
     pub hoverable: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// List item component
@@ -99,6 +105,7 @@ pub fn ListItem(props: ListItemProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "list-item{class_css}",
             style: "display: flex; align-items: center; gap: 12px; padding: {padding}; background: {bg_color}; border-left: 3px solid {border_left}; opacity: {opacity}; cursor: {cursor}; transition: background 0.15s ease;",
             onclick: move |_| {
@@ -112,7 +119,7 @@ pub fn ListItem(props: ListItemProps) -> Element {
             if let Some(leading) = props.leading {
                 div {
                     class: "list-item-leading",
-                    style: "flex-shrink: 0; display: flex; align-items: center;",
+                    style: "flex-shrink: 0; display: flex; align-items: center; {props.style.clone().unwrap_or_default()}",
                     {leading}
                 }
             }
@@ -168,6 +175,12 @@ pub struct ListGroupProps {
     /// Sticky header
     #[props(default = false)]
     pub sticky: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// List group component (sectioned list)
@@ -183,6 +196,7 @@ pub fn ListGroup(props: ListGroupProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "list-group{class_css}",
             style: "border-radius: 8px; overflow: hidden;",
 
@@ -200,7 +214,7 @@ pub fn ListGroup(props: ListGroupProps) -> Element {
 
             div {
                 class: "list-group-items",
-                style: "background: white; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px;",
+                style: "background: white; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px; {props.style.clone().unwrap_or_default()}",
                 {props.children}
             }
         }
@@ -232,6 +246,12 @@ pub struct ActionListItemProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Action list item (menu item style)
@@ -277,6 +297,7 @@ pub fn ActionListItem(props: ActionListItemProps) -> Element {
 
     rsx! {
         button {
+            id: "{props.id.clone().unwrap_or_default()}",
             type: "button",
             class: "action-list-item{class_css}",
             style: "display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 14px; background: transparent; border: none; text-align: left; cursor: {cursor}; opacity: {opacity}; border-radius: 6px; transition: background 0.15s ease;",
@@ -313,7 +334,7 @@ pub fn ActionListItem(props: ActionListItemProps) -> Element {
             if let Some(shortcut) = props.shortcut {
                 kbd {
                     class: "action-list-item-shortcut",
-                    style: "padding: 2px 6px; font-size: 11px; background: {theme.tokens.read().colors.muted.to_rgba()}; border-radius: 4px; color: {theme.tokens.read().colors.muted.to_rgba()}; flex-shrink: 0;",
+                    style: "padding: 2px 6px; font-size: 11px; background: {theme.tokens.read().colors.muted.to_rgba()}; border-radius: 4px; color: {theme.tokens.read().colors.muted.to_rgba()}; flex-shrink: 0; {props.style.clone().unwrap_or_default()}",
                     "{shortcut}"
                 }
             }
@@ -334,6 +355,12 @@ pub struct ExpandableListItemProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Expandable list item component
@@ -349,6 +376,7 @@ pub fn ExpandableListItem(props: ExpandableListItemProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "expandable-list-item{class_css}",
             style: "border-bottom: 1px solid #e2e8f0;",
 
@@ -372,7 +400,7 @@ pub fn ExpandableListItem(props: ExpandableListItemProps) -> Element {
             if is_expanded() {
                 div {
                     class: "expandable-list-item-content",
-                    style: "padding: 0 16px 16px; animation: expand 0.2s ease;",
+                    style: "padding: 0 16px 16px; animation: expand 0.2s ease; {props.style.clone().unwrap_or_default()}",
                     {props.children}
                 }
             }

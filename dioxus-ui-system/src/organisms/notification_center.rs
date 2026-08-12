@@ -75,6 +75,10 @@ pub struct NotificationCenterProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Notification center component (dropdown)
@@ -89,10 +93,14 @@ pub fn NotificationCenter(props: NotificationCenterProps) -> Element {
         .map(|c| format!(" {}", c))
         .unwrap_or_default();
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
             class: "notification-center{class_css}",
-            style: "position: relative;",
+            style: "position: relative; {style}",
 
             // Trigger button
             button {
@@ -316,9 +324,11 @@ pub struct BannerAlertProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
-
-/// Banner alert component (persistent notification)
 #[component]
 pub fn BannerAlert(props: BannerAlertProps) -> Element {
     let mut is_dismissed = use_signal(|| false);
@@ -344,10 +354,14 @@ pub fn BannerAlert(props: BannerAlertProps) -> Element {
 
     let text_color = theme.tokens.read().colors.foreground.to_rgba();
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
             class: "banner-alert{class_css}",
-            style: "padding: 12px 16px; background: {bg_color}; border-left: 4px solid {border_color}; display: flex; align-items: center; gap: 12px;",
+            style: "padding: 12px 16px; background: {bg_color}; border-left: 4px solid {border_color}; display: flex; align-items: center; gap: 12px; {style}",
 
             span {
                 class: "banner-alert-icon",

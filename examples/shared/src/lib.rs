@@ -197,7 +197,7 @@ fn InputShowcase() -> Element {
                         input_type: InputType::Email,
                         required: true,
                         hint: Some("We'll never share your email.".to_string()),
-                        onchange: move |v| email.set(v),
+                        on_change: move |v| email.set(v),
                     }
 
                     InputGroup {
@@ -210,7 +210,7 @@ fn InputShowcase() -> Element {
                         } else {
                             None
                         },
-                        onchange: move |v| {
+                        on_change: move |v| {
                             password.set(v);
                             error.set(true);
                         },
@@ -426,13 +426,13 @@ fn CardsOrganismsShowcase() -> Element {
                                     label: "",
                                     value: "sk-xxxxxxxxxxxx".to_string(),
                                     input_type: InputType::Password,
-                                    onchange: move |_| {},
+                                    on_change: move |_| {},
                                 }
 
                                 Checkbox {
                                     checked: true,
                                     label: Some("Enable notifications".to_string()),
-                                    onchange: move |_| {},
+                                    on_change: move |_| {},
                                 }
                             }
                         },
@@ -667,7 +667,7 @@ fn StepperShowcase() -> Element {
                                                 label: "Email",
                                                 value: "".to_string(),
                                                 input_type: InputType::Email,
-                                                onchange: move |_| {},
+                                                on_change: move |_| {},
                                             }
                                         }
                                     },
@@ -679,7 +679,7 @@ fn StepperShowcase() -> Element {
                                             InputGroup {
                                                 label: "Full Name",
                                                 value: "".to_string(),
-                                                onchange: move |_| {},
+                                                on_change: move |_| {},
                                             }
                                         }
                                     },
@@ -691,7 +691,7 @@ fn StepperShowcase() -> Element {
                                             Checkbox {
                                                 checked: true,
                                                 label: Some("Enable notifications".to_string()),
-                                                onchange: move |_| {},
+                                                on_change: move |_| {},
                                             }
                                         }
                                     },
@@ -858,7 +858,7 @@ fn NewFormControlsShowcase() -> Element {
                     Checkbox {
                         checked: checked(),
                         label: Some("Accept terms and conditions".to_string()),
-                        onchange: move |v| checked.set(v),
+                        on_change: move |v| checked.set(v),
                     }
 
                     // Radio
@@ -872,21 +872,21 @@ fn NewFormControlsShowcase() -> Element {
                             value: "option1".to_string(),
                             checked: radio_value() == "option1",
                             label: Some("Option 1".to_string()),
-                            onchange: move |_| radio_value.set("option1".to_string()),
+                            on_change: move |_| radio_value.set("option1".to_string()),
                         }
                         Radio {
                             name: "radio-group".to_string(),
                             value: "option2".to_string(),
                             checked: radio_value() == "option2",
                             label: Some("Option 2".to_string()),
-                            onchange: move |_| radio_value.set("option2".to_string()),
+                            on_change: move |_| radio_value.set("option2".to_string()),
                         }
                         Radio {
                             name: "radio-group".to_string(),
                             value: "option3".to_string(),
                             checked: radio_value() == "option3",
                             label: Some("Option 3".to_string()),
-                            onchange: move |_| radio_value.set("option3".to_string()),
+                            on_change: move |_| radio_value.set("option3".to_string()),
                         }
                     }
 
@@ -896,7 +896,7 @@ fn NewFormControlsShowcase() -> Element {
                     Switch {
                         checked: switch_on(),
                         label: Some(if switch_on() { "Notifications ON" } else { "Notifications OFF" }.to_string()),
-                        onchange: move |v| switch_on.set(v),
+                        on_change: move |v| switch_on.set(v),
                     }
 
                     Separator {}
@@ -907,7 +907,7 @@ fn NewFormControlsShowcase() -> Element {
                         value: selected(),
                         options: options,
                         placeholder: Some("Select...".to_string()),
-                        onchange: move |v| selected.set(v),
+                        on_change: move |v| selected.set(v),
                     }
 
                     Separator {}
@@ -919,7 +919,7 @@ fn NewFormControlsShowcase() -> Element {
                         placeholder: Some("Type your message here...".to_string()),
                         rows: 3,
                         max_length: Some(200),
-                        onchange: move |v| textarea.set(v),
+                        on_change: move |v| textarea.set(v),
                     }
                 }
             }
@@ -1233,7 +1233,7 @@ fn SkeletonShowcase() -> Element {
                     Switch {
                         checked: loading(),
                         label: Some("Show Skeleton".to_string()),
-                        onchange: move |v| loading.set(v),
+                        on_change: move |v| loading.set(v),
                     }
 
                     if loading() {

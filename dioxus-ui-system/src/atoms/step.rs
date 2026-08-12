@@ -111,6 +111,15 @@ pub struct StepIndicatorProps {
     /// Optional aria label
     #[props(default)]
     pub aria_label: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Step indicator atom - shows the step number or icon in a circle
@@ -187,8 +196,13 @@ pub fn StepIndicator(props: StepIndicatorProps) -> Element {
 
     let font_size_val = props.size.font_size();
 
+    let class_css = props.class.clone().unwrap_or_default();
+    let style_css = props.style.clone().unwrap_or_default();
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         div {
+            class: "step-indicator {class_css}",
             style: "
                 width: {size}px; 
                 height: {size}px; 
@@ -204,7 +218,9 @@ pub fn StepIndicator(props: StepIndicatorProps) -> Element {
                 flex-shrink: 0;
                 cursor: {cursor};
                 transition: all 200ms ease;
+                {style_css}
             ",
+            id: "{id_css}",
             aria_label: props.aria_label.clone().unwrap_or_else(|| format!("Step {}", props.step)),
             aria_current: if props.state == StepState::Active { Some("step") } else { None },
             onclick: move |_| {
@@ -233,6 +249,15 @@ pub struct StepConnectorProps {
     /// Connector thickness
     #[props(default = "2px".to_string())]
     pub thickness: String,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Step connector atom - line connecting step indicators
@@ -246,17 +271,23 @@ pub fn StepConnector(props: StepConnectorProps) -> Element {
         }
     });
     let thickness_val = props.thickness.clone();
+    let class_css = props.class.clone().unwrap_or_default();
+    let style_css = props.style.clone().unwrap_or_default();
+    let id_css = props.id.clone().unwrap_or_default();
 
     if props.horizontal {
         rsx! {
             div {
+                class: "step-connector {class_css}",
                 style: "
                     flex: 1;
                     height: {thickness_val};
                     background: {color};
                     min-width: 24px;
                     transition: background 200ms ease;
+                    {style_css}
                 ",
+                id: "{id_css}",
                 role: "separator",
                 aria_orientation: "horizontal",
             }
@@ -264,6 +295,7 @@ pub fn StepConnector(props: StepConnectorProps) -> Element {
     } else {
         rsx! {
             div {
+                class: "step-connector {class_css}",
                 style: "
                     width: {thickness_val};
                     flex: 1;
@@ -271,7 +303,9 @@ pub fn StepConnector(props: StepConnectorProps) -> Element {
                     min-height: 24px;
                     margin-left: 15px;
                     transition: background 200ms ease;
+                    {style_css}
                 ",
+                id: "{id_css}",
                 role: "separator",
                 aria_orientation: "vertical",
             }
@@ -293,6 +327,15 @@ pub struct StepLabelProps {
     /// Text size
     #[props(default)]
     pub size: StepSize,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Step label atom - displays step title and optional description
@@ -319,9 +362,15 @@ pub fn StepLabel(props: StepLabelProps) -> Element {
         "500"
     };
 
+    let class_css = props.class.clone().unwrap_or_default();
+    let style_css = props.style.clone().unwrap_or_default();
+    let id_css = props.id.clone().unwrap_or_default();
+
     rsx! {
         div {
-            style: "display: flex; flex-direction: column; gap: 2px;",
+            class: "step-label {class_css}",
+            style: "display: flex; flex-direction: column; gap: 2px;{style_css}",
+            id: "{id_css}",
 
             span {
                 style: "

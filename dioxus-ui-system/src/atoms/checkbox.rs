@@ -14,7 +14,7 @@ pub struct CheckboxProps {
     pub checked: bool,
     /// Callback when checked state changes
     #[props(default)]
-    pub onchange: Option<EventHandler<bool>>,
+    pub on_change: Option<EventHandler<bool>>,
     /// Whether the checkbox is disabled
     #[props(default)]
     pub disabled: bool,
@@ -27,6 +27,9 @@ pub struct CheckboxProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Checkbox atom component
@@ -101,7 +104,7 @@ pub fn Checkbox(props: CheckboxProps) -> Element {
         if !disabled {
             let new_checked = !is_checked();
             is_checked.set(new_checked);
-            if let Some(handler) = &props.onchange {
+            if let Some(handler) = &props.on_change {
                 handler.call(new_checked);
             }
         }
@@ -115,6 +118,7 @@ pub fn Checkbox(props: CheckboxProps) -> Element {
             disabled: disabled,
             style: "{checkbox_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
+            id: "{props.id.clone().unwrap_or_default()}",
             onclick: handle_click,
             onmouseenter: move |_| if !disabled { is_hovered.set(true) },
             onmouseleave: move |_| is_hovered.set(false),

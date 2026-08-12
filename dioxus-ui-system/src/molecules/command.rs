@@ -70,6 +70,8 @@ struct CommandContext {
     focused: Signal<bool>,
     /// Callback when any item is selected (for closing the palette)
     on_item_select: Callback<()>,
+    /// Trigger signal to select the highlighted item
+    select_trigger: Signal<usize>,
 }
 
 // ============================================================================
@@ -87,6 +89,12 @@ pub struct CommandProps {
     /// Callback when an item is selected (can be used to close the command palette)
     #[props(default)]
     pub on_select: Option<EventHandler<()>>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Command container component
@@ -99,6 +107,7 @@ pub fn Command(props: CommandProps) -> Element {
     let highlighted_index = use_signal(|| 0usize);
     let item_count = use_signal(|| 0usize);
     let focused = use_signal(|| false);
+    let select_trigger = use_signal(|| 0usize);
 
     let on_item_select = props.on_select.clone();
     let context = CommandContext {
@@ -112,6 +121,7 @@ pub fn Command(props: CommandProps) -> Element {
                 handler.call(());
             }
         }),
+        select_trigger,
     };
 
     let class_css = props
@@ -137,8 +147,9 @@ pub fn Command(props: CommandProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "command{class_css}",
-            style: "{container_style}",
+            style: "{container_style} {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
     }
@@ -159,6 +170,15 @@ pub struct CommandInputProps {
     pub value: String,
     /// Callback when value changes
     pub on_value_change: EventHandler<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Command input component
@@ -206,7 +226,8 @@ pub fn CommandInput(props: CommandInputProps) -> Element {
                 context.highlighted_index.set(current.saturating_sub(1));
             }
             Key::Enter => {
-                // Selection is handled by CommandList
+                let current = context.select_trigger.read().clone();
+                context.select_trigger.set(current + 1);
             }
             Key::Escape => {
                 context.highlighted_index.set(0);
@@ -223,6 +244,7 @@ pub fn CommandInput(props: CommandInputProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "command-input-wrapper",
             style: "position: relative; display: flex; align-items: center;",
 
@@ -234,8 +256,8 @@ pub fn CommandInput(props: CommandInputProps) -> Element {
             }
 
             input {
-                class: "command-input",
-                style: "{input_style} padding-left: 44px;",
+                class: "command-input {props.class.clone().unwrap_or_default()}",
+                style: "{input_style} padding-left: 44px; {props.style.clone().unwrap_or_default()}",
                 type: "text",
                 placeholder: "{placeholder_text}",
                 value: "{value_for_input}",
@@ -262,6 +284,15 @@ pub fn CommandInput(props: CommandInputProps) -> Element {
 pub struct CommandListProps {
     /// Child elements (CommandGroup, CommandItem, CommandSeparator, CommandEmpty)
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Command list component
@@ -284,8 +315,9 @@ pub fn CommandList(props: CommandListProps) -> Element {
 
     rsx! {
         div {
-            class: "command-list",
-            style: "{list_style}",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "command-list {props.class.clone().unwrap_or_default()}",
+            style: "{list_style} {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
     }
@@ -303,6 +335,15 @@ pub struct CommandGroupProps {
     pub heading: Option<String>,
     /// Child command items
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Command group component
@@ -323,13 +364,14 @@ pub fn CommandGroup(props: CommandGroupProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "command-group",
             style: "{group_style}",
 
             if let Some(heading) = props.heading {
                 div {
-                    class: "command-group-heading",
-                    style: "padding: 8px 12px; font-size: 12px; font-weight: 500; color: {theme.tokens.read().colors.muted.to_rgba()}; text-transform: uppercase; letter-spacing: 0.05em;",
+                    class: "command-group-heading {props.class.clone().unwrap_or_default()}",
+                    style: "padding: 8px 12px; font-size: 12px; font-weight: 500; color: {theme.tokens.read().colors.muted.to_rgba()}; text-transform: uppercase; letter-spacing: 0.05em; {props.style.clone().unwrap_or_default()}",
                     "{heading}"
                 }
             }
@@ -355,6 +397,15 @@ pub struct CommandItemProps {
     /// Whether the item is disabled
     #[props(default = false)]
     pub disabled: bool,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Command item component
@@ -388,6 +439,19 @@ pub fn CommandItem(props: CommandItemProps) -> Element {
     use_effect(move || {
         if is_match && search_value == item_value {
             context.highlighted_index.set(item_index_for_effect);
+        }
+    });
+
+    // Trigger selection when Enter is pressed and this item is highlighted
+    let on_select = props.on_select.clone();
+    use_effect(move || {
+        let trigger = context.select_trigger.read();
+        if *trigger == 0 {
+            return;
+        }
+        if *context.highlighted_index.peek() == *item_index.peek() {
+            on_select.call(());
+            context.on_item_select.call(());
         }
     });
 
@@ -440,8 +504,9 @@ pub fn CommandItem(props: CommandItemProps) -> Element {
 
     rsx! {
         div {
-            class: "command-item",
-            style: "{item_style} background: {bg_color}; color: {text_color};",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "command-item {props.class.clone().unwrap_or_default()}",
+            style: "{item_style} background: {bg_color}; color: {text_color}; {props.style.clone().unwrap_or_default()}",
             onclick: handle_click,
             onmouseenter: handle_mouse_enter,
 
@@ -486,6 +551,15 @@ pub fn CommandSeparator() -> Element {
 pub struct CommandEmptyProps {
     /// Content to display when no results
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Command empty component
@@ -512,8 +586,9 @@ pub fn CommandEmpty(props: CommandEmptyProps) -> Element {
 
     rsx! {
         div {
-            class: "command-empty",
-            style: "{empty_style}",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "command-empty {props.class.clone().unwrap_or_default()}",
+            style: "{empty_style} {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
     }
@@ -528,6 +603,15 @@ pub fn CommandEmpty(props: CommandEmptyProps) -> Element {
 pub struct CommandShortcutProps {
     /// Keyboard shortcut text (e.g., "⌘K", "Ctrl+P")
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Command shortcut component
@@ -547,8 +631,9 @@ pub fn CommandShortcut(props: CommandShortcutProps) -> Element {
 
     rsx! {
         span {
-            class: "command-shortcut",
-            style: "{shortcut_style} margin-left: auto;",
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "command-shortcut {props.class.clone().unwrap_or_default()}",
+            style: "{shortcut_style} margin-left: auto; {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
     }

@@ -31,6 +31,9 @@ pub struct SeparatorProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Separator molecule component
@@ -72,6 +75,7 @@ pub fn Separator(props: SeparatorProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             style: "{separator_style} {props.style.clone().unwrap_or_default()} {aria_props}",
             class: "{props.class.clone().unwrap_or_default()}",
             aria_orientation: "{orientation_attr}",

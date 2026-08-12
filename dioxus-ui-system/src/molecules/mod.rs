@@ -77,7 +77,7 @@ pub use hover_card::{
     HoverCardHeaderProps, HoverCardProps, HoverCardUserInfo, HoverCardUserInfoProps,
     Side as HoverCardSide,
 };
-pub use input_group::InputGroup;
+pub use input_group::{InputGroup, InputGroupProps};
 pub use list_item::{
     ActionListItem, ActionListItemProps, ExpandableListItem, ExpandableListItemProps, ListGroup,
     ListGroupProps, ListItem, ListItemProps, ListItemVariant,

@@ -61,6 +61,15 @@ pub struct ToastProps {
     /// Position in stack
     #[props(default = 0)]
     pub index: usize,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Toast notification component
@@ -85,6 +94,7 @@ pub fn Toast(props: ToastProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             class: "toast toast-{variant_name}",
             style: "position: fixed; top: {top}px; right: 16px; z-index: 9999; min-width: 300px; max-width: 400px; padding: 16px; background: {bg_color}; border-left: 4px solid {border_color}; border-radius: 8px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); display: flex; align-items: flex-start; gap: 12px;",
 
@@ -124,8 +134,8 @@ pub fn Toast(props: ToastProps) -> Element {
             if props.closable {
                 button {
                     type: "button",
-                    class: "toast-close",
-                    style: "flex-shrink: 0; background: none; border: none; cursor: pointer; font-size: 18px; color: #9ca3af; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px;",
+                    class: "toast-close {props.class.clone().unwrap_or_default()}",
+                    style: "flex-shrink: 0; background: none; border: none; cursor: pointer; font-size: 18px; color: #9ca3af; padding: 0; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 4px; {props.style.clone().unwrap_or_default()}",
                     onclick: handle_close,
                     "✕"
                 }
@@ -258,14 +268,32 @@ pub fn use_toast() -> ToastManager {
 #[derive(Props, Clone, PartialEq)]
 pub struct ToastProviderProps {
     pub children: Element,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 pub fn ToastProvider(props: ToastProviderProps) -> Element {
     let toast_manager = use_toast();
 
+    let id = props.id.clone().unwrap_or_default();
+    let custom_class = props.class.clone().unwrap_or_default();
+    let custom_style = props.style.clone().unwrap_or_default();
+
     rsx! {
-        {props.children}
-        {toast_manager.render()}
+        div {
+            id: "{id}",
+            class: "{custom_class}",
+            style: "{custom_style}",
+            {props.children}
+            {toast_manager.render()}
+        }
     }
 }

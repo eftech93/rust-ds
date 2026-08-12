@@ -1,6 +1,6 @@
 //! Molecule component documentation pages
 
-use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, Section};
+use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, PropsTable, Section};
 use dioxus::prelude::*;
 use dioxus_ui_system::atoms::{Box, HStack, VStack};
 use dioxus_ui_system::molecules::{
@@ -86,6 +86,47 @@ pub fn CardPage() -> Element {
     CardContent {{ \"Content here\" }}
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "CardProps" }
+                PropsTable { props: vec![
+                    ("children", "Element", "Card content"),
+                    ("variant", "CardVariant", "Visual variant (Default, Muted, Elevated, Outlined, Ghost)"),
+                    ("padding", "Option<String>", "Custom padding size"),
+                    ("full_width", "bool", "Full width"),
+                    ("onclick", "Option<EventHandler<MouseEvent>>", "Click handler (makes card interactive)"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("overflow_hidden", "bool", "Whether to hide overflow (default: true)"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "CardHeaderProps" }
+                PropsTable { props: vec![
+                    ("children", "Element", "Header content"),
+                    ("title", "Option<String>", "Optional title (convenience prop)"),
+                    ("subtitle", "Option<String>", "Optional subtitle"),
+                    ("action", "Option<Element>", "Optional action element"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "CardContentProps" }
+                PropsTable { props: vec![
+                    ("children", "Element", "Content"),
+                    ("padding", "Option<String>", "Custom padding"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "CardFooterProps" }
+                PropsTable { props: vec![
+                    ("children", "Element", "Footer content"),
+                    ("justify", "CardFooterJustify", "Justify content: Start, Center, End, Between"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
         }
     }
 }
@@ -113,6 +154,28 @@ pub fn BadgePage() -> Element {
     \"Success\"
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "BadgeProps" }
+                PropsTable { props: vec![
+                    ("children", "Element", "Badge content"),
+                    ("variant", "BadgeVariant", "Visual variant"),
+                    ("size", "BadgeSize", "Badge size (Sm, Md, Lg)"),
+                    ("icon", "Option<String>", "Optional leading icon"),
+                    ("onclick", "Option<EventHandler<MouseEvent>>", "Click handler (makes badge interactive)"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom class name"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "StatusBadgeProps" }
+                PropsTable { props: vec![
+                    ("status", "String", "Status text"),
+                    ("status_type", "StatusType", "Status type (Default, Info, Success, Warning, Error)"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
         }
     }
 }
@@ -138,6 +201,20 @@ pub fn AlertPage() -> Element {
     icon: Some(\"check-circle\".to_string()),
     \"Operation completed!\"
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("children", "Element", "Alert content"),
+                    ("variant", "AlertVariant", "Alert variant (Default, Destructive, Success, Warning, Info)"),
+                    ("title", "Option<String>", "Optional title"),
+                    ("icon", "Option<String>", "Optional icon name"),
+                    ("dismissible", "bool", "Whether alert is dismissible"),
+                    ("on_dismiss", "Option<EventHandler<()>>", "Callback when dismissed"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom class name"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
             }
         }
     }
@@ -166,6 +243,29 @@ pub fn AvatarPage() -> Element {
     src: Some(\"avatar.png\".to_string()),
     alt: \"User avatar\".to_string(),
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "AvatarProps" }
+                PropsTable { props: vec![
+                    ("src", "Option<String>", "Image source URL"),
+                    ("alt", "String", "Alt text for the image"),
+                    ("name", "Option<String>", "User name (used for fallback initials)"),
+                    ("size", "AvatarSize", "Avatar size (Xs, Sm, Md, Lg, Xl)"),
+                    ("fallback", "Option<Element>", "Custom fallback content"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom class name"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "AvatarGroupProps" }
+                PropsTable { props: vec![
+                    ("max", "usize", "Maximum number of avatars to show (default: 4)"),
+                    ("size", "AvatarSize", "Size of all avatars in the group"),
+                    ("children", "Element", "Avatar children"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
             }
         }
     }
@@ -213,6 +313,45 @@ Dialog {{
         Button {{ variant: ButtonVariant::Primary, onclick: move |_| open.set(false), \"Confirm\" }}
     }}
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "DialogProps" }
+                PropsTable { props: vec![
+                    ("open", "bool", "Whether the dialog is open"),
+                    ("on_close", "EventHandler<()>", "Callback when dialog should close"),
+                    ("children", "Element", "Dialog content"),
+                    ("title", "Option<String>", "Dialog title"),
+                    ("description", "Option<String>", "Dialog description"),
+                    ("show_close_button", "bool", "Whether to show close button (default: true)"),
+                    ("close_on_overlay_click", "bool", "Whether clicking overlay closes the dialog (default: true)"),
+                    ("content_style", "Option<String>", "Custom inline styles for the content"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "DialogFooterProps" }
+                PropsTable { props: vec![
+                    ("children", "Element", "Footer content (usually buttons)"),
+                    ("align", "DialogFooterAlign", "Align content (Start, Center, End, Between)"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "AlertDialogProps" }
+                PropsTable { props: vec![
+                    ("open", "bool", "Whether the dialog is open"),
+                    ("on_close", "EventHandler<()>", "Callback when dialog should close"),
+                    ("title", "String", "Dialog title"),
+                    ("description", "String", "Dialog description"),
+                    ("cancel_text", "String", "Cancel button text (default: Cancel)"),
+                    ("confirm_text", "String", "Confirm button text (default: Confirm)"),
+                    ("on_confirm", "EventHandler<()>", "Callback when confirmed"),
+                    ("destructive", "bool", "Whether the action is destructive"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
             }
         }
     }
@@ -301,6 +440,18 @@ pub fn DropdownPage() -> Element {
                         }
                     }
                 }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("trigger", "Element", "Trigger element"),
+                    ("items", "Vec<DropdownMenuItem>", "Menu items"),
+                    ("on_select", "EventHandler<String>", "Callback when an item is selected"),
+                    ("align", "DropdownAlign", "Menu alignment (Start, End, Center)"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                ]}
             }
         }
     }
@@ -393,6 +544,28 @@ pub fn TooltipPage() -> Element {
     Button {{ \"Click me\" }}
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "TooltipProps" }
+                PropsTable { props: vec![
+                    ("children", "Element", "Trigger element"),
+                    ("content", "String", "Tooltip content"),
+                    ("placement", "TooltipPlacement", "Tooltip placement"),
+                    ("delay", "u64", "Delay before showing tooltip in ms (default: 200)"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "SimpleTooltipProps" }
+                PropsTable { props: vec![
+                    ("children", "Element", "Element to wrap"),
+                    ("text", "String", "Tooltip text"),
+                    ("placement", "TooltipPlacement", "Tooltip placement"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
         }
     }
 }
@@ -413,6 +586,16 @@ pub fn SeparatorPage() -> Element {
                     }
                 }
                 CodeBlock { code: "Separator {{}}".to_string() }
+            }
+
+            Section { title: "Props",
+                PropsTable { props: vec![
+                    ("orientation", "SeparatorOrientation", "Separator orientation (Horizontal, Vertical)"),
+                    ("decorative", "bool", "Whether the separator is decorative only (default: true)"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom class name"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
             }
         }
     }
@@ -443,6 +626,45 @@ pub fn SkeletonMoleculePage() -> Element {
     height: None,
     animate: true,
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "SkeletonProps" }
+                PropsTable { props: vec![
+                    ("width", "Option<String>", "Width of the skeleton"),
+                    ("height", "Option<String>", "Height of the skeleton"),
+                    ("animate", "bool", "Whether to show animation (default: true)"),
+                    ("rounded", "Option<String>", "Border radius"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("class", "Option<String>", "Custom class name"),
+                    ("id", "Option<String>", "Element id"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "SkeletonCircleProps" }
+                PropsTable { props: vec![
+                    ("size", "String", "Size of the circle in px (default: 40)"),
+                    ("animate", "bool", "Whether to show animation (default: true)"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "SkeletonTextProps" }
+                PropsTable { props: vec![
+                    ("lines", "usize", "Number of lines (default: 3)"),
+                    ("animate", "bool", "Whether to show animation (default: true)"),
+                    ("last_line_width", "u8", "Last line width as percentage (default: 60)"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "SkeletonCardProps" }
+                PropsTable { props: vec![
+                    ("animate", "bool", "Whether to show animation (default: true)"),
+                    ("show_avatar", "bool", "Show avatar placeholder (default: true)"),
+                    ("text_lines", "usize", "Number of text lines (default: 2)"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                ]}
             }
         }
     }
@@ -526,11 +748,11 @@ pub fn StepperPage() -> Element {
                                 VStack { gap: SpacingSize::Sm,
                                     Box {
                                         Label { "Username" }
-                                        Input { value: "".to_string(), placeholder: "Enter username", onchange: move |_| {} }
+                                        Input { value: "".to_string(), placeholder: "Enter username", on_change: move |_| {} }
                                     }
                                     Box {
                                         Label { "Email" }
-                                        Input { value: "".to_string(), placeholder: "Enter email", onchange: move |_| {} }
+                                        Input { value: "".to_string(), placeholder: "Enter email", on_change: move |_| {} }
                                     }
                                 }
                             }
@@ -554,12 +776,79 @@ HorizontalStepper {{
     active_step: 1,
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "HorizontalStepperProps" }
+                PropsTable { props: vec![
+                    ("steps", "Vec<StepItem>", "List of steps"),
+                    ("active_step", "usize", "Current active step index (0-based)"),
+                    ("size", "StepSize", "Step size"),
+                    ("on_step_click", "Option<EventHandler<usize>>", "Optional click handler for steps"),
+                    ("allow_click_completed", "bool", "Allow clicking completed steps (default: true)"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "VerticalStepperProps" }
+                PropsTable { props: vec![
+                    ("steps", "Vec<StepItem>", "List of steps"),
+                    ("active_step", "usize", "Current active step index (0-based)"),
+                    ("size", "StepSize", "Step size"),
+                    ("on_step_click", "Option<EventHandler<usize>>", "Optional click handler for steps"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "StepItemProps" }
+                PropsTable { props: vec![
+                    ("index", "usize", "Step index (0-based)"),
+                    ("step", "StepItem", "Step data"),
+                    ("size", "StepSize", "Step size"),
+                    ("show_connector", "bool", "Whether to show connector (default: true)"),
+                    ("connector_completed", "bool", "Connector is completed"),
+                    ("horizontal", "bool", "Horizontal layout (default: true)"),
+                    ("on_click", "Option<EventHandler<usize>>", "Click handler"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "StepContentProps" }
+                PropsTable { props: vec![
+                    ("active_step", "usize", "Current active step"),
+                    ("step_index", "usize", "Step index this content belongs to"),
+                    ("children", "Element", "Content to display"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "StepperActionsProps" }
+                PropsTable { props: vec![
+                    ("current_step", "usize", "Current step"),
+                    ("total_steps", "usize", "Total steps"),
+                    ("on_back", "Option<EventHandler<()>>", "Back button handler"),
+                    ("on_next", "Option<EventHandler<()>>", "Next button handler"),
+                    ("on_finish", "Option<EventHandler<()>>", "Finish button handler"),
+                    ("on_skip", "Option<EventHandler<()>>", "Skip button handler"),
+                    ("finish_label", "String", "Custom finish button label (default: Finish)"),
+                    ("next_label", "String", "Custom next button label (default: Next)"),
+                    ("back_label", "String", "Custom back button label (default: Back)"),
+                    ("disable_back", "bool", "Disable back button"),
+                    ("disable_next", "bool", "Disable next button"),
+                    ("show_skip", "bool", "Show skip button"),
+                    ("align", "StepperActionsAlign", "Alignment (End, Center, SpaceBetween)"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
         }
     }
 }
 
 #[component]
 pub fn PopoverPage() -> Element {
+    let mut open = use_signal(|| false);
+
     rsx! {
         DocPage {
             title: "Popover",
@@ -567,8 +856,72 @@ pub fn PopoverPage() -> Element {
 
             Section { title: "Basic Popover",
                 ExampleBox {
-                    p { "Popover component for displaying content in a floating panel." }
+                    Box { style: "padding: 40px;",
+                        Popover {
+                            open: open(),
+                            on_open_change: move |o| open.set(o),
+                            trigger: rsx! {
+                                Button { variant: ButtonVariant::Primary, "Open Popover" }
+                            },
+                            PopoverHeader {
+                                title: "Popover Title".to_string(),
+                                description: Some("This is a description of the popover content.".to_string()),
+                            }
+                            p { "Here is some content inside the popover panel." }
+                            PopoverFooter {
+                                Button { variant: ButtonVariant::Ghost, onclick: move |_| open.set(false), "Cancel" }
+                                Button { variant: ButtonVariant::Primary, onclick: move |_| open.set(false), "Confirm" }
+                            }
+                        }
+                    }
                 }
+                CodeBlock { code: r#"let mut open = use_signal(|| false);
+
+Popover {
+    open: open(),
+    on_open_change: move |o| open.set(o),
+    trigger: rsx! {
+        Button { variant: ButtonVariant::Primary, "Open Popover" }
+    },
+    PopoverHeader {
+        title: "Popover Title".to_string(),
+        description: Some("Description...".to_string()),
+    }
+    "Content here"
+    PopoverFooter {
+        Button { variant: ButtonVariant::Ghost, onclick: move |_| open.set(false), "Cancel" }
+        Button { variant: ButtonVariant::Primary, onclick: move |_| open.set(false), "Confirm" }
+    }
+}"#.to_string() }
+            }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "PopoverProps" }
+                PropsTable { props: vec![
+                    ("trigger", "Element", "Trigger element"),
+                    ("children", "Element", "Popover content"),
+                    ("open", "bool", "Whether the popover is open"),
+                    ("on_open_change", "Option<EventHandler<bool>>", "Callback when open state changes"),
+                    ("placement", "PopoverPlacement", "Popover placement"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "PopoverHeaderProps" }
+                PropsTable { props: vec![
+                    ("title", "String", "Header title"),
+                    ("description", "Option<String>", "Optional description"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "PopoverFooterProps" }
+                PropsTable { props: vec![
+                    ("children", "Element", "Footer content"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
             }
         }
     }
@@ -597,6 +950,30 @@ pub fn ToastPage() -> Element {
             Section { title: "Usage",
                 p { "Use the use_toast hook to show notifications:" }
                 CodeBlock { code: "let mut toast = use_toast();\ntoast.show_success(\"Operation completed!\");".to_string() }
+            }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "ToastProps" }
+                PropsTable { props: vec![
+                    ("message", "String", "Toast message"),
+                    ("variant", "ToastVariant", "Toast variant (Info, Success, Warning, Error)"),
+                    ("duration_ms", "u64", "Duration before auto-dismiss (default: 5000)"),
+                    ("closable", "bool", "Whether to show close button (default: true)"),
+                    ("on_close", "EventHandler<()>", "Close handler"),
+                    ("action", "Option<String>", "Action button text"),
+                    ("on_action", "Option<EventHandler<()>>", "Action handler"),
+                    ("index", "usize", "Position in stack"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "ToastProviderProps" }
+                PropsTable { props: vec![
+                    ("children", "Element", "Child elements"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
             }
         }
     }
@@ -655,6 +1032,38 @@ Combobox {{
     placeholder: Some(\"Search...\".to_string()),
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "ComboboxProps" }
+                PropsTable { props: vec![
+                    ("options", "Vec<ComboboxOption>", "Available options"),
+                    ("value", "Option<String>", "Currently selected value"),
+                    ("on_change", "EventHandler<String>", "Change handler"),
+                    ("placeholder", "Option<String>", "Placeholder text"),
+                    ("label", "Option<String>", "Label"),
+                    ("disabled", "bool", "Whether the field is disabled"),
+                    ("error", "Option<String>", "Error message"),
+                    ("creatable", "bool", "Allow creating new options"),
+                    ("on_create", "Option<EventHandler<String>>", "Created option handler"),
+                    ("clearable", "bool", "Clearable (default: true)"),
+                    ("loading", "bool", "Loading state"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "MultiComboboxProps" }
+                PropsTable { props: vec![
+                    ("options", "Vec<ComboboxOption>", "Available options"),
+                    ("values", "Vec<String>", "Selected values"),
+                    ("on_change", "EventHandler<Vec<String>>", "Change handler"),
+                    ("placeholder", "Option<String>", "Placeholder text"),
+                    ("label", "Option<String>", "Label"),
+                    ("max", "usize", "Maximum selections (default: usize::MAX)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
         }
     }
 }
@@ -702,6 +1111,49 @@ pub fn MediaObjectPage() -> Element {
     like_count: 5,
     liked: false,
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "MediaObjectProps" }
+                PropsTable { props: vec![
+                    ("media", "Element", "Media content (image, icon, avatar)"),
+                    ("children", "Element", "Body content (text)"),
+                    ("align", "MediaAlign", "Media alignment (Start, Center, End)"),
+                    ("gap", "u16", "Spacing between media and content (default: 16)"),
+                    ("reverse", "bool", "Whether to reverse the order"),
+                    ("responsive", "bool", "Stack on mobile (default: true)"),
+                    ("media_width", "Option<String>", "Media width when stacked"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "MediaContentProps" }
+                PropsTable { props: vec![
+                    ("title", "Option<String>", "Title/heading"),
+                    ("title_level", "u8", "Title element level (default: 4)"),
+                    ("description", "Option<String>", "Description/body text"),
+                    ("children", "Option<Element>", "Additional content"),
+                    ("meta", "Option<String>", "Metadata (date, author, etc.)"),
+                    ("actions", "Option<Element>", "Actions (buttons, links)"),
+                    ("id", "Option<String>", "Element id"),
+                    ("class", "Option<String>", "Custom CSS classes"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "CommentProps" }
+                PropsTable { props: vec![
+                    ("author", "String", "Author name"),
+                    ("avatar", "Option<Element>", "Author avatar"),
+                    ("content", "String", "Comment text"),
+                    ("timestamp", "String", "Timestamp"),
+                    ("on_reply", "Option<EventHandler<()>>", "Reply action"),
+                    ("on_like", "Option<EventHandler<()>>", "Like action"),
+                    ("liked", "bool", "Whether liked"),
+                    ("like_count", "u32", "Like count"),
+                    ("replies", "Option<Element>", "Nested replies"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
             }
         }
     }
@@ -763,6 +1215,42 @@ Pagination {{
     show_prev_next: true,
 }}".to_string() }
             }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "PaginationProps" }
+                PropsTable { props: vec![
+                    ("total_pages", "u32", "Total number of pages"),
+                    ("current_page", "u32", "Current page (1-indexed, default: 1)"),
+                    ("on_change", "EventHandler<u32>", "Page change handler"),
+                    ("sibling_count", "u32", "Number of sibling pages to show (default: 1)"),
+                    ("show_first_last", "bool", "Show first/last buttons (default: true)"),
+                    ("show_prev_next", "bool", "Show previous/next buttons (default: true)"),
+                    ("simple", "bool", "Simple mode (prev/next only, default: false)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "PageSizeSelectorProps" }
+                PropsTable { props: vec![
+                    ("options", "Vec<u32>", "Available page sizes (default: [10,25,50,100])"),
+                    ("value", "u32", "Current page size"),
+                    ("on_change", "EventHandler<u32>", "Change handler"),
+                    ("label", "Option<String>", "Label"),
+                    ("suffix", "Option<String>", "Per page suffix"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "PaginationInfoProps" }
+                PropsTable { props: vec![
+                    ("current_page", "u32", "Current page"),
+                    ("page_size", "u32", "Page size"),
+                    ("total_items", "u32", "Total items"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+            }
         }
     }
 }
@@ -809,6 +1297,55 @@ pub fn ListItemPage() -> Element {
     variant: ListItemVariant::Default,
     hoverable: true,
 }}".to_string() }
+            }
+
+            Section { title: "Props",
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "ListItemProps" }
+                PropsTable { props: vec![
+                    ("title", "String", "Primary text"),
+                    ("description", "Option<String>", "Secondary text/description"),
+                    ("leading", "Option<Element>", "Leading element (icon, avatar, checkbox)"),
+                    ("trailing", "Option<Element>", "Trailing element (icon, button, meta)"),
+                    ("on_click", "Option<EventHandler<()>>", "Click handler"),
+                    ("variant", "ListItemVariant", "Variant/state (Default, Selected, Active, Disabled)"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("dense", "bool", "Dense mode (compact)"),
+                    ("divider", "bool", "Divider below"),
+                    ("hoverable", "bool", "Hover effect"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "ListGroupProps" }
+                PropsTable { props: vec![
+                    ("title", "Option<String>", "Group title"),
+                    ("children", "Element", "Group items"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("sticky", "bool", "Sticky header"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "ActionListItemProps" }
+                PropsTable { props: vec![
+                    ("label", "String", "Action label"),
+                    ("icon", "Option<String>", "Icon"),
+                    ("description", "Option<String>", "Description/help text"),
+                    ("shortcut", "Option<String>", "Keyboard shortcut"),
+                    ("on_click", "EventHandler<()>", "Click handler"),
+                    ("disabled", "bool", "Disabled state"),
+                    ("destructive", "bool", "Danger/destructive action"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
+                h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "ExpandableListItemProps" }
+                PropsTable { props: vec![
+                    ("header", "Element", "Header content"),
+                    ("children", "Element", "Expandable content"),
+                    ("default_expanded", "bool", "Initially expanded"),
+                    ("class", "Option<String>", "Additional CSS classes"),
+                    ("id", "Option<String>", "Element id"),
+                    ("style", "Option<String>", "Custom inline styles"),
+                ]}
             }
         }
     }

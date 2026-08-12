@@ -74,6 +74,9 @@ pub struct IconProps {
     /// Rotate degrees (0, 90, 180, 270)
     #[props(default)]
     pub rotate: u16,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Icon atom component
@@ -170,6 +173,7 @@ pub fn Icon(props: IconProps) -> Element {
         svg {
             style: "{final_style}",
             class: "{class}",
+            id: "{props.id.clone().unwrap_or_default()}",
             width: "{px}",
             height: "{px}",
             view_box: "{view_box}",

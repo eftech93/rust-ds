@@ -37,6 +37,9 @@ pub struct ToggleGroupProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Toggle item properties (for use within ToggleGroup)
@@ -55,6 +58,9 @@ pub struct ToggleItemProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Toggle group context for managing state
@@ -163,6 +169,7 @@ pub fn ToggleGroup(props: ToggleGroupProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
             role: "group",
             style: "{final_style}",
             class: "{class}",
@@ -284,6 +291,7 @@ pub fn ToggleItem(props: ToggleItemProps) -> Element {
 
     rsx! {
         button {
+            id: "{props.id.clone().unwrap_or_default()}",
             r#type: "button",
             role: "switch",
             aria_pressed: "{is_selected}",

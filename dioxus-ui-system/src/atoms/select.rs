@@ -45,7 +45,7 @@ pub struct SelectProps {
     pub value: String,
     /// Callback when selection changes
     #[props(default)]
-    pub onchange: Option<EventHandler<String>>,
+    pub on_change: Option<EventHandler<String>>,
     /// Available options
     pub options: Vec<SelectOption>,
     /// Placeholder text when no value selected
@@ -63,6 +63,9 @@ pub struct SelectProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Select atom component (native HTML select with styling)
@@ -116,7 +119,7 @@ pub fn Select(props: SelectProps) -> Element {
     let handle_change = move |e: Event<FormData>| {
         let data = e.data();
         let new_value = data.value();
-        if let Some(handler) = &props.onchange {
+        if let Some(handler) = &props.on_change {
             handler.call(new_value);
         }
     };
@@ -127,6 +130,7 @@ pub fn Select(props: SelectProps) -> Element {
             disabled: disabled,
             style: "{select_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
+            id: "{props.id.clone().unwrap_or_default()}",
             onchange: handle_change,
             onfocus: move |_| is_focused.set(true),
             onblur: move |_| is_focused.set(false),
@@ -163,7 +167,7 @@ pub struct MultiSelectProps {
     pub values: Vec<String>,
     /// Callback when selection changes
     #[props(default)]
-    pub onchange: Option<EventHandler<Vec<String>>>,
+    pub on_change: Option<EventHandler<Vec<String>>>,
     /// Available options
     pub options: Vec<SelectOption>,
     /// Placeholder text
@@ -221,21 +225,21 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             .build()
     });
 
-    let onchange_clone = props.onchange.clone();
+    let on_change_clone = props.on_change.clone();
     let max_selections = props.max_selections;
 
     let remove_selected = move |value: String| {
-        let onchange = onchange_clone.clone();
+        let on_change = on_change_clone.clone();
         selected.with_mut(|s| {
             s.retain(|v| v != &value);
-            if let Some(h) = onchange {
+            if let Some(h) = on_change {
                 h.call(s.clone());
             }
         });
     };
 
     let add_selected = move |value: String| {
-        let onchange = onchange_clone.clone();
+        let on_change = on_change_clone.clone();
         selected.with_mut(|s| {
             if !s.contains(&value) {
                 if let Some(max) = max_selections {
@@ -244,7 +248,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                     }
                 }
                 s.push(value);
-                if let Some(h) = onchange {
+                if let Some(h) = on_change {
                     h.call(s.clone());
                 }
             }

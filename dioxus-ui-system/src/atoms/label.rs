@@ -82,6 +82,9 @@ pub struct LabelProps {
     /// Line clamp (number of lines)
     #[props(default)]
     pub line_clamp: Option<u8>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// HTML element options for Label
@@ -222,47 +225,48 @@ pub fn Label(props: LabelProps) -> Element {
 
     let class = props.class.clone().unwrap_or_default();
     let html_for = props.html_for.clone();
+    let id = props.id.clone().unwrap_or_default();
 
     // Render the appropriate element
     match props.as_element {
         LabelElement::Span => rsx! {
-            span { style: "{final_style}", class: "{class}", {props.children} }
+            span { style: "{final_style}", class: "{class}", id: "{id}", {props.children} }
         },
         LabelElement::P => rsx! {
-            p { style: "{final_style}", class: "{class}", {props.children} }
+            p { style: "{final_style}", class: "{class}", id: "{id}", {props.children} }
         },
         LabelElement::Div => rsx! {
-            div { style: "{final_style}", class: "{class}", {props.children} }
+            div { style: "{final_style}", class: "{class}", id: "{id}", {props.children} }
         },
         LabelElement::Label => rsx! {
-            label { style: "{final_style}", class: "{class}", r#for: html_for, {props.children} }
+            label { style: "{final_style}", class: "{class}", r#for: html_for, id: "{id}", {props.children} }
         },
         LabelElement::H1 => rsx! {
-            h1 { style: "{final_style}", class: "{class}", {props.children} }
+            h1 { style: "{final_style}", class: "{class}", id: "{id}", {props.children} }
         },
         LabelElement::H2 => rsx! {
-            h2 { style: "{final_style}", class: "{class}", {props.children} }
+            h2 { style: "{final_style}", class: "{class}", id: "{id}", {props.children} }
         },
         LabelElement::H3 => rsx! {
-            h3 { style: "{final_style}", class: "{class}", {props.children} }
+            h3 { style: "{final_style}", class: "{class}", id: "{id}", {props.children} }
         },
         LabelElement::H4 => rsx! {
-            h4 { style: "{final_style}", class: "{class}", {props.children} }
+            h4 { style: "{final_style}", class: "{class}", id: "{id}", {props.children} }
         },
         LabelElement::H5 => rsx! {
-            h5 { style: "{final_style}", class: "{class}", {props.children} }
+            h5 { style: "{final_style}", class: "{class}", id: "{id}", {props.children} }
         },
         LabelElement::H6 => rsx! {
-            h6 { style: "{final_style}", class: "{class}", {props.children} }
+            h6 { style: "{final_style}", class: "{class}", id: "{id}", {props.children} }
         },
         LabelElement::Strong => rsx! {
-            strong { style: "{final_style}", class: "{class}", {props.children} }
+            strong { style: "{final_style}", class: "{class}", id: "{id}", {props.children} }
         },
         LabelElement::Em => rsx! {
-            em { style: "{final_style}", class: "{class}", {props.children} }
+            em { style: "{final_style}", class: "{class}", id: "{id}", {props.children} }
         },
         LabelElement::Small => rsx! {
-            small { style: "{final_style}", class: "{class}", {props.children} }
+            small { style: "{final_style}", class: "{class}", id: "{id}", {props.children} }
         },
     }
 }

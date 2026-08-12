@@ -84,6 +84,10 @@ pub struct BarChartProps {
     /// Custom styles
     #[props(default)]
     pub style: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Bar chart component
@@ -114,6 +118,8 @@ pub fn BarChart(props: BarChartProps) -> Element {
     if all_series.is_empty() || all_series[0].data.is_empty() {
         return rsx! {
             Box {
+                id: props.id.clone(),
+                class: props.class.clone(),
                 width: Some(props.width.clone()),
                 height: Some(props.height.clone()),
                 display: crate::atoms::BoxDisplay::Flex,
@@ -331,8 +337,13 @@ pub fn BarChart(props: BarChartProps) -> Element {
     let tooltip_fg = tokens.colors.popover_foreground.to_rgba();
     let tooltip_border = tokens.colors.border.to_rgba();
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+
     rsx! {
         Box {
+            id: Some(id),
+            class: Some(class),
             width: Some(props.width.clone()),
             height: Some(props.height.clone()),
             style: Some(container_style),

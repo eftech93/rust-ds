@@ -28,6 +28,9 @@ pub struct SkeletonProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Skeleton molecule component
@@ -49,6 +52,7 @@ pub fn Skeleton(props: SkeletonProps) -> Element {
 
     rsx! {
         Box {
+            id: "{props.id.clone().unwrap_or_default()}",
             style: "{skeleton_style} width: {width}; height: {height}; border-radius: {rounded}; {animation} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
         }
@@ -67,6 +71,12 @@ pub struct SkeletonCircleProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Skeleton circle component
@@ -85,6 +95,8 @@ pub fn SkeletonCircle(props: SkeletonCircleProps) -> Element {
 
     rsx! {
         Box {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{skeleton_style} width: {props.size}px; height: {props.size}px; {animation} {props.style.clone().unwrap_or_default()}",
         }
     }
@@ -105,6 +117,12 @@ pub struct SkeletonTextProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Skeleton text component
@@ -114,6 +132,8 @@ pub fn SkeletonText(props: SkeletonTextProps) -> Element {
 
     rsx! {
         VStack {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: props.style.clone().unwrap_or_default(),
             gap: SpacingSize::Sm,
             align: AlignItems::Stretch,
@@ -149,6 +169,12 @@ pub struct SkeletonCardProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Skeleton card component
@@ -169,6 +195,8 @@ pub fn SkeletonCard(props: SkeletonCardProps) -> Element {
 
     rsx! {
         VStack {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{card_style} {custom_style}",
             gap: SpacingSize::Md,
             align: AlignItems::Stretch,

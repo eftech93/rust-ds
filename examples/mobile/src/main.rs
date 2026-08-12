@@ -804,13 +804,13 @@ fn ComponentsPage(props: ComponentsPageProps) -> Element {
                                 Checkbox {
                                     checked: true,
                                     label: Some("Enable notifications".to_string()),
-                                    onchange: move |_| {},
+                                    on_change: move |_| {},
                                 }
 
                                 Checkbox {
                                     checked: false,
                                     label: Some("Dark mode".to_string()),
-                                    onchange: move |_| {},
+                                    on_change: move |_| {},
                                 }
                             }
                         },
@@ -1030,14 +1030,14 @@ fn NewFormControlsShowcase() -> Element {
             Checkbox {
                 checked: checked(),
                 label: Some("Accept terms".to_string()),
-                onchange: move |v| checked.set(v),
+                on_change: move |v| checked.set(v),
             }
 
             // Switch
             Switch {
                 checked: switch_on(),
                 label: Some(if switch_on() { "On" } else { "Off" }.to_string()),
-                onchange: move |v| switch_on.set(v),
+                on_change: move |v| switch_on.set(v),
             }
 
             // Select
@@ -1046,7 +1046,7 @@ fn NewFormControlsShowcase() -> Element {
                 value: selected(),
                 options: options,
                 placeholder: Some("Choose...".to_string()),
-                onchange: move |v| selected.set(v),
+                on_change: move |v| selected.set(v),
             }
 
             // TextArea
@@ -1055,7 +1055,7 @@ fn NewFormControlsShowcase() -> Element {
                 value: textarea(),
                 placeholder: Some("Type here...".to_string()),
                 rows: 3,
-                onchange: move |v| textarea.set(v),
+                on_change: move |v| textarea.set(v),
             }
         }
     }
@@ -1095,7 +1095,7 @@ fn InputShowcase() -> Element {
                 value: email(),
                 placeholder: Some("you@example.com".to_string()),
                 input_type: InputType::Email,
-                onchange: move |v| email.set(v),
+                on_change: move |v| email.set(v),
             }
 
             InputGroup {
@@ -1108,7 +1108,7 @@ fn InputShowcase() -> Element {
                 } else {
                     None
                 },
-                onchange: move |v| password.set(v),
+                on_change: move |v| password.set(v),
             }
 
             Button {

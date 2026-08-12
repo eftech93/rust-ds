@@ -60,6 +60,10 @@ pub struct TabsProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Tabs variant
@@ -98,8 +102,13 @@ pub fn Tabs(props: TabsProps) -> Element {
         TabsVariant::Soft => Style::new().w_full().flex().gap(&t.spacing, "sm").build(),
     });
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
+            class: "{class}",
             style: "{tabs_container_style} {props.style.clone().unwrap_or_default()}",
 
             for tab in props.tabs.clone() {
@@ -261,17 +270,25 @@ pub struct TabPanelProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
 }
 
-/// Tab panel component
 #[component]
 pub fn TabPanel(props: TabPanelProps) -> Element {
     let _theme = use_theme();
 
     let panel_style = use_style(|t| Style::new().w_full().pt(&t.spacing, "md").build());
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
+            class: "{class}",
             role: "tabpanel",
             style: "{panel_style} {props.style.clone().unwrap_or_default()}",
             {props.children}
@@ -291,9 +308,12 @@ pub struct VerticalTabsProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
 }
 
-/// Vertical tabs component
 #[component]
 pub fn VerticalTabs(props: VerticalTabsProps) -> Element {
     let _theme = use_theme();
@@ -309,8 +329,13 @@ pub fn VerticalTabs(props: VerticalTabsProps) -> Element {
             .build()
     });
 
+    let id = props.id.clone().unwrap_or_default();
+    let class = props.class.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
+            class: "{class}",
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
 
             div {

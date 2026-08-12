@@ -85,6 +85,10 @@ pub struct RichTextEditorProps {
     /// Additional CSS classes
     #[props(default)]
     pub class: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Rich text editor component
@@ -120,10 +124,14 @@ pub fn RichTextEditor(props: RichTextEditorProps) -> Element {
         }
     };
 
+    let id = props.id.clone().unwrap_or_default();
+    let style = props.style.clone().unwrap_or_default();
+
     rsx! {
         div {
+            id: "{id}",
             class: "rich-text-editor{class_css}",
-            style: "{container_style}",
+            style: "{container_style} {style}",
 
             // Toolbar
             if !props.disabled {
@@ -135,6 +143,7 @@ pub fn RichTextEditor(props: RichTextEditorProps) -> Element {
 
             // Content editable area
             RichTextContent {
+                id: props.id.clone(),
                 value: props.value.clone(),
                 placeholder: props.placeholder.clone(),
                 disabled: props.disabled,
@@ -155,6 +164,12 @@ pub struct RichTextToolbarProps {
     /// Disabled state
     #[props(default = false)]
     pub disabled: bool,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Rich text toolbar component with formatting buttons
@@ -399,6 +414,10 @@ pub struct ToolbarButtonProps {
     pub style: String,
     /// Hover style
     pub hover_style: String,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Toolbar button component
@@ -466,13 +485,20 @@ pub struct RichTextContentProps {
     /// Input handler
     #[props(default)]
     pub on_input: Option<EventHandler<String>>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Rich text content editable area
 #[component]
 pub fn RichTextContent(props: RichTextContentProps) -> Element {
     let theme = use_theme();
-    let inner_html = use_signal(|| props.value.clone());
+    #[allow(unused_mut)]
+    let mut inner_html = use_signal(|| props.value.clone());
 
     let max_height_style = props
         .max_height
@@ -506,11 +532,36 @@ pub fn RichTextContent(props: RichTextContentProps) -> Element {
             .build()
     });
 
+    let editor_id = use_hook(|| {
+        format!(
+            "rich-text-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_millis()
+        )
+    });
+
     let on_input = {
         let on_input_handler = props.on_input.clone();
+        let _editor_id = editor_id.clone();
         move |_e: Event<dioxus::events::FormData>| {
-            // In a real implementation, we would get innerHTML from the event target
-            // For now, we trigger the handler with current content
+            #[cfg(all(feature = "web", target_arch = "wasm32"))]
+            {
+                if let Some(window) = web_sys::window() {
+                    if let Some(document) = window.document() {
+                        if let Some(el) = document.get_element_by_id(&_editor_id) {
+                            let html = el.inner_html();
+                            inner_html.set(html.clone());
+                            if let Some(handler) = &on_input_handler {
+                                handler.call(html);
+                            }
+                            return;
+                        }
+                    }
+                }
+            }
+            // Fallback for non-web or if DOM access fails
             if let Some(handler) = &on_input_handler {
                 handler.call(inner_html());
             }
@@ -532,6 +583,7 @@ pub fn RichTextContent(props: RichTextContentProps) -> Element {
 
             // Content editable div
             div {
+                id: "{editor_id}",
                 contenteditable: !props.disabled,
                 style: "min-height: 100%; outline: none;",
                 oninput: on_input,
@@ -558,6 +610,12 @@ pub struct SimpleRichTextProps {
     /// Disabled state
     #[props(default = false)]
     pub disabled: bool,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Simple rich text editor with basic formatting only
@@ -581,6 +639,9 @@ pub fn SimpleRichText(props: SimpleRichTextProps) -> Element {
 
     rsx! {
         RichTextEditor {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             value: props.value,
             on_change: props.on_change,
             placeholder: props.placeholder,
@@ -605,6 +666,12 @@ pub struct MinimalRichTextProps {
     /// Disabled state
     #[props(default = false)]
     pub disabled: bool,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Minimal rich text editor with text formatting only
@@ -628,6 +695,9 @@ pub fn MinimalRichText(props: MinimalRichTextProps) -> Element {
 
     rsx! {
         RichTextEditor {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             value: props.value,
             on_change: props.on_change,
             placeholder: props.placeholder,
@@ -659,6 +729,12 @@ pub struct FullRichTextProps {
     /// Maximum height
     #[props(default)]
     pub max_height: Option<String>,
+    #[props(default)]
+    pub id: Option<String>,
+    #[props(default)]
+    pub class: Option<String>,
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 /// Full-featured rich text editor with all formatting options
@@ -666,6 +742,9 @@ pub struct FullRichTextProps {
 pub fn FullRichText(props: FullRichTextProps) -> Element {
     rsx! {
         RichTextEditor {
+            id: props.id.clone(),
+            class: props.class.clone(),
+            style: props.style.clone(),
             value: props.value,
             on_change: props.on_change,
             placeholder: props.placeholder,

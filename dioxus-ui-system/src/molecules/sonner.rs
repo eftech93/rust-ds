@@ -8,6 +8,9 @@ use crate::theme::{use_style, use_theme};
 use dioxus::prelude::*;
 use std::time::Duration;
 
+#[cfg(all(feature = "web", target_arch = "wasm32"))]
+use wasm_bindgen::JsCast;
+
 /// Toast position on screen
 #[derive(Default, Clone, PartialEq, Debug)]
 pub enum ToastPosition {
@@ -70,6 +73,12 @@ pub struct SonnerProps {
     /// Callback when toast is dismissed
     #[props(default)]
     pub on_dismiss: Option<EventHandler<String>>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
 }
 
 /// Sonner toast notification container
@@ -102,6 +111,8 @@ pub fn Sonner(props: SonnerProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
 
             for toast in props.toasts.iter() {
@@ -123,13 +134,61 @@ struct ToastItemProps {
     rich_colors: bool,
     close_button: bool,
     on_dismiss: Option<EventHandler<String>>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
+    /// Custom CSS classes
+    #[props(default)]
+    pub class: Option<String>,
+    /// Custom inline styles
+    #[props(default)]
+    pub style: Option<String>,
 }
 
 #[component]
 fn ToastItem(props: ToastItemProps) -> Element {
     let theme = use_theme();
-    let progress = use_signal(|| 100.0);
+    #[allow(unused_mut)]
+    let mut progress = use_signal(|| 100.0);
     let toast_id = props.toast.id.clone();
+
+    // Animate progress from 100% down to 0% over the toast duration on web targets.
+    #[cfg(all(feature = "web", target_arch = "wasm32"))]
+    {
+        let duration = props.toast.duration;
+        let on_dismiss = props.on_dismiss.clone();
+        let id = toast_id.clone();
+        use_effect(move || {
+            let duration_ms = duration.as_millis() as f64;
+            if duration_ms <= 0.0 {
+                return;
+            }
+            let start = js_sys::Date::now();
+            let on_dismiss = on_dismiss.clone();
+            let id = id.clone();
+            wasm_bindgen_futures::spawn_local(async move {
+                loop {
+                    let elapsed = js_sys::Date::now() - start;
+                    let pct = 100.0 * (1.0 - elapsed / duration_ms).max(0.0);
+                    progress.set(pct);
+                    if pct <= 0.0 {
+                        if let Some(handler) = on_dismiss {
+                            handler.call(id);
+                        }
+                        break;
+                    }
+                    let promise = js_sys::Promise::new(&mut |resolve, _| {
+                        let func = resolve.unchecked_ref::<js_sys::Function>();
+                        web_sys::window()
+                            .unwrap()
+                            .set_timeout_with_callback_and_timeout_and_arguments_0(func, 50)
+                            .unwrap();
+                    });
+                    let _ = wasm_bindgen_futures::JsFuture::from(promise).await;
+                }
+            });
+        });
+    }
 
     // Read theme colors
     let theme_fg = use_memo(move || theme.tokens.read().colors.foreground.clone());
@@ -232,6 +291,8 @@ fn ToastItem(props: ToastItemProps) -> Element {
 
     rsx! {
         div {
+            id: "{props.id.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
             style: "{toast_style} border: 1px solid {border_color};",
 
             div {
@@ -267,7 +328,7 @@ fn ToastItem(props: ToastItemProps) -> Element {
             }
 
             div {
-                style: "{progress_style} width: {progress()}%;",
+                style: "{progress_style} width: {progress()}%; {props.style.clone().unwrap_or_default()}",
             }
         }
     }

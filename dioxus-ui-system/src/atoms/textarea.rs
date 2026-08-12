@@ -14,7 +14,7 @@ pub struct TextAreaProps {
     pub value: String,
     /// Callback when value changes
     #[props(default)]
-    pub onchange: Option<EventHandler<String>>,
+    pub on_change: Option<EventHandler<String>>,
     /// Placeholder text
     #[props(default)]
     pub placeholder: Option<String>,
@@ -45,6 +45,9 @@ pub struct TextAreaProps {
     /// Custom class name
     #[props(default)]
     pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// TextArea atom component
@@ -105,7 +108,7 @@ pub fn TextArea(props: TextAreaProps) -> Element {
             }
         }
 
-        if let Some(handler) = &props.onchange {
+        if let Some(handler) = &props.on_change {
             handler.call(new_value);
         }
     };
@@ -117,6 +120,7 @@ pub fn TextArea(props: TextAreaProps) -> Element {
     rsx! {
         div {
             style: "width: 100%;",
+            id: "{props.id.clone().unwrap_or_default()}",
 
             textarea {
                 value: "{props.value}",
@@ -158,7 +162,7 @@ pub struct AutoResizeTextAreaProps {
     pub value: String,
     /// Callback when value changes
     #[props(default)]
-    pub onchange: Option<EventHandler<String>>,
+    pub on_change: Option<EventHandler<String>>,
     /// Placeholder text
     #[props(default)]
     pub placeholder: Option<String>,
@@ -174,6 +178,12 @@ pub struct AutoResizeTextAreaProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Custom class name
+    #[props(default)]
+    pub class: Option<String>,
+    /// Element id
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Auto-resizing TextArea component
@@ -207,7 +217,7 @@ pub fn AutoResizeTextArea(props: AutoResizeTextAreaProps) -> Element {
     let handle_input = move |e: Event<FormData>| {
         let data = e.data();
         let new_value = data.value();
-        if let Some(handler) = &props.onchange {
+        if let Some(handler) = &props.on_change {
             handler.call(new_value);
         }
     };
@@ -219,6 +229,8 @@ pub fn AutoResizeTextArea(props: AutoResizeTextAreaProps) -> Element {
             rows: rows,
             disabled: props.disabled,
             style: "{textarea_style} {props.style.clone().unwrap_or_default()}",
+            class: "{props.class.clone().unwrap_or_default()}",
+            id: "{props.id.clone().unwrap_or_default()}",
             oninput: handle_input,
             onfocus: move |_| is_focused.set(true),
             onblur: move |_| is_focused.set(false),
