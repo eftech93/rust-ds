@@ -4,9 +4,9 @@ use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, PropsTable, Section};
 use dioxus::prelude::*;
 use dioxus_ui_system::atoms::{Box, HStack, VStack};
 use dioxus_ui_system::molecules::ToastVariant;
+use dioxus_ui_system::organisms::file_upload::{FileType, UploadedFile};
 use dioxus_ui_system::organisms::FooterVariant;
 use dioxus_ui_system::organisms::*;
-use dioxus_ui_system::organisms::file_upload::{FileType, UploadedFile};
 use dioxus_ui_system::prelude::*;
 
 #[component]

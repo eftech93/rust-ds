@@ -26,22 +26,16 @@ pub enum FileType {
 impl FileType {
     /// Detect file type from extension
     pub fn from_file_name(file_name: &str) -> Self {
-        let ext = file_name
-            .split('.')
-            .last()
-            .unwrap_or("")
-            .to_lowercase();
+        let ext = file_name.split('.').last().unwrap_or("").to_lowercase();
         match ext.as_str() {
-            "jpg" | "jpeg" | "png" | "gif" | "webp" | "svg" | "bmp" | "ico" | "tiff" | "tif"
-                => FileType::Image,
-            "pdf" | "doc" | "docx" | "txt" | "rtf" | "odt" | "xls" | "xlsx" | "ppt"
-                | "pptx" | "csv" => FileType::Document,
-            "mp4" | "mov" | "avi" | "mkv" | "flv" | "wmv" | "webm" | "m4v"
-                => FileType::Video,
-            "mp3" | "wav" | "flac" | "aac" | "ogg" | "m4a" | "wma"
-                => FileType::Audio,
-            "zip" | "rar" | "7z" | "tar" | "gz" | "bz2" | "xz"
-                => FileType::Archive,
+            "jpg" | "jpeg" | "png" | "gif" | "webp" | "svg" | "bmp" | "ico" | "tiff" | "tif" => {
+                FileType::Image
+            }
+            "pdf" | "doc" | "docx" | "txt" | "rtf" | "odt" | "xls" | "xlsx" | "ppt" | "pptx"
+            | "csv" => FileType::Document,
+            "mp4" | "mov" | "avi" | "mkv" | "flv" | "wmv" | "webm" | "m4v" => FileType::Video,
+            "mp3" | "wav" | "flac" | "aac" | "ogg" | "m4a" | "wma" => FileType::Audio,
+            "zip" | "rar" | "7z" | "tar" | "gz" | "bz2" | "xz" => FileType::Archive,
             _ => FileType::Other,
         }
     }
@@ -206,10 +200,7 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
             if let Some(max_mb) = max_size_mb {
                 let max_bytes = (max_mb * 1024.0 * 1024.0) as u64;
                 if size > max_bytes {
-                    return Err(format!(
-                        "File too large. Maximum size: {} MB",
-                        max_mb
-                    ));
+                    return Err(format!("File too large. Maximum size: {} MB", max_mb));
                 }
             }
 
@@ -242,7 +233,7 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                         if let Some(file_list) = input.files() {
                             let mut new_files = Vec::new();
                             let file_count = file_list.length();
-                            
+
                             for i in 0..file_count {
                                 if let Some(file) = file_list.get(i) {
                                     // Check max files limit
@@ -250,20 +241,23 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                                         break;
                                     }
                                     if files_signal().len() + new_files.len() >= max_files {
-                                        validation_error.set(Some(format!("Maximum {} files allowed", max_files)));
+                                        validation_error.set(Some(format!(
+                                            "Maximum {} files allowed",
+                                            max_files
+                                        )));
                                         break;
                                     }
-                                    
+
                                     let name = file.name();
                                     let size = file.size() as u64;
                                     let file_type = file.type_();
-                                    
+
                                     // Validate file
                                     if let Err(err) = validate_file(&name, size) {
                                         validation_error.set(Some(err));
                                         continue;
                                     }
-                                    
+
                                     new_files.push(UploadedFile {
                                         name,
                                         size,
@@ -272,7 +266,7 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                                     });
                                 }
                             }
-                            
+
                             // Update files signal
                             if !new_files.is_empty() {
                                 files_signal.with_mut(|f| {
@@ -282,7 +276,7 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                                         *f = new_files.clone();
                                     }
                                 });
-                                
+
                                 // Call callbacks
                                 let all_files = files_signal();
                                 on_upload.call(all_files.clone());
@@ -290,18 +284,24 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                                     on_change_cb.call(all_files.clone());
                                 }
                             }
-                            
+
                             // Clear the input value to allow re-selecting the same file
                             input.set_value("");
                         }
                     }
                 }
             }
-            
+
             // Non-web platforms - placeholder
             #[cfg(not(all(feature = "web", target_arch = "wasm32")))]
             {
-                let _ = (&on_upload, &on_change, &allow_multiple, &max_files, &validate_file);
+                let _ = (
+                    &on_upload,
+                    &on_change,
+                    &allow_multiple,
+                    &max_files,
+                    &validate_file,
+                );
             }
         }
     };
@@ -317,7 +317,7 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                     f.remove(index);
                 }
             });
-            
+
             // Call callbacks with updated files
             let all_files = files_signal();
             on_upload.call(all_files.clone());
@@ -346,7 +346,10 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
     } else {
         "Upload file"
     };
-    let label_text = props.label.clone().unwrap_or_else(|| default_label.to_string());
+    let label_text = props
+        .label
+        .clone()
+        .unwrap_or_else(|| default_label.to_string());
 
     let helper_text = props.helper_text.clone().or_else(|| {
         let mut parts = Vec::new();
@@ -410,18 +413,18 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                             e.prevent_default();
                             is_dragging.set(false);
                             validation_error.set(None);
-                            
+
                             #[cfg(all(feature = "web", target_arch = "wasm32"))]
                             {
                                 use dioxus::web::WebEventExt;
                                 use wasm_bindgen::JsCast;
                                 use web_sys::DataTransfer;
-                                
+
                                 if let Some(data_transfer) = e.data().as_web_event().dyn_ref::<DataTransfer>() {
                                     if let Some(file_list) = data_transfer.files() {
                                         let mut new_files = Vec::new();
                                         let file_count = file_list.length();
-                                        
+
                                         for i in 0..file_count {
                                             if let Some(file) = file_list.get(i) {
                                                 if !allow_multiple && i > 0 {
@@ -431,16 +434,16 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                                                     validation_error.set(Some(format!("Maximum {} files allowed", max_files)));
                                                     break;
                                                 }
-                                                
+
                                                 let name = file.name();
                                                 let size = file.size() as u64;
                                                 let file_type = file.type_();
-                                                
+
                                                 if let Err(err) = validate_file(&name, size) {
                                                     validation_error.set(Some(err));
                                                     continue;
                                                 }
-                                                
+
                                                 new_files.push(UploadedFile {
                                                     name,
                                                     size,
@@ -449,7 +452,7 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                                                 });
                                             }
                                         }
-                                        
+
                                         if !new_files.is_empty() {
                                             files_signal.with_mut(|f| {
                                                 if allow_multiple {
@@ -458,7 +461,7 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                                                     *f = new_files.clone();
                                                 }
                                             });
-                                            
+
                                             let all_files = files_signal();
                                             on_upload.call(all_files.clone());
                                             if let Some(ref on_change_cb) = on_change {
@@ -468,7 +471,7 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                                     }
                                 }
                             }
-                            
+
                             #[cfg(not(all(feature = "web", target_arch = "wasm32")))]
                             {
                                 let _ = (&on_upload, &on_change, &allow_multiple, &max_files, &validate_file);
