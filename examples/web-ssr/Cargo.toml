@@ -8,7 +8,7 @@ dioxus = { workspace = true }
 dioxus-ui-system = { path = "../../dioxus-ui-system" }
 example-shared = { path = "../shared" }
 tokio = { version = "1", features = ["full"] }
-axum = { version = "0.7", features = ["macros"] }
+axum = { version = "0.8", features = ["macros"] }
 tracing = "0.1"
 
 [features]
