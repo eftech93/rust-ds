@@ -339,7 +339,10 @@ pub fn StepContent(props: StepContentProps) -> Element {
 
     let custom_style = props.style.clone().unwrap_or_default();
     let custom_class = props.class.clone().unwrap_or_default();
-    let id = props.id.clone().unwrap_or_else(|| format!("step-content-{}", props.step_index));
+    let id = props
+        .id
+        .clone()
+        .unwrap_or_else(|| format!("step-content-{}", props.step_index));
 
     rsx! {
         if is_active {

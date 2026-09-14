@@ -156,7 +156,8 @@ pub fn Sheet(props: SheetProps) -> Element {
                     on_close.call(false);
                 }
             }) as Box<dyn FnMut(_)>);
-            let func: js_sys::Function = closure.as_ref().unchecked_ref::<js_sys::Function>().clone();
+            let func: js_sys::Function =
+                closure.as_ref().unchecked_ref::<js_sys::Function>().clone();
             if let Some(window) = web_sys::window() {
                 window
                     .add_event_listener_with_callback("keydown", &func)
