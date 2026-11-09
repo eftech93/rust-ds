@@ -1,0 +1,191 @@
+name: Release
+
+# Branch-based releases:
+#   1. scripts/dev.sh bump X.Y.Z   -> bumps versions, creates branch release/vX.Y.Z
+#   2. push the branch             -> this workflow verifies it (dry run)
+#   3. merge the PR into main      -> this workflow publishes vX.Y.Z
+# The branch name must equal v<crate version>. A manual run from the Actions
+# tab is a dry run unless "dry_run" is unticked.
+#
+# Runs on a self-hosted runner. Override the runner label with the
+# repository variable RELEASE_RUNNER (defaults to "self-hosted").
+
+on:
+  push:
+    branches: ["release/v*"]
+  pull_request:
+    types: [closed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (verify + package only, no publish/deploy)"
+        type: boolean
+        default: true
+      deploy_docs:
+        description: "Build the docs site"
+        type: boolean
+        default: true
+
+concurrency:
+  group: release-${{ github.event.pull_request.head.ref || github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+  CRATE: dioxus-ui-system
+  DIOXUS_CLI_VERSION: "0.7"
+  PAGES_BASE_PATH: rust-ds
+  # Merged PR -> the merge commit on main; otherwise the triggering commit.
+  RELEASE_SHA: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    # For pull_request events, only merged PRs from a release/v* branch.
+    if: >-
+      github.event_name != 'pull_request' ||
+      (github.event.pull_request.merged &&
+       startsWith(github.event.pull_request.head.ref, 'release/v'))
+    runs-on: ${{ vars.RELEASE_RUNNER || 'self-hosted' }}
+    outputs:
+      version: ${{ steps.meta.outputs.version }}
+      publish: ${{ steps.meta.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_SHA }}
+
+      - name: Ensure Rust toolchain
+        shell: bash
+        run: |
+          if ! command -v rustup >/dev/null; then
+            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
+            echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+            export PATH="$HOME/.cargo/bin:$PATH"
+          fi
+          rustup toolchain install stable --profile minimal -c clippy,rustfmt -t wasm32-unknown-unknown
+          rustup default stable
+
+      - name: Resolve version
+        id: meta
+        shell: bash
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          version=$(cargo metadata --no-deps --format-version 1 \
+            | python3 -c "import json,sys; print(next(p['version'] for p in json.load(sys.stdin)['packages'] if p['name']=='$CRATE'))")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+          case "$GITHUB_EVENT_NAME" in
+            push)              branch="$GITHUB_REF_NAME"; publish=false ;;
+            pull_request)      branch="$HEAD_REF";        publish=true ;;
+            workflow_dispatch) branch="";                 publish=$([[ "$DRY_RUN" == "false" ]] && echo true || echo false) ;;
+          esac
+          if [[ -n "$branch" && "$branch" != "release/v$version" ]]; then
+            echo "::error::Branch $branch does not match $CRATE version $version (expected release/v$version)"
+            exit 1
+          fi
+          echo "publish=$publish" >> "$GITHUB_OUTPUT"
+          echo "Releasing $CRATE $version"
+
+      - run: cargo fmt --all --check
+      - run: cargo clippy -p ${{ env.CRATE }} --all-targets -- -D warnings
+      - run: cargo test -p ${{ env.CRATE }}
+      - run: cargo check -p ${{ env.CRATE }} --target wasm32-unknown-unknown
+      - run: cargo publish -p ${{ env.CRATE }} --dry-run
+
+  publish-crate:
+    needs: verify
+    if: needs.verify.outputs.publish == 'true'
+    runs-on: ${{ vars.RELEASE_RUNNER || 'self-hosted' }}
+    environment: release
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_SHA }}
+      - name: Publish to crates.io (skips if version already exists)
+        shell: bash
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+          VERSION: ${{ needs.verify.outputs.version }}
+        run: |
+          if [[ -z "$CARGO_REGISTRY_TOKEN" ]]; then
+            echo "::error::CARGO_REGISTRY_TOKEN secret is not set"; exit 1
+          fi
+          code=$(curl -s -o /dev/null -w '%{http_code}' -A "rust-ds-release (github.com/eftech93/rust-ds)" \
+            "https://crates.io/api/v1/crates/$CRATE/$VERSION")
+          if [[ "$code" == "200" ]]; then
+            echo "$CRATE $VERSION already on crates.io, skipping"
+          else
+            cargo publish -p "$CRATE"
+          fi
+
+  github-release:
+    needs: [verify, publish-crate]
+    runs-on: ${{ vars.RELEASE_RUNNER || 'self-hosted' }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_SHA }}
+          fetch-depth: 0
+      - name: Create GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v${{ needs.verify.outputs.version }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists"; exit 0
+          fi
+          # Records the release (and creates the tag) on the merge commit in main.
+          gh release create "$TAG" --target "$RELEASE_SHA" --title "$TAG" --generate-notes \
+            --notes "crates.io: https://crates.io/crates/$CRATE/${TAG#v}"$'\n'"docs.rs: https://docs.rs/$CRATE/${TAG#v}"
+
+  build-docs:
+    needs: verify
+    if: github.event_name != 'workflow_dispatch' || inputs.deploy_docs
+    runs-on: ${{ vars.RELEASE_RUNNER || 'self-hosted' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.RELEASE_SHA }}
+      - name: Ensure dioxus-cli ${{ env.DIOXUS_CLI_VERSION }}
+        shell: bash
+        run: |
+          if ! dx --version 2>/dev/null | grep -q "^dioxus $DIOXUS_CLI_VERSION"; then
+            command -v cargo-binstall >/dev/null || cargo install cargo-binstall --locked
+            cargo binstall -y --force "dioxus-cli@$DIOXUS_CLI_VERSION"
+          fi
+          dx --version
+      - name: Build docs site
+        shell: bash
+        working-directory: docs-app
+        run: |
+          sed -i.bak "s|^# base_path = .*|base_path = \"/$PAGES_BASE_PATH/\"|" Dioxus.toml
+          dx build --platform web --release
+          out="$GITHUB_WORKSPACE/target/dx/dioxus-ui-docs/release/web/public"
+          cp "$out/index.html" "$out/404.html"   # SPA routing on GitHub Pages
+          rm -rf "$GITHUB_WORKSPACE/_site" && cp -R "$out" "$GITHUB_WORKSPACE/_site"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy-docs:
+    needs: [verify, build-docs]
+    if: needs.verify.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
