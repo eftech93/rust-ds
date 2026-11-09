@@ -162,10 +162,25 @@ struct ToastItem {
 static NEXT_TOAST_ID: std::sync::atomic::AtomicUsize = std::sync::atomic::AtomicUsize::new(1);
 
 impl ToastManager {
+    /// Create a standalone manager owned by the current component (this is a hook).
+    ///
+    /// Prefer [`use_toast`] inside a [`ToastProvider`] so toasts render in the
+    /// shared container.
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
-            toasts: use_signal(|| Vec::new()),
+            toasts: use_signal(Vec::new),
         }
+    }
+
+    /// Number of toasts currently queued.
+    pub fn len(&self) -> usize {
+        self.toasts.read().len()
+    }
+
+    /// Whether no toasts are queued.
+    pub fn is_empty(&self) -> bool {
+        self.toasts.read().is_empty()
     }
 
     pub fn show(&mut self, message: impl Into<String>) {
@@ -259,9 +274,16 @@ impl ToastManager {
     }
 }
 
-/// Hook to access toast manager
+/// Hook to access the toast manager.
+///
+/// Inside a [`ToastProvider`] this returns the provider's shared manager, so
+/// toasts shown from any descendant render in the provider's container.
+/// Without a provider it returns a component-local manager (render it yourself
+/// with [`ToastManager::render`]).
 pub fn use_toast() -> ToastManager {
-    ToastManager::new()
+    let shared = try_use_context::<ToastManager>();
+    let local = use_signal(Vec::new);
+    shared.unwrap_or(ToastManager { toasts: local })
 }
 
 /// Toast provider component (wraps app and provides toast container)
@@ -281,7 +303,9 @@ pub struct ToastProviderProps {
 
 #[component]
 pub fn ToastProvider(props: ToastProviderProps) -> Element {
-    let toast_manager = use_toast();
+    let toast_manager = use_context_provider(|| ToastManager {
+        toasts: Signal::new(Vec::new()),
+    });
 
     let id = props.id.clone().unwrap_or_default();
     let custom_class = props.class.clone().unwrap_or_default();
@@ -295,5 +319,48 @@ pub fn ToastProvider(props: ToastProviderProps) -> Element {
             {props.children}
             {toast_manager.render()}
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn descendant_use_toast_renders_in_provider() {
+        #[component]
+        fn Child() -> Element {
+            let mut toast = use_toast();
+            // Show once on first render.
+            use_hook(move || toast.show_success("Saved from child"));
+            rsx! { span { "child" } }
+        }
+
+        fn app() -> Element {
+            rsx! { ToastProvider { Child {} } }
+        }
+
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dom.render_immediate(&mut dioxus::dioxus_core::NoOpMutations);
+        let html = dioxus_ssr::render(&dom);
+        assert!(html.contains("Saved from child"), "{html}");
+    }
+
+    #[test]
+    fn use_toast_shares_provider_manager() {
+        #[component]
+        fn Probe() -> Element {
+            let a = use_toast();
+            let b = use_toast();
+            let same = a.toasts == b.toasts;
+            rsx! { span { "same={same}" } }
+        }
+        fn app() -> Element {
+            rsx! { ToastProvider { Probe {} } }
+        }
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        assert!(dioxus_ssr::render(&dom).contains("same=true"));
     }
 }
