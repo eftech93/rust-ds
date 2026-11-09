@@ -95,6 +95,8 @@ pub struct Style {
     pub transition: Option<String>,
     pub transform: Option<String>,
     pub overflow: Option<String>,
+    pub overflow_x: Option<String>,
+    pub overflow_y: Option<String>,
     pub visibility: Option<String>,
     pub pointer_events: Option<String>,
     pub user_select: Option<String>,
@@ -102,6 +104,17 @@ pub struct Style {
     pub word_break: Option<String>,
     pub outline: Option<String>,
     pub resize: Option<String>,
+
+    // Flex item
+    pub flex: Option<String>,
+    pub flex_grow: Option<String>,
+    pub flex_shrink: Option<String>,
+
+    // Border style
+    pub border_style: Option<String>,
+
+    /// Raw CSS appended verbatim at the end of the built string (see [`Style::custom`])
+    pub custom_css: Option<String>,
 }
 
 impl Style {
@@ -607,10 +620,7 @@ impl Style {
 
     /// Set border style (dashed, dotted, etc.)
     pub fn border_style(mut self, style: &str) -> Self {
-        // This is a simplified implementation - border_style would need proper field
-        // For now, we'll append it to the existing border or set it as custom
-        let existing = self.transform.clone().unwrap_or_default();
-        self.transform = Some(format!("{} border-style: {};", existing, style));
+        self.border_style = Some(style.into());
         self
     }
 
@@ -904,9 +914,7 @@ impl Style {
 
     /// Set flex-shrink
     pub fn flex_shrink(mut self, value: u8) -> Self {
-        // Note: flex_shrink is not in the struct, adding as custom for now
-        // We'll use a different approach - add it to the struct
-        self.transform = Some(format!("flex-shrink: {}", value));
+        self.flex_shrink = Some(value.to_string());
         self
     }
 
@@ -918,9 +926,7 @@ impl Style {
 
     /// Set flex-grow
     pub fn flex_grow(mut self, value: u8) -> Self {
-        // We'll add this to the transform field as a workaround since flex_grow isn't a standard field
-        let existing = self.transform.unwrap_or_default();
-        self.transform = Some(format!("{} flex-grow: {};", existing, value));
+        self.flex_grow = Some(value.to_string());
         self
     }
 
@@ -941,29 +947,37 @@ impl Style {
 
     /// Set flex-grow to 1 (flex-1)
     pub fn flex_1(mut self) -> Self {
-        let existing = self.transform.unwrap_or_default();
-        self.transform = Some(format!("{} flex: 1 1 0%;", existing));
+        self.flex = Some("1 1 0%".into());
         self
     }
 
     /// Set overflow-x to auto
     pub fn overflow_x_auto(mut self) -> Self {
-        let existing = self.transform.unwrap_or_default();
-        self.transform = Some(format!("{} overflow-x: auto;", existing));
+        self.overflow_x = Some("auto".into());
         self
     }
 
     /// Set overflow-y to auto
     pub fn overflow_y_auto(mut self) -> Self {
-        let existing = self.transform.unwrap_or_default();
-        self.transform = Some(format!("{} overflow-y: auto;", existing));
+        self.overflow_y = Some("auto".into());
         self
     }
 
-    /// Add custom/raw CSS
+    /// Add custom/raw CSS (e.g. `"grid-template-columns: 1fr 1fr;"`).
+    ///
+    /// Multiple calls accumulate. The CSS is appended verbatim after all typed
+    /// properties, so it can override them.
     pub fn custom(mut self, css: &str) -> Self {
-        let existing = self.transform.unwrap_or_default();
-        self.transform = Some(format!("{} {}", existing, css));
+        let css = css.trim();
+        if css.is_empty() {
+            return self;
+        }
+        let mut existing = self.custom_css.unwrap_or_default();
+        existing.push_str(css);
+        if !css.ends_with(';') {
+            existing.push(';');
+        }
+        self.custom_css = Some(existing);
         self
     }
 
@@ -1045,6 +1059,8 @@ impl Style {
         write_if_some(&mut style, "transition", &self.transition);
         write_if_some(&mut style, "transform", &self.transform);
         write_if_some(&mut style, "overflow", &self.overflow);
+        write_if_some(&mut style, "overflow-x", &self.overflow_x);
+        write_if_some(&mut style, "overflow-y", &self.overflow_y);
         write_if_some(&mut style, "visibility", &self.visibility);
         write_if_some(&mut style, "pointer-events", &self.pointer_events);
         write_if_some(&mut style, "user-select", &self.user_select);
@@ -1052,6 +1068,18 @@ impl Style {
         write_if_some(&mut style, "word-break", &self.word_break);
         write_if_some(&mut style, "outline", &self.outline);
         write_if_some(&mut style, "resize", &self.resize);
+
+        // Flex item
+        write_if_some(&mut style, "flex", &self.flex);
+        write_if_some(&mut style, "flex-grow", &self.flex_grow);
+        write_if_some(&mut style, "flex-shrink", &self.flex_shrink);
+
+        // Border style
+        write_if_some(&mut style, "border-style", &self.border_style);
+
+        if let Some(css) = &self.custom_css {
+            style.push_str(css);
+        }
 
         style
     }
@@ -1259,6 +1287,29 @@ impl Style {
         if other.resize.is_some() {
             self.resize = other.resize;
         }
+        if other.overflow_x.is_some() {
+            self.overflow_x = other.overflow_x;
+        }
+        if other.overflow_y.is_some() {
+            self.overflow_y = other.overflow_y;
+        }
+        if other.flex.is_some() {
+            self.flex = other.flex;
+        }
+        if other.flex_grow.is_some() {
+            self.flex_grow = other.flex_grow;
+        }
+        if other.flex_shrink.is_some() {
+            self.flex_shrink = other.flex_shrink;
+        }
+        if other.border_style.is_some() {
+            self.border_style = other.border_style;
+        }
+        // Raw CSS accumulates: both sides are kept, `other` last so it wins.
+        self.custom_css = match (self.custom_css, other.custom_css) {
+            (Some(a), Some(b)) => Some(a + &b),
+            (a, b) => b.or(a),
+        };
 
         self
     }
@@ -1311,5 +1362,60 @@ mod tests {
         assert!(style_str.contains("display:flex"));
         assert!(style_str.contains("align-items:center"));
         assert!(style_str.contains("justify-content:center"));
+    }
+
+    #[test]
+    fn test_flex_item_and_overflow_are_real_properties() {
+        let style = Style::new()
+            .flex_1()
+            .flex_grow(2)
+            .flex_shrink(0)
+            .overflow_x_auto()
+            .overflow_y_auto()
+            .border_style("dashed")
+            .build();
+
+        assert!(!style.contains("transform"));
+        assert!(style.contains("flex:1 1 0%;"));
+        assert!(style.contains("flex-grow:2;"));
+        assert!(style.contains("flex-shrink:0;"));
+        assert!(style.contains("overflow-x:auto;"));
+        assert!(style.contains("overflow-y:auto;"));
+        assert!(style.contains("border-style:dashed;"));
+    }
+
+    #[test]
+    fn test_flex_shrink_keeps_transform() {
+        let style = Style::new()
+            .transform("rotate(45deg)")
+            .flex_shrink(0)
+            .build();
+        assert!(style.contains("transform:rotate(45deg);"));
+        assert!(style.contains("flex-shrink:0;"));
+    }
+
+    #[test]
+    fn test_custom_css_accumulates_and_appends() {
+        let style = Style::new()
+            .flex()
+            .custom("grid-area: main")
+            .custom("color: red;")
+            .build();
+        assert!(!style.contains("transform"));
+        assert!(style.ends_with("grid-area: main;color: red;"));
+    }
+
+    #[test]
+    fn test_merge_new_fields() {
+        let base = Style::new().flex_grow(1).overflow_x_auto().custom("a: b;");
+        let other = Style::new()
+            .flex_grow(3)
+            .border_style("dotted")
+            .custom("c: d;");
+        let style = base.merge(other).build();
+        assert!(style.contains("flex-grow:3;"));
+        assert!(style.contains("overflow-x:auto;"));
+        assert!(style.contains("border-style:dotted;"));
+        assert!(style.ends_with("a: b;c: d;"));
     }
 }
