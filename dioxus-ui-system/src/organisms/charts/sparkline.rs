@@ -191,7 +191,8 @@ pub fn Sparkline(props: SparklineProps) -> Element {
     let min_pos: Option<(f64, f64)> = if show_min_max {
         data.iter()
             .enumerate()
-            .min_by(|a, b| a.1.partial_cmp(b.1).unwrap())
+            .filter(|(_, v)| !v.is_nan())
+            .min_by(|a, b| a.1.total_cmp(b.1))
             .map(|(idx, _)| points[idx])
     } else {
         None
@@ -200,7 +201,8 @@ pub fn Sparkline(props: SparklineProps) -> Element {
     let max_pos: Option<(f64, f64)> = if show_min_max {
         data.iter()
             .enumerate()
-            .max_by(|a, b| a.1.partial_cmp(b.1).unwrap())
+            .filter(|(_, v)| !v.is_nan())
+            .max_by(|a, b| a.1.total_cmp(b.1))
             .map(|(idx, _)| points[idx])
     } else {
         None
@@ -392,5 +394,27 @@ pub fn TrendIndicator(
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn nan_values_do_not_panic_with_min_max() {
+        fn app() -> Element {
+            rsx! {
+                Sparkline {
+                    data: vec![1.0, f64::NAN, 3.0, -2.0, f64::NAN],
+                    show_min_max: true,
+                    show_last_point: true,
+                }
+            }
+        }
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        let html = dioxus_ssr::render(&dom);
+        assert!(html.contains("<svg"), "{html}");
     }
 }

@@ -147,10 +147,10 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
                 div {
                     style: "{input_wrapper_style} display: flex; align-items: center;",
 
-                    if props.leading_icon.is_some() {
+                    if let Some(icon) = props.leading_icon {
                         div {
                             style: "position: absolute; left: 12px; z-index: 1;",
-                            {props.leading_icon.unwrap()}
+                            {icon}
                         }
                     }
 
@@ -162,10 +162,10 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
                         on_change: props.on_change.clone(),
                     }
 
-                    if props.trailing_icon.is_some() {
+                    if let Some(icon) = props.trailing_icon {
                         div {
                             style: "position: absolute; right: 12px; z-index: 1;",
-                            {props.trailing_icon.unwrap()}
+                            {icon}
                         }
                     }
                 }

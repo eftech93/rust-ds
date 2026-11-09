@@ -178,11 +178,11 @@ pub fn Header(props: HeaderProps) -> Element {
             }
 
             // Right section: Actions
-            if props.actions.is_some() {
+            if let Some(actions) = props.actions {
                 HStack {
                     align: crate::atoms::AlignItems::Center,
                     gap: crate::atoms::SpacingSize::Sm,
-                    {props.actions.unwrap()}
+                    {actions}
                 }
             }
         }
@@ -228,7 +228,7 @@ pub fn HeaderNavLink(props: HeaderNavLinkProps) -> Element {
     });
 
     let href = item.href.clone();
-    let has_icon = item.icon.is_some();
+    let icon = item.icon.clone();
 
     let id = props.id.clone().unwrap_or_default();
     let class = props.class.clone().unwrap_or_default();
@@ -241,9 +241,9 @@ pub fn HeaderNavLink(props: HeaderNavLinkProps) -> Element {
             style: "{style} {custom_style}",
             href: "{href}",
 
-            if has_icon {
+            if let Some(name) = icon {
                 Icon {
-                    name: item.icon.unwrap(),
+                    name,
                     size: IconSize::Small,
                     color: IconColor::Current,
                 }
@@ -475,7 +475,7 @@ pub fn UserMenuItemView(props: UserMenuItemViewProps) -> Element {
             .build()
     });
 
-    let has_icon = item.icon.is_some();
+    let icon = item.icon.clone();
 
     let id = props.id.clone().unwrap_or_default();
     let class = props.class.clone().unwrap_or_default();
@@ -493,9 +493,9 @@ pub fn UserMenuItemView(props: UserMenuItemViewProps) -> Element {
                 props.on_close.call(());
             },
 
-            if has_icon {
+            if let Some(name) = icon {
                 Icon {
-                    name: item.icon.unwrap(),
+                    name,
                     size: IconSize::Small,
                     color: IconColor::Current,
                 }

@@ -143,40 +143,41 @@ fn BreadcrumbLink(props: BreadcrumbLinkProps) -> Element {
         .build()
     });
 
-    let has_icon = props.item.icon.is_some();
+    let icon = props.item.icon.clone();
 
-    if props.is_last || props.item.href.is_none() {
-        rsx! {
+    let href = props.item.href.clone().filter(|_| !props.is_last);
+    let Some(href) = href else {
+        return rsx! {
             span {
                 id: "{props.id.clone().unwrap_or_default()}",
                 class: "{props.class.clone().unwrap_or_default()}",
                 style: "{link_style} cursor: default; {props.style.clone().unwrap_or_default()}",
                 aria_current: "page",
 
-                if has_icon {
-                    BreadcrumbIcon { name: props.item.icon.clone().unwrap() }
+                if let Some(name) = icon {
+                    BreadcrumbIcon { name }
                 }
 
                 "{props.item.label}"
             }
-        }
-    } else {
-        rsx! {
+        };
+    };
+
+    rsx! {
             a {
-                href: "{props.item.href.clone().unwrap()}",
+                href: "{href}",
                 style: "{link_style}",
                 onmouseenter: move |e| {
                     let _ = e;
                     // Could add hover effect here
                 },
 
-                if has_icon {
-                    BreadcrumbIcon { name: props.item.icon.clone().unwrap() }
+                if let Some(name) = icon {
+                    BreadcrumbIcon { name }
                 }
 
                 "{props.item.label}"
             }
-        }
     }
 }
 

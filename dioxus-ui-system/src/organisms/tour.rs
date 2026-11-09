@@ -127,17 +127,6 @@ pub fn Tour(props: TourProps) -> Element {
         internal_step()
     };
 
-    let total_steps = props.steps.len();
-    if total_steps == 0 || !props.open {
-        return rsx! {};
-    }
-
-    let step = props
-        .steps
-        .get(current_step)
-        .cloned()
-        .unwrap_or_else(|| props.steps.first().cloned().unwrap());
-
     let mask_color = props
         .mask_color
         .clone()
@@ -154,6 +143,20 @@ pub fn Tour(props: TourProps) -> Element {
             .max_w_px(400)
             .build()
     });
+
+    // Early return only after all hooks so hook order stays stable.
+    let total_steps = props.steps.len();
+    if !props.open {
+        return rsx! {};
+    }
+    let Some(step) = props
+        .steps
+        .get(current_step)
+        .or_else(|| props.steps.first())
+        .cloned()
+    else {
+        return rsx! {};
+    };
 
     let handle_next = move |_| {
         let next = (current_step + 1).min(total_steps - 1);
@@ -358,5 +361,32 @@ mod tests {
         let step =
             TourStep::new("#sidebar", "Nav", "Navigation menu").with_placement(Placement::Right);
         assert_eq!(step.placement, Placement::Right);
+    }
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    #[test]
+    fn open_tour_with_no_steps_renders_nothing() {
+        let html = render(|| rsx! { Tour { steps: vec![], open: true, on_open_change: |_| {} } });
+        assert!(html.is_empty(), "{html}");
+    }
+
+    #[test]
+    fn out_of_range_step_falls_back_to_first() {
+        let html = render(|| {
+            rsx! {
+                Tour {
+                    steps: vec![TourStep::new("#a", "First step", "body")],
+                    open: true,
+                    current_step: 5,
+                    on_open_change: |_| {},
+                }
+            }
+        });
+        assert!(html.contains("First step"), "{html}");
     }
 }

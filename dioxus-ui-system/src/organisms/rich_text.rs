@@ -574,10 +574,10 @@ pub fn RichTextContent(props: RichTextContentProps) -> Element {
             style: "{content_style} {max_height_style} {disabled_style} {focus_style} overflow: auto;",
 
             // Placeholder (shown when empty)
-            if inner_html().is_empty() && props.placeholder.is_some() {
+            if let Some(placeholder) = props.placeholder.clone().filter(|_| inner_html().is_empty()) {
                 div {
                     style: "position: absolute; color: {theme.tokens.read().colors.muted.to_rgba()}; pointer-events: none;",
-                    "{props.placeholder.clone().unwrap()}"
+                    "{placeholder}"
                 }
             }
 
