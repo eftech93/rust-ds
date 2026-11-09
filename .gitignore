@@ -2,7 +2,7 @@
 # Rust - General
 # =============================================================================
 # Compiled files
-/target/
+/target
 **/target/
 Cargo.lock
 
