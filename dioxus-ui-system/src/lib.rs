@@ -50,9 +50,9 @@ pub mod prelude {
 
     // Theme
     pub use crate::theme::{
-        use_style, use_theme, Color, ColorScale, RadiusScale, SpacingScale, ThemeContext,
-        ThemeMode, ThemeProvider, ThemeSelector, ThemeToggle, ThemeTokens, Typography,
-        TypographyScale,
+        try_use_theme, use_style, use_theme, Color, ColorScale, RadiusScale, SpacingScale,
+        ThemeContext, ThemeMode, ThemeProvider, ThemeSelector, ThemeToggle, ThemeTokens,
+        Typography, TypographyScale,
     };
 
     // Styles
