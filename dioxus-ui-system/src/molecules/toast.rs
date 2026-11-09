@@ -82,7 +82,7 @@ pub fn Toast(props: ToastProps) -> Element {
     let text_color = theme.tokens.read().colors.foreground.to_rgba();
 
     let handle_close = {
-        let on_close = props.on_close.clone();
+        let on_close = props.on_close;
         move |_| {
             on_close.call(());
         }

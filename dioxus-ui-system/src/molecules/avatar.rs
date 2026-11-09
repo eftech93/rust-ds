@@ -8,24 +8,19 @@ use crate::theme::{use_style, use_theme};
 use dioxus::prelude::*;
 
 /// Avatar sizes
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub enum AvatarSize {
     /// Extra small (24px)
     Xs,
     /// Small (32px)
     Sm,
     /// Medium (40px)
+    #[default]
     Md,
     /// Large (48px)
     Lg,
     /// Extra large (64px)
     Xl,
-}
-
-impl Default for AvatarSize {
-    fn default() -> Self {
-        AvatarSize::Md
-    }
 }
 
 /// Avatar properties

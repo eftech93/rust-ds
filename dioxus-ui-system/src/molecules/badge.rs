@@ -85,7 +85,7 @@ pub struct BadgeProps {
 pub fn Badge(props: BadgeProps) -> Element {
     let _theme = use_theme();
     let variant = props.variant.clone();
-    let size = props.size.clone();
+    let size = props.size;
     let has_icon = props.icon.is_some();
     let has_onclick = props.onclick.is_some();
 
@@ -183,7 +183,7 @@ pub fn Badge(props: BadgeProps) -> Element {
 
     let class = props.class.clone().unwrap_or_default();
     let icon_element = props.icon.clone();
-    let onclick_handler = props.onclick.clone();
+    let onclick_handler = props.onclick;
 
     let id = props.id.clone().unwrap_or_default();
 

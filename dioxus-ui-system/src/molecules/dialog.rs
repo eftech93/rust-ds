@@ -104,7 +104,7 @@ pub fn Dialog(props: DialogProps) -> Element {
                     DialogHeader {
                         title: props.title.clone(),
                         show_close_button: props.show_close_button,
-                        on_close: props.on_close.clone(),
+                        on_close: props.on_close,
                     }
                 }
 
@@ -319,7 +319,7 @@ pub fn AlertDialog(props: AlertDialogProps) -> Element {
             id: "{props.id.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
             open: props.open,
-            on_close: props.on_close.clone(),
+            on_close: props.on_close,
             title: props.title.clone(),
             show_close_button: false,
             close_on_overlay_click: false,

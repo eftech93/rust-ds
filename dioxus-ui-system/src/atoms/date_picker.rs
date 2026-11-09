@@ -325,7 +325,7 @@ fn DatePickerCalendar(props: DatePickerCalendarProps) -> Element {
                         let day_value = day;
                         let year_value = year;
                         let month_value = month;
-                        let on_select = props.on_select.clone();
+                        let on_select = props.on_select;
 
                         rsx! {
                             button {

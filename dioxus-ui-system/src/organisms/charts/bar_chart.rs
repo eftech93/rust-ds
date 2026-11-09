@@ -212,7 +212,7 @@ pub fn BarChart(props: BarChartProps) -> Element {
     let variant = props.variant.clone();
     let y_axis = props.y_axis.clone();
     let animation = props.animation.clone();
-    let on_bar_click = props.on_bar_click.clone();
+    let on_bar_click = props.on_bar_click;
     let bar_radius = props.bar_radius;
     let tooltip = props.tooltip.clone();
 
@@ -448,21 +448,24 @@ pub fn BarChart(props: BarChartProps) -> Element {
     }
 }
 
+/// (series index, point index, fill, label, point, x, y, width, height, value label, tooltip)
+type BarGeometry = (
+    usize,
+    usize,
+    String,
+    String,
+    ChartDataPoint,
+    f64,
+    f64,
+    f64,
+    f64,
+    String,
+    String,
+);
+
 #[derive(Props, Clone, PartialEq)]
 struct BarElementsProps {
-    bars: Vec<(
-        usize,
-        usize,
-        String,
-        String,
-        ChartDataPoint,
-        f64,
-        f64,
-        f64,
-        f64,
-        String,
-        String,
-    )>,
+    bars: Vec<BarGeometry>,
     animation_enabled: bool,
     on_bar_click: Option<EventHandler<ChartDataPoint>>,
     tooltip_enabled: bool,
@@ -480,15 +483,15 @@ fn BarElements(props: BarElementsProps) -> Element {
                 color_css: color_css,
                 animation_enabled: props.animation_enabled,
                 point: point,
-                on_bar_click: props.on_bar_click.clone(),
+                on_bar_click: props.on_bar_click,
                 tooltip_enabled: props.tooltip_enabled,
                 bar_x: bar_x,
                 bar_y: bar_y,
                 bar_w: bar_w,
                 bar_h: bar_h,
                 tooltip_content: tooltip_content,
-                on_tooltip_show: props.on_tooltip_show.clone(),
-                on_tooltip_hide: props.on_tooltip_hide.clone(),
+                on_tooltip_show: props.on_tooltip_show,
+                on_tooltip_hide: props.on_tooltip_hide,
             }
         }
     }
@@ -513,7 +516,7 @@ struct BarPathProps {
 
 #[component]
 fn BarPath(props: BarPathProps) -> Element {
-    let on_click = props.on_bar_click.clone();
+    let on_click = props.on_bar_click;
     let point = props.point.clone();
     let tooltip_content = props.tooltip_content.clone();
 

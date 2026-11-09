@@ -121,7 +121,7 @@ pub fn Sonner(props: SonnerProps) -> Element {
                     toast: toast.clone(),
                     rich_colors: props.rich_colors,
                     close_button: props.close_button,
-                    on_dismiss: props.on_dismiss.clone(),
+                    on_dismiss: props.on_dismiss,
                 }
             }
         }
@@ -282,7 +282,7 @@ fn ToastItem(props: ToastItemProps) -> Element {
     });
 
     let handle_dismiss = move |_| {
-        if let Some(on_dismiss) = props.on_dismiss.clone() {
+        if let Some(on_dismiss) = props.on_dismiss {
             on_dismiss.call(toast_id.clone());
         }
     };

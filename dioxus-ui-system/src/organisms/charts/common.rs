@@ -248,8 +248,8 @@ impl ChartTooltip {
         let mut parts = Vec::new();
 
         // Series name
-        if self.show_series_name && series_name.is_some() {
-            parts.push(series_name.unwrap().to_string());
+        if let Some(name) = series_name.filter(|_| self.show_series_name) {
+            parts.push(name.to_string());
         }
 
         // Label
@@ -349,16 +349,14 @@ fn nice_number(x: f64, round: bool) -> f64 {
         } else {
             10.0
         }
+    } else if f <= 1.0 {
+        1.0
+    } else if f <= 2.0 {
+        2.0
+    } else if f <= 5.0 {
+        5.0
     } else {
-        if f <= 1.0 {
-            1.0
-        } else if f <= 2.0 {
-            2.0
-        } else if f <= 5.0 {
-            5.0
-        } else {
-            10.0
-        }
+        10.0
     };
 
     nf * 10.0_f64.powi(exp)
@@ -432,8 +430,8 @@ pub fn calculate_area_path(points: &[(f64, f64)], baseline_y: f64) -> String {
     let mut path = format!("M {},{} ", points[0].0, baseline_y);
     path.push_str(&format!("L {},{} ", points[0].0, points[0].1));
 
-    for i in 1..points.len() {
-        path.push_str(&format!("L {},{} ", points[i].0, points[i].1));
+    for (x, y) in points.iter().skip(1) {
+        path.push_str(&format!("L {},{} ", x, y));
     }
 
     path.push_str(&format!(

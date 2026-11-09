@@ -438,7 +438,7 @@ pub fn UserMenuDropdown(props: UserMenuDropdownProps) -> Element {
             for item in props.items {
                 UserMenuItemView {
                     item: item,
-                    on_close: props.on_close.clone(),
+                    on_close: props.on_close,
                 }
             }
         }

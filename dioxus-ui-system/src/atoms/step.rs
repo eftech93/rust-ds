@@ -145,7 +145,7 @@ pub fn StepIndicator(props: StepIndicatorProps) -> Element {
     } else {
         "default"
     };
-    let clickable = props.on_click.clone();
+    let clickable = props.on_click;
 
     // Content based on state and icon
     let content: Element = if let Some(icon) = props.icon.clone() {
@@ -157,12 +157,10 @@ pub fn StepIndicator(props: StepIndicatorProps) -> Element {
                     StepSize::Md => IconSize::Medium,
                     StepSize::Lg => IconSize::Large,
                 },
-                color: if props.state == StepState::Completed {
-                    IconColor::Success
-                } else if props.state == StepState::Error {
-                    IconColor::Destructive
-                } else {
-                    IconColor::Current
+                color: match props.state {
+                    StepState::Completed => IconColor::Success,
+                    StepState::Error => IconColor::Destructive,
+                    _ => IconColor::Current,
                 },
             }
         }
@@ -224,7 +222,7 @@ pub fn StepIndicator(props: StepIndicatorProps) -> Element {
             aria_label: props.aria_label.clone().unwrap_or_else(|| format!("Step {}", props.step)),
             aria_current: if props.state == StepState::Active { Some("step") } else { None },
             onclick: move |_| {
-                if let Some(handler) = clickable.clone() {
+                if let Some(handler) = clickable {
                     handler.call(());
                 }
             },

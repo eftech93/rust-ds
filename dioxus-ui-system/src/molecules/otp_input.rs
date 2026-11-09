@@ -65,7 +65,7 @@ pub struct OtpInputProps {
 /// ```
 #[component]
 pub fn OtpInput(props: OtpInputProps) -> Element {
-    let length = props.length.max(1).min(12); // Clamp between 1 and 12
+    let length = props.length.clamp(1, 12);
     let disabled = props.disabled;
     let error = props.error;
     let mask = props.mask;
@@ -150,8 +150,8 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
 
     let custom_style = props.style.clone().unwrap_or_default();
     let class = props.class.clone().unwrap_or_default();
-    let on_change = props.on_change.clone();
-    let on_complete = props.on_complete.clone();
+    let on_change = props.on_change;
+    let on_complete = props.on_complete;
     let current_value = props.value.clone();
 
     // Helper to check if all digits are filled and call on_complete
@@ -190,8 +190,8 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                     let aria_label = format!("Digit {} of {}", idx + 1, length);
 
                     // Clone values for closures
-                    let on_change_clone = on_change.clone();
-                    let on_change_clone2 = on_change.clone();
+                    let on_change_clone = on_change;
+                    let on_change_clone2 = on_change;
                     let current_value_clone = current_value.clone();
                     let current_value_clone2 = current_value.clone();
 
@@ -255,7 +255,7 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                                     handle_paste(idx, &val, &current_value_clone)
                                 } else {
                                     // Only accept single digit
-                                    let digit = val.chars().filter(|c| c.is_ascii_digit()).next();
+                                    let digit = val.chars().find(|c| c.is_ascii_digit());
                                     if let Some(d) = digit {
                                         update_value_at(idx, d, &current_value_clone)
                                     } else {
@@ -281,17 +281,14 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                                     current.iter().take(length).collect::<String>().trim().to_string()
                                 };
 
-                                match e.key() {
-                                    Key::Backspace => {
-                                        let current_value_char = current_value_clone2.chars().nth(idx).unwrap_or(' ');
+                                if e.key() == Key::Backspace {
+                                    let current_value_char = current_value_clone2.chars().nth(idx).unwrap_or(' ');
 
-                                        if current_value_char != ' ' && current_value_char != '\0' {
-                                            // Clear current value
-                                            let new_code = clear_value_at(idx, &current_value_clone2);
-                                            on_change_clone2.call(new_code);
-                                        }
+                                    if current_value_char != ' ' && current_value_char != '\0' {
+                                        // Clear current value
+                                        let new_code = clear_value_at(idx, &current_value_clone2);
+                                        on_change_clone2.call(new_code);
                                     }
-                                    _ => {}
                                 }
                             },
                             onfocus: move |_| {

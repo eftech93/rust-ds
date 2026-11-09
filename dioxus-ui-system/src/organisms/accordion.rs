@@ -97,7 +97,7 @@ pub fn Accordion(props: AccordionProps) -> Element {
                     is_last: index == props.items.len() - 1,
                     multiple: props.multiple,
                     collapsible: props.collapsible,
-                    on_toggle: props.on_change.clone(),
+                    on_toggle: props.on_change,
                     all_expanded: props.expanded.clone(),
                 }
             }

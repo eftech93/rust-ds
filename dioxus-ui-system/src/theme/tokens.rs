@@ -23,20 +23,15 @@ pub struct ThemeTokens {
 }
 
 /// Theme mode variants supporting light, dark, and custom brand themes
-#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize, Default)]
 pub enum ThemeMode {
     /// Light mode
+    #[default]
     Light,
     /// Dark mode
     Dark,
     /// Custom brand theme with name
     Brand(String),
-}
-
-impl Default for ThemeMode {
-    fn default() -> Self {
-        ThemeMode::Light
-    }
 }
 
 /// Color scale with semantic color names

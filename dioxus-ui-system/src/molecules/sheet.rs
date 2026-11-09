@@ -285,7 +285,7 @@ pub fn Sheet(props: SheetProps) -> Element {
                     title: props.title.clone(),
                     description: props.description.clone(),
                     show_close_button: props.show_close_button,
-                    on_close: props.on_open_change.clone(),
+                    on_close: props.on_open_change,
                 }
             }
 

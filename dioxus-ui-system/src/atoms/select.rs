@@ -225,11 +225,11 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             .build()
     });
 
-    let on_change_clone = props.on_change.clone();
+    let on_change_clone = props.on_change;
     let max_selections = props.max_selections;
 
     let remove_selected = move |value: String| {
-        let on_change = on_change_clone.clone();
+        let on_change = on_change_clone;
         selected.with_mut(|s| {
             s.retain(|v| v != &value);
             if let Some(h) = on_change {
@@ -239,7 +239,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
     };
 
     let add_selected = move |value: String| {
-        let on_change = on_change_clone.clone();
+        let on_change = on_change_clone;
         selected.with_mut(|s| {
             if !s.contains(&value) {
                 if let Some(max) = max_selections {
@@ -287,7 +287,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                         key: "{value}",
                         value: value.clone(),
                         label: label.clone(),
-                        tag_style: tag_style.clone(),
+                        tag_style: tag_style,
                         on_remove: remove_selected,
                     }
                 }
@@ -408,7 +408,7 @@ fn MultiSelectDropdown(props: MultiSelectDropdownProps) -> Element {
                 DropdownOptionItem {
                     key: "{option.value}",
                     option: option.clone(),
-                    item_style: item_style.clone(),
+                    item_style: item_style,
                     is_selected: props.selected.contains(&option.value),
                     on_select: props.on_select,
                 }

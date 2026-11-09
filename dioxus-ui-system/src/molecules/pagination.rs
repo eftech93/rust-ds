@@ -143,7 +143,6 @@ pub fn Pagination(props: PaginationProps) -> Element {
                 // Page numbers
                 for (idx, item) in pages.iter().enumerate() {
                     {
-                        let idx = idx;
                         match item {
                             PageItem::Number(page) => {
                                 let is_active = *page == current;

@@ -113,7 +113,7 @@ pub fn Tour(props: TourProps) -> Element {
             t.colors.muted.to_rgba(),
             t.colors.primary.to_rgba(),
             t.colors.border.to_rgba(),
-            t.radius.md.clone(),
+            t.radius.md,
             t.shadows.xl.clone(),
         )
     });
@@ -163,11 +163,11 @@ pub fn Tour(props: TourProps) -> Element {
         if props.current_step.is_none() {
             internal_step.set(next);
         }
-        if let Some(on_step_change) = props.on_step_change.clone() {
+        if let Some(on_step_change) = props.on_step_change {
             on_step_change.call(next);
         }
         if next == total_steps - 1 && current_step == total_steps - 1 {
-            if let Some(on_finish) = props.on_finish.clone() {
+            if let Some(on_finish) = props.on_finish {
                 on_finish.call(());
             }
             props.on_open_change.call(false);
@@ -179,7 +179,7 @@ pub fn Tour(props: TourProps) -> Element {
         if props.current_step.is_none() {
             internal_step.set(prev);
         }
-        if let Some(on_step_change) = props.on_step_change.clone() {
+        if let Some(on_step_change) = props.on_step_change {
             on_step_change.call(prev);
         }
     };

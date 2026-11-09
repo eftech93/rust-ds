@@ -337,7 +337,7 @@ pub fn CarouselItem(props: CarouselItemProps) -> Element {
 
     let is_active = carousel
         .as_ref()
-        .map_or(false, |ctx| *ctx.current_index.read() == props.index);
+        .is_some_and(|ctx| *ctx.current_index.read() == props.index);
 
     let item_style = use_style(move |_t| Style::new().min_w("100%").w_full().h_full().build());
 
@@ -373,10 +373,8 @@ pub struct CarouselPreviousProps {
 pub fn CarouselPrevious(props: CarouselPreviousProps) -> Element {
     let carousel = use_carousel();
 
-    let can_go_prev = carousel
-        .as_ref()
-        .map_or(false, |ctx| *ctx.can_go_prev.read());
-    let go_prev = carousel.as_ref().map(|ctx| ctx.go_prev.clone());
+    let can_go_prev = carousel.as_ref().is_some_and(|ctx| *ctx.can_go_prev.read());
+    let go_prev = carousel.as_ref().map(|ctx| ctx.go_prev);
 
     let button_style = use_style(move |t| {
         Style::new()
@@ -445,10 +443,8 @@ pub struct CarouselNextProps {
 pub fn CarouselNext(props: CarouselNextProps) -> Element {
     let carousel = use_carousel();
 
-    let can_go_next = carousel
-        .as_ref()
-        .map_or(false, |ctx| *ctx.can_go_next.read());
-    let go_next = carousel.as_ref().map(|ctx| ctx.go_next.clone());
+    let can_go_next = carousel.as_ref().is_some_and(|ctx| *ctx.can_go_next.read());
+    let go_next = carousel.as_ref().map(|ctx| ctx.go_next);
 
     let button_style = use_style(move |t| {
         Style::new()
@@ -575,7 +571,7 @@ pub fn CarouselDots(props: CarouselDotsProps) -> Element {
         .unwrap_or_else(|| carousel.as_ref().map_or(0, |ctx| *ctx.total_items.read()));
 
     let current_index = carousel.as_ref().map_or(0, |ctx| *ctx.current_index.read());
-    let go_to = carousel.as_ref().map(|ctx| ctx.go_to.clone());
+    let go_to = carousel.as_ref().map(|ctx| ctx.go_to);
 
     let container_style = use_style(move |_t| {
         Style::new()
@@ -601,7 +597,7 @@ pub fn CarouselDots(props: CarouselDotsProps) -> Element {
                 CarouselDot {
                     index: index,
                     is_active: index == current_index,
-                    go_to: go_to.clone(),
+                    go_to: go_to,
                     style: props.dot_style.clone(),
                 }
             }
@@ -622,7 +618,7 @@ struct CarouselDotProps {
 fn CarouselDot(props: CarouselDotProps) -> Element {
     let is_active = props.is_active;
     let index = props.index;
-    let go_to = props.go_to.clone();
+    let go_to = props.go_to;
 
     let dot_style = use_style(move |t| {
         Style::new()
@@ -701,7 +697,7 @@ pub fn SimpleCarousel(props: SimpleCarouselProps) -> Element {
             style: props.style.clone(),
             opts: props.opts.clone(),
             orientation: props.orientation.clone(),
-            on_index_change: props.on_index_change.clone(),
+            on_index_change: props.on_index_change,
 
             CarouselContent {
                 for (index, item) in props.items.iter().enumerate() {

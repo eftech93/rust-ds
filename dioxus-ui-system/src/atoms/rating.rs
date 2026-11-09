@@ -92,7 +92,7 @@ pub fn Rating(props: RatingProps) -> Element {
                                 key: "{i}",
                                 style: "font-size: {props.size}px; color: {star_color}; {cursor} user-select: none; line-height: 1;",
                                 onclick: {
-                                    let on_change = props.on_change.clone();
+                                    let on_change = props.on_change;
                                     move |e: Event<dioxus::html::MouseData>| {
                                         if props.interactive {
                                             e.stop_propagation();

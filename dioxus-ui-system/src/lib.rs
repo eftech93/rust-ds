@@ -39,9 +39,8 @@ pub mod organisms;
 pub mod styles;
 pub mod theme;
 
-/// Prelude module for convenient imports
+/// Prelude module: convenient re-exports for common types
 pub mod prelude {
-    //! Convenient re-exports for common types
 
     // Config
     pub use crate::config::{

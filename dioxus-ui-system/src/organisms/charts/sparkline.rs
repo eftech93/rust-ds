@@ -147,7 +147,7 @@ pub fn Sparkline(props: SparklineProps) -> Element {
     let show_last_point = props.show_last_point;
     let show_min_max = props.show_min_max;
     let line_width = props.line_width;
-    let onclick = props.onclick.clone();
+    let onclick = props.onclick;
 
     // Calculate points for line/area
     let points: Vec<(f64, f64)> = data

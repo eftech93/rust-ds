@@ -120,16 +120,16 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
                 "{err}"
             }
         })
-    } else if let Some(h) = hint {
-        Some(rsx! {
-            Label {
-                size: TextSize::ExtraSmall,
-                color: TextColor::Muted,
-                "{h}"
+    } else {
+        hint.map(|h| {
+            rsx! {
+                Label {
+                    size: TextSize::ExtraSmall,
+                    color: TextColor::Muted,
+                    "{h}"
+                }
             }
         })
-    } else {
-        None
     };
 
     let custom_style = props.style.clone().unwrap_or_default();
@@ -159,7 +159,7 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
                         placeholder: placeholder,
                         input_type: input_type,
                         disabled: disabled,
-                        on_change: props.on_change.clone(),
+                        on_change: props.on_change,
                     }
 
                     if let Some(icon) = props.trailing_icon {
