@@ -238,8 +238,8 @@ pub fn ResizablePanel(props: ResizablePanelProps) -> Element {
                     Direction::Vertical => "width:100%".to_string(),
                 },
                 match *direction.read() {
-                    Direction::Horizontal => "height:100%",
-                    Direction::Vertical => &format!("height:{}%", size.read()),
+                    Direction::Horizontal => "height:100%".to_string(),
+                    Direction::Vertical => format!("height:{}%", size.read()),
                 },
                 if *is_dragging.read() { "pointer-events:none;" } else { "" },
                 style

@@ -3,11 +3,8 @@
 use crate::components::three_demo::ThreeViewDemo;
 use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, PropsTable, Section};
 use dioxus::prelude::*;
-use dioxus_ui_system::organisms::{
-    Calendar, CalendarMode, ImageUploader, Menubar,
-};
+use dioxus_ui_system::organisms::{Calendar, CalendarMode, ImageUploader, Menubar};
 use dioxus_ui_system::prelude::*;
-
 
 /// ThreeView documentation page - dioxus-three 3D viewer component
 #[component]
@@ -18,7 +15,7 @@ pub fn ThreeViewPage() -> Element {
             description: "A Three.js 3D viewer component for Dioxus applications. Supports Desktop (WebView), Web (WASM), and Mobile platforms with multiple 3D formats and custom shaders.",
 
             ThreeViewInteractiveExample {}
-            
+
             ThreeViewDocumentation {}
         }
     }
@@ -30,7 +27,7 @@ fn ThreeViewInteractiveExample() -> Element {
     rsx! {
         Section { title: "Interactive Example",
             p { "This example demonstrates a ThreeView scene with interactive controls. Try adjusting the camera, shaders, and model properties:" }
-            
+
             ThreeViewDemo {}
         }
     }
@@ -138,18 +135,18 @@ dioxus-three = { git = "https://github.com/eftech93/dioxus-three" }"##;
                     li { "🔲 Shadow support and wireframe mode" }
                     li { "🌊 Custom GLSL shader support with built-in presets" }
                 }
-                
+
             }
 
             Section { title: "Platform-Specific Usage",
                 p { "Dioxus Three supports three different platforms. Here's how to launch your app on each:" }
-                
+
                 h4 { style: "margin-top: 16px;", "Desktop" }
                 CodeBlock { code: desktop_launch_code.to_string() }
-                
+
                 h4 { style: "margin-top: 16px;", "Web (WASM)" }
                 CodeBlock { code: web_launch_code.to_string() }
-                
+
                 h4 { style: "margin-top: 16px;", "Mobile" }
                 CodeBlock { code: mobile_launch_code.to_string() }
             }
@@ -157,10 +154,10 @@ dioxus-three = { git = "https://github.com/eftech93/dioxus-three" }"##;
             Section { title: "Installation",
                 p { "For Desktop applications, add to your Cargo.toml:" }
                 CodeBlock { code: basic_usage_code.to_string() }
-                
+
                 p { style: "margin-top: 16px;", "For Web applications:" }
                 CodeBlock { code: web_usage_code.to_string() }
-                
+
                 p { style: "margin-top: 16px;", "Or use the latest from git:" }
                 CodeBlock { code: cargo_git_code.to_string() }
             }
@@ -176,45 +173,45 @@ dioxus-three = { git = "https://github.com/eftech93/dioxus-three" }"##;
                         }
                     }
                     tbody {
-                        tr { 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Obj" } } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".obj" } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "Wavefront OBJ format" } 
+                        tr {
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Obj" } }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".obj" }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "Wavefront OBJ format" }
                         }
-                        tr { 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Fbx" } } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".fbx" } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "Autodesk FBX format" } 
+                        tr {
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Fbx" } }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".fbx" }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "Autodesk FBX format" }
                         }
-                        tr { 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Gltf" } } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".gltf" } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "glTF 2.0 JSON format" } 
+                        tr {
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Gltf" } }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".gltf" }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "glTF 2.0 JSON format" }
                         }
-                        tr { 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Glb" } } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".glb" } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "glTF 2.0 binary format" } 
+                        tr {
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Glb" } }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".glb" }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "glTF 2.0 binary format" }
                         }
-                        tr { 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Stl" } } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".stl" } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "STL stereolithography format" } 
+                        tr {
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Stl" } }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".stl" }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "STL stereolithography format" }
                         }
-                        tr { 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Ply" } } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".ply" } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "Stanford PLY format" } 
+                        tr {
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Ply" } }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".ply" }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "Stanford PLY format" }
                         }
-                        tr { 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Dae" } } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".dae" } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "Collada DAE format" } 
+                        tr {
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Dae" } }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", ".dae" }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "Collada DAE format" }
                         }
-                        tr { 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Cube" } } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "N/A" } 
-                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "Default cube (no file needed)" } 
+                        tr {
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", code { "ModelFormat::Cube" } }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "N/A" }
+                            td { style: "padding: 8px; border-bottom: 1px solid #e2e8f0;", "Default cube (no file needed)" }
                         }
                     }
                 }
@@ -222,7 +219,7 @@ dioxus-three = { git = "https://github.com/eftech93/dioxus-three" }"##;
 
             Section { title: "API Reference",
                 p { "Key types and their fields:" }
-                
+
                 h4 { style: "margin-top: 16px;", "ThreeView Props" }
                 CodeBlock { code: api_props_code.to_string() }
 
@@ -244,13 +241,13 @@ dioxus-three = { git = "https://github.com/eftech93/dioxus-three" }"##;
 
             Section { title: "Running Examples",
                 p { "The dioxus-three repository includes examples for all platforms:" }
-                
+
                 h4 { style: "margin-top: 16px;", "Desktop Demo" }
                 CodeBlock { code: "cd examples/demo\ncargo run".to_string() }
-                
+
                 h4 { style: "margin-top: 16px;", "Web Demo (WASM)" }
                 CodeBlock { code: "cd examples/web-demo\ndx serve --platform web".to_string() }
-                
+
                 h4 { style: "margin-top: 16px;", "Mobile Demo" }
                 CodeBlock { code: "cd examples/mobile-demo\n# Android:\ndx build --platform android\n# iOS (macOS only):\ndx build --platform ios".to_string() }
             }
@@ -613,7 +610,7 @@ pub fn TreePage() -> Element {
                 TreeNodeData::new("personal", "Personal")
                     .with_icon("folder")
                     .with_children(vec![
-                        TreeNodeData::new("resume", "resume.docx").with_icon("file"),
+                        TreeNodeData::new("resume", "resume.docx").with_icon("file")
                     ]),
             ]),
         TreeNodeData::new("images", "Images")
@@ -625,7 +622,7 @@ pub fn TreePage() -> Element {
         TreeNodeData::new("music", "Music")
             .with_icon("folder")
             .with_children(vec![
-                TreeNodeData::new("song", "song.mp3").with_icon("music"),
+                TreeNodeData::new("song", "song.mp3").with_icon("music")
             ]),
     ];
 
@@ -1114,22 +1111,18 @@ pub fn KanbanPage() -> Element {
             ]),
         KanbanColumn::new("in_progress", "In Progress")
             .with_color("#f59e0b")
-            .with_cards(vec![
-                KanbanCard::new("3", "Build component library")
-                    .with_description("Create base atom components")
-                    .with_tags(vec!["frontend".to_string()])
-                    .with_assignee("JD")
-                    .with_due_date("Apr 25"),
-            ]),
+            .with_cards(vec![KanbanCard::new("3", "Build component library")
+                .with_description("Create base atom components")
+                .with_tags(vec!["frontend".to_string()])
+                .with_assignee("JD")
+                .with_due_date("Apr 25")]),
         KanbanColumn::new("done", "Done")
             .with_color("#22c55e")
-            .with_cards(vec![
-                KanbanCard::new("4", "Project kickoff")
-                    .with_description("Initial team meeting and planning")
-                    .with_tags(vec!["planning".to_string()])
-                    .with_assignee("AL")
-                    .with_due_date("Apr 10"),
-            ]),
+            .with_cards(vec![KanbanCard::new("4", "Project kickoff")
+                .with_description("Initial team meeting and planning")
+                .with_tags(vec!["planning".to_string()])
+                .with_assignee("AL")
+                .with_due_date("Apr 10")]),
     ];
 
     rsx! {

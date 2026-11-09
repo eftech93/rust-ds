@@ -1,15 +1,40 @@
 //! Dioxus Three - Web Demo
 //!
-//! Minimal version with cube selection workflow
+//! NOTE: The interactive ThreeView demo has been temporarily commented out during
+//! the migration to Dioxus 0.7 because the upstream `dioxus-three` crate (up to v0.0.4)
+//! pins Dioxus 0.6. Once upstream `dioxus-three` is upgraded to Dioxus 0.7, this component
+//! can be restored by uncommenting the original code below and re-enabling `dioxus-three`
+//! in `docs-app/Cargo.toml`.
 
 use dioxus::prelude::*;
+
+/// Placeholder for the ThreeView demo while upstream dioxus-three is updated for Dioxus 0.7.
+#[component]
+pub fn ThreeViewDemo() -> Element {
+    rsx! {
+        div {
+            style: "padding: 32px; border: 1px dashed var(--border, #e5e7eb); border-radius: 8px; text-align: center; color: var(--muted-foreground, #6b7280); background: var(--muted, #f9fafb);",
+            p { style: "font-weight: 600; font-size: 16px; margin-bottom: 8px;", "ThreeView Interactive Demo (Temporarily Disabled)" }
+            p { style: "font-size: 14px; max-width: 600px; margin: 0 auto;",
+                "The Three.js viewer component requires `dioxus-three`, which currently pins Dioxus 0.6. "
+                "The original demo code is preserved in `three_demo.rs` and can be re-enabled once `dioxus-three` supports Dioxus 0.7."
+            }
+        }
+    }
+}
+
+/*
+// ============================================================================
+// ORIGINAL IMPLEMENTATION (Preserved for maintainer decision once dioxus-three supports Dioxus 0.7):
+// ============================================================================
+
 use dioxus_three::{ModelConfig, ModelFormat, ShaderPreset};
 use dioxus_ui_system::prelude::*;
 use dioxus_ui_system::atoms::{NumberInput};
 
 /// The main ThreeView demo component - Cube selection workflow
 #[component]
-pub fn ThreeViewDemo() -> Element {
+fn OriginalThreeViewDemo() -> Element {
     // Scene state - start with one cube
     let mut models = use_signal(|| {
         vec![SceneModel {
@@ -36,17 +61,17 @@ pub fn ThreeViewDemo() -> Element {
     rsx! {
         div {
             style: "display: flex; align-items: stretch; width: 100%; margin: 0; padding: 0; gap: 0;",
-            
+
             // LEFT: Control Panel
             div {
                 style: "width: 290px; flex-shrink: 0; border: 1px solid var(--border); border-radius: 4px; margin: 0; padding: 0 20px;",
-                
+
                 // Model Section
                 div {
                     style: "border-bottom: 1px solid var(--border); margin: 0; padding: 8px 0;",
-                    
+
                     div { style: "font-size: 11px; font-weight: 600; margin: 0 0 4px 0; padding: 0; color: var(--foreground, #111827);", "📦 Cubes" }
-                    
+
                     // Add Cube button
                     Button {
                         variant: ButtonVariant::Secondary,
@@ -68,11 +93,11 @@ pub fn ThreeViewDemo() -> Element {
                         },
                         "➕ Add Cube"
                     }
-                    
+
                     // Cube list
                     div {
                         style: "display: flex; flex-wrap: wrap; gap: 4px; margin: 0; padding: 0;",
-                        
+
                         for (idx, model) in models.read().iter().enumerate() {
                             CubeListItem {
                                 name: model.name.clone(),
@@ -83,42 +108,42 @@ pub fn ThreeViewDemo() -> Element {
                         }
                     }
                 }
-                
+
                 // Selected Model Controls
                 SelectedModelControls { models, selected_idx: selected_model() }
-                
+
                 // Scene Options Section
                 div {
                     style: "border-bottom: 1px solid var(--border); margin: 0; padding: 8px 0;",
-                    
+
                     div { style: "font-size: 11px; font-weight: 600; margin: 0 0 4px 0; padding: 0; color: var(--foreground, #111827);", "🎬 Scene" }
-                    
+
                     div {
                         style: "display: flex; margin: 0; padding: 0; gap: 8px;",
-                        
+
                         div {
                             style: "display: flex; align-items: center; margin: 0; padding: 0;",
-                            
+
                             Switch {
                                 checked: auto_rotate(),
                                 on_change: move |v| auto_rotate.set(v),
                             }
                             span { style: "font-size: 10px; margin: 0 0 0 4px; padding: 0; color: var(--foreground, #111827);", "Rotate" }
                         }
-                        
+
                         div {
                             style: "display: flex; align-items: center; margin: 0; padding: 0;",
-                            
+
                             Switch {
                                 checked: show_grid(),
                                 on_change: move |v| show_grid.set(v),
                             }
                             span { style: "font-size: 10px; margin: 0 0 0 4px; padding: 0; color: var(--foreground, #111827);", "Grid" }
                         }
-                        
+
                         div {
                             style: "display: flex; align-items: center; margin: 0; padding: 0;",
-                            
+
                             Switch {
                                 checked: show_axes(),
                                 on_change: move |v| show_axes.set(v),
@@ -126,7 +151,7 @@ pub fn ThreeViewDemo() -> Element {
                             span { style: "font-size: 10px; margin: 0 0 0 4px; padding: 0; color: var(--foreground, #111827);", "Axes" }
                         }
                     }
-                    
+
                     if auto_rotate() {
                         div { style: "margin: 8px 0 0 0; padding: 0;",
                             Slider {
@@ -139,20 +164,20 @@ pub fn ThreeViewDemo() -> Element {
                         }
                     }
                 }
-                
+
                 // Camera Section
                 div {
                     style: "border-bottom: 1px solid var(--border); margin: 0; padding: 8px 0;",
-                    
+
                     div { style: "font-size: 11px; font-weight: 600; margin: 0 0 4px 0; padding: 0; color: var(--foreground, #111827);", "📷 Camera" }
-                    
+
                     CameraSlider { label: "X", value: cam_x, min: -30.0, max: 30.0 }
                     CameraSlider { label: "Y", value: cam_y, min: -30.0, max: 30.0 }
                     CameraSlider { label: "Z", value: cam_z, min: -30.0, max: 30.0 }
-                    
+
                     div {
                         style: "display: flex; margin: 8px 0 0 0; padding: 0; gap: 4px;",
-                        
+
                         Button {
                             variant: ButtonVariant::Secondary,
                             size: ButtonSize::Sm,
@@ -160,7 +185,7 @@ pub fn ThreeViewDemo() -> Element {
                             onclick: move |_| { cam_x.set(0.0); cam_y.set(15.0); cam_z.set(0.01); },
                             "Top"
                         }
-                        
+
                         Button {
                             variant: ButtonVariant::Secondary,
                             size: ButtonSize::Sm,
@@ -168,7 +193,7 @@ pub fn ThreeViewDemo() -> Element {
                             onclick: move |_| { cam_x.set(15.0); cam_y.set(0.0); cam_z.set(0.0); },
                             "Side"
                         }
-                        
+
                         Button {
                             variant: ButtonVariant::Primary,
                             size: ButtonSize::Sm,
@@ -178,7 +203,7 @@ pub fn ThreeViewDemo() -> Element {
                         }
                     }
                 }
-                
+
                 // Reset Button
                 div {
                     style: "margin: 0; padding: 8px 0;",
@@ -205,11 +230,11 @@ pub fn ThreeViewDemo() -> Element {
                     }
                 }
             }
-            
+
             // RIGHT: 3D Renderer
             div {
                 style: "flex: 1; background: #000000; border-radius: 4px; margin: 0; padding: 0; min-height: 500px;",
-                
+
                 ThreeViewWrapper {
                     models: models,
                     cam_x: cam_x,
@@ -231,12 +256,12 @@ pub fn ThreeViewDemo() -> Element {
 fn CubeListItem(name: String, color: String, is_selected: bool, on_click: EventHandler<()>) -> Element {
     let border_color = if is_selected { "2px solid #3b82f6" } else { "2px solid transparent" };
     let bg_color = if is_selected { "rgba(59, 130, 246, 0.1)" } else { "rgba(0,0,0,0.05)" };
-    
+
     rsx! {
         div {
             onclick: move |_| on_click.call(()),
             style: "display: flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 4px; cursor: pointer; background: {bg_color}; border: {border_color}; font-size: 11px;",
-            
+
             div {
                 style: "width: 12px; height: 12px; border-radius: 2px; background: {color}; border: 1px solid rgba(0,0,0,0.2);"
             }
@@ -281,7 +306,7 @@ fn ThreeViewWrapper(
     shader: Signal<ShaderPreset>,
 ) -> Element {
     let model_configs: Vec<ModelConfig> = models.read().iter().map(|m| m.config.clone()).collect();
-    
+
     let cx = cam_x();
     let cy = cam_y();
     let cz = cam_z();
@@ -290,7 +315,7 @@ fn ThreeViewWrapper(
     let sg = show_grid();
     let sa = show_axes();
     let _sh = shader();
-    
+
     rsx! {
         dioxus_three::ThreeView {
             models: model_configs,
@@ -334,9 +359,9 @@ fn SelectedModelControls(models: Signal<Vec<SceneModel>>, selected_idx: usize) -
     rsx! {
         div {
             style: "border-bottom: 1px solid var(--border); margin: 0; padding: 8px 0;",
-            
+
             div { style: "font-size: 11px; font-weight: 600; margin: 0 0 8px 0; padding: 0; color: var(--foreground, #111827);", "🔧 {model_name}" }
-            
+
             // Position
             div {
                 style: "margin: 0 0 8px 0; padding: 0;",
@@ -384,7 +409,7 @@ fn SelectedModelControls(models: Signal<Vec<SceneModel>>, selected_idx: usize) -
                     }
                 }
             }
-            
+
             // Rotation
             div {
                 style: "margin: 0 0 8px 0; padding: 0;",
@@ -432,7 +457,7 @@ fn SelectedModelControls(models: Signal<Vec<SceneModel>>, selected_idx: usize) -
                     }
                 }
             }
-            
+
             // Scale
             div {
                 style: "margin: 0 0 8px 0; padding: 0;",
@@ -452,14 +477,14 @@ fn SelectedModelControls(models: Signal<Vec<SceneModel>>, selected_idx: usize) -
                 div { style: "font-size: 10px; margin: 4px 0 0 0; padding: 0; color: var(--foreground, #111827);", "{scale_formatted}"
                 }
             }
-            
+
             // Color
             div {
                 style: "margin: 0; padding: 0;",
                 div { style: "font-size: 10px; font-weight: 500; margin: 0 0 4px 0; color: var(--foreground, #111827);", "Color" }
                 div {
                     style: "display: flex; align-items: center; margin: 0; padding: 0; gap: 8px;",
-                    
+
                     input {
                         r#type: "color",
                         value: "{color}",
@@ -503,3 +528,4 @@ fn string_to_shader(s: &str) -> ShaderPreset {
         _ => ShaderPreset::None,
     }
 }
+*/

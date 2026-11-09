@@ -429,7 +429,16 @@ fn get_today() -> Date {
     let month_days = [
         31,
         if is_leap_year(year) { 29 } else { 28 },
-        31, 30, 31, 30, 31, 31, 30, 31, 30, 31,
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31,
     ];
     let mut month = 1u8;
     for (i, md) in month_days.iter().enumerate() {

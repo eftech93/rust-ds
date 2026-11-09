@@ -4,11 +4,13 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-dioxus = { version = "0.6", features = ["web", "router"] }
+dioxus = { version = "0.7", features = ["web", "router"] }
 dioxus-ui-system = { path = "../dioxus-ui-system" }
-dioxus-three = "0.0.3"
+# NOTE: dioxus-three is commented out during the Dioxus 0.7 migration because dioxus-three (up to v0.0.4)
+# strictly pins Dioxus 0.6. When dioxus-three is updated to support Dioxus 0.7, this can be re-enabled.
+# dioxus-three = "0.0.3"
 tracing = "0.1"
-web-sys = { version = "0.3", features = ["Window", "Storage", "Navigator", "Clipboard"] }
+web-sys = { workspace = true }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 

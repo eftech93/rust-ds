@@ -58,8 +58,9 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
     let _theme = use_theme();
 
     let container_style = use_style(|_t| Style::new().build());
-    
-    let container_style_with_buttons = use_style(|_t| Style::new().flex().flex_col().w_full().build());
+
+    let container_style_with_buttons =
+        use_style(|_t| Style::new().flex().flex_col().w_full().build());
 
     let input_wrapper_style = use_style(|t| {
         Style::new()
@@ -71,7 +72,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
             .overflow_hidden()
             .build()
     });
-    
+
     let input_wrapper_style_no_buttons = use_style(|t| {
         Style::new()
             .flex()
@@ -106,7 +107,7 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
             .bg(&t.colors.background)
             .build()
     });
-    
+
     let input_style_no_buttons = use_style(|t| {
         Style::new()
             .min_w_px(60)
