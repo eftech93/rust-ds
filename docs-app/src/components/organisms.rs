@@ -774,7 +774,7 @@ pub fn DataTablePage() -> Element {
 
     // State for search and filters
     let mut search_query = use_signal(|| "".to_string());
-    let mut active_filters = use_signal(|| HashMap::<String, String>::new());
+    let mut active_filters = use_signal(HashMap::<String, String>::new);
 
     // Filter the data based on search query and active filters
     let filtered_users: Vec<User> = all_users
@@ -790,15 +790,13 @@ pub fn DataTablePage() -> Element {
                 || user.department.to_lowercase().contains(&search_lower);
 
             // Custom filters
-            let matches_role = active_filters()
-                .get("role")
-                .map_or(true, |v| v == &user.role);
+            let matches_role = active_filters().get("role").is_none_or(|v| v == &user.role);
             let matches_status = active_filters()
                 .get("status")
-                .map_or(true, |v| v == &user.status);
+                .is_none_or(|v| v == &user.status);
             let matches_dept = active_filters()
                 .get("department")
-                .map_or(true, |v| v == &user.department);
+                .is_none_or(|v| v == &user.department);
 
             matches_search && matches_role && matches_status && matches_dept
         })
@@ -1976,10 +1974,10 @@ pub fn HeroPage() -> Element {
 #[component]
 pub fn FileUploadPage() -> Element {
     // State for tracking selected files in each example
-    let mut single_file = use_signal(|| Vec::<UploadedFile>::new());
-    let mut multiple_files = use_signal(|| Vec::<UploadedFile>::new());
-    let mut image_files = use_signal(|| Vec::<UploadedFile>::new());
-    let mut doc_files = use_signal(|| Vec::<UploadedFile>::new());
+    let mut single_file = use_signal(Vec::<UploadedFile>::new);
+    let mut multiple_files = use_signal(Vec::<UploadedFile>::new);
+    let mut image_files = use_signal(Vec::<UploadedFile>::new);
+    let mut doc_files = use_signal(Vec::<UploadedFile>::new);
 
     rsx! {
         DocPage {

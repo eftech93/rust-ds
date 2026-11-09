@@ -1024,9 +1024,9 @@ Breadcrumb {
 /// Input Group documentation page
 #[component]
 pub fn InputGroupPage() -> Element {
-    let mut email = use_signal(|| String::new());
-    let mut username = use_signal(|| String::new());
-    let mut password = use_signal(|| String::new());
+    let mut email = use_signal(String::new);
+    let mut username = use_signal(String::new);
+    let mut password = use_signal(String::new);
 
     rsx! {
         DocPage {

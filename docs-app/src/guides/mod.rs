@@ -47,7 +47,7 @@ pub fn QuickStartPage() -> Element {
             h1 { style: "margin: 0; font-size: 32px; font-weight: 800;", "Quick Start" }
 
             Section { number: 1, title: "Add Dependencies",
-                CodeBlock { code: "# Cargo.toml\n[dependencies]\ndioxus = \"0.6\"\ndioxus-ui-system = \"0.1\"".to_string() }
+                CodeBlock { code: "# Cargo.toml\n[dependencies]\ndioxus = \"0.7\"\ndioxus-ui-system = \"0.0.8\"".to_string() }
             }
 
             Section { number: 2, title: "Wrap with ThemeProvider",
@@ -84,8 +84,8 @@ pub fn StylingPage() -> Element {
 
 #[component]
 pub fn FormsPage() -> Element {
-    let mut name = use_signal(|| String::new());
-    let mut email = use_signal(|| String::new());
+    let mut name = use_signal(String::new);
+    let mut email = use_signal(String::new);
     let mut submitted = use_signal(|| false);
 
     rsx! {
