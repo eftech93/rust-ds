@@ -66,8 +66,7 @@ jobs:
             echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
             export PATH="$HOME/.cargo/bin:$PATH"
           fi
-          rustup toolchain install stable --profile minimal -c clippy,rustfmt -t wasm32-unknown-unknown
-          rustup default stable
+          rustup toolchain install   # version/components/targets from rust-toolchain.toml
 
       - name: Resolve version
         id: meta

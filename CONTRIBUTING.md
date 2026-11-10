@@ -6,8 +6,9 @@ issue before starting larger changes.
 
 ## Development setup
 
-- Rust stable (MSRV is `1.80`, set in the workspace `Cargo.toml`) with `rustfmt` and `clippy`
-- The WASM target: `rustup target add wasm32-unknown-unknown`
+- Rust: the toolchain is pinned in `rust-toolchain.toml` (rustup installs it automatically,
+  with `clippy`, `rustfmt` and the wasm target), so local runs, CI and the release runner use
+  the same clippy. The crate's MSRV for users is `rust-version` (`1.80`) in `Cargo.toml`.
 - Dioxus CLI 0.7 for the docs site and web/mobile examples:
   `cargo binstall dioxus-cli@0.7` (or `cargo install dioxus-cli --version "^0.7" --locked`)
 - Linux only, for the desktop/mobile examples (needed by `cargo clippy --workspace`):
