@@ -58,15 +58,7 @@ jobs:
         with:
           ref: ${{ env.RELEASE_SHA }}
 
-      - name: Ensure Rust toolchain
-        shell: bash
-        run: |
-          if ! command -v rustup >/dev/null; then
-            curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal
-            echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
-            export PATH="$HOME/.cargo/bin:$PATH"
-          fi
-          rustup toolchain install   # version/components/targets from rust-toolchain.toml
+      - uses: ./.github/actions/rust-toolchain
 
       - name: Resolve version
         id: meta
@@ -106,6 +98,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.RELEASE_SHA }}
+      - uses: ./.github/actions/rust-toolchain
       - name: Publish to crates.io (skips if version already exists)
         shell: bash
         env:
@@ -154,6 +147,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.RELEASE_SHA }}
+      - uses: ./.github/actions/rust-toolchain
       - name: Ensure dioxus-cli ${{ env.DIOXUS_CLI_VERSION }}
         shell: bash
         run: |
