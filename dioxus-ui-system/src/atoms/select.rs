@@ -404,7 +404,7 @@ fn MultiSelectDropdown(props: MultiSelectDropdownProps) -> Element {
         div {
             style: "{dropdown_style}",
 
-            for option in props.options.iter().cloned().collect::<Vec<_>>() {
+            for option in props.options.iter().cloned() {
                 DropdownOptionItem {
                     key: "{option.value}",
                     option: option.clone(),

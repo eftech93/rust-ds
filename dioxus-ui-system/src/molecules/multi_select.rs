@@ -217,12 +217,9 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                 Key::Escape => {
                     is_open.set(false);
                 }
-                Key::Backspace => {
-                    if search_value().is_empty() && !selected_values().is_empty() {
-                        if let Some(last) = selected_values().last() {
-                            let last_value = last.clone();
-                            remove_value.call(last_value);
-                        }
+                Key::Backspace if search_value().is_empty() => {
+                    if let Some(last) = selected_values().last() {
+                        remove_value.call(last.clone());
                     }
                 }
                 _ => {}
