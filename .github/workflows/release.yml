@@ -152,7 +152,8 @@ jobs:
         shell: bash
         run: |
           if ! dx --version 2>/dev/null | grep -q "^dioxus $DIOXUS_CLI_VERSION"; then
-            command -v cargo-binstall >/dev/null || cargo install cargo-binstall --locked
+            command -v cargo-binstall >/dev/null || curl -L --proto '=https' --tlsv1.2 -sSf \
+              https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
             cargo binstall -y --force "dioxus-cli@$DIOXUS_CLI_VERSION"
           fi
           dx --version

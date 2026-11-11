@@ -54,6 +54,8 @@ opt-level = "z"
 # Profile for WASM builds specifically
 [profile.wasm-release]
 inherits = "release"
-strip = "symbols"
+# Do not strip: wasm-bindgen needs the custom sections rustc emits
+# (`__wasm_bindgen_unstable`, `target_features`). dx runs wasm-opt afterwards.
+strip = false
 opt-level = "z"
 lto = true
