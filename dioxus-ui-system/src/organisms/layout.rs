@@ -644,9 +644,7 @@ fn TopNavLink(props: TopNavLinkProps) -> Element {
             .transition("all 150ms ease")
             .no_underline();
 
-        if item.active {
-            base.bg(&t.colors.muted).text_color(&t.colors.foreground)
-        } else if is_hovered() {
+        if item.active || is_hovered() {
             base.bg(&t.colors.muted).text_color(&t.colors.foreground)
         } else {
             base.text_color(&t.colors.muted_foreground)

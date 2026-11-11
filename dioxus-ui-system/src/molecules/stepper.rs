@@ -109,7 +109,7 @@ pub struct StepItemProps {
 pub fn StepItemComponent(props: StepItemProps) -> Element {
     let step = &props.step;
     let clickable = !step.disabled && props.on_click.is_some();
-    let on_click = props.on_click.clone();
+    let on_click = props.on_click;
     let index = props.index;
 
     let indicator = rsx! {
@@ -123,7 +123,7 @@ pub fn StepItemComponent(props: StepItemProps) -> Element {
             icon: step.icon.clone(),
             on_click: if clickable {
                 Some(EventHandler::new(move |_| {
-                    if let Some(handler) = on_click.clone() {
+                    if let Some(handler) = on_click {
                         handler.call(index);
                     }
                 }))
@@ -248,7 +248,7 @@ pub fn HorizontalStepper(props: HorizontalStepperProps) -> Element {
                     show_connector: index < props.steps.len() - 1,
                     connector_completed: index < props.active_step,
                     horizontal: true,
-                    on_click: props.on_step_click.clone(),
+                    on_click: props.on_step_click,
                 }
             }
         }
@@ -304,7 +304,7 @@ pub fn VerticalStepper(props: VerticalStepperProps) -> Element {
                         show_connector: index < props.steps.len() - 1,
                         connector_completed: index < props.active_step,
                         horizontal: false,
-                        on_click: props.on_step_click.clone(),
+                        on_click: props.on_step_click,
                     }
                 }
             }
@@ -442,7 +442,7 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
 
             // Back button (or spacer for alignment)
             if !is_first {
-                if let Some(on_back) = props.on_back.clone() {
+                if let Some(on_back) = props.on_back {
                     crate::atoms::Button {
                         variant: crate::atoms::ButtonVariant::Secondary,
                         disabled: props.disable_back,
@@ -456,7 +456,7 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
 
             // Skip button (optional)
             if props.show_skip && !is_last {
-                if let Some(on_skip) = props.on_skip.clone() {
+                if let Some(on_skip) = props.on_skip {
                     crate::atoms::Button {
                         variant: crate::atoms::ButtonVariant::Ghost,
                         onclick: move |_| on_skip.call(()),
@@ -467,7 +467,7 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
 
             // Next/Finish button
             if is_last {
-                if let Some(on_finish) = props.on_finish.clone() {
+                if let Some(on_finish) = props.on_finish {
                     crate::atoms::Button {
                         variant: crate::atoms::ButtonVariant::Primary,
                         disabled: props.disable_next,
@@ -476,7 +476,7 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
                     }
                 }
             } else {
-                if let Some(on_next) = props.on_next.clone() {
+                if let Some(on_next) = props.on_next {
                     crate::atoms::Button {
                         variant: crate::atoms::ButtonVariant::Primary,
                         disabled: props.disable_next,

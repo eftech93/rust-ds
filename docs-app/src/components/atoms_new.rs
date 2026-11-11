@@ -116,7 +116,7 @@ NumberInput {
                 ExampleBox {
                     Box { style: "max-width: 200px;",
                         NumberInput {
-                            value: 3.14,
+                            value: 2.75,
                             on_change: move |_| {},
                             precision: Some(2),
                             step: 0.01,

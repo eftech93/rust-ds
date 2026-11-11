@@ -1,42 +1,14 @@
-# Dioxus UI Documentation Site
+# dioxus-ui-docs
 
-A comprehensive documentation site for the Dioxus UI System with multi-page navigation, component examples, and theme building guides.
-
-## Structure
-
-- **Atoms** - Basic building blocks (Button, Input, Label, etc.)
-- **Molecules** - Component combinations (Card, Dialog, Badge, etc.)
-- **Organisms** - Complex layouts (Header, Tabs, Accordion, etc.)
-- **Themes** - Design tokens and customization
-- **Guides** - Usage tutorials and best practices
-
-## Development
+The documentation site for `dioxus-ui-system`, published at
+https://eftech93.github.io/rust-ds/. It has a page per component (atoms, molecules,
+organisms, charts) with live examples and props tables, plus theme and guide pages.
 
 ```bash
-# Run development server
-dx serve --platform web
-
-# Build for production
-dx build --platform web --release
+cd docs-app
+dx serve --platform web     # http://localhost:8080
 ```
 
-## Deployment
-
-The site is configured to deploy to GitHub Pages at `/rust-ds/`.
-
-To deploy:
-
-1. Build the release version:
-   ```bash
-   dx build --platform web --release
-   ```
-
-2. Copy the output from `target/dx/dioxus-ui-docs/release/web/public/` to your GitHub Pages branch.
-
-## Features
-
-- Multi-page navigation with sidebar
-- Interactive component examples
-- Live theme switching
-- Props documentation tables
-- Code examples with syntax highlighting
+Requires the Dioxus CLI 0.7 and the `wasm32-unknown-unknown` target. Production builds,
+the GitHub Pages base path and deployment are covered in the
+[Docs site section of CONTRIBUTING.md](../CONTRIBUTING.md#docs-site).

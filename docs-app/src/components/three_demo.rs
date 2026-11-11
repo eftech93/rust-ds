@@ -80,7 +80,7 @@ fn OriginalThreeViewDemo() -> Element {
                         style: Some("padding: 4px 6px; font-size: 11px; margin: 0 0 8px 0;".to_string()),
                         onclick: move |_| {
                             let id = next_id();
-                            let colors = vec!["#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#ffeaa7", "#dfe6e9", "#fd79a8", "#a29bfe"];
+                            let colors = ["#ff6b6b", "#4ecdc4", "#45b7d1", "#96ceb4", "#ffeaa7", "#dfe6e9", "#fd79a8", "#a29bfe"];
                             let color = colors[id % colors.len()];
                             let config = ModelConfig::new("", ModelFormat::Cube)
                                 .with_color(color);

@@ -345,14 +345,14 @@ pub fn KanbanColumnView(props: KanbanColumnViewProps) -> Element {
                     KanbanCardView {
                         key: "{card.id}",
                         card: card.clone(),
-                        on_click: props.on_card_click.clone(),
+                        on_click: props.on_card_click,
                         hover: props.card_hover,
                     }
                 }
             }
 
             // Add Card Button
-            if let Some(on_add) = props.on_add_card.clone() {
+            if let Some(on_add) = props.on_add_card {
                 div {
                     style: "padding: 0 12px 12px 12px;",
                     Button {
@@ -443,7 +443,7 @@ pub fn KanbanCardView(props: KanbanCardViewProps) -> Element {
 
     let card = props.card.clone();
     let card_id = card.id.clone();
-    let onclick_handler = props.on_click.clone();
+    let onclick_handler = props.on_click;
 
     let id = props.id.clone().unwrap_or_default();
     let class = props.class.clone().unwrap_or_default();
@@ -633,7 +633,7 @@ pub fn AddColumnButton(props: AddColumnButtonProps) -> Element {
         .build()
     });
 
-    let onclick_handler = props.on_add_column.clone();
+    let onclick_handler = props.on_add_column;
 
     let id = props.id.clone().unwrap_or_default();
     let class = props.class.clone().unwrap_or_default();
@@ -692,7 +692,7 @@ pub fn SimpleKanban(props: SimpleKanbanProps) -> Element {
             class: props.class.clone(),
             style: props.style.clone(),
             columns: props.columns.clone(),
-            on_card_click: props.on_card_click.clone(),
+            on_card_click: props.on_card_click,
             height: props.height.clone(),
             show_card_count: true,
             card_hover: true,

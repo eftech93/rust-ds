@@ -188,7 +188,7 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
 
     // Handle file selection
     let mut _handle_files = {
-        let on_change = props.on_change.clone();
+        let on_change = props.on_change;
         move |new_files: Vec<(String, String, usize)>| {
             validation_error.set(None);
             let mut current_images = images();
@@ -222,7 +222,7 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
 
     // Remove an image
     let remove_image = {
-        let on_change = props.on_change.clone();
+        let on_change = props.on_change;
         move |index: usize| {
             let mut current = images();
             if index < current.len() {
@@ -312,7 +312,6 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
                     e.prevent_default();
                     is_dragging.set(false);
                     if props.disabled {
-                        return;
                     }
                     // Note: Actual file reading would require platform-specific implementation
                     // This is a placeholder for the drop handler
@@ -423,7 +422,7 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
                             image: image.clone(),
                             index: index,
                             on_remove: {
-                                let mut remove_image = remove_image.clone();
+                                let mut remove_image = remove_image;
                                 move || remove_image(index)
                             },
                         }
@@ -442,7 +441,7 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
                             key: "{image.id}",
                             image: image.clone(),
                             on_remove: {
-                                let mut remove_image = remove_image.clone();
+                                let mut remove_image = remove_image;
                                 move || remove_image(index)
                             },
                         }

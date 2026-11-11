@@ -306,20 +306,15 @@ pub struct SkeletonAvatarProps {
 }
 
 /// Avatar size
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug, Default)]
 pub enum AvatarSize {
-    Xs,  // 24px
-    Sm,  // 32px
-    Md,  // 40px
-    Lg,  // 48px
-    Xl,  // 64px
+    Xs, // 24px
+    Sm, // 32px
+    #[default]
+    Md, // 40px
+    Lg, // 48px
+    Xl, // 64px
     Xxl, // 96px
-}
-
-impl Default for AvatarSize {
-    fn default() -> Self {
-        AvatarSize::Md
-    }
 }
 
 impl AvatarSize {

@@ -39,9 +39,8 @@ pub mod organisms;
 pub mod styles;
 pub mod theme;
 
-/// Prelude module for convenient imports
+/// Prelude module: convenient re-exports for common types
 pub mod prelude {
-    //! Convenient re-exports for common types
 
     // Config
     pub use crate::config::{
@@ -50,9 +49,9 @@ pub mod prelude {
 
     // Theme
     pub use crate::theme::{
-        use_style, use_theme, Color, ColorScale, RadiusScale, SpacingScale, ThemeContext,
-        ThemeMode, ThemeProvider, ThemeSelector, ThemeToggle, ThemeTokens, Typography,
-        TypographyScale,
+        try_use_theme, use_style, use_theme, Color, ColorScale, RadiusScale, SpacingScale,
+        ThemeContext, ThemeMode, ThemeProvider, ThemeSelector, ThemeToggle, ThemeTokens,
+        Typography, TypographyScale,
     };
 
     // Styles

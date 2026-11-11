@@ -258,7 +258,7 @@ pub fn PieChart(props: PieChartProps) -> Element {
 
     let show_labels = props.show_labels;
     let show_percentages = props.show_percentages;
-    let on_slice_click = props.on_slice_click.clone();
+    let on_slice_click = props.on_slice_click;
     let legend_position = props.legend_position.clone();
     let title = props.title.clone();
     let variant = props.variant.clone();
@@ -385,7 +385,7 @@ pub fn PieChart(props: PieChartProps) -> Element {
                         show_labels: show_labels,
                         point: point,
                         tooltip_content: tooltip_content,
-                        on_slice_click: on_slice_click.clone(),
+                        on_slice_click: on_slice_click,
                         tooltip_enabled: tooltip.enabled,
                         on_tooltip_show: Some(EventHandler::new(move |(x, y, content): (i32, i32, String)| {
                             tooltip_state.set(Some((x, y, content)));
@@ -433,7 +433,7 @@ struct PieSliceProps {
 
 #[component]
 fn PieSlice(props: PieSliceProps) -> Element {
-    let on_click = props.on_slice_click.clone();
+    let on_click = props.on_slice_click;
     let point = props.point.clone();
     let tooltip_content = props.tooltip_content.clone();
 

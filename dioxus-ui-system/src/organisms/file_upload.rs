@@ -26,7 +26,11 @@ pub enum FileType {
 impl FileType {
     /// Detect file type from extension
     pub fn from_file_name(file_name: &str) -> Self {
-        let ext = file_name.split('.').last().unwrap_or("").to_lowercase();
+        let ext = file_name
+            .split('.')
+            .next_back()
+            .unwrap_or("")
+            .to_lowercase();
         match ext.as_str() {
             "jpg" | "jpeg" | "png" | "gif" | "webp" | "svg" | "bmp" | "ico" | "tiff" | "tif" => {
                 FileType::Image
@@ -131,7 +135,7 @@ pub struct FileUploadProps {
 pub fn FileUpload(props: FileUploadProps) -> Element {
     let theme = use_theme();
     let mut is_dragging = use_signal(|| false);
-    let mut files = use_signal(|| Vec::<UploadedFile>::new());
+    let mut files = use_signal(Vec::<UploadedFile>::new);
     let mut validation_error = use_signal(|| None::<String>);
 
     // Determine if multiple files are allowed
@@ -210,13 +214,12 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
 
     // Handle file selection
     let handle_file_select = {
-        let on_upload = props.on_upload.clone();
-        let on_change = props.on_change.clone();
+        let on_upload = props.on_upload;
+        let on_change = props.on_change;
         let max_files = props.max_files;
-        let allow_multiple = allow_multiple;
         let validate_file = _validate_file.clone();
         #[allow(unused_mut, unused_variables)]
-        let mut files_signal = files.clone();
+        let mut files_signal = files;
         #[allow(unused_variables)]
         move |e: Event<FormData>| {
             validation_error.set(None);
@@ -308,9 +311,9 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
 
     // Remove a file
     let mut remove_file = {
-        let on_upload = props.on_upload.clone();
-        let on_change = props.on_change.clone();
-        let mut files_signal = files.clone();
+        let on_upload = props.on_upload;
+        let on_change = props.on_change;
+        let mut files_signal = files;
         move |index: usize| {
             files_signal.with_mut(|f| {
                 if index < f.len() {
@@ -329,8 +332,8 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
 
     // Clear all files
     let mut clear_files = {
-        let on_upload = props.on_upload.clone();
-        let on_change = props.on_change.clone();
+        let on_upload = props.on_upload;
+        let on_change = props.on_change;
         move || {
             files.set(Vec::new());
             on_upload.call(Vec::new());
@@ -402,13 +405,12 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                         is_dragging.set(false);
                     },
                     ondrop: {
-                        let on_upload = props.on_upload.clone();
-                        let on_change = props.on_change.clone();
+                        let on_upload = props.on_upload;
+                        let on_change = props.on_change;
                         let max_files = props.max_files;
-                        let allow_multiple = allow_multiple;
                         let validate_file = _validate_file.clone();
                         #[allow(unused_mut, unused_variables)]
-                        let mut files_signal = files.clone();
+                        let mut files_signal = files;
                         move |e: Event<dioxus::html::DragData>| {
                             e.prevent_default();
                             is_dragging.set(false);

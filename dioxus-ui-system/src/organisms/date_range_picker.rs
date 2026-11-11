@@ -96,10 +96,10 @@ pub fn DateRangePicker(props: DateRangePickerProps) -> Element {
     let handle_select = {
         let start_date = props.start_date.clone();
         let end_date = props.end_date.clone();
-        let on_start_date_change = props.on_start_date_change.clone();
-        let on_end_date_change = props.on_end_date_change.clone();
-        let on_range_change = props.on_range_change.clone();
-        let mut selecting_start = selecting_start.clone();
+        let on_start_date_change = props.on_start_date_change;
+        let on_end_date_change = props.on_end_date_change;
+        let on_range_change = props.on_range_change;
+        let mut selecting_start = selecting_start;
 
         move |date: String| {
             if selecting_start() {
@@ -166,10 +166,10 @@ pub fn DateRangePicker(props: DateRangePickerProps) -> Element {
 
     // Handle preset selection
     let handle_preset = {
-        let on_start_date_change = props.on_start_date_change.clone();
-        let on_end_date_change = props.on_end_date_change.clone();
-        let on_range_change = props.on_range_change.clone();
-        let mut is_open = is_open.clone();
+        let on_start_date_change = props.on_start_date_change;
+        let on_end_date_change = props.on_end_date_change;
+        let on_range_change = props.on_range_change;
+        let mut is_open = is_open;
 
         move |(start, end): (String, String)| {
             if let Some(ref handler) = on_start_date_change {
@@ -188,10 +188,10 @@ pub fn DateRangePicker(props: DateRangePickerProps) -> Element {
 
     // Handle clear
     let handle_clear = {
-        let on_start_date_change = props.on_start_date_change.clone();
-        let on_end_date_change = props.on_end_date_change.clone();
-        let on_range_change = props.on_range_change.clone();
-        let mut selecting_start = selecting_start.clone();
+        let on_start_date_change = props.on_start_date_change;
+        let on_end_date_change = props.on_end_date_change;
+        let on_range_change = props.on_range_change;
+        let mut selecting_start = selecting_start;
 
         move |e: Event<dioxus::html::MouseData>| {
             e.stop_propagation();
@@ -212,8 +212,8 @@ pub fn DateRangePicker(props: DateRangePickerProps) -> Element {
 
     // Close dropdown
     let close_dropdown = {
-        let mut is_open = is_open.clone();
-        let mut selecting_start = selecting_start.clone();
+        let mut is_open = is_open;
+        let mut selecting_start = selecting_start;
 
         move || {
             is_open.set(false);
@@ -365,7 +365,7 @@ fn DateRangePickerDropdown(props: DateRangePickerDropdownProps) -> Element {
             if !props.presets.is_empty() {
                 DateRangePresets {
                     presets: props.presets.clone(),
-                    on_preset_select: props.on_preset_select.clone(),
+                    on_preset_select: props.on_preset_select,
                 }
             }
 
@@ -384,7 +384,7 @@ fn DateRangePickerDropdown(props: DateRangePickerDropdownProps) -> Element {
                     show_prev_nav: true,
                     show_next_nav: true,
                     on_navigate_prev: {
-                        let mut left_view = left_view.clone();
+                        let mut left_view = left_view;
                         move || {
                             let current = left_view();
                             let new_month = if current.month == 1 { 12 } else { current.month - 1 };
@@ -393,7 +393,7 @@ fn DateRangePickerDropdown(props: DateRangePickerDropdownProps) -> Element {
                         }
                     },
                     on_navigate_next: {
-                        let mut left_view = left_view.clone();
+                        let mut left_view = left_view;
                         move || {
                             let current = left_view();
                             let new_month = if current.month == 12 { 1 } else { current.month + 1 };
@@ -401,7 +401,7 @@ fn DateRangePickerDropdown(props: DateRangePickerDropdownProps) -> Element {
                             left_view.set(Date { year: new_year, month: new_month, day: 1 });
                         }
                     },
-                    on_select: props.on_select.clone(),
+                    on_select: props.on_select,
                 }
 
                 // Right calendar
@@ -416,7 +416,7 @@ fn DateRangePickerDropdown(props: DateRangePickerDropdownProps) -> Element {
                     show_next_nav: true,
                     on_navigate_prev: move || {},
                     on_navigate_next: {
-                        let mut left_view = left_view.clone();
+                        let mut left_view = left_view;
                         move || {
                             let current = left_view();
                             let new_month = if current.month == 12 { 1 } else { current.month + 1 };
@@ -424,15 +424,15 @@ fn DateRangePickerDropdown(props: DateRangePickerDropdownProps) -> Element {
                             left_view.set(Date { year: new_year, month: new_month, day: 1 });
                         }
                     },
-                    on_select: props.on_select.clone(),
+                    on_select: props.on_select,
                 }
             }
 
             // Footer with quick actions
             DateRangeFooter {
                 today: today.clone(),
-                on_select: props.on_select.clone(),
-                on_close: props.on_close.clone(),
+                on_select: props.on_select,
+                on_close: props.on_close,
             }
         }
     }
@@ -473,7 +473,7 @@ fn DateRangePresets(props: DateRangePresetsProps) -> Element {
                 PresetButton {
                     key: "{preset.label}",
                     preset: preset.clone(),
-                    on_preset_select: props.on_preset_select.clone(),
+                    on_preset_select: props.on_preset_select,
                 }
             }
         }
@@ -694,7 +694,7 @@ fn Calendar(props: CalendarProps) -> Element {
                         let day_value = day;
                         let year_value = year;
                         let month_value = month;
-                        let on_select = props.on_select.clone();
+                        let on_select = props.on_select;
 
                         rsx! {
                             button {

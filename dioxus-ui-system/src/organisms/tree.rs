@@ -154,9 +154,9 @@ pub fn Tree(props: TreeProps) -> Element {
                     node: node.clone(),
                     depth: 0,
                     selected_id: props.selected_id.clone(),
-                    on_select: props.on_select.clone(),
+                    on_select: props.on_select,
                     expanded_ids: props.expanded_ids.clone(),
-                    on_toggle_expand: props.on_toggle_expand.clone(),
+                    on_toggle_expand: props.on_toggle_expand,
                     show_lines: props.show_lines,
                 }
             }
@@ -237,7 +237,7 @@ fn TreeNode(props: TreeNodeProps) -> Element {
 
     let handle_select = {
         let node_id = node_id.clone();
-        let on_select = props.on_select.clone();
+        let on_select = props.on_select;
         move |_| {
             if is_disabled {
                 return;
@@ -250,7 +250,7 @@ fn TreeNode(props: TreeNodeProps) -> Element {
 
     let handle_toggle = {
         let node_id = node_id.clone();
-        let on_toggle = props.on_toggle_expand.clone();
+        let on_toggle = props.on_toggle_expand;
         move |e: Event<MouseData>| {
             e.stop_propagation();
             if is_disabled {
@@ -329,9 +329,9 @@ fn TreeNode(props: TreeNodeProps) -> Element {
                             node: child.clone(),
                             depth: depth + 1,
                             selected_id: props.selected_id.clone(),
-                            on_select: props.on_select.clone(),
+                            on_select: props.on_select,
                             expanded_ids: props.expanded_ids.clone(),
-                            on_toggle_expand: props.on_toggle_expand.clone(),
+                            on_toggle_expand: props.on_toggle_expand,
                             show_lines: props.show_lines,
                         }
                     }
@@ -446,10 +446,13 @@ pub struct TreeNodeBuilderProps {
 pub fn TreeWithState(props: TreeProps) -> Element {
     // Use signals for internal state
     let internal_selected = use_signal(|| None::<String>);
-    let internal_expanded = use_signal(|| Vec::<String>::new());
+    let internal_expanded = use_signal(Vec::<String>::new);
 
     // Determine which state to use - external (props) or internal (signals)
-    let selected_id = props.selected_id.clone().or_else(|| internal_selected());
+    let selected_id = props
+        .selected_id
+        .clone()
+        .or_else(|| internal_selected.cloned());
 
     let expanded_ids = if props.expanded_ids.is_empty() {
         internal_expanded()
@@ -458,30 +461,29 @@ pub fn TreeWithState(props: TreeProps) -> Element {
     };
 
     // Create event handlers that update internal state if no external handler provided
-    let on_select: EventHandler<String> = if let Some(handler) = props.on_select.clone() {
+    let on_select: EventHandler<String> = if let Some(handler) = props.on_select {
         handler
     } else {
-        let mut selected = internal_selected.clone();
+        let mut selected = internal_selected;
         EventHandler::new(move |id: String| {
             selected.set(Some(id));
         })
     };
 
-    let on_toggle_expand: EventHandler<String> =
-        if let Some(handler) = props.on_toggle_expand.clone() {
-            handler
-        } else {
-            let mut expanded = internal_expanded.clone();
-            EventHandler::new(move |id: String| {
-                expanded.with_mut(|exp| {
-                    if exp.contains(&id) {
-                        exp.retain(|x| x != &id);
-                    } else {
-                        exp.push(id);
-                    }
-                });
-            })
-        };
+    let on_toggle_expand: EventHandler<String> = if let Some(handler) = props.on_toggle_expand {
+        handler
+    } else {
+        let mut expanded = internal_expanded;
+        EventHandler::new(move |id: String| {
+            expanded.with_mut(|exp| {
+                if exp.contains(&id) {
+                    exp.retain(|x| x != &id);
+                } else {
+                    exp.push(id);
+                }
+            });
+        })
+    };
 
     rsx! {
         Tree {

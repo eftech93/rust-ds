@@ -24,12 +24,40 @@ impl ThemeContext {
     pub fn current(&self) -> ThemeTokens {
         self.tokens.read().clone()
     }
+
+    /// Build a standalone context (light theme) that is not shared with any
+    /// [`ThemeProvider`]. Used as the fallback when no provider is mounted.
+    ///
+    /// Must be called inside a component scope (it creates signals/callbacks).
+    fn standalone() -> Self {
+        let mut tokens = Signal::new(ThemeTokens::light());
+        Self {
+            tokens,
+            set_theme: Callback::new(move |t: ThemeTokens| tokens.set(t)),
+            toggle_mode: Callback::new(move |()| {
+                tokens.with_mut(|current| {
+                    *current = match current.mode {
+                        super::tokens::ThemeMode::Dark => ThemeTokens::light(),
+                        _ => ThemeTokens::dark(),
+                    };
+                });
+            }),
+            set_theme_by_name: Callback::new(move |name: String| {
+                if let Some(t) = ThemeTokens::by_name(&name) {
+                    tokens.set(t);
+                }
+            }),
+        }
+    }
 }
 
 /// Hook to access the theme context
 ///
-/// # Panics
-/// Panics if called outside of a ThemeProvider
+/// If no [`ThemeProvider`] ancestor exists, this does **not** panic: it returns
+/// a component-local context initialised with [`ThemeTokens::light`]. Theme
+/// changes made through that fallback only affect the calling component, so
+/// wrap your app in a `ThemeProvider` for app-wide theming. Use
+/// [`try_use_theme`] if you need to know whether a provider is present.
 ///
 /// # Example
 /// ```rust,ignore
@@ -45,10 +73,19 @@ impl ThemeContext {
 /// }
 /// ```
 pub fn use_theme() -> ThemeContext {
-    use_context::<ThemeContext>()
+    use_hook(|| try_consume_context::<ThemeContext>().unwrap_or_else(ThemeContext::standalone))
+}
+
+/// Hook to access the theme context, returning `None` when no
+/// [`ThemeProvider`] ancestor exists.
+pub fn try_use_theme() -> Option<ThemeContext> {
+    use_hook(try_consume_context::<ThemeContext>)
 }
 
 /// Hook for computing memoized styles based on theme
+///
+/// Like [`use_theme`], falls back to the default light theme when no
+/// [`ThemeProvider`] is mounted instead of panicking.
 ///
 /// # Type Parameters
 /// * `F` - Function type that computes a value from theme tokens
@@ -298,5 +335,50 @@ mod tests {
         // Note: This is a basic test - full testing requires dioxus testing utilities
         let tokens = ThemeTokens::light();
         assert!(matches!(tokens.mode, ThemeMode::Light));
+    }
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    #[test]
+    fn use_theme_falls_back_without_provider() {
+        fn app() -> Element {
+            let theme = use_theme();
+            let bg = theme.tokens.read().colors.background.to_rgba();
+            let has_provider = try_use_theme().is_some();
+            rsx! { div { "data-provider": "{has_provider}", style: "background:{bg}" } }
+        }
+        let html = render(app);
+        let expected = ThemeTokens::light().colors.background.to_rgba();
+        assert!(html.contains("data-provider=\"false\""), "{html}");
+        assert!(html.contains(&expected), "{html}");
+    }
+
+    #[test]
+    fn use_style_falls_back_without_provider() {
+        fn app() -> Element {
+            let mode = use_style(|t| format!("{:?}", t.mode));
+            rsx! { span { "{mode}" } }
+        }
+        assert!(render(app).contains("Light"));
+    }
+
+    #[test]
+    fn try_use_theme_sees_provider() {
+        fn inner() -> Element {
+            let found = try_use_theme().is_some();
+            rsx! { span { "found={found}" } }
+        }
+        fn app() -> Element {
+            rsx! { ThemeProvider { initial_theme: ThemeTokens::dark(), Inner {} } }
+        }
+        #[allow(non_snake_case)]
+        fn Inner() -> Element {
+            inner()
+        }
+        assert!(render(app).contains("found=true"));
     }
 }

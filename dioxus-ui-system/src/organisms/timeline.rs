@@ -89,7 +89,7 @@ pub fn Timeline(props: TimelineProps) -> Element {
     let border_color = theme.tokens.read().colors.border.to_rgba();
 
     // Provide context for child items
-    use_context_provider(|| TimelineContext::new(props.position.clone()));
+    use_context_provider(|| TimelineContext::new(props.position));
 
     let timeline_style = Style::new().flex().flex_col().relative().py_px(16).w_full();
 
@@ -155,7 +155,7 @@ pub struct TimelineItemProps {
 #[component]
 pub fn TimelineItem(props: TimelineItemProps) -> Element {
     let context = use_timeline_context();
-    let position = context.position.clone();
+    let position = context.position;
 
     let theme = use_theme();
     let border_color = theme.tokens.read().colors.border.to_rgba();
@@ -606,7 +606,7 @@ pub fn SimpleTimeline(props: SimpleTimelineProps) -> Element {
 
     rsx! {
         Timeline {
-            position: props.position.clone(),
+            position: props.position,
 
             for (index, event) in props.events.iter().enumerate() {
                 TimelineItem {

@@ -28,21 +28,11 @@ impl Direction {
 }
 
 /// Panel configuration
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 struct PanelConfig {
     default_size: Option<f32>,
     min_size: Option<f32>,
     max_size: Option<f32>,
-}
-
-impl Default for PanelConfig {
-    fn default() -> Self {
-        Self {
-            default_size: None,
-            min_size: None,
-            max_size: None,
-        }
-    }
 }
 
 /// Resizable state context
@@ -272,7 +262,7 @@ pub fn ResizableHandle(props: ResizableHandleProps) -> Element {
     let mut is_hovered = use_signal(|| false);
 
     use_hook({
-        let ctx = ctx.clone();
+        let ctx = ctx;
         move || {
             let current_count = *ctx.panel_count.read();
             if current_count > 0 {
@@ -367,7 +357,7 @@ pub fn ResizableHandle(props: ResizableHandleProps) -> Element {
 
     let mut panel_sizes = ctx.panel_sizes;
     let update_sizes_on_drag = {
-        let ctx = ctx.clone();
+        let ctx = ctx;
         move |current_pos: f32| {
             let Some(handle_idx) = *ctx.active_handle.read() else {
                 return;
@@ -433,7 +423,7 @@ pub fn ResizableHandle(props: ResizableHandleProps) -> Element {
                 }
             },
             onmousemove: {
-                let mut update = update_sizes_on_drag.clone();
+                let mut update = update_sizes_on_drag;
                 move |evt: MouseEvent| {
                     if !*ctx.dragging.read() {
                         return;
@@ -477,7 +467,7 @@ pub fn ResizableHandle(props: ResizableHandleProps) -> Element {
                 }
             },
             ontouchmove: {
-                let mut update = update_sizes_on_drag.clone();
+                let mut update = update_sizes_on_drag;
                 move |evt: TouchEvent| {
                     if !*ctx.dragging.read() {
                         return;

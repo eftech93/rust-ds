@@ -114,7 +114,7 @@ pub fn RichTextEditor(props: RichTextEditorProps) -> Element {
     });
 
     let _on_input = {
-        let on_change = props.on_change.clone();
+        let on_change = props.on_change;
         move |_e: Event<dioxus::events::KeyboardData>| {
             if let Some(handler) = &on_change {
                 // In a real implementation, we would get the innerHTML from the contenteditable
@@ -150,7 +150,7 @@ pub fn RichTextEditor(props: RichTextEditorProps) -> Element {
                 min_height: props.min_height,
                 max_height: props.max_height.clone(),
                 is_focused: is_focused(),
-                on_input: props.on_change.clone(),
+                on_input: props.on_change,
             }
         }
     }
@@ -543,7 +543,7 @@ pub fn RichTextContent(props: RichTextContentProps) -> Element {
     });
 
     let on_input = {
-        let on_input_handler = props.on_input.clone();
+        let on_input_handler = props.on_input;
         let _editor_id = editor_id.clone();
         move |_e: Event<dioxus::events::FormData>| {
             #[cfg(all(feature = "web", target_arch = "wasm32"))]
@@ -574,10 +574,10 @@ pub fn RichTextContent(props: RichTextContentProps) -> Element {
             style: "{content_style} {max_height_style} {disabled_style} {focus_style} overflow: auto;",
 
             // Placeholder (shown when empty)
-            if inner_html().is_empty() && props.placeholder.is_some() {
+            if let Some(placeholder) = props.placeholder.clone().filter(|_| inner_html().is_empty()) {
                 div {
                     style: "position: absolute; color: {theme.tokens.read().colors.muted.to_rgba()}; pointer-events: none;",
-                    "{props.placeholder.clone().unwrap()}"
+                    "{placeholder}"
                 }
             }
 

@@ -97,7 +97,7 @@ pub fn ConfirmationDialog(props: ConfirmationDialogProps) -> Element {
             class: props.class.clone(),
             style: props.style.clone(),
             open: props.open,
-            on_close: props.on_close.clone(),
+            on_close: props.on_close,
             title: props.title.clone(),
 
             div {
