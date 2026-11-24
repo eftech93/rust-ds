@@ -180,7 +180,7 @@ pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
                         DropdownMenuItemView {
                             key: "{item.value}",
                             item: item.clone(),
-                            on_select: props.on_select.clone(),
+                            on_select: props.on_select,
                             on_close: move || is_open.set(false),
                         }
                     }
@@ -237,8 +237,8 @@ fn DropdownMenuItemView(props: DropdownMenuItemViewProps) -> Element {
     });
 
     let value = props.item.value.clone();
-    let on_select = props.on_select.clone();
-    let on_close = props.on_close.clone();
+    let on_select = props.on_select;
+    let on_close = props.on_close;
 
     rsx! {
         div {

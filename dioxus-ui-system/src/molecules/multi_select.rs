@@ -48,7 +48,7 @@ pub struct MultiSelectProps {
 pub fn MultiSelect(props: MultiSelectProps) -> Element {
     let _theme = use_theme();
     let mut is_open = use_signal(|| false);
-    let mut search_value = use_signal(|| String::new());
+    let mut search_value = use_signal(String::new);
     let mut highlighted_index = use_signal(|| 0usize);
     let mut selected_values = use_signal(|| props.value.clone());
     let options = props.options.clone();
@@ -95,8 +95,8 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
 
     // Toggle option selection
     let toggle_option = use_callback({
-        let mut selected_values = selected_values.clone();
-        let on_change = props.on_change.clone();
+        let mut selected_values = selected_values;
+        let on_change = props.on_change;
         move |value: String| {
             let mut new_values = selected_values();
             if new_values.contains(&value) {
@@ -111,8 +111,8 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
 
     // Remove a selected value
     let remove_value = use_callback({
-        let mut selected_values = selected_values.clone();
-        let on_change = props.on_change.clone();
+        let mut selected_values = selected_values;
+        let on_change = props.on_change;
         move |value: String| {
             let mut new_values = selected_values();
             new_values.retain(|v| v != &value);
@@ -123,8 +123,8 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
 
     // Select all options
     let select_all = use_callback({
-        let mut selected_values = selected_values.clone();
-        let on_change = props.on_change.clone();
+        let mut selected_values = selected_values;
+        let on_change = props.on_change;
         let options = options.clone();
         let max_selected = props.max_selected;
         move |()| {
@@ -146,8 +146,8 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
 
     // Clear all selections
     let clear_all = use_callback({
-        let mut selected_values = selected_values.clone();
-        let on_change = props.on_change.clone();
+        let mut selected_values = selected_values;
+        let on_change = props.on_change;
         move |()| {
             selected_values.set(Vec::new());
             on_change.call(Vec::new());
@@ -156,9 +156,9 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
 
     // Create new option
     let create_option = use_callback({
-        let mut selected_values = selected_values.clone();
-        let mut search_value = search_value.clone();
-        let on_change = props.on_change.clone();
+        let mut selected_values = selected_values;
+        let mut search_value = search_value;
+        let on_change = props.on_change;
         move |()| {
             let value = search_value().trim().to_string();
             if !value.is_empty() && !is_at_max() {
@@ -175,7 +175,6 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
 
     // Handle keyboard navigation
     let handle_key_down = {
-        let filtered_options = filtered_options.clone();
         let creatable = props.creatable;
         move |e: Event<dioxus::html::KeyboardData>| {
             use dioxus::html::input_data::keyboard_types::Key;
@@ -218,12 +217,9 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                 Key::Escape => {
                     is_open.set(false);
                 }
-                Key::Backspace => {
-                    if search_value().is_empty() && !selected_values().is_empty() {
-                        if let Some(last) = selected_values().last() {
-                            let last_value = last.clone();
-                            remove_value.call(last_value);
-                        }
+                Key::Backspace if search_value().is_empty() => {
+                    if let Some(last) = selected_values().last() {
+                        remove_value.call(last.clone());
                     }
                 }
                 _ => {}
@@ -526,14 +522,14 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                                     is_selected: selected_values().contains(&option.value),
                                     is_highlighted: index == highlighted_index(),
                                     is_disabled: option.disabled || (!selected_values().contains(&option.value) && is_at_max()),
-                                    item_style_base: item_style_base.clone(),
-                                    primary_color: primary_color.clone(),
-                                    border_color: border_color.clone(),
-                                    foreground_color: foreground_color.clone(),
-                                    highlighted_bg: highlighted_bg.clone(),
-                                    on_toggle: toggle_option.clone(),
+                                    item_style_base: item_style_base,
+                                    primary_color: primary_color,
+                                    border_color: border_color,
+                                    foreground_color: foreground_color,
+                                    highlighted_bg: highlighted_bg,
+                                    on_toggle: toggle_option,
                                     set_highlighted_index: {
-                                        let mut idx = highlighted_index.clone();
+                                        let mut idx = highlighted_index;
                                         Callback::new(move |i: usize| idx.set(i))
                                     },
                                     index,
@@ -545,14 +541,14 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                                 MultiSelectCreateOptionItem {
                                     search_value: search_value().trim().to_string(),
                                     is_highlighted: highlighted_index() == filtered_options().len(),
-                                    item_style_base: item_style_base.clone(),
-                                    primary_color: primary_color.clone(),
-                                    highlighted_bg: highlighted_bg.clone(),
-                                    border_color: border_color.clone(),
-                                    on_create: create_option.clone(),
+                                    item_style_base: item_style_base,
+                                    primary_color: primary_color,
+                                    highlighted_bg: highlighted_bg,
+                                    border_color: border_color,
+                                    on_create: create_option,
                                     set_highlighted_index: {
                                         let idx = filtered_options().len();
-                                        let mut hi = highlighted_index.clone();
+                                        let mut hi = highlighted_index;
                                         Callback::new(move |_: ()| hi.set(idx))
                                     },
                                 }

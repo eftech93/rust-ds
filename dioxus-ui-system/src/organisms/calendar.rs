@@ -75,7 +75,7 @@ pub fn Calendar(props: CalendarProps) -> Element {
         .month
         .as_ref()
         .and_then(|m| parse_month_year(m))
-        .unwrap_or_else(|| (today.year, today.month));
+        .unwrap_or((today.year, today.month));
 
     let mut view_year = use_signal(|| initial_view_date.0);
     let mut view_month = use_signal(|| initial_view_date.1);
@@ -327,7 +327,7 @@ pub fn Calendar(props: CalendarProps) -> Element {
                 max_date: props.max_date.clone(),
                 show_week_numbers: props.show_week_numbers,
                 mode: props.mode.clone(),
-                on_change: props.on_change.clone(),
+                on_change: props.on_change,
                 go_to_today,
             }
         }
@@ -477,10 +477,10 @@ fn CalendarGrid(props: CalendarGridProps) -> Element {
                             props.min_date.clone(),
                             props.max_date.clone(),
                         ),
-                        selected_dates: props.selected_dates.clone(),
-                        range_start: props.range_start.clone(),
+                        selected_dates: props.selected_dates,
+                        range_start: props.range_start,
                         mode: props.mode.clone(),
-                        on_change: props.on_change.clone(),
+                        on_change: props.on_change,
                     }
                 }
             }

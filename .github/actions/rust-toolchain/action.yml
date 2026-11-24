@@ -1,0 +1,13 @@
+name: Ensure Rust toolchain
+description: Install rustup if missing (self-hosted runners) and the toolchain pinned in rust-toolchain.toml.
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        export PATH="$HOME/.cargo/bin:$PATH"
+        if ! command -v rustup >/dev/null; then
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain none
+        fi
+        echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+        rustup toolchain install   # version/components/targets from rust-toolchain.toml

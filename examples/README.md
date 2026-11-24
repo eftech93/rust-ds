@@ -1,159 +1,125 @@
-# Dioxus UI System Examples
+# Examples
 
-This directory contains example applications demonstrating the Dioxus UI System across different platforms.
+Example apps for `dioxus-ui-system` on each supported platform. They all use the local
+crate via a path dependency and share their showcase UI through `examples/shared`.
 
-## Examples Overview
+| Crate | Directory | Platform | Run (from the repo root) |
+|-------|-----------|----------|-----|
+| `example-shared`  | `shared/`  | library | used by the others |
+| `example-web-csr` | `web-csr/` | browser (WASM) | `scripts/dev.sh web` |
+| `example-web-ssr` | `web-ssr/` | server-rendered HTML (Axum) | `scripts/dev.sh ssr` |
+| `example-desktop` | `desktop/` | Windows / macOS / Linux | `scripts/dev.sh desktop` |
+| `example-mobile`  | `mobile/`  | iOS / Android | `scripts/dev.sh ios` / `scripts/dev.sh android` |
 
-| Example | Platform | Description | Run Command |
-|---------|----------|-------------|-------------|
-| `web-csr` | Web (WASM) | Client-side rendering with WebAssembly | **`dx serve --platform web`** ⚠️ |
-| `web-ssr` | Web (Server) | Server-side rendering with Axum | `cargo run` (tries ports 3000-3003, 8080) |
-| `desktop` | Desktop | Native desktop app (Windows/Mac/Linux) | `cargo run` |
-| `mobile` | Mobile | iOS/Android native apps | `dx bundle --platform ios/android` |
+Prerequisites: Rust stable, `rustup target add wasm32-unknown-unknown`, and the Dioxus CLI
+0.7 (`cargo binstall dioxus-cli@0.7`) for the web and mobile examples. See
+[CONTRIBUTING.md](../CONTRIBUTING.md) for the full setup.
 
-⚠️ **Note:** Web examples require `dx` (Dioxus CLI), not `cargo run`.
+`scripts/dev.sh doctor` checks your setup. The `scripts/dev.sh` commands wrap the plain
+`dx`/`cargo` commands shown below.
 
-## Shared Components
+## shared
 
-The `shared` crate contains reusable components that are used across all examples:
+`ComponentShowcase` / `ComponentShowcaseInner` (gallery of buttons, inputs, badges, cards,
+icons, typography, an interactive counter and the theme switcher), `LayoutShowcase` /
+`LayoutShowcaseInner`, and `AppHeader`. The `*Inner` variants expect the caller to provide
+the `ThemeProvider`.
 
-- `ComponentShowcase` - Comprehensive UI component gallery
-- `AppHeader` - Navigation header component
-- Individual showcase components for each component category
+## web-csr
 
-## Running Examples
-
-### Web (Client-Side Rendering)
+Client-side rendered app compiled to WebAssembly.
 
 ```bash
 cd examples/web-csr
-
-# Development server with hot reload
-dx serve --platform web
-
-# Or with explicit hot reload
-dx serve --platform web --hot-reload
-
-# Build for production
-dx build --platform web --release
+dx serve --platform web                 # http://localhost:8080, hot reload
+dx serve --platform web --port 3000     # if 8080 is taken
+dx build --platform web --release       # production build
 ```
 
-### Web (Server-Side Rendering)
+`cargo run` does not work here: the crate targets WASM and must be built and served by `dx`.
+
+## web-ssr
+
+Renders the showcase to HTML on the server with `dioxus::ssr::render_element()` and serves
+it with Axum. No client-side interactivity.
 
 ```bash
 cd examples/web-ssr
-
-# Run the Axum server
 cargo run
-
-# Open http://localhost:3000 in your browser
 ```
 
-### Desktop
+The server tries ports 3000, 3001, 3002, 3003 and 8080 in order and prints the URL it
+bound to.
+
+## desktop
+
+Native window (1400x900, menu bar disabled) showing the shared showcase.
 
 ```bash
 cd examples/desktop
-
-# Run in development mode
-cargo run
-
-# Build for production
-cargo build --release
-
-# Create app bundle (macOS)
-cargo bundle --release
+cargo run              # or: cargo run --release
 ```
 
-### Mobile
+On Linux you need the WebKitGTK dev packages:
+`sudo apt-get install libwebkit2gtk-4.1-dev libgtk-3-dev libxdo-dev libayatana-appindicator3-dev`.
 
-#### iOS
+## mobile
+
+Native app with a welcome page, a components page, a layouts page and a theme toggle, using
+signals for navigation.
 
 ```bash
 cd examples/mobile
-
-# Build for iOS simulator
-dx bundle --platform ios
-
-# Or run with hot reload (experimental)
-dx serve --platform ios
+dx serve --platform ios        # build, install and run on the simulator
+dx serve --platform android    # build, install and run on an emulator/device
+dx bundle --platform ios       # bundle only (also: --platform android, --release)
 ```
 
-#### Android
+Simulator helpers: `scripts/dev.sh ios sim` boots a simulator, `ios logs` streams the app's
+logs, `ios status` shows whether the app is installed and lists recent crash reports, and
+`ios reset` erases all simulators.
 
-```bash
-cd examples/mobile
+### iOS setup (macOS)
 
-# Build for Android
-dx bundle --platform android
+1. Install Xcode from the App Store, then:
+   ```bash
+   xcode-select --install
+   sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+   sudo xcodebuild -license accept
+   ```
+2. Install an iOS simulator runtime: Xcode → Settings → Platforms → iOS
+   (or `xcrun simctl runtime add ios`).
+3. Add the Rust targets:
+   ```bash
+   rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+   ```
 
-# Or run with hot reload (experimental)
-dx serve --platform android
-```
+### Android setup
 
-## Project Structure
+1. Install Android Studio with the SDK, platform tools and NDK.
+2. Set environment variables (e.g. in `~/.zshrc`):
+   ```bash
+   export ANDROID_HOME=$HOME/Library/Android/sdk     # Linux: $HOME/Android/Sdk
+   export ANDROID_NDK_HOME=$ANDROID_HOME/ndk/<version>
+   export PATH=$PATH:$ANDROID_HOME/emulator:$ANDROID_HOME/platform-tools
+   ```
+3. Add the Rust targets:
+   ```bash
+   rustup target add aarch64-linux-android armv7-linux-androideabi x86_64-linux-android
+   ```
 
-```
-examples/
-├── shared/          # Shared components library
-│   ├── src/
-│   │   └── lib.rs   # ComponentShowcase and helpers
-│   └── Cargo.toml
-├── web-csr/         # Web Client-Side Rendering
-│   ├── src/
-│   │   └── main.rs
-│   └── Cargo.toml
-├── web-ssr/         # Web Server-Side Rendering
-│   ├── src/
-│   │   └── main.rs
-│   └── Cargo.toml
-├── desktop/         # Native Desktop App
-│   ├── src/
-│   │   └── main.rs
-│   └── Cargo.toml
-└── mobile/          # Native Mobile App
-    ├── src/
-    │   └── main.rs
-    └── Cargo.toml
-```
+### Troubleshooting
 
-## ComponentShowcase
+| Problem | Fix |
+|---------|-----|
+| `dx: command not found` | Add `~/.cargo/bin` to `PATH`, or reinstall the CLI |
+| `SDK "iphonesimulator" cannot be located` | Install Xcode and a simulator runtime, then `sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer`; verify with `xcrun --show-sdk-path --sdk iphonesimulator` |
+| `tool 'xcodebuild' requires Xcode` | `sudo xcode-select --reset`, then switch to the Xcode path as above |
+| Xcode installed under another name | Find it with `mdfind "kMDItemCFBundleIdentifier == 'com.apple.dt.Xcode'"` |
+| Android NDK not found | Set `ANDROID_NDK_HOME` to the installed NDK version |
+| Missing Rust targets | `rustup target list --installed` and add the ones listed above |
+| App logs | `scripts/dev.sh ios logs` streams simulator logs |
 
-The main `ComponentShowcase` component displays all available UI components:
-
-- **Buttons** - All variants, sizes, and states
-- **Form Inputs** - Input fields with validation
-- **Badges** - Status indicators and labels
-- **Cards** - Different card variants
-- **Icons** - 30+ built-in icons
-- **Typography** - Text styles and formatting
-- **Interactive Demo** - State management example
-- **Theme System** - Light/dark mode toggle
-
-## Platform-Specific Features
-
-### Web CSR
-- WebAssembly compilation
-- Hot reload support
-- SEO-friendly structure
-
-### Web SSR
-- Server-side rendering with Axum
-- Fast initial page load
-- Hydration support
-
-### Desktop
-- Native window controls
-- Menu bar (can be disabled)
-- System tray support (optional)
-
-### Mobile
-- Safe area handling (notch, home indicator)
-- Touch-optimized interface
-- Platform-specific navigation
-
-## Notes
-
-- All examples use the same `ComponentShowcase` from the `shared` crate
-- Platform-specific banners indicate which platform is running
-- The theme system works consistently across all platforms
-- Responsive design adapts to different screen sizes
+Earlier versions of the library crashed on iOS with "Could not find context ThemeContext"
+when themed components rendered. Since 0.0.8 `use_theme()` falls back to a light theme instead of
+panicking, but keep the app wrapped in a `ThemeProvider` so theme changes apply app-wide.

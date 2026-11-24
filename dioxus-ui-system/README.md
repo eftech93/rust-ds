@@ -1,32 +1,39 @@
-# Dioxus UI System
-
-A pure Rust design system for Dioxus with Atomic Design principles. Build beautiful, type-safe user interfaces without touching CSS or JavaScript.
+# dioxus-ui-system
 
 [![Crates.io](https://img.shields.io/crates/v/dioxus-ui-system)](https://crates.io/crates/dioxus-ui-system)
-[![Documentation](https://docs.rs/dioxus-ui-system/badge.svg)](https://docs.rs/dioxus-ui-system)
-[![License](https://img.shields.io/crates/l/dioxus-ui-system)](LICENSE)
+[![docs.rs](https://docs.rs/dioxus-ui-system/badge.svg)](https://docs.rs/dioxus-ui-system)
+[![License](https://img.shields.io/crates/l/dioxus-ui-system)](#license)
 
-## Features
+A pure Rust design system for [Dioxus](https://dioxuslabs.com/) 0.7. Components are
+organized as atoms, molecules and organisms, styled from typed theme tokens with inline
+styles (no CSS files), and run on web (WASM), desktop and mobile.
 
-- 🎨 **Atomic Design Architecture**: Components organized as Atoms, Molecules, and Organisms
-- 🌗 **Type-Safe Theming**: Comprehensive theme system with light/dark/brand modes
-- 🦀 **Pure Rust Styling**: No CSS files - all styles generated in Rust
-- 🎯 **Tailwind-like API**: Fluent style builder for rapid UI development
-- 📱 **Multi-Platform**: Works on Web (WASM), Desktop, and Mobile
-- ⚡ **Zero Runtime CSS**: Inline styles for maximum performance
-- 🔒 **Type Safety**: Catch styling errors at compile time
+Live component gallery: https://eftech93.github.io/rust-ds/
 
-## Quick Start
-
-Add to your `Cargo.toml`:
+## Installation
 
 ```toml
 [dependencies]
-dioxus-ui-system = "0.1"
-dioxus = { version = "0.6", features = ["web"] }
+dioxus = "0.7"
+dioxus-ui-system = "0.0.8"
 ```
 
-Create your first UI:
+### Features
+
+| Feature   | Default | Description |
+|-----------|---------|-------------|
+| `web`     | yes     | Enables `dioxus/web` plus `web-sys`/`wasm-bindgen` integrations (theme persistence via `localStorage`, clipboard, file inputs) |
+| `desktop` | no      | Enables `dioxus/desktop` |
+| `mobile`  | no      | Enables `dioxus/mobile` |
+| `router`  | no      | Adds `dioxus-router` |
+
+For non-web targets disable the defaults:
+
+```toml
+dioxus-ui-system = { version = "0.0.8", default-features = false, features = ["desktop"] }
+```
+
+## Quick start
 
 ```rust
 use dioxus::prelude::*;
@@ -38,18 +45,29 @@ fn main() {
 
 #[component]
 fn App() -> Element {
+    let mut email = use_signal(String::new);
+
     rsx! {
         ThemeProvider {
             Card {
-                CardHeader {
-                    title: "Welcome",
-                    subtitle: Some("Get started with Dioxus UI".to_string()),
-                }
+                variant: CardVariant::Elevated,
+                CardHeader { title: "Sign up", subtitle: "It takes a minute" }
                 CardContent {
-                    p { "Build beautiful UIs with pure Rust!" }
+                    InputGroup {
+                        label: "Email",
+                        value: email(),
+                        placeholder: "you@example.com",
+                        hint: "We'll never share your email.",
+                        on_change: move |v| email.set(v),
+                    }
+                }
+                CardFooter {
+                    justify: CardFooterJustify::Between,
+                    Button { variant: ButtonVariant::Ghost, "Cancel" }
                     Button {
                         variant: ButtonVariant::Primary,
-                        "Get Started"
+                        onclick: move |_| println!("submitted {}", email()),
+                        "Continue"
                     }
                 }
             }
@@ -58,336 +76,132 @@ fn App() -> Element {
 }
 ```
 
-## Architecture
-
-### Atomic Design
-
-Components are organized following Atomic Design principles:
-
-```
-Atoms          →  Buttons, Inputs, Labels, Icons
-Molecules      →  InputGroup, Card, Badge
-Organisms      →  Header, DataTable
-```
-
-### Theme System
-
-The theme system provides type-safe design tokens:
-
-```rust
-use dioxus_ui_system::theme::{ThemeTokens, Color};
-
-// Use preset themes
-let light = ThemeTokens::light();
-let dark = ThemeTokens::dark();
-
-// Create custom brand theme
-let brand = ThemeTokens::brand(Color::new(220, 38, 38), "acme");
-```
-
-### Style Builder
-
-Build styles with a fluent, Tailwind-like API:
-
-```rust
-use dioxus_ui_system::styles::Style;
-use dioxus_ui_system::theme::use_theme;
-
-fn MyComponent() -> Element {
-    let theme = use_theme();
-    
-    let style = Style::new()
-        .flex()
-        .flex_col()
-        .items_center()
-        .gap(&theme.tokens().spacing, "md")
-        .bg(&theme.tokens().colors.primary)
-        .p(&theme.tokens().spacing, "lg")
-        .rounded(&theme.tokens().radius, "lg")
-        .build();
-    
-    rsx! {
-        div { style: "{style}", "Hello World" }
-    }
-}
-```
-
-## Components
-
-### Atoms
-
-#### Button
-
-```rust
-use dioxus_ui_system::atoms::{Button, ButtonVariant, ButtonSize};
-
-rsx! {
-    Button {
-        variant: ButtonVariant::Primary,
-        size: ButtonSize::Md,
-        onclick: move |_| println!("Clicked!"),
-        "Click me"
-    }
-}
-```
-
-**Variants**: `Primary`, `Secondary`, `Ghost`, `Destructive`, `Link`
-
-**Sizes**: `Sm`, `Md`, `Lg`, `Icon`
-
-#### Input
-
-```rust
-use dioxus_ui_system::atoms::{Input, InputType};
-
-let mut value = use_signal(|| String::new());
-
-rsx! {
-    Input {
-        value: value(),
-        input_type: InputType::Email,
-        placeholder: Some("email@example.com".to_string()),
-        onchange: move |v| value.set(v),
-    }
-}
-```
-
-#### Label
-
-```rust
-use dioxus_ui_system::atoms::{Label, TextSize, TextWeight, TextColor};
-
-rsx! {
-    Label {
-        size: TextSize::H1,
-        weight: TextWeight::Bold,
-        color: TextColor::Primary,
-        "Hello World"
-    }
-}
-```
-
-#### Icon
-
-```rust
-use dioxus_ui_system::atoms::{Icon, IconSize, IconColor};
-
-rsx! {
-    Icon {
-        name: "check".to_string(),
-        size: IconSize::Medium,
-        color: IconColor::Success,
-    }
-}
-```
-
-Built-in icons: `check`, `x`, `plus`, `minus`, `arrow-left/right/up/down`, `chevron-*`, `menu`, `search`, `user`, `settings`, `home`, `bell`, `heart`, `star`, `trash`, `edit`, `copy`, `external-link`, `loading`, `info`, `warning`, `alert`, `error`, `moon`, `sun`
-
-### Molecules
-
-#### Card
-
-```rust
-use dioxus_ui_system::molecules::{Card, CardVariant, CardHeader, CardContent, CardFooter};
-
-rsx! {
-    Card {
-        variant: CardVariant::Elevated,
-        CardHeader {
-            title: "Card Title",
-            subtitle: Some("Card subtitle".to_string()),
-        }
-        CardContent {
-            "Card content goes here"
-        }
-        CardFooter {
-            justify: CardFooterJustify::Between,
-            Button { variant: ButtonVariant::Ghost, "Cancel" }
-            Button { variant: ButtonVariant::Primary, "Save" }
-        }
-    }
-}
-```
-
-#### InputGroup
-
-```rust
-use dioxus_ui_system::molecules::InputGroup;
-
-rsx! {
-    InputGroup {
-        label: "Email",
-        value: email(),
-        placeholder: Some("you@example.com".to_string()),
-        hint: Some("We'll never share your email.".to_string()),
-        error: if invalid { Some("Invalid email".to_string()) } else { None },
-        required: true,
-        onchange: move |v| email.set(v),
-    }
-}
-```
-
-#### Badge
-
-```rust
-use dioxus_ui_system::molecules::{Badge, BadgeVariant, BadgeSize};
-
-rsx! {
-    Badge {
-        variant: BadgeVariant::Success,
-        size: BadgeSize::Md,
-        icon: Some("check".to_string()),
-        "Active"
-    }
-}
-```
-
-### Organisms
-
-#### Header
-
-```rust
-use dioxus_ui_system::organisms::{Header, NavItem};
-
-let nav_items = vec![
-    NavItem {
-        label: "Home".to_string(),
-        href: "/".to_string(),
-        icon: Some("home".to_string()),
-        active: true,
-    },
-];
-
-rsx! {
-    Header {
-        brand_title: "My App",
-        nav_items: nav_items,
-        actions: rsx! {
-            ThemeToggle {}
-        }
-    }
-}
-```
+Everything is re-exported from `dioxus_ui_system::prelude`; the modules `atoms`,
+`molecules`, `organisms`, `theme`, `styles` and `config` are also public.
 
 ## Theming
 
-### Theme Provider
-
-Wrap your app with the ThemeProvider:
+Wrap the app in `ThemeProvider`:
 
 ```rust
 rsx! {
     ThemeProvider {
-        initial_theme: Some(ThemeTokens::dark()),
-        YourApp {}
+        initial_theme: ThemeTokens::dark(), // optional, defaults to light
+        persist_theme: true,                // optional, saves the choice to localStorage (web)
+        App {}
     }
 }
 ```
 
-### Accessing Theme
+Presets: `ThemeTokens::light()`, `dark()`, `rose()`, `blue()`, `green()`, `violet()`,
+`orange()`, or by name with `ThemeTokens::by_name("rose")`. Build a brand theme from one
+color, or edit tokens directly:
 
 ```rust
-use dioxus_ui_system::theme::use_theme;
+use dioxus_ui_system::theme::{Color, ThemeTokens};
 
-fn MyComponent() -> Element {
+let brand = ThemeTokens::brand(Color::new(147, 51, 234), "purple");
+
+let mut custom = ThemeTokens::light();
+custom.colors.primary = Color::new(220, 38, 38);
+```
+
+`ThemeToggle` (light/dark) and `ThemeSelector` (preset picker) are ready-made controls.
+
+Reading the theme inside a component:
+
+```rust
+#[component]
+fn Panel() -> Element {
     let theme = use_theme();
-    let bg = theme.tokens().colors.background.to_rgba();
-    
-    rsx! {
-        div { style: "background-color: {bg}", "Content" }
-    }
+    let bg = theme.tokens.read().colors.background.to_rgba();
+    // theme.toggle_mode.call(()); theme.set_theme_by_name.call("blue".into());
+
+    rsx! { div { style: "background-color: {bg}", "Content" } }
 }
 ```
 
-### Custom Themes
+`use_theme()` does not panic when no `ThemeProvider` is mounted: it falls back to a
+component-local light theme (changes made through it only affect that component). Use
+`try_use_theme()` to get an `Option<ThemeContext>` when you need to detect the provider.
+`use_style(|tokens| ...)` returns a memoized value derived from the current tokens.
+
+## Style builder
+
+`Style` is a fluent, Tailwind-like builder that produces an inline style string from
+theme scales:
 
 ```rust
-use dioxus_ui_system::theme::{ThemeTokens, Color};
+#[component]
+fn Toolbar(children: Element) -> Element {
+    let theme = use_theme();
+    let t = theme.tokens.read();
 
-let mut theme = ThemeTokens::light();
-theme.colors.primary = Color::new(147, 51, 234); // Purple
-theme.colors.primary_foreground = Color::new(255, 255, 255);
+    let style = Style::new()
+        .flex()
+        .items_center()
+        .justify_between()
+        .gap(&t.spacing, "md")
+        .p(&t.spacing, "lg")
+        .bg(&t.colors.muted)
+        .rounded(&t.radius, "lg")
+        .overflow_x_auto()
+        .custom("backdrop-filter: blur(4px);")
+        .build();
 
-// Or use brand helper
-let brand_theme = ThemeTokens::brand(Color::new(147, 51, 234), "purple-brand");
+    rsx! { div { style: "{style}", {children} } }
+}
 ```
 
-## Multi-Platform Support
+Spacing sizes are `xs`, `sm`, `md`, `lg`, `xl`, `xxl`; radius sizes are `none`, `sm`,
+`md`, `lg`, `xl`, `full`. The `cx!` and `style_if!` macros help with conditional
+classes/styles.
 
-The library supports Web, Desktop, and Mobile via feature flags:
+## Customizing components
 
-```toml
-[dependencies]
-dioxus-ui-system = { version = "0.1", default-features = false, features = ["web"] }
-# or
-dioxus-ui-system = { version = "0.1", default-features = false, features = ["desktop"] }
-# or
-dioxus-ui-system = { version = "0.1", default-features = false, features = ["mobile"] }
+Most components accept `style: Option<String>` and `class: Option<String>` in addition to
+their variants and sizes. App-wide defaults can be set once at startup:
+
+```rust
+ComponentConfig::builder()
+    .button_size("lg")
+    .card_padding("24px")
+    .transitions(true)
+    .build();
 ```
 
-## Examples
+## Component catalog
 
-Run the example app:
+**Atoms**: Button, IconButton, Input, PasswordInput, NumberInput, TextArea,
+AutoResizeTextArea, InputTag, Select, Checkbox, Radio/RadioGroup, Switch, Toggle, Slider,
+RangeSlider, Rating/RatingInput, DatePicker, Label, Heading, Paragraph, Blockquote,
+Caption, Icon, Tag/TagGroup, Divider, Progress, Spinner, LoadingOverlay, Skeleton
+variants, Step indicators, Box/HStack/VStack/Center/Spacer, AspectRatio
 
-```bash
-# Web
-cd example-app && dx serve --platform web
+**Molecules**: Card, Badge, Alert, Avatar/AvatarGroup, Breadcrumb, Dialog, AlertDialog,
+Sheet, DropdownMenu, ContextMenu, Popover, HoverCard, Tooltip, Toast/ToastProvider
+(`use_toast`), Sonner, Combobox, Command palette, MultiSelect, OtpInput,
+TimePicker/TimeInput, Pagination, Stepper, Collapsible, ScrollArea, Separator,
+ToggleGroup, QrCode, InputGroup, ListItem, MediaObject
 
-# Desktop
-cd example-app && cargo run --features desktop
+**Organisms**: Header, Footer, Layout, Hero, DataTable, Tabs/VerticalTabs, Accordion,
+Cards (Action, Image, Media, Pricing, Profile, Stat, ...), Calendar, DateRangePicker,
+Carousel, Tree, Timeline, Menubar, Kanban, Tour, Stepper/Wizard, FileUpload,
+ImageUploader, RichTextEditor, NotificationCenter, ConfirmationDialog, Resizable panels
 
-# Mobile (requires setup)
-cd example-app && dx build --platform ios
-```
+**Charts**: BarChart, LineChart, PieChart, DonutChart, GaugeChart, Sparkline
 
-## Project Structure
+Built-in icon names for `Icon { name: ... }` include `check`, `x`, `plus`, `minus`,
+`arrow-*`, `chevron-*`, `menu`, `search`, `user`, `settings`, `home`, `bell`, `heart`,
+`star`, `trash`, `edit`, `copy`, `external-link`, `loading`, `info`, `warning`, `alert`,
+`error`, `moon`, `sun`, `book`, `layout`, `sidebar`, `maximize`, `box`, `smartphone`,
+`palette`.
 
-```
-dioxus-ui-system/
-├── Cargo.toml
-├── src/
-│   ├── lib.rs          # Main library entry
-│   ├── theme/          # Theme system
-│   │   ├── tokens.rs   # Design tokens
-│   │   ├── context.rs  # Theme context & provider
-│   │   └── mod.rs
-│   ├── styles/         # Styling system
-│   │   ├── builder.rs  # Style builder
-│   │   └── mod.rs
-│   ├── atoms/          # Atomic design atoms
-│   │   ├── button.rs
-│   │   ├── input.rs
-│   │   ├── label.rs
-│   │   ├── icon.rs
-│   │   └── mod.rs
-│   ├── molecules/      # Atomic design molecules
-│   │   ├── input_group.rs
-│   │   ├── card.rs
-│   │   ├── badge.rs
-│   │   └── mod.rs
-│   └── organisms/      # Atomic design organisms
-│       ├── header.rs
-│       ├── data_table.rs
-│       └── mod.rs
-└── example-app/        # Example application
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+Props and live examples for every component are in the
+[documentation site](https://eftech93.github.io/rust-ds/) and on
+[docs.rs](https://docs.rs/dioxus-ui-system).
 
 ## License
 
-This project is licensed under the MIT OR Apache-2.0 license.
-
-## Acknowledgments
-
-- Inspired by [shadcn/ui](https://ui.shadcn.com/) and [Radix UI](https://www.radix-ui.com/)
-- Built with [Dioxus](https://dioxuslabs.com/)
-- Atomic Design methodology by Brad Frost
+Licensed under either of MIT or Apache-2.0 at your option.
+Source and issue tracker: https://github.com/eftech93/rust-ds

@@ -176,8 +176,8 @@ fn ButtonShowcase() -> Element {
 /// Input showcase section
 #[component]
 fn InputShowcase() -> Element {
-    let mut email = use_signal(|| String::new());
-    let mut password = use_signal(|| String::new());
+    let mut email = use_signal(String::new);
+    let mut password = use_signal(String::new);
     let mut error = use_signal(|| false);
 
     rsx! {
@@ -835,7 +835,7 @@ fn NewFormControlsShowcase() -> Element {
     let mut radio_value = use_signal(|| "option1".to_string());
     let mut switch_on = use_signal(|| true);
     let mut selected = use_signal(|| "".to_string());
-    let mut textarea = use_signal(|| String::new());
+    let mut textarea = use_signal(String::new);
 
     let options = vec![
         SelectOption::new("", "Select an option..."),
@@ -1739,7 +1739,7 @@ fn DataTableShowcase() -> Element {
 
     // State for search and filters
     let mut search_query = use_signal(|| "".to_string());
-    let mut active_filters = use_signal(|| HashMap::<String, String>::new());
+    let mut active_filters = use_signal(HashMap::<String, String>::new);
 
     // Filter the data
     let filtered_products: Vec<ProductRef> = all_products
@@ -1754,10 +1754,10 @@ fn DataTableShowcase() -> Element {
 
             let matches_category = active_filters()
                 .get("category")
-                .map_or(true, |v| v == &p.0.category);
+                .is_none_or(|v| v == &p.0.category);
             let matches_status = active_filters()
                 .get("status")
-                .map_or(true, |v| v == &p.0.status);
+                .is_none_or(|v| v == &p.0.status);
 
             matches_search && matches_category && matches_status
         })

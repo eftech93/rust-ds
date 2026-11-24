@@ -193,7 +193,7 @@ pub fn NotificationCenter(props: NotificationCenterProps) -> Element {
                                             class: "notification-item",
                                             style: "display: flex; gap: 12px; padding: 16px; border-bottom: 1px solid {theme.tokens.read().colors.border.to_rgba()}; background: {bg_color}; cursor: pointer; transition: background 0.15s ease;",
                                             onclick: {
-                                                let on_mark_read = props.on_mark_read.clone();
+                                                let on_mark_read = props.on_mark_read;
                                                 let id = notification.id.clone();
                                                 move |_| {
                                                     if let Some(handler) = &on_mark_read {
@@ -240,7 +240,7 @@ pub fn NotificationCenter(props: NotificationCenterProps) -> Element {
                                                         class: "notification-item-action",
                                                         style: "margin-top: 8px; font-size: 13px; font-weight: 500; color: {theme.tokens.read().colors.primary.to_rgba()}; background: none; border: none; cursor: pointer; padding: 0;",
                                                         onclick: {
-                                                            let on_action = props.on_action.clone();
+                                                            let on_action = props.on_action;
                                                             let id = notification.id.clone();
                                                             move |e: Event<dioxus::html::MouseData>| {
                                                                 e.stop_propagation();
@@ -262,12 +262,11 @@ pub fn NotificationCenter(props: NotificationCenterProps) -> Element {
                                             }
 
                                             // Dismiss button
-                                            if let Some(on_dismiss) = props.on_dismiss.clone() {
+                                            if let Some(on_dismiss) = props.on_dismiss {
                                                 button {
                                                     type: "button",
                                                     style: "flex-shrink: 0; background: none; border: none; cursor: pointer; font-size: 14px; color: {theme.tokens.read().colors.muted.to_rgba()}; padding: 4px; margin: -4px; opacity: 0; transition: opacity 0.15s ease;",
                                                     onclick: {
-                                                        let on_dismiss = on_dismiss.clone();
                                                         let notif_id = notification.id.clone();
                                                         move |e: Event<dioxus::html::MouseData>| {
                                                             e.stop_propagation();

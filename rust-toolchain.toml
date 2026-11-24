@@ -1,0 +1,6 @@
+# Pin the dev/CI toolchain so clippy lints (CI uses -D warnings) don't change under us.
+# MSRV for users of the crate is `rust-version` in Cargo.toml, not this.
+[toolchain]
+channel = "1.99.1"
+components = ["clippy", "rustfmt"]
+targets = ["wasm32-unknown-unknown"]

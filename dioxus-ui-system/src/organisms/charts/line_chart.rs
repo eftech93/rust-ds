@@ -207,7 +207,7 @@ pub fn LineChart(props: LineChartProps) -> Element {
     let show_points = props.show_points;
     let point_radius = props.point_radius;
     let line_width = props.line_width;
-    let on_point_click = props.on_point_click.clone();
+    let on_point_click = props.on_point_click;
     let tooltip = props.tooltip.clone();
 
     // Pre-compute Y axis data: (y_position, label, x2_for_grid)
@@ -293,7 +293,7 @@ pub fn LineChart(props: LineChartProps) -> Element {
                 for point in prev_points.iter().rev() {
                     d.push_str(&format!("L {},{} ", point.0, point.1));
                 }
-                d.push_str("Z");
+                d.push('Z');
                 Some(d)
             } else {
                 let baseline = margin.top as f64 + chart_height as f64;
@@ -303,7 +303,7 @@ pub fn LineChart(props: LineChartProps) -> Element {
                     d.push_str(&format!("L {},{} ", point.0, point.1));
                 }
                 d.push_str(&format!("L {},{} ", points[points.len() - 1].0, baseline));
-                d.push_str("Z");
+                d.push('Z');
                 Some(d)
             }
         } else {
@@ -439,7 +439,7 @@ pub fn LineChart(props: LineChartProps) -> Element {
                         series_data: all_series[series_idx].data.clone(),
                         tooltip_contents: tooltip_contents,
                         series_name: series_name,
-                        on_point_click: on_point_click.clone(),
+                        on_point_click: on_point_click,
                         tooltip_enabled: tooltip.enabled,
                         on_tooltip_show: Some(EventHandler::new(move |(x, y, content): (i32, i32, String)| {
                             tooltip_state.set(Some((x, y, content)));
@@ -525,10 +525,10 @@ fn LineSeries(props: LineSeriesProps) -> Element {
                         point: props.series_data[i].clone(),
                         tooltip_content: props.tooltip_contents[i].clone(),
                         series_name: props.series_name.clone(),
-                        on_point_click: props.on_point_click.clone(),
+                        on_point_click: props.on_point_click,
                         tooltip_enabled: props.tooltip_enabled,
-                        on_tooltip_show: props.on_tooltip_show.clone(),
-                        on_tooltip_hide: props.on_tooltip_hide.clone(),
+                        on_tooltip_show: props.on_tooltip_show,
+                        on_tooltip_hide: props.on_tooltip_hide,
                     }
                 }
             }
@@ -554,7 +554,7 @@ struct LinePointProps {
 
 #[component]
 fn LinePoint(props: LinePointProps) -> Element {
-    let on_click = props.on_point_click.clone();
+    let on_click = props.on_point_click;
     let point = props.point.clone();
     let tooltip_content = props.tooltip_content.clone();
 

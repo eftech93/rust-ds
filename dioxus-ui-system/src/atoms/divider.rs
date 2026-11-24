@@ -80,7 +80,7 @@ pub fn Divider(props: DividerProps) -> Element {
     let style_css = props
         .style
         .as_ref()
-        .map(|s| format!("{}", s))
+        .map(|s| s.to_string())
         .unwrap_or_default();
 
     let id_css = props.id.clone().unwrap_or_default();

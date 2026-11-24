@@ -1013,7 +1013,7 @@ fn NewFormControlsShowcase() -> Element {
     let mut checked = use_signal(|| false);
     let mut switch_on = use_signal(|| true);
     let mut selected = use_signal(|| "".to_string());
-    let mut textarea = use_signal(|| String::new());
+    let mut textarea = use_signal(String::new);
 
     let options = vec![
         SelectOption::new("", "Select..."),
@@ -1083,8 +1083,8 @@ fn ComponentSection(title: String, children: Element) -> Element {
 /// Input showcase with state
 #[component]
 fn InputShowcase() -> Element {
-    let mut email = use_signal(|| String::new());
-    let mut password = use_signal(|| String::new());
+    let mut email = use_signal(String::new);
+    let mut password = use_signal(String::new);
 
     rsx! {
         VStack {
@@ -1103,7 +1103,7 @@ fn InputShowcase() -> Element {
                 value: password(),
                 placeholder: Some("Enter password".to_string()),
                 input_type: InputType::Password,
-                error: if password().len() > 0 && password().len() < 8 {
+                error: if !password().is_empty() && password().len() < 8 {
                     Some("Must be at least 8 characters".to_string())
                 } else {
                     None

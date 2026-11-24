@@ -8,24 +8,19 @@ use crate::theme::{use_style, use_theme};
 use dioxus::prelude::*;
 
 /// Avatar sizes
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Default)]
 pub enum AvatarSize {
     /// Extra small (24px)
     Xs,
     /// Small (32px)
     Sm,
     /// Medium (40px)
+    #[default]
     Md,
     /// Large (48px)
     Lg,
     /// Extra large (64px)
     Xl,
-}
-
-impl Default for AvatarSize {
-    fn default() -> Self {
-        AvatarSize::Md
-    }
 }
 
 /// Avatar properties
@@ -96,8 +91,7 @@ pub fn Avatar(props: AvatarProps) -> Element {
             .build()
     });
 
-    let show_image = props.src.is_some() && !image_error();
-    let src_clone = props.src.clone();
+    let image_src = props.src.clone().filter(|_| !image_error());
 
     let id = props.id.clone().unwrap_or_default();
 
@@ -107,9 +101,9 @@ pub fn Avatar(props: AvatarProps) -> Element {
             style: "{avatar_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
 
-            if show_image {
+            if let Some(src) = image_src {
                 img {
-                    src: "{src_clone.clone().unwrap()}",
+                    src: "{src}",
                     alt: "{props.alt}",
                     style: "width: 100%; height: 100%; object-fit: cover;",
                     onerror: move |_| image_error.set(true),

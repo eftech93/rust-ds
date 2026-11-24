@@ -116,7 +116,7 @@ pub fn Tabs(props: TabsProps) -> Element {
                     tab: tab.clone(),
                     is_active: props.active_tab == tab.id,
                     variant: props.variant.clone(),
-                    on_click: props.on_change.clone(),
+                    on_click: props.on_change,
                 }
             }
         }
@@ -345,7 +345,7 @@ pub fn VerticalTabs(props: VerticalTabsProps) -> Element {
                     VerticalTabButton {
                         tab: tab.clone(),
                         is_active: props.active_tab == tab.id,
-                        on_click: props.on_change.clone(),
+                        on_click: props.on_change,
                     }
                 }
             }

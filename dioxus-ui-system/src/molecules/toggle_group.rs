@@ -164,7 +164,7 @@ pub fn ToggleGroup(props: ToggleGroupProps) -> Element {
     use_context_provider(|| ToggleGroupContext {
         selected_values,
         group_type: props.group_type.clone(),
-        on_value_change: props.on_value_change.clone(),
+        on_value_change: props.on_value_change,
     });
 
     rsx! {

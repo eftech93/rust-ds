@@ -132,7 +132,7 @@ pub fn Tag(props: TagProps) -> Element {
         TagSize::Sm => 10,
         _ => 12,
     };
-    let on_click = props.on_click.clone();
+    let on_click = props.on_click;
 
     let style_css = props.style.clone().unwrap_or_default();
     let id_css = props.id.clone().unwrap_or_default();
@@ -324,7 +324,7 @@ pub fn TagGroup(props: TagGroupProps) -> Element {
                     let variant = tag.variant.clone().unwrap_or(TagVariant::Default);
 
                     let on_click = {
-                        let on_change = props.on_change.clone();
+                        let on_change = props.on_change;
                         let tag_id = tag.id.clone();
                         let selected = selected.clone();
                         move |_| {
@@ -343,7 +343,7 @@ pub fn TagGroup(props: TagGroupProps) -> Element {
                     };
 
                     let on_remove = props.on_remove.as_ref().map(|handler| {
-                        let h = handler.clone();
+                        let h = *handler;
                         let tag_id = tag.id.clone();
                         Callback::new(move |_| {
                             h.call(tag_id.clone());
@@ -408,7 +408,7 @@ pub struct InputTagProps {
 /// Input tag component (tag input)
 #[component]
 pub fn InputTag(props: InputTagProps) -> Element {
-    let mut input_value = use_signal(|| String::new());
+    let mut input_value = use_signal(String::new);
     let mut is_focused = use_signal(|| false);
 
     let class_css = props
@@ -438,7 +438,7 @@ pub fn InputTag(props: InputTagProps) -> Element {
                 {
                     let tag_text = tag.clone();
                     let on_remove = {
-                        let on_change = props.on_change.clone();
+                        let on_change = props.on_change;
                         let tags = props.tags.clone();
                         move |_| {
                             let mut new_tags = tags.clone();
@@ -470,7 +470,7 @@ pub fn InputTag(props: InputTagProps) -> Element {
                     style: "flex: 1; min-width: 80px; border: none; outline: none; font-size: 14px; padding: 4px;",
                     onfocus: move |_| is_focused.set(true),
                     onblur: {
-                        let on_change = props.on_change.clone();
+                        let on_change = props.on_change;
                         let tags = props.tags.clone();
                         let allow_duplicates = props.allow_duplicates;
                         move |_| {
@@ -478,13 +478,12 @@ pub fn InputTag(props: InputTagProps) -> Element {
                             let value = input_value();
                             if !value.is_empty() {
                                 let trimmed = value.trim().to_string();
-                                if !trimmed.is_empty() {
-                                    if allow_duplicates || !tags.contains(&trimmed) {
+                                if !trimmed.is_empty()
+                                    && (allow_duplicates || !tags.contains(&trimmed)) {
                                         let mut new_tags = tags.clone();
                                         new_tags.push(trimmed);
                                         on_change.call(new_tags);
                                     }
-                                }
                                 input_value.set(String::new());
                             }
                         }
@@ -493,7 +492,7 @@ pub fn InputTag(props: InputTagProps) -> Element {
                         input_value.set(e.value());
                     },
                     onkeydown: {
-                        let on_change = props.on_change.clone();
+                        let on_change = props.on_change;
                         let tags = props.tags.clone();
                         let allow_duplicates = props.allow_duplicates;
                         move |e: Event<dioxus::html::KeyboardData>| {
@@ -502,13 +501,12 @@ pub fn InputTag(props: InputTagProps) -> Element {
                                 let value = input_value();
                                 if !value.is_empty() {
                                     let trimmed = value.trim().to_string();
-                                    if !trimmed.is_empty() {
-                                        if allow_duplicates || !tags.contains(&trimmed) {
+                                    if !trimmed.is_empty()
+                                        && (allow_duplicates || !tags.contains(&trimmed)) {
                                             let mut new_tags = tags.clone();
                                             new_tags.push(trimmed);
                                             on_change.call(new_tags);
                                         }
-                                    }
                                     input_value.set(String::new());
                                 }
                             } else if e.key() == Key::Backspace && input_value().is_empty() && !tags.is_empty() {

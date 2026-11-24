@@ -127,7 +127,7 @@ pub fn Combobox(props: ComboboxProps) -> Element {
     };
 
     let mut select_option = {
-        let on_change = props.on_change.clone();
+        let on_change = props.on_change;
         move |option: ComboboxOption| {
             input_value.set(option.label.clone());
             on_change.call(option.value);
@@ -366,7 +366,7 @@ pub struct MultiComboboxProps {
 pub fn MultiCombobox(props: MultiComboboxProps) -> Element {
     let theme = use_theme();
     let mut is_open = use_signal(|| false);
-    let mut input_value = use_signal(|| String::new());
+    let mut input_value = use_signal(String::new);
 
     let class_css = props
         .class
@@ -404,7 +404,7 @@ pub fn MultiCombobox(props: MultiComboboxProps) -> Element {
                 for option in selected_options.clone() {
                     {
                         let option_value = option.value.clone();
-                        let on_change = props.on_change.clone();
+                        let on_change = props.on_change;
                         let values = props.values.clone();
                         rsx! {
                             span {
@@ -456,7 +456,7 @@ pub fn MultiCombobox(props: MultiComboboxProps) -> Element {
                             let option = option.clone();
                             let option_value = option.value.clone();
                             let values = props.values.clone();
-                            let on_change = props.on_change.clone();
+                            let on_change = props.on_change;
                             rsx! {
                                 div {
                                     key: "{option_value}",

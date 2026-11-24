@@ -1,6 +1,6 @@
 [package]
 name = "dioxus-ui-system"
-version = "0.0.7"
+version = "0.0.8"
 edition.workspace = true
 authors.workspace = true
 license.workspace = true
@@ -32,3 +32,6 @@ router = ["dep:dioxus-router"]
 [lib]
 name = "dioxus_ui_system"
 path = "src/lib.rs"
+
+[dev-dependencies]
+dioxus-ssr = "0.7"

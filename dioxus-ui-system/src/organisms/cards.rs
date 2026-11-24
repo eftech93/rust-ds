@@ -12,9 +12,10 @@ use crate::molecules::{
     Badge, BadgeVariant, Card, CardContent, CardFooter, CardFooterJustify, CardHeader, CardVariant,
 };
 
-/// ============================================================================
-/// 1. Single Action Card
-/// ============================================================================
+// ============================================================================
+// 1. Single Action Card
+// ============================================================================
+
 /// Card with a single primary action button
 #[derive(Props, Clone, PartialEq)]
 pub struct ActionCardProps {
@@ -262,7 +263,7 @@ pub fn ImageCard(props: ImageCardProps) -> Element {
                     }
 
                     if let Some(label) = props.action_label.clone() {
-                        if let Some(handler) = props.on_action.clone() {
+                        if let Some(handler) = props.on_action {
                             Button {
                                 variant: ButtonVariant::Ghost,
                                 onclick: move |_| handler.call(()),
@@ -501,7 +502,7 @@ pub fn ProfileCard(props: ProfileCardProps) -> Element {
                     }
 
                     // Action
-                    if let Some(handler) = props.on_action.clone() {
+                    if let Some(handler) = props.on_action {
                         Button {
                             variant: ButtonVariant::Primary,
                             full_width: true,
@@ -706,7 +707,7 @@ pub fn HorizontalCard(props: HorizontalCardProps) -> Element {
                     }
 
                     if let Some(label) = props.action_label.clone() {
-                        if let Some(handler) = props.on_action.clone() {
+                        if let Some(handler) = props.on_action {
                             div {
                                 style: "margin-top: 12px;",
 
@@ -818,7 +819,7 @@ pub fn NotificationCard(props: NotificationCardProps) -> Element {
                                 "{props.title}"
                             }
 
-                            if let Some(handler) = props.on_dismiss.clone() {
+                            if let Some(handler) = props.on_dismiss {
                                 button {
                                     style: "background: none; border: none; cursor: pointer; padding: 4px; color: #94a3b8;",
                                     onclick: move |_| handler.call(()),
@@ -1086,7 +1087,7 @@ pub fn MediaCard(props: MediaCardProps) -> Element {
 
                 // Play overlay for video/audio
                 if let Some(icon) = overlay_icon {
-                    if let Some(handler) = props.on_play.clone() {
+                    if let Some(handler) = props.on_play {
                         div {
                             style: "position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); cursor: pointer;",
                             onclick: move |_| handler.call(()),
@@ -1139,7 +1140,7 @@ pub fn MediaCard(props: MediaCardProps) -> Element {
                     div {
                         style: "display: flex; gap: 8px;",
 
-                        if let Some(handler) = props.on_like.clone() {
+                        if let Some(handler) = props.on_like {
                             button {
                                 style: "background: none; border: none; cursor: pointer; padding: 4px;",
                                 onclick: move |_| handler.call(()),
@@ -1152,7 +1153,7 @@ pub fn MediaCard(props: MediaCardProps) -> Element {
                             }
                         }
 
-                        if let Some(handler) = props.on_share.clone() {
+                        if let Some(handler) = props.on_share {
                             button {
                                 style: "background: none; border: none; cursor: pointer; padding: 4px;",
                                 onclick: move |_| handler.call(()),

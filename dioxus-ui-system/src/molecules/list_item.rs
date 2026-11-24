@@ -98,7 +98,7 @@ pub fn ListItem(props: ListItemProps) -> Element {
         bg_color.clone()
     };
 
-    let on_click = props.on_click.clone();
+    let on_click = props.on_click;
 
     let title_color = theme.tokens.read().colors.foreground.to_rgba();
     let desc_color = theme.tokens.read().colors.muted.to_rgba();

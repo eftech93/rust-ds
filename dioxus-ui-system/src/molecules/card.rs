@@ -153,7 +153,7 @@ pub fn Card(props: CardProps) -> Element {
 
     let class = props.class.clone().unwrap_or_default();
 
-    let onclick_handler = props.onclick.clone();
+    let onclick_handler = props.onclick;
 
     rsx! {
         div {

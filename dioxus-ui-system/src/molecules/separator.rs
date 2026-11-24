@@ -61,24 +61,59 @@ pub fn Separator(props: SeparatorProps) -> Element {
         }
     });
 
-    let aria_props = if props.decorative {
-        "aria-hidden: true;"
-    } else {
-        "role: separator;"
-    };
-
+    let decorative = props.decorative;
     let orientation_attr = if is_horizontal {
         "horizontal"
     } else {
         "vertical"
     };
 
+    // Decorative separators are hidden from assistive tech; semantic ones get
+    // role="separator" (+ aria-orientation, which is only meaningful with that role).
+    let role = if decorative { "none" } else { "separator" };
+    let aria_hidden = decorative.then_some("true");
+    let aria_orientation = (!decorative).then_some(orientation_attr);
+
     rsx! {
         div {
             id: "{props.id.clone().unwrap_or_default()}",
-            style: "{separator_style} {props.style.clone().unwrap_or_default()} {aria_props}",
+            style: "{separator_style} {props.style.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
-            aria_orientation: "{orientation_attr}",
+            role: role,
+            aria_hidden: aria_hidden,
+            aria_orientation: aria_orientation,
+            "data-orientation": orientation_attr,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    #[test]
+    fn decorative_separator_is_hidden_and_style_is_css_only() {
+        let html = render(|| rsx! { Separator {} });
+        assert!(html.contains("aria-hidden=\"true\""), "{html}");
+        assert!(html.contains("role=\"none\""), "{html}");
+        assert!(!html.contains("aria-orientation"), "{html}");
+        assert!(!html.contains("aria-hidden:"), "{html}");
+        assert!(!html.contains("role:"), "{html}");
+    }
+
+    #[test]
+    fn semantic_vertical_separator_has_role_and_orientation() {
+        let html = render(|| {
+            rsx! { Separator { decorative: false, orientation: SeparatorOrientation::Vertical } }
+        });
+        assert!(html.contains("role=\"separator\""), "{html}");
+        assert!(html.contains("aria-orientation=\"vertical\""), "{html}");
+        assert!(!html.contains("aria-hidden"), "{html}");
     }
 }

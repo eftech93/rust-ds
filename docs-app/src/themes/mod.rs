@@ -828,7 +828,7 @@ pub fn CustomThemePage() -> Element {
                         step: 100,
                         on_change: move |v| {
                             let mut new_state = theme_state();
-                            new_state.font_weight_normal = v as u16;
+                            new_state.font_weight_normal = v;
                             theme_state.set(new_state);
                         },
                     }
@@ -840,7 +840,7 @@ pub fn CustomThemePage() -> Element {
                         step: 100,
                         on_change: move |v| {
                             let mut new_state = theme_state();
-                            new_state.font_weight_medium = v as u16;
+                            new_state.font_weight_medium = v;
                             theme_state.set(new_state);
                         },
                     }
@@ -852,7 +852,7 @@ pub fn CustomThemePage() -> Element {
                         step: 100,
                         on_change: move |v| {
                             let mut new_state = theme_state();
-                            new_state.font_weight_semibold = v as u16;
+                            new_state.font_weight_semibold = v;
                             theme_state.set(new_state);
                         },
                     }
@@ -864,7 +864,7 @@ pub fn CustomThemePage() -> Element {
                         step: 100,
                         on_change: move |v| {
                             let mut new_state = theme_state();
-                            new_state.font_weight_bold = v as u16;
+                            new_state.font_weight_bold = v;
                             theme_state.set(new_state);
                         },
                     }

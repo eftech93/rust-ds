@@ -127,7 +127,7 @@ pub fn Stepper(props: StepperProps) -> Element {
                             active_step: props.active_step,
                             size: props.size.clone(),
                             on_step_click: if props.allow_back_navigation {
-                                props.on_step_change.clone()
+                                props.on_step_change
                             } else {
                                 None
                             },
@@ -139,7 +139,7 @@ pub fn Stepper(props: StepperProps) -> Element {
                             active_step: props.active_step,
                             size: props.size.clone(),
                             on_step_click: if props.allow_back_navigation {
-                                props.on_step_change.clone()
+                                props.on_step_change
                             } else {
                                 None
                             },
@@ -150,7 +150,7 @@ pub fn Stepper(props: StepperProps) -> Element {
                             steps: steps.clone(),
                             active_step: props.active_step,
                             size: StepSize::Sm,
-                            on_step_click: props.on_step_change.clone(),
+                            on_step_click: props.on_step_change,
                         }
                     },
                 }
@@ -213,7 +213,7 @@ pub fn CompactStepper(props: CompactStepperProps) -> Element {
                         show_connector: false,
                         connector_completed: false,
                         horizontal: true,
-                        on_click: props.on_step_click.clone(),
+                        on_click: props.on_step_click,
                     }
 
                     if index < props.steps.len() - 1 {
@@ -526,7 +526,7 @@ pub fn StepSummary(props: StepSummaryProps) -> Element {
                     }
 
                     if props.editable {
-                        if let Some(on_edit) = props.on_edit.clone() {
+                        if let Some(on_edit) = props.on_edit {
                             crate::atoms::Button {
                                 variant: crate::atoms::ButtonVariant::Ghost,
                                 size: crate::atoms::ButtonSize::Sm,

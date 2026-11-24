@@ -247,7 +247,7 @@ impl ShadowSize {
 }
 
 /// Background color options
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug, Default)]
 pub enum BackgroundColor {
     /// Primary color
     Primary,
@@ -272,15 +272,10 @@ pub enum BackgroundColor {
     /// Warning color
     Warning,
     /// Transparent
+    #[default]
     Transparent,
     /// Custom color
     Custom(Color),
-}
-
-impl Default for BackgroundColor {
-    fn default() -> Self {
-        BackgroundColor::Transparent
-    }
 }
 
 /// Border width
@@ -712,7 +707,7 @@ pub fn Box(props: BoxProps) -> Element {
 
         // Shadow
         if shadow != ShadowSize::None {
-            style = style.shadow_themed(&t, shadow.as_str());
+            style = style.shadow_themed(t, shadow.as_str());
         }
 
         // Overflow

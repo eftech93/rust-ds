@@ -315,7 +315,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
                                 DataTableFilter {
                                     filter: filter.clone(),
                                     active_value: props.active_filters.get(&filter.key).cloned().unwrap_or_default(),
-                                    on_change: props.on_filter_change.clone(),
+                                    on_change: props.on_filter_change,
                                 }
                             }
                         }
@@ -331,7 +331,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
                     selectable: selectable,
                     selected_count: selected_keys.len(),
                     total_count: data.len(),
-                    on_select_all: props.on_selection_change.clone(),
+                    on_select_all: props.on_selection_change,
                     all_keys: data.iter().map(|r| (props.key_extractor)(r)).collect(),
                 }
 
@@ -343,8 +343,8 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
                             key_extractor: props.key_extractor,
                             selectable: selectable,
                             is_selected: selected_keys.contains(&(props.key_extractor)(&row)),
-                            on_select: props.on_selection_change.clone(),
-                            on_click: props.on_row_click.clone(),
+                            on_select: props.on_selection_change,
+                            on_click: props.on_row_click,
                             selected_keys: selected_keys.clone(),
                         }
                     }
@@ -555,7 +555,7 @@ pub fn DataTableRow<T: Clone + PartialEq + 'static>(props: DataTableRowProps<T>)
     let row_data_for_click = props.row.clone();
     let row_data_for_select = props.row.clone();
     let selected_keys = props.selected_keys.clone();
-    let onclick_handler = props.on_click.clone();
+    let onclick_handler = props.on_click;
 
     let id = props.id.clone().unwrap_or_default();
     let class = props.class.clone().unwrap_or_default();

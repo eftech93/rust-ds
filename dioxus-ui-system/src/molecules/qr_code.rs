@@ -266,11 +266,13 @@ fn generate_placeholder_pattern(value: &str, size: usize) -> Vec<Vec<bool>> {
 
     let mut pattern = vec![vec![false; size]; size];
 
-    // Generate pattern based on hash
+    // Generate pattern based on hash (index-based: cells depend on both i and j)
+    #[allow(clippy::needless_range_loop)]
     for i in 0..size {
         for j in 0..size {
             // Skip position detection patterns
-            if (i < 7 && j < 7) || (i < 7 && j >= size - 7) || (i >= size - 7 && j < 7) {
+            let in_finder = |a: usize, b: usize| a < 7 && (b < 7 || b >= size - 7);
+            if in_finder(i, j) || in_finder(j, i) {
                 continue;
             }
             // Skip timing patterns

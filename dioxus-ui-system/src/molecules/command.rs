@@ -103,13 +103,13 @@ pub struct CommandProps {
 #[component]
 pub fn Command(props: CommandProps) -> Element {
     let _theme = use_theme();
-    let value = use_signal(|| String::new());
+    let value = use_signal(String::new);
     let highlighted_index = use_signal(|| 0usize);
     let item_count = use_signal(|| 0usize);
     let focused = use_signal(|| false);
     let select_trigger = use_signal(|| 0usize);
 
-    let on_item_select = props.on_select.clone();
+    let on_item_select = props.on_select;
     let context = CommandContext {
         value,
         highlighted_index,
@@ -214,19 +214,19 @@ pub fn CommandInput(props: CommandInputProps) -> Element {
         match e.key() {
             Key::ArrowDown => {
                 e.prevent_default();
-                let count = context.item_count.read().clone();
+                let count = *context.item_count.read();
                 if count > 0 {
-                    let current = context.highlighted_index.read().clone();
+                    let current = *context.highlighted_index.read();
                     context.highlighted_index.set((current + 1).min(count - 1));
                 }
             }
             Key::ArrowUp => {
                 e.prevent_default();
-                let current = context.highlighted_index.read().clone();
+                let current = *context.highlighted_index.read();
                 context.highlighted_index.set(current.saturating_sub(1));
             }
             Key::Enter => {
-                let current = context.select_trigger.read().clone();
+                let current = *context.select_trigger.read();
                 context.select_trigger.set(current + 1);
             }
             Key::Escape => {
@@ -420,9 +420,9 @@ pub fn CommandItem(props: CommandItemProps) -> Element {
     let mut item_index = use_signal(|| 0usize);
 
     use_hook(|| {
-        let index = context.item_count.read().clone();
+        let index = *context.item_count.read();
         item_index.set(index);
-        let current_count = context.item_count.read().clone();
+        let current_count = *context.item_count.read();
         context.item_count.set(current_count + 1);
     });
 
@@ -432,10 +432,10 @@ pub fn CommandItem(props: CommandItemProps) -> Element {
     let is_match = search_value.is_empty() || item_value.contains(&search_value);
 
     // Check if this item is currently highlighted
-    let is_highlighted = context.highlighted_index.read().clone() == item_index.read().clone();
+    let is_highlighted = *context.highlighted_index.read() == *item_index.read();
 
     // Update highlighted index if this item is the only match
-    let item_index_for_effect = item_index.read().clone();
+    let item_index_for_effect = *item_index.read();
     use_effect(move || {
         if is_match && search_value == item_value {
             context.highlighted_index.set(item_index_for_effect);
@@ -443,7 +443,7 @@ pub fn CommandItem(props: CommandItemProps) -> Element {
     });
 
     // Trigger selection when Enter is pressed and this item is highlighted
-    let on_select = props.on_select.clone();
+    let on_select = props.on_select;
     use_effect(move || {
         let trigger = context.select_trigger.read();
         if *trigger == 0 {
@@ -498,7 +498,7 @@ pub fn CommandItem(props: CommandItemProps) -> Element {
 
     let handle_mouse_enter = move |_| {
         if !props.disabled {
-            context.highlighted_index.set(item_index.read().clone());
+            context.highlighted_index.set(*item_index.read());
         }
     };
 

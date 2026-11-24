@@ -19,6 +19,9 @@ pub struct TooltipProps {
     /// Delay before showing tooltip (in ms)
     #[props(default = 200)]
     pub delay: u64,
+    /// Delay before hiding tooltip (in ms)
+    #[props(default = 0)]
+    pub hide_delay: u64,
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
@@ -65,7 +68,9 @@ pub enum TooltipPlacement {
 pub fn Tooltip(props: TooltipProps) -> Element {
     let _theme = use_theme();
     let mut is_visible = use_signal(|| false);
-    let show_timeout = use_signal(|| None::<i32>);
+    // Bumped on every enter/leave; a pending timer only applies if the
+    // generation it captured is still current (cancels stale show/hide).
+    let mut generation = use_signal(|| 0u64);
 
     let position_style = match props.placement {
         TooltipPlacement::Top => {
@@ -101,20 +106,25 @@ pub fn Tooltip(props: TooltipProps) -> Element {
             .build()
     });
 
-    let mut show_tooltip = move || {
-        // Use set_timeout for delay (simplified)
-        // In a real implementation, you'd use web_sys::set_timeout_with_callback
-        // For now, we show immediately
-        is_visible.set(true);
+    let mut schedule = move |visible: bool, delay_ms: u64| {
+        generation += 1;
+        let current = *generation.peek();
+        if delay_ms == 0 {
+            is_visible.set(visible);
+            return;
+        }
+        // Tasks spawned here are owned by this component and dropped on unmount.
+        spawn(async move {
+            sleep_ms(delay_ms).await;
+            if *generation.peek() == current {
+                is_visible.set(visible);
+            }
+        });
     };
 
-    let mut hide_tooltip = move || {
-        if let Some(timeout) = show_timeout() {
-            // Clear timeout would go here
-            let _ = timeout;
-        }
-        is_visible.set(false);
-    };
+    let (show_delay, hide_delay) = (props.delay, props.hide_delay);
+    let mut show_tooltip = move || schedule(true, show_delay);
+    let mut hide_tooltip = move || schedule(false, hide_delay);
 
     rsx! {
         span {
@@ -138,6 +148,24 @@ pub fn Tooltip(props: TooltipProps) -> Element {
         }
     }
 }
+
+/// Resolve after `ms` milliseconds (browser `setTimeout`).
+#[cfg(all(feature = "web", target_arch = "wasm32"))]
+async fn sleep_ms(ms: u64) {
+    let promise = js_sys::Promise::new(&mut |resolve, _reject| {
+        if let Some(window) = web_sys::window() {
+            let _ = window.set_timeout_with_callback_and_timeout_and_arguments_0(
+                &resolve,
+                ms.min(i32::MAX as u64) as i32,
+            );
+        }
+    });
+    let _ = wasm_bindgen_futures::JsFuture::from(promise).await;
+}
+
+/// Non-web targets have no timer runtime here: apply immediately.
+#[cfg(not(all(feature = "web", target_arch = "wasm32")))]
+async fn sleep_ms(_ms: u64) {}
 
 /// Simple tooltip that wraps any element
 #[derive(Props, Clone, PartialEq)]

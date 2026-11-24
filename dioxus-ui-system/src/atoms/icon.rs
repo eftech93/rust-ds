@@ -101,7 +101,7 @@ pub struct IconProps {
 pub fn Icon(props: IconProps) -> Element {
     let _theme = use_theme();
 
-    let size = props.size.clone();
+    let size = props.size;
     let color = props.color.clone();
     let flip_h = props.flip_h;
     let flip_v = props.flip_v;
@@ -287,7 +287,7 @@ pub fn IconButton(props: IconButtonProps) -> Element {
             },
             Icon {
                 name: props.icon.clone(),
-                size: props.size.clone(),
+                size: props.size,
                 color: props.color.clone(),
             }
         }

@@ -114,11 +114,11 @@ impl TimeValue {
         }
     }
 
-    fn now(use_24h: bool) -> Self {
+    fn now(_use_24h: bool) -> Self {
         // Get current time - in a real app, use system time
         // For now, default to 12:00
         TimeValue {
-            hour: if use_24h { 12 } else { 12 },
+            hour: 12,
             minute: 0,
             second: 0,
             is_pm: true,
@@ -219,7 +219,7 @@ pub fn TimePicker(props: TimePickerProps) -> Element {
     });
 
     let on_select_time = {
-        let on_change = props.on_change.clone();
+        let on_change = props.on_change;
         let use_24h = props.use_24h;
         let show_seconds = props.show_seconds;
         move |time: TimeValue| {
@@ -230,7 +230,7 @@ pub fn TimePicker(props: TimePickerProps) -> Element {
     };
 
     let on_clear = {
-        let on_change = props.on_change.clone();
+        let on_change = props.on_change;
         move |e: Event<MouseData>| {
             e.stop_propagation();
             on_change.call(None);
@@ -344,8 +344,8 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
     let theme = use_theme();
 
     // Use signals for each component
-    let initial = props.value.clone().unwrap_or_else(|| TimeValue {
-        hour: if props.use_24h { 12 } else { 12 },
+    let initial = props.value.clone().unwrap_or(TimeValue {
+        hour: 12,
         minute: 0,
         second: 0,
         is_pm: false,
@@ -427,7 +427,7 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
     let second_options: Vec<u32> = (0..60).step_by(5).collect();
 
     let on_select = {
-        let on_select = props.on_select.clone();
+        let on_select = props.on_select;
         move || {
             on_select.call(TimeValue {
                 hour: hour(),
@@ -439,11 +439,11 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
     };
 
     let on_now = {
-        let mut hour = hour.clone();
-        let mut minute = minute.clone();
-        let mut second = second.clone();
-        let mut is_pm = is_pm.clone();
-        let on_select = props.on_select.clone();
+        let mut hour = hour;
+        let mut minute = minute;
+        let mut second = second;
+        let mut is_pm = is_pm;
+        let on_select = props.on_select;
         let use_24h = props.use_24h;
         move || {
             let now = TimeValue::now(use_24h);
