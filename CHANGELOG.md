@@ -70,6 +70,14 @@ are unchanged. Only our components' props were renamed.
   default text)
 - `rich_text::ToolbarButton`: `title` (`&'static str`) and `style` → `Option<String>`
 
+### Docs and release
+
+- Docs site: props tables and code samples match the 0.0.9 API, and a new
+  "Migrating to 0.0.9" guide is at `/guides/migration`.
+- Release workflow: publishing now runs on the push to `main` that the release PR's
+  merge creates (only when the version is not on crates.io yet). This lets the
+  GitHub Pages deploy pass the `github-pages` environment's main-only rule.
+
 ## [0.0.8] - 2026-11-24
 
 0.0.7 was never published to crates.io; its changes are included here.
