@@ -94,7 +94,7 @@ pub fn CardPage() -> Element {
                     ("variant", "CardVariant", "Visual variant (Default, Muted, Elevated, Outlined, Ghost)"),
                     ("padding", "Option<String>", "Custom padding size"),
                     ("full_width", "bool", "Full width"),
-                    ("onclick", "Option<EventHandler<MouseEvent>>", "Click handler (makes card interactive)"),
+                    ("on_click", "Option<EventHandler<()>>", "Click handler (makes card interactive)"),
                     ("style", "Option<String>", "Custom inline styles"),
                     ("class", "Option<String>", "Custom CSS classes"),
                     ("overflow_hidden", "bool", "Whether to hide overflow (default: true)"),
@@ -162,7 +162,7 @@ pub fn BadgePage() -> Element {
                     ("variant", "BadgeVariant", "Visual variant"),
                     ("size", "BadgeSize", "Badge size (Sm, Md, Lg)"),
                     ("icon", "Option<String>", "Optional leading icon"),
-                    ("onclick", "Option<EventHandler<MouseEvent>>", "Click handler (makes badge interactive)"),
+                    ("on_click", "Option<EventHandler<()>>", "Click handler (makes badge interactive)"),
                     ("style", "Option<String>", "Custom inline styles"),
                     ("class", "Option<String>", "Custom class name"),
                     ("id", "Option<String>", "Element id"),
@@ -282,7 +282,7 @@ pub fn DialogPage() -> Element {
 
             Section { title: "Basic Dialog",
                 ExampleBox {
-                    Button { variant: ButtonVariant::Primary, onclick: move |_| open.set(true), "Open Dialog" }
+                    Button { variant: ButtonVariant::Primary, on_click: move |_| open.set(true), "Open Dialog" }
 
                     Dialog {
                         open: open(),
@@ -294,8 +294,8 @@ pub fn DialogPage() -> Element {
 
                         DialogFooter {
                             align: DialogFooterAlign::End,
-                            Button { variant: ButtonVariant::Ghost, onclick: move |_| open.set(false), "Cancel" }
-                            Button { variant: ButtonVariant::Primary, onclick: move |_| open.set(false), "Confirm" }
+                            Button { variant: ButtonVariant::Ghost, on_click: move |_| open.set(false), "Cancel" }
+                            Button { variant: ButtonVariant::Primary, on_click: move |_| open.set(false), "Confirm" }
                         }
                     }
                 }
@@ -309,8 +309,8 @@ Dialog {{
     // Content here
     DialogFooter {{
         align: DialogFooterAlign::End,
-        Button {{ onclick: move |_| open.set(false), \"Cancel\" }}
-        Button {{ variant: ButtonVariant::Primary, onclick: move |_| open.set(false), \"Confirm\" }}
+        Button {{ on_click: move |_| open.set(false), \"Cancel\" }}
+        Button {{ variant: ButtonVariant::Primary, on_click: move |_| open.set(false), \"Confirm\" }}
     }}
 }}".to_string() }
             }
@@ -319,7 +319,7 @@ Dialog {{
                 h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "DialogProps" }
                 PropsTable { props: vec![
                     ("open", "bool", "Whether the dialog is open"),
-                    ("on_close", "EventHandler<()>", "Callback when dialog should close"),
+                    ("on_close", "Option<EventHandler<()>>", "Callback when dialog should close"),
                     ("children", "Element", "Dialog content"),
                     ("title", "Option<String>", "Dialog title"),
                     ("description", "Option<String>", "Dialog description"),
@@ -341,12 +341,12 @@ Dialog {{
                 h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "AlertDialogProps" }
                 PropsTable { props: vec![
                     ("open", "bool", "Whether the dialog is open"),
-                    ("on_close", "EventHandler<()>", "Callback when dialog should close"),
-                    ("title", "String", "Dialog title"),
-                    ("description", "String", "Dialog description"),
+                    ("on_close", "Option<EventHandler<()>>", "Callback when dialog should close"),
+                    ("title", "Option<String>", "Dialog title"),
+                    ("description", "Option<String>", "Dialog description"),
                     ("cancel_text", "String", "Cancel button text (default: Cancel)"),
                     ("confirm_text", "String", "Confirm button text (default: Confirm)"),
-                    ("on_confirm", "EventHandler<()>", "Callback when confirmed"),
+                    ("on_confirm", "Option<EventHandler<()>>", "Callback when confirmed"),
                     ("destructive", "bool", "Whether the action is destructive"),
                     ("id", "Option<String>", "Element id"),
                     ("class", "Option<String>", "Custom CSS classes"),
@@ -446,7 +446,7 @@ pub fn DropdownPage() -> Element {
                 PropsTable { props: vec![
                     ("trigger", "Element", "Trigger element"),
                     ("items", "Vec<DropdownMenuItem>", "Menu items"),
-                    ("on_select", "EventHandler<String>", "Callback when an item is selected"),
+                    ("on_select", "Option<EventHandler<String>>", "Callback when an item is selected"),
                     ("align", "DropdownAlign", "Menu alignment (Start, End, Center)"),
                     ("style", "Option<String>", "Custom inline styles"),
                     ("id", "Option<String>", "Element id"),
@@ -869,8 +869,8 @@ pub fn PopoverPage() -> Element {
                             }
                             p { "Here is some content inside the popover panel." }
                             PopoverFooter {
-                                Button { variant: ButtonVariant::Ghost, onclick: move |_| open.set(false), "Cancel" }
-                                Button { variant: ButtonVariant::Primary, onclick: move |_| open.set(false), "Confirm" }
+                                Button { variant: ButtonVariant::Ghost, on_click: move |_| open.set(false), "Cancel" }
+                                Button { variant: ButtonVariant::Primary, on_click: move |_| open.set(false), "Confirm" }
                             }
                         }
                     }
@@ -889,8 +889,8 @@ Popover {
     }
     "Content here"
     PopoverFooter {
-        Button { variant: ButtonVariant::Ghost, onclick: move |_| open.set(false), "Cancel" }
-        Button { variant: ButtonVariant::Primary, onclick: move |_| open.set(false), "Confirm" }
+        Button { variant: ButtonVariant::Ghost, on_click: move |_| open.set(false), "Cancel" }
+        Button { variant: ButtonVariant::Primary, on_click: move |_| open.set(false), "Confirm" }
     }
 }"#.to_string() }
             }
@@ -909,7 +909,7 @@ Popover {
                 ]}
                 h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "PopoverHeaderProps" }
                 PropsTable { props: vec![
-                    ("title", "String", "Header title"),
+                    ("title", "Option<String>", "Header title"),
                     ("description", "Option<String>", "Optional description"),
                     ("id", "Option<String>", "Element id"),
                     ("class", "Option<String>", "Custom CSS classes"),
@@ -940,9 +940,9 @@ pub fn ToastPage() -> Element {
             Section { title: "Toast Variants",
                 ExampleBox {
                     HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap;",
-                        Button { variant: ButtonVariant::Primary, onclick: move |_| toast.show_success("Success!"), "Success Toast" }
-                        Button { variant: ButtonVariant::Secondary, onclick: move |_| toast.show_error("Error occurred"), "Error Toast" }
-                        Button { variant: ButtonVariant::Ghost, onclick: move |_| toast.show_warning("Warning message"), "Warning Toast" }
+                        Button { variant: ButtonVariant::Primary, on_click: move |_| toast.show_success("Success!"), "Success Toast" }
+                        Button { variant: ButtonVariant::Secondary, on_click: move |_| toast.show_error("Error occurred"), "Error Toast" }
+                        Button { variant: ButtonVariant::Ghost, on_click: move |_| toast.show_warning("Warning message"), "Warning Toast" }
                     }
                 }
             }
@@ -959,7 +959,7 @@ pub fn ToastPage() -> Element {
                     ("variant", "ToastVariant", "Toast variant (Info, Success, Warning, Error)"),
                     ("duration_ms", "u64", "Duration before auto-dismiss (default: 5000)"),
                     ("closable", "bool", "Whether to show close button (default: true)"),
-                    ("on_close", "EventHandler<()>", "Close handler"),
+                    ("on_close", "Option<EventHandler<()>>", "Close handler"),
                     ("action", "Option<String>", "Action button text"),
                     ("on_action", "Option<EventHandler<()>>", "Action handler"),
                     ("index", "usize", "Position in stack"),
@@ -1038,7 +1038,7 @@ Combobox {{
                 PropsTable { props: vec![
                     ("options", "Vec<ComboboxOption>", "Available options"),
                     ("value", "Option<String>", "Currently selected value"),
-                    ("on_change", "EventHandler<String>", "Change handler"),
+                    ("on_change", "Option<EventHandler<String>>", "Change handler"),
                     ("placeholder", "Option<String>", "Placeholder text"),
                     ("label", "Option<String>", "Label"),
                     ("disabled", "bool", "Whether the field is disabled"),
@@ -1055,7 +1055,7 @@ Combobox {{
                 PropsTable { props: vec![
                     ("options", "Vec<ComboboxOption>", "Available options"),
                     ("values", "Vec<String>", "Selected values"),
-                    ("on_change", "EventHandler<Vec<String>>", "Change handler"),
+                    ("on_change", "Option<EventHandler<Vec<String>>>", "Change handler"),
                     ("placeholder", "Option<String>", "Placeholder text"),
                     ("label", "Option<String>", "Label"),
                     ("max", "usize", "Maximum selections (default: usize::MAX)"),
@@ -1221,7 +1221,7 @@ Pagination {{
                 PropsTable { props: vec![
                     ("total_pages", "u32", "Total number of pages"),
                     ("current_page", "u32", "Current page (1-indexed, default: 1)"),
-                    ("on_change", "EventHandler<u32>", "Page change handler"),
+                    ("on_change", "Option<EventHandler<u32>>", "Page change handler"),
                     ("sibling_count", "u32", "Number of sibling pages to show (default: 1)"),
                     ("show_first_last", "bool", "Show first/last buttons (default: true)"),
                     ("show_prev_next", "bool", "Show previous/next buttons (default: true)"),
@@ -1234,7 +1234,7 @@ Pagination {{
                 PropsTable { props: vec![
                     ("options", "Vec<u32>", "Available page sizes (default: [10,25,50,100])"),
                     ("value", "u32", "Current page size"),
-                    ("on_change", "EventHandler<u32>", "Change handler"),
+                    ("on_change", "Option<EventHandler<u32>>", "Change handler"),
                     ("label", "Option<String>", "Label"),
                     ("suffix", "Option<String>", "Per page suffix"),
                     ("class", "Option<String>", "Additional CSS classes"),
@@ -1302,7 +1302,7 @@ pub fn ListItemPage() -> Element {
             Section { title: "Props",
                 h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "ListItemProps" }
                 PropsTable { props: vec![
-                    ("title", "String", "Primary text"),
+                    ("title", "Option<String>", "Primary text"),
                     ("description", "Option<String>", "Secondary text/description"),
                     ("leading", "Option<Element>", "Leading element (icon, avatar, checkbox)"),
                     ("trailing", "Option<Element>", "Trailing element (icon, button, meta)"),
@@ -1326,11 +1326,11 @@ pub fn ListItemPage() -> Element {
                 ]}
                 h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "ActionListItemProps" }
                 PropsTable { props: vec![
-                    ("label", "String", "Action label"),
+                    ("label", "Option<String>", "Action label"),
                     ("icon", "Option<String>", "Icon"),
                     ("description", "Option<String>", "Description/help text"),
                     ("shortcut", "Option<String>", "Keyboard shortcut"),
-                    ("on_click", "EventHandler<()>", "Click handler"),
+                    ("on_click", "Option<EventHandler<()>>", "Click handler"),
                     ("disabled", "bool", "Disabled state"),
                     ("destructive", "bool", "Danger/destructive action"),
                     ("class", "Option<String>", "Additional CSS classes"),

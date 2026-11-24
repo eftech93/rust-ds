@@ -51,7 +51,8 @@ pub struct TabsProps {
     /// Currently active tab ID
     pub active_tab: String,
     /// Callback when tab changes
-    pub on_change: EventHandler<String>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<String>>,
     /// Tab content (rendered based on active tab)
     pub children: Element,
     /// Tabs variant
@@ -128,7 +129,8 @@ struct TabButtonProps {
     tab: TabItem,
     is_active: bool,
     variant: TabsVariant,
-    on_click: EventHandler<String>,
+    #[props(default)]
+    on_click: Option<EventHandler<String>>,
 }
 
 #[component]
@@ -209,7 +211,9 @@ fn TabButton(props: TabButtonProps) -> Element {
 
     let handle_click = move |_| {
         if !is_disabled {
-            props.on_click.call(props.tab.id.clone());
+            if let Some(h) = &props.on_click {
+                h.call(props.tab.id.clone());
+            }
         }
     };
 
@@ -304,7 +308,8 @@ pub struct VerticalTabsProps {
     /// Currently active tab ID
     pub active_tab: String,
     /// Callback when tab changes
-    pub on_change: EventHandler<String>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<String>>,
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
@@ -357,7 +362,8 @@ pub fn VerticalTabs(props: VerticalTabsProps) -> Element {
 struct VerticalTabButtonProps {
     tab: TabItem,
     is_active: bool,
-    on_click: EventHandler<String>,
+    #[props(default)]
+    on_click: Option<EventHandler<String>>,
 }
 
 #[component]
@@ -402,7 +408,9 @@ fn VerticalTabButton(props: VerticalTabButtonProps) -> Element {
 
     let handle_click = move |_| {
         if !is_disabled {
-            props.on_click.call(props.tab.id.clone());
+            if let Some(h) = &props.on_click {
+                h.call(props.tab.id.clone());
+            }
         }
     };
 

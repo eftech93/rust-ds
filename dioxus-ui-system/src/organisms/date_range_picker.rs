@@ -56,9 +56,9 @@ pub struct DateRangePickerProps {
     /// Maximum selectable date (YYYY-MM-DD)
     #[props(default)]
     pub max_date: Option<String>,
-    /// Placeholder text
-    #[props(default = "Select date range...".to_string())]
-    pub placeholder: String,
+    /// Placeholder text (defaults to "Select date range...")
+    #[props(default)]
+    pub placeholder: Option<String>,
     /// Whether the picker is disabled
     #[props(default = false)]
     pub disabled: bool,
@@ -215,7 +215,7 @@ pub fn DateRangePicker(props: DateRangePickerProps) -> Element {
         let mut is_open = is_open;
         let mut selecting_start = selecting_start;
 
-        move || {
+        move |_| {
             is_open.set(false);
             selecting_start.set(true);
         }
@@ -253,7 +253,7 @@ pub fn DateRangePicker(props: DateRangePickerProps) -> Element {
                     } else {
                         span {
                             style: "color: {theme.tokens.read().colors.muted.to_rgba()};",
-                            "{props.placeholder}"
+                            {props.placeholder.clone().unwrap_or_else(|| "Select date range...".to_string())}
                         }
                     }
 
@@ -306,9 +306,12 @@ pub struct DateRangePickerDropdownProps {
     pub max_date: Option<String>,
     pub presets: Vec<DateRangePreset>,
     pub selecting_start: bool,
-    pub on_select: EventHandler<String>,
-    pub on_preset_select: EventHandler<(String, String)>,
-    pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub on_select: Option<EventHandler<String>>,
+    #[props(default)]
+    pub on_preset_select: Option<EventHandler<(String, String)>>,
+    #[props(default)]
+    pub on_close: Option<EventHandler<()>>,
     #[props(default)]
     pub id: Option<String>,
     #[props(default)]
@@ -352,7 +355,11 @@ fn DateRangePickerDropdown(props: DateRangePickerDropdownProps) -> Element {
         div {
             class: "date-range-picker-backdrop",
             style: "position: fixed; inset: 0; z-index: 40;",
-            onclick: move |_| props.on_close.call(()),
+            onclick: move |_| {
+                if let Some(h) = &props.on_close {
+                    h.call(());
+                }
+            },
         }
 
         // Dropdown
@@ -385,7 +392,7 @@ fn DateRangePickerDropdown(props: DateRangePickerDropdownProps) -> Element {
                     show_next_nav: true,
                     on_navigate_prev: {
                         let mut left_view = left_view;
-                        move || {
+                        move |_| {
                             let current = left_view();
                             let new_month = if current.month == 1 { 12 } else { current.month - 1 };
                             let new_year = if current.month == 1 { current.year - 1 } else { current.year };
@@ -394,7 +401,7 @@ fn DateRangePickerDropdown(props: DateRangePickerDropdownProps) -> Element {
                     },
                     on_navigate_next: {
                         let mut left_view = left_view;
-                        move || {
+                        move |_| {
                             let current = left_view();
                             let new_month = if current.month == 12 { 1 } else { current.month + 1 };
                             let new_year = if current.month == 12 { current.year + 1 } else { current.year };
@@ -414,10 +421,9 @@ fn DateRangePickerDropdown(props: DateRangePickerDropdownProps) -> Element {
                     selecting_start: props.selecting_start,
                     show_prev_nav: false,
                     show_next_nav: true,
-                    on_navigate_prev: move || {},
                     on_navigate_next: {
                         let mut left_view = left_view;
-                        move || {
+                        move |_| {
                             let current = left_view();
                             let new_month = if current.month == 12 { 1 } else { current.month + 1 };
                             let new_year = if current.month == 12 { current.year + 1 } else { current.year };
@@ -446,7 +452,8 @@ fn get_dropdown_style() -> String {
 #[derive(Props, Clone, PartialEq)]
 pub struct DateRangePresetsProps {
     pub presets: Vec<DateRangePreset>,
-    pub on_preset_select: EventHandler<(String, String)>,
+    #[props(default)]
+    pub on_preset_select: Option<EventHandler<(String, String)>>,
     #[props(default)]
     pub id: Option<String>,
     #[props(default)]
@@ -483,7 +490,8 @@ fn DateRangePresets(props: DateRangePresetsProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct PresetButtonProps {
     pub preset: DateRangePreset,
-    pub on_preset_select: EventHandler<(String, String)>,
+    #[props(default)]
+    pub on_preset_select: Option<EventHandler<(String, String)>>,
     #[props(default)]
     pub id: Option<String>,
     #[props(default)]
@@ -509,7 +517,9 @@ fn PresetButton(props: PresetButtonProps) -> Element {
             style: "padding: 6px 12px; font-size: 12px; font-weight: 500; color: {theme.tokens.read().colors.primary.to_rgba()}; background: {theme.tokens.read().colors.primary.to_rgba()}15; border: none; border-radius: 6px; cursor: pointer; transition: all 0.15s ease; {style}",
             onclick: move |_| {
                 let (start, end) = (preset.get_range)();
-                props.on_preset_select.call((start, end));
+                if let Some(h) = &props.on_preset_select {
+                    h.call((start, end));
+                }
             },
             "{props.preset.label}"
         }
@@ -520,8 +530,10 @@ fn PresetButton(props: PresetButtonProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub(crate) struct DateRangeFooterProps {
     pub today: Date,
-    pub on_select: EventHandler<String>,
-    pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub on_select: Option<EventHandler<String>>,
+    #[props(default)]
+    pub on_close: Option<EventHandler<()>>,
 }
 
 #[component]
@@ -540,7 +552,11 @@ fn DateRangeFooter(props: DateRangeFooterProps) -> Element {
             button {
                 type: "button",
                 style: "font-size: 12px; color: {theme.tokens.read().colors.muted.to_rgba()}; background: none; border: none; cursor: pointer;",
-                onclick: move |_| props.on_select.call(today_str.clone()),
+                onclick: move |_| {
+                    if let Some(h) = &props.on_select {
+                        h.call(today_str.clone());
+                    }
+                },
                 "Today"
             }
 
@@ -548,7 +564,11 @@ fn DateRangeFooter(props: DateRangeFooterProps) -> Element {
             button {
                 type: "button",
                 style: "font-size: 12px; color: {theme.tokens.read().colors.foreground.to_rgba()}; background: none; border: none; cursor: pointer; font-weight: 500;",
-                onclick: move |_| props.on_close.call(()),
+                onclick: move |_| {
+                    if let Some(h) = &props.on_close {
+                        h.call(());
+                    }
+                },
                 "Done"
             }
         }
@@ -566,9 +586,12 @@ pub(crate) struct CalendarProps {
     pub selecting_start: bool,
     pub show_prev_nav: bool,
     pub show_next_nav: bool,
-    pub on_navigate_prev: EventHandler<()>,
-    pub on_navigate_next: EventHandler<()>,
-    pub on_select: EventHandler<String>,
+    #[props(default)]
+    pub on_navigate_prev: Option<EventHandler<()>>,
+    #[props(default)]
+    pub on_navigate_next: Option<EventHandler<()>>,
+    #[props(default)]
+    pub on_select: Option<EventHandler<String>>,
 }
 
 #[component]
@@ -598,7 +621,11 @@ fn Calendar(props: CalendarProps) -> Element {
                     button {
                         type: "button",
                         style: "background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px 8px; border-radius: 4px;",
-                        onclick: move |_| props.on_navigate_prev.call(()),
+                        onclick: move |_| {
+                            if let Some(h) = &props.on_navigate_prev {
+                                h.call(());
+                            }
+                        },
                         "◀"
                     }
                 } else {
@@ -614,7 +641,11 @@ fn Calendar(props: CalendarProps) -> Element {
                     button {
                         type: "button",
                         style: "background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px 8px; border-radius: 4px;",
-                        onclick: move |_| props.on_navigate_next.call(()),
+                        onclick: move |_| {
+                            if let Some(h) = &props.on_navigate_next {
+                                h.call(());
+                            }
+                        },
                         "▶"
                     }
                 } else {
@@ -703,7 +734,9 @@ fn Calendar(props: CalendarProps) -> Element {
                                 style: "aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 14px; border-radius: {border_radius}; background: {bg_color}; color: {text_color}; cursor: {cursor}; border: none; font-weight: {font_weight};",
                                 disabled: is_disabled,
                                 onclick: move |_| {
-                                    on_select.call(format!("{:04}-{:02}-{:02}", year_value, month_value, day_value));
+                                    if let Some(h) = &on_select {
+                                        h.call(format!("{:04}-{:02}-{:02}", year_value, month_value, day_value));
+                                    }
                                 },
                                 "{day}"
                             }

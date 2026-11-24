@@ -174,10 +174,12 @@ struct TreeNodeProps {
     /// Currently selected node ID
     selected_id: Option<String>,
     /// Callback when node is selected
+    #[props(default)]
     on_select: Option<EventHandler<String>>,
     /// List of expanded node IDs
     expanded_ids: Vec<String>,
     /// Callback when expand/collapse is toggled
+    #[props(default)]
     on_toggle_expand: Option<EventHandler<String>>,
     /// Whether to show connector lines
     show_lines: bool,

@@ -169,7 +169,8 @@ pub struct CommandInputProps {
     #[props(default)]
     pub value: String,
     /// Callback when value changes
-    pub on_value_change: EventHandler<String>,
+    #[props(default)]
+    pub on_value_change: Option<EventHandler<String>>,
     /// Element id
     #[props(default)]
     pub id: Option<String>,
@@ -265,7 +266,9 @@ pub fn CommandInput(props: CommandInputProps) -> Element {
                     let new_value = e.value();
                     context.value.set(new_value.clone());
                     context.highlighted_index.set(0);
-                    props.on_value_change.call(new_value);
+                    if let Some(handler) = &props.on_value_change {
+                        handler.call(new_value);
+                    }
                 },
                 onkeydown: handle_key_down,
                 onfocus: move |_| context.focused.set(true),
@@ -391,7 +394,8 @@ pub struct CommandItemProps {
     /// Search value for filtering
     pub value: String,
     /// Callback when item is selected
-    pub on_select: EventHandler<()>,
+    #[props(default)]
+    pub on_select: Option<EventHandler<()>>,
     /// Child elements
     pub children: Element,
     /// Whether the item is disabled
@@ -450,7 +454,9 @@ pub fn CommandItem(props: CommandItemProps) -> Element {
             return;
         }
         if *context.highlighted_index.peek() == *item_index.peek() {
-            on_select.call(());
+            if let Some(handler) = &on_select {
+                handler.call(());
+            }
             context.on_item_select.call(());
         }
     });
@@ -491,7 +497,9 @@ pub fn CommandItem(props: CommandItemProps) -> Element {
 
     let handle_click = move |_| {
         if !props.disabled {
-            props.on_select.call(());
+            if let Some(handler) = &props.on_select {
+                handler.call(());
+            }
             context.on_item_select.call(());
         }
     };

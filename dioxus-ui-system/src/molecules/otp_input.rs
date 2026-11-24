@@ -17,13 +17,14 @@ pub struct OtpInputProps {
     #[props(default)]
     pub value: String,
     /// Change handler called when the full code is entered or modified
-    pub on_change: EventHandler<String>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<String>>,
     /// Disabled state
     #[props(default)]
     pub disabled: bool,
-    /// Error state styling
+    /// Error message (shows error state and renders the message when `Some`)
     #[props(default)]
-    pub error: bool,
+    pub error: Option<String>,
     /// Mask input (show • instead of numbers)
     #[props(default)]
     pub mask: bool,
@@ -57,9 +58,9 @@ pub struct OtpInputProps {
 ///         length: 6,
 ///         value: code(),
 ///         on_change: move |v| code.set(v),
-///         on_complete: Some(EventHandler::new(move |v: String| {
+///         on_complete: move |v: String| {
 ///             println!("Code complete: {}", v);
-///         })),
+///         },
 ///     }
 /// }
 /// ```
@@ -67,7 +68,7 @@ pub struct OtpInputProps {
 pub fn OtpInput(props: OtpInputProps) -> Element {
     let length = props.length.clamp(1, 12);
     let disabled = props.disabled;
-    let error = props.error;
+    let has_error = props.error.is_some();
     let mask = props.mask;
     let auto_focus = props.auto_focus;
 
@@ -93,7 +94,7 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
             .rounded(&t.radius, "md")
             .border(
                 1,
-                if error {
+                if has_error {
                     &t.colors.destructive
                 } else {
                     &t.colors.border
@@ -122,7 +123,7 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
         };
 
         // Error state shadow
-        if error {
+        if has_error {
             Style {
                 box_shadow: Some(format!("0 0 0 1px {}", t.colors.destructive.to_rgba())),
                 ..base
@@ -162,6 +163,15 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
             }
         }
     };
+
+    // Error message style
+    let error_style = use_style(|t| {
+        Style::new()
+            .mt(&t.spacing, "xs")
+            .font_size(12)
+            .text_color(&t.colors.destructive)
+            .build()
+    });
 
     let id = props.id.clone().unwrap_or_default();
 
@@ -209,7 +219,7 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                             autofocus: should_auto_focus,
                             "aria-label": "{aria_label}",
                             "aria-disabled": disabled,
-                            "aria-invalid": error,
+                            "aria-invalid": has_error,
                             style: "{input_style} {focus_style}",
                             oninput: move |e| {
                                 let val = e.value();
@@ -263,7 +273,9 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                                     }
                                 };
 
-                                on_change_clone.call(new_code.clone());
+                                if let Some(handler) = &on_change_clone {
+                                    handler.call(new_code.clone());
+                                }
                                 check_complete(&new_code);
                             },
                             onkeydown: move |e: Event<dioxus::html::KeyboardData>| {
@@ -287,7 +299,9 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                                     if current_value_char != ' ' && current_value_char != '\0' {
                                         // Clear current value
                                         let new_code = clear_value_at(idx, &current_value_clone2);
-                                        on_change_clone2.call(new_code);
+                                        if let Some(handler) = &on_change_clone2 {
+                                            handler.call(new_code);
+                                        }
                                     }
                                 }
                             },
@@ -302,6 +316,14 @@ pub fn OtpInput(props: OtpInputProps) -> Element {
                         }
                     }
                 }
+            }
+        }
+
+        if let Some(error_msg) = props.error.clone() {
+            span {
+                role: "alert",
+                style: "{error_style} display: block; text-align: center;",
+                "{error_msg}"
             }
         }
     }

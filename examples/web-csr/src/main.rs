@@ -123,14 +123,14 @@ fn ShowcaseView() -> Element {
                 Button {
                     variant: if current_tab() == "components" { ButtonVariant::Primary } else { ButtonVariant::Ghost },
                     size: ButtonSize::Sm,
-                    onclick: move |_| current_tab.set("components".to_string()),
+                    on_click: move |_| current_tab.set("components".to_string()),
                     "Components"
                 }
 
                 Button {
                     variant: if current_tab() == "layouts" { ButtonVariant::Primary } else { ButtonVariant::Ghost },
                     size: ButtonSize::Sm,
-                    onclick: move |_| current_tab.set("layouts".to_string()),
+                    on_click: move |_| current_tab.set("layouts".to_string()),
                     "Layouts"
                 }
             }

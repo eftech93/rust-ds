@@ -225,7 +225,9 @@ pub fn Kanban(props: KanbanProps) -> Element {
 pub struct KanbanColumnViewProps {
     pub column: KanbanColumn,
     pub width: String,
+    #[props(default)]
     pub on_card_click: Option<EventHandler<String>>,
+    #[props(default)]
     pub on_add_card: Option<EventHandler<String>>,
     pub show_card_count: bool,
     pub card_hover: bool,
@@ -359,7 +361,7 @@ pub fn KanbanColumnView(props: KanbanColumnViewProps) -> Element {
                         variant: ButtonVariant::Ghost,
                         size: ButtonSize::Sm,
                         full_width: true,
-                        onclick: move |_| on_add.call(column_id.clone()),
+                        on_click: move |_| on_add.call(column_id.clone()),
 
                         Icon {
                             name: "plus".to_string(),
@@ -378,6 +380,7 @@ pub fn KanbanColumnView(props: KanbanColumnViewProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct KanbanCardViewProps {
     pub card: KanbanCard,
+    #[props(default)]
     pub on_click: Option<EventHandler<String>>,
     pub hover: bool,
     #[props(default)]
@@ -560,7 +563,8 @@ pub fn KanbanCardView(props: KanbanCardViewProps) -> Element {
 /// Simple tag for kanban cards
 #[derive(Props, Clone, PartialEq)]
 pub struct KanbanTagProps {
-    pub label: String,
+    #[props(default)]
+    pub label: Option<String>,
     #[props(default)]
     pub id: Option<String>,
     #[props(default)]
@@ -571,9 +575,10 @@ pub struct KanbanTagProps {
 
 #[component]
 pub fn KanbanTag(props: KanbanTagProps) -> Element {
+    let label = props.label.clone().unwrap_or_default();
+
     // Generate a consistent color based on the label
-    let color_hash = props
-        .label
+    let color_hash = label
         .bytes()
         .fold(0u32, |acc, b| acc.wrapping_add(b as u32));
     let hue = color_hash % 360;
@@ -589,7 +594,7 @@ pub fn KanbanTag(props: KanbanTagProps) -> Element {
             id: "{id}",
             class: "{class}",
             style: "display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; background: {bg_color}; color: {text_color}; white-space: nowrap; {style}",
-            "{props.label}"
+            "{label}"
         }
     }
 }
@@ -597,6 +602,7 @@ pub fn KanbanTag(props: KanbanTagProps) -> Element {
 /// Add column button component
 #[derive(Props, Clone, PartialEq)]
 pub struct AddColumnButtonProps {
+    #[props(default)]
     pub on_add_column: Option<EventHandler<()>>,
     #[props(default)]
     pub id: Option<String>,

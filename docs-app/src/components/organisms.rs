@@ -110,7 +110,7 @@ pub fn HeaderPage() -> Element {
                 h4 { "UserMenuDropdownProps" }
                 PropsTable { props: vec![
                     ("items", "Vec", ""),
-                    ("on_close", "EventHandler", ""),
+                    ("on_close", "Option<EventHandler<()>>", ""),
                     ("id", "Option", ""),
                     ("class", "Option", ""),
                     ("style", "Option", "")
@@ -118,7 +118,7 @@ pub fn HeaderPage() -> Element {
                 h4 { "UserMenuItemViewProps" }
                 PropsTable { props: vec![
                     ("item", "UserMenuItem", ""),
-                    ("on_close", "EventHandler", ""),
+                    ("on_close", "Option<EventHandler<()>>", ""),
                     ("id", "Option", ""),
                     ("class", "Option", ""),
                     ("style", "Option", "")
@@ -140,8 +140,8 @@ pub fn LayoutPage() -> Element {
             Section { title: "Layout Types",
                 ExampleBox {
                     HStack { gap: SpacingSize::Sm, style: "margin-bottom: 16px;",
-                        Button { variant: if layout_type() == LayoutType::Sidebar { ButtonVariant::Primary } else { ButtonVariant::Secondary }, onclick: move |_| layout_type.set(LayoutType::Sidebar), "Sidebar" }
-                        Button { variant: if layout_type() == LayoutType::TopNav { ButtonVariant::Primary } else { ButtonVariant::Secondary }, onclick: move |_| layout_type.set(LayoutType::TopNav), "TopNav" }
+                        Button { variant: if layout_type() == LayoutType::Sidebar { ButtonVariant::Primary } else { ButtonVariant::Secondary }, on_click: move |_| layout_type.set(LayoutType::Sidebar), "Sidebar" }
+                        Button { variant: if layout_type() == LayoutType::TopNav { ButtonVariant::Primary } else { ButtonVariant::Secondary }, on_click: move |_| layout_type.set(LayoutType::TopNav), "TopNav" }
                     }
 
                     Box { style: "height: 300px; border: 1px solid rgb(226,232,240); border-radius: 8px; overflow: hidden;",
@@ -252,7 +252,7 @@ Tabs {{
                 PropsTable { props: vec![
                     ("tabs", "Vec", "Tab items"),
                     ("active_tab", "String", "Currently active tab ID"),
-                    ("on_change", "EventHandler", "Callback when tab changes"),
+                    ("on_change", "Option<EventHandler<String>>", "Callback when tab changes"),
                     ("children", "Element", "Tab content (rendered based on active tab)"),
                     ("variant", "TabsVariant", "Tabs variant"),
                     ("style", "Option", "Custom inline styles"),
@@ -270,7 +270,7 @@ Tabs {{
                 PropsTable { props: vec![
                     ("tabs", "Vec", "Tab items"),
                     ("active_tab", "String", "Currently active tab ID"),
-                    ("on_change", "EventHandler", "Callback when tab changes"),
+                    ("on_change", "Option<EventHandler<String>>", "Callback when tab changes"),
                     ("style", "Option", "Custom inline styles"),
                     ("id", "Option", ""),
                     ("class", "Option", "")
@@ -335,7 +335,7 @@ Accordion {{
                 PropsTable { props: vec![
                     ("items", "Vec", "Accordion items"),
                     ("expanded", "Vec", "Currently expanded item IDs (for single: one item, for multiple: many)"),
-                    ("on_change", "EventHandler<Vec>", "Callback when expanded items change"),
+                    ("on_change", "Option<EventHandler<Vec<String>>>", "Callback when expanded items change"),
                     ("multiple", "bool", "Whether multiple items can be expanded"),
                     ("collapsible", "bool", "Whether items can be collapsed"),
                     ("style", "Option", "Custom inline styles"),
@@ -344,7 +344,7 @@ Accordion {{
                 ] }
                 h4 { "AccordionItem2Props" }
                 PropsTable { props: vec![
-                    ("title", "String", "Item title"),
+                    ("title", "Option<String>", "Item title"),
                     ("children", "Element", "Item content"),
                     ("default_expanded", "bool", "Whether item is expanded"),
                     ("style", "Option", "Custom inline styles"),
@@ -431,10 +431,10 @@ pub fn CardsPage() -> Element {
             Section { title: "Props",
                 h4 { "ActionCardProps" }
                 PropsTable { props: vec![
-                    ("title", "String", "Card title"),
-                    ("description", "String", "Card description"),
+                    ("title", "Option<String>", "Card title"),
+                    ("description", "Option<String>", "Card description"),
                     ("action_label", "String", "Action button text"),
-                    ("on_action", "EventHandler", "Action button callback"),
+                    ("on_action", "Option<EventHandler<()>>", "Action button callback"),
                     ("icon", "Option", "Optional icon name"),
                     ("variant", "CardVariant", "Card variant"),
                     ("badge", "Option", "Optional badge"),
@@ -444,12 +444,12 @@ pub fn CardsPage() -> Element {
                 ] }
                 h4 { "DualActionCardProps" }
                 PropsTable { props: vec![
-                    ("title", "String", "Card title"),
-                    ("description", "String", "Card description"),
+                    ("title", "Option<String>", "Card title"),
+                    ("description", "Option<String>", "Card description"),
                     ("primary_label", "String", "Primary action label"),
                     ("secondary_label", "String", "Secondary action label"),
-                    ("on_primary", "EventHandler", "Primary action callback"),
-                    ("on_secondary", "EventHandler", "Secondary action callback"),
+                    ("on_primary", "Option<EventHandler<()>>", "Primary action callback"),
+                    ("on_secondary", "Option<EventHandler<()>>", "Secondary action callback"),
                     ("icon", "Option", "Optional icon"),
                     ("id", "Option", "Element id"),
                     ("class", "Option", "Custom CSS classes"),
@@ -459,8 +459,8 @@ pub fn CardsPage() -> Element {
                 PropsTable { props: vec![
                     ("image_url", "String", "Image URL"),
                     ("image_alt", "String", "Image alt text"),
-                    ("title", "String", "Card title"),
-                    ("description", "String", "Card description"),
+                    ("title", "Option<String>", "Card title"),
+                    ("description", "Option<String>", "Card description"),
                     ("action_label", "Option", "Optional action"),
                     ("on_action", "Option<EventHandler>", "Action callback"),
                     ("aspect_ratio", "String", "Image aspect ratio (default: 16/9)"),
@@ -471,12 +471,12 @@ pub fn CardsPage() -> Element {
                 h4 { "ImageActionCardProps" }
                 PropsTable { props: vec![
                     ("image_url", "String", "Image URL"),
-                    ("title", "String", "Card title"),
-                    ("description", "String", "Card description"),
+                    ("title", "Option<String>", "Card title"),
+                    ("description", "Option<String>", "Card description"),
                     ("primary_label", "String", "Primary action"),
                     ("secondary_label", "String", "Secondary action"),
-                    ("on_primary", "EventHandler", "Primary callback"),
-                    ("on_secondary", "EventHandler", "Secondary callback"),
+                    ("on_primary", "Option<EventHandler<()>>", "Primary callback"),
+                    ("on_secondary", "Option<EventHandler<()>>", "Secondary callback"),
                     ("badge", "Option", "Optional badge on image"),
                     ("id", "Option", "Element id"),
                     ("class", "Option", "Custom CSS classes"),
@@ -503,7 +503,7 @@ pub fn CardsPage() -> Element {
                     ("description", "Option", "Plan description"),
                     ("features", "Vec", "List of features"),
                     ("cta_label", "String", "CTA button label"),
-                    ("on_cta", "EventHandler", "CTA callback"),
+                    ("on_cta", "Option<EventHandler<()>>", "CTA callback"),
                     ("recommended", "bool", "Is this the recommended plan"),
                     ("id", "Option", "Element id"),
                     ("class", "Option", "Custom CSS classes"),
@@ -512,8 +512,8 @@ pub fn CardsPage() -> Element {
                 h4 { "HorizontalCardProps" }
                 PropsTable { props: vec![
                     ("image_url", "String", "Image URL"),
-                    ("title", "String", "Card title"),
-                    ("description", "String", "Card description"),
+                    ("title", "Option<String>", "Card title"),
+                    ("description", "Option<String>", "Card description"),
                     ("action_label", "Option", "Optional action"),
                     ("on_action", "Option<EventHandler>", "Action callback"),
                     ("id", "Option", "Element id"),
@@ -522,7 +522,7 @@ pub fn CardsPage() -> Element {
                 ] }
                 h4 { "NotificationCardProps" }
                 PropsTable { props: vec![
-                    ("title", "String", "Notification title"),
+                    ("title", "Option<String>", "Notification title"),
                     ("message", "String", "Notification message"),
                     ("notification_type", "NotificationType", "Notification type"),
                     ("timestamp", "Option", "Timestamp"),
@@ -534,7 +534,7 @@ pub fn CardsPage() -> Element {
                 ] }
                 h4 { "StatCardProps" }
                 PropsTable { props: vec![
-                    ("label", "String", "Stat label"),
+                    ("label", "Option<String>", "Stat label"),
                     ("value", "String", "Stat value"),
                     ("change", "Option", "Change indicator (e.g., \"+12%\")"),
                     ("change_positive", "Option", "Is the change positive"),
@@ -546,7 +546,7 @@ pub fn CardsPage() -> Element {
                 ] }
                 h4 { "ExpandableCardProps" }
                 PropsTable { props: vec![
-                    ("title", "String", "Card title"),
+                    ("title", "Option<String>", "Card title"),
                     ("preview", "Element", "Preview content (always visible)"),
                     ("expanded_content", "Element", "Expanded content (shown when expanded)"),
                     ("default_expanded", "bool", "Initial expanded state"),
@@ -558,7 +558,7 @@ pub fn CardsPage() -> Element {
                 PropsTable { props: vec![
                     ("media_url", "String", "Media URL (image or video thumbnail)"),
                     ("media_type", "MediaType", "Media type indicator"),
-                    ("title", "String", "Card title"),
+                    ("title", "Option<String>", "Card title"),
                     ("creator", "Option", "Creator/Author"),
                     ("duration", "Option", "Duration (for video/audio)"),
                     ("on_like", "Option<EventHandler>", "Like callback"),
@@ -1028,7 +1028,7 @@ DataTable {{
                 PropsTable { props: vec![
                     ("current_page", "usize", ""),
                     ("total_pages", "usize", ""),
-                    ("on_page_change", "EventHandler", ""),
+                    ("on_page_change", "Option<EventHandler<usize>>", ""),
                     ("show_first_last", "bool", ""),
                     ("id", "Option", ""),
                     ("class", "Option", ""),
@@ -1222,8 +1222,8 @@ Wizard {{
                 PropsTable { props: vec![
                     ("steps", "Vec", "List of steps"),
                     ("active_step", "usize", "Current active step"),
-                    ("on_step_change", "EventHandler", "Step change callback"),
-                    ("on_finish", "EventHandler", "Finish callback"),
+                    ("on_step_change", "Option<EventHandler<usize>>", "Step change callback"),
+                    ("on_finish", "Option<EventHandler<()>>", "Finish callback"),
                     ("on_cancel", "Option<EventHandler>", "Cancel callback"),
                     ("title", "Option", "Wizard title"),
                     ("show_progress", "bool", "Show progress summary"),
@@ -1716,7 +1716,7 @@ ChartTooltip {{
                     ("show_last_point", "bool", "Show current value indicator"),
                     ("show_min_max", "bool", "Show min/max indicators"),
                     ("animation", "ChartAnimation", "Animation configuration"),
-                    ("onclick", "Option<EventHandler>", "Click handler"),
+                    ("on_click", "Option<EventHandler<()>>", "Click handler"),
                     ("style", "Option", "Custom styles"),
                     ("id", "Option", ""),
                     ("class", "Option", "")
@@ -1935,7 +1935,7 @@ pub fn HeroPage() -> Element {
             Section { title: "Props",
                 h4 { "HeroProps" }
                 PropsTable { props: vec![
-                    ("title", "String", "Main headline"),
+                    ("title", "Option<String>", "Main headline"),
                     ("subtitle", "Option", "Subtitle/description"),
                     ("background", "Option", "Background element (image, gradient, video)"),
                     ("primary_cta", "Option", "Primary CTA button"),
@@ -2197,8 +2197,8 @@ FileUpload {{
                     ("max_files", "usize", "Maximum number of files"),
                     ("multiple", "bool", "Multiple files allowed"),
                     ("single", "bool", "Single file mode (alias for !multiple)"),
-                    ("on_upload", "EventHandler<Vec>", "Upload handler"),
-                    ("on_change", "Option<EventHandler<Vec>>", "Change handler (called when files are selected)"),
+                    ("on_upload", "Option<EventHandler<Vec<UploadedFile>>>", "Upload handler"),
+                    ("on_change", "Option<EventHandler<Vec<UploadedFile>>>", "Change handler (called when files are selected)"),
                     ("label", "Option", "Label"),
                     ("helper_text", "Option", "Helper text"),
                     ("error", "Option", "Error message"),
@@ -2212,7 +2212,7 @@ FileUpload {{
                 h4 { "FileUploadItemProps" }
                 PropsTable { props: vec![
                     ("file", "UploadedFile", ""),
-                    ("on_remove", "EventHandler", ""),
+                    ("on_remove", "Option<EventHandler<()>>", ""),
                     ("id", "Option", ""),
                     ("class", "Option", ""),
                     ("style", "Option", "")
@@ -2359,7 +2359,7 @@ pub fn ConfirmationDialogPage() -> Element {
             Section { title: "Delete Confirmation",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md, style: "align-items: flex-start;",
-                        Button { variant: ButtonVariant::Destructive, onclick: move |_| show_delete.set(true), "Delete Item" }
+                        Button { variant: ButtonVariant::Destructive, on_click: move |_| show_delete.set(true), "Delete Item" }
 
                         DeleteConfirmDialog {
                             open: show_delete(),
@@ -2375,7 +2375,7 @@ pub fn ConfirmationDialogPage() -> Element {
             Section { title: "Unsaved Changes",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md, style: "align-items: flex-start;",
-                        Button { onclick: move |_| show_unsaved.set(true), "Show Unsaved Dialog" }
+                        Button { on_click: move |_| show_unsaved.set(true), "Show Unsaved Dialog" }
 
                         UnsavedChangesDialog {
                             open: show_unsaved(),
@@ -2390,7 +2390,7 @@ pub fn ConfirmationDialogPage() -> Element {
             Section { title: "Sign Out",
                 ExampleBox {
                     VStack { gap: SpacingSize::Md, style: "align-items: flex-start;",
-                        Button { onclick: move |_| show_signout.set(true), "Sign Out" }
+                        Button { on_click: move |_| show_signout.set(true), "Sign Out" }
 
                         SignOutDialog {
                             open: show_signout(),
@@ -2417,14 +2417,14 @@ DeleteConfirmDialog {{
                 h4 { "ConfirmationDialogProps" }
                 PropsTable { props: vec![
                     ("open", "bool", "Whether the dialog is open"),
-                    ("on_close", "EventHandler", "On close handler"),
-                    ("title", "String", "Dialog title"),
+                    ("on_close", "Option<EventHandler<()>>", "On close handler"),
+                    ("title", "Option<String>", "Dialog title"),
                     ("message", "String", "Confirmation message"),
                     ("confirm_text", "Option", "Confirm button text"),
                     ("cancel_text", "Option", "Cancel button text"),
                     ("variant", "ConfirmVariant", "Confirm button variant"),
                     ("icon", "Option", "Icon"),
-                    ("on_confirm", "EventHandler", "On confirm handler"),
+                    ("on_confirm", "Option<EventHandler<()>>", "On confirm handler"),
                     ("loading", "bool", "Loading state"),
                     ("class", "Option", "Additional CSS classes"),
                     ("id", "Option", "Element id"),
@@ -2433,10 +2433,10 @@ DeleteConfirmDialog {{
                 h4 { "DeleteConfirmDialogProps" }
                 PropsTable { props: vec![
                     ("open", "bool", ""),
-                    ("on_close", "EventHandler", ""),
+                    ("on_close", "Option<EventHandler<()>>", ""),
                     ("title", "Option", ""),
                     ("item_name", "String", ""),
-                    ("on_confirm", "EventHandler", ""),
+                    ("on_confirm", "Option<EventHandler<()>>", ""),
                     ("loading", "bool", ""),
                     ("id", "Option", "Element id"),
                     ("class", "Option", "Custom CSS classes"),
@@ -2445,9 +2445,9 @@ DeleteConfirmDialog {{
                 h4 { "UnsavedChangesDialogProps" }
                 PropsTable { props: vec![
                     ("open", "bool", ""),
-                    ("on_close", "EventHandler", ""),
-                    ("on_save", "EventHandler", ""),
-                    ("on_discard", "EventHandler", ""),
+                    ("on_close", "Option<EventHandler<()>>", ""),
+                    ("on_save", "Option<EventHandler<()>>", ""),
+                    ("on_discard", "Option<EventHandler<()>>", ""),
                     ("id", "Option", "Element id"),
                     ("class", "Option", "Custom CSS classes"),
                     ("style", "Option", "Custom inline styles")
@@ -2455,8 +2455,8 @@ DeleteConfirmDialog {{
                 h4 { "SignOutDialogProps" }
                 PropsTable { props: vec![
                     ("open", "bool", ""),
-                    ("on_close", "EventHandler", ""),
-                    ("on_confirm", "EventHandler", ""),
+                    ("on_close", "Option<EventHandler<()>>", ""),
+                    ("on_confirm", "Option<EventHandler<()>>", ""),
                     ("id", "Option", "Element id"),
                     ("class", "Option", "Custom CSS classes"),
                     ("style", "Option", "Custom inline styles")

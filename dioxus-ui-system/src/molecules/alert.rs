@@ -165,7 +165,8 @@ pub fn Alert(props: AlertProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 struct AlertIconProps {
     name: String,
-    style: String,
+    #[props(default)]
+    style: Option<String>,
     /// Element id
     #[props(default)]
     pub id: Option<String>,
@@ -176,6 +177,7 @@ struct AlertIconProps {
 
 #[component]
 fn AlertIcon(props: AlertIconProps) -> Element {
+    let icon_style = props.style.clone().unwrap_or_default();
     // Map icon names to SVG paths
     let svg_content = match props.name.as_str() {
         "alert-triangle" => rsx! {
@@ -188,7 +190,7 @@ fn AlertIcon(props: AlertIconProps) -> Element {
                 stroke_width: "2",
                 stroke_linecap: "round",
                 stroke_linejoin: "round",
-                style: "{props.style}",
+                style: "{icon_style}",
                 path { d: "m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" }
                 line { x1: "12", y1: "9", x2: "12", y2: "13" }
                 line { x1: "12", y1: "17", x2: "12.01", y2: "17" }
@@ -202,7 +204,7 @@ fn AlertIcon(props: AlertIconProps) -> Element {
                 stroke_width: "2",
                 stroke_linecap: "round",
                 stroke_linejoin: "round",
-                style: "{props.style}",
+                style: "{icon_style}",
                 path { d: "M22 11.08V12a10 10 0 1 1-5.93-9.14" }
                 polyline { points: "22 4 12 14.01 9 11.01" }
             }
@@ -215,7 +217,7 @@ fn AlertIcon(props: AlertIconProps) -> Element {
                 stroke_width: "2",
                 stroke_linecap: "round",
                 stroke_linejoin: "round",
-                style: "{props.style}",
+                style: "{icon_style}",
                 circle { cx: "12", cy: "12", r: "10" }
                 line { x1: "12", y1: "16", x2: "12", y2: "12" }
                 line { x1: "12", y1: "8", x2: "12.01", y2: "8" }

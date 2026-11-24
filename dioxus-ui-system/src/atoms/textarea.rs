@@ -27,12 +27,9 @@ pub struct TextAreaProps {
     /// Whether the textarea is read-only
     #[props(default)]
     pub readonly: bool,
-    /// Whether the textarea has an error
+    /// Error message; `None` means no error
     #[props(default)]
-    pub error: bool,
-    /// Error message
-    #[props(default)]
-    pub error_message: Option<String>,
+    pub error: Option<String>,
     /// Whether the field is required
     #[props(default)]
     pub required: bool,
@@ -57,7 +54,7 @@ pub fn TextArea(props: TextAreaProps) -> Element {
     let mut is_focused = use_signal(|| false);
 
     let disabled = props.disabled;
-    let error = props.error;
+    let error = props.error.is_some();
 
     let textarea_style = use_style(move |t| {
         let base = Style::new()
@@ -137,12 +134,10 @@ pub fn TextArea(props: TextAreaProps) -> Element {
             }
 
             // Error message or character count
-            if error {
-                if let Some(err_msg) = props.error_message.clone() {
-                    div {
-                        style: "margin-top: 4px; color: #ef4444; font-size: 12px;",
-                        "{err_msg}"
-                    }
+            if let Some(err_msg) = props.error.clone() {
+                div {
+                    style: "margin-top: 4px; color: #ef4444; font-size: 12px;",
+                    "{err_msg}"
                 }
             } else if show_count {
                 div {

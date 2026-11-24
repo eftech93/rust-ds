@@ -51,7 +51,8 @@ pub struct ToastProps {
     #[props(default = true)]
     pub closable: bool,
     /// Close handler
-    pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub on_close: Option<EventHandler<()>>,
     /// Action button text
     #[props(default)]
     pub action: Option<String>,
@@ -84,7 +85,9 @@ pub fn Toast(props: ToastProps) -> Element {
     let handle_close = {
         let on_close = props.on_close;
         move |_| {
-            on_close.call(());
+            if let Some(handler) = &on_close {
+                handler.call(());
+            }
         }
     };
 

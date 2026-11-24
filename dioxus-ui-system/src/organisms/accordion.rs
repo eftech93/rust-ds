@@ -49,7 +49,8 @@ pub struct AccordionProps {
     /// Currently expanded item IDs (for single: one item, for multiple: many)
     pub expanded: Vec<String>,
     /// Callback when expanded items change
-    pub on_change: EventHandler<Vec<String>>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<Vec<String>>>,
     /// Whether multiple items can be expanded
     #[props(default)]
     pub multiple: bool,
@@ -112,7 +113,8 @@ struct AccordionSectionProps {
     is_last: bool,
     multiple: bool,
     collapsible: bool,
-    on_toggle: EventHandler<Vec<String>>,
+    #[props(default)]
+    on_toggle: Option<EventHandler<Vec<String>>>,
     all_expanded: Vec<String>,
 }
 
@@ -192,7 +194,9 @@ fn AccordionSection(props: AccordionSectionProps) -> Element {
             }
         }
 
-        props.on_toggle.call(new_expanded);
+        if let Some(h) = &props.on_toggle {
+            h.call(new_expanded);
+        }
     };
 
     let chevron_rotation = if is_expanded {
@@ -255,7 +259,8 @@ fn AccordionChevron() -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct AccordionItem2Props {
     /// Item title
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Item content
     pub children: Element,
     /// Whether item is expanded
@@ -330,7 +335,9 @@ pub fn AccordionItem2(props: AccordionItem2Props) -> Element {
                     onmouseenter: move |_| is_hovered.set(true),
                     onmouseleave: move |_| is_hovered.set(false),
 
-                    "{props.title}"
+                    if let Some(title) = props.title.clone() {
+                        "{title}"
+                    }
 
                     span {
                         style: "transform: {chevron_rotation}; transition: transform 200ms ease;",

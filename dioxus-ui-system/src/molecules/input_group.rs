@@ -10,8 +10,9 @@ use dioxus::prelude::*;
 /// Input Group properties
 #[derive(Props, Clone, PartialEq)]
 pub struct InputGroupProps {
-    /// Field label
-    pub label: String,
+    /// Field label (no label is rendered when `None`)
+    #[props(default)]
+    pub label: Option<String>,
     /// Current input value
     #[props(default)]
     pub value: String,
@@ -86,31 +87,33 @@ pub fn InputGroup(props: InputGroupProps) -> Element {
 
     let input_wrapper_style = use_style(|_| Style::new().relative().build());
 
-    let label_element = if required {
-        rsx! {
-            Label {
-                id: "{props.id.clone().unwrap_or_default()}",
-                class: "{props.class.clone().unwrap_or_default()}",
-                style: "{props.style.clone().unwrap_or_default()}",
-                size: TextSize::Small,
-                weight: crate::atoms::label::TextWeight::Medium,
-                "{label}"
+    let label_element = label.map(|label| {
+        if required {
+            rsx! {
+                Label {
+                    id: "{props.id.clone().unwrap_or_default()}",
+                    class: "{props.class.clone().unwrap_or_default()}",
+                    style: "{props.style.clone().unwrap_or_default()}",
+                    size: TextSize::Small,
+                    weight: crate::atoms::label::TextWeight::Medium,
+                    "{label}"
+                    Label {
+                        size: TextSize::Small,
+                        color: TextColor::Destructive,
+                        " *"
+                    }
+                }
+            }
+        } else {
+            rsx! {
                 Label {
                     size: TextSize::Small,
-                    color: TextColor::Destructive,
-                    " *"
+                    weight: crate::atoms::label::TextWeight::Medium,
+                    "{label}"
                 }
             }
         }
-    } else {
-        rsx! {
-            Label {
-                size: TextSize::Small,
-                weight: crate::atoms::label::TextWeight::Medium,
-                "{label}"
-            }
-        }
-    };
+    });
 
     let helper_text = if let Some(err) = error {
         Some(rsx! {

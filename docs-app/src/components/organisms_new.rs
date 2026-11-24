@@ -303,9 +303,9 @@ pub fn CalendarPage() -> Element {
                 h4 { "CalendarProps" }
                 PropsTable { props: vec![
                     ("value", "Option", "Selected date (YYYY-MM-DD format) for Single mode For Multiple mode, this is not used - use on_change to track multiple dates For Range mode, this represents the start date"),
-                    ("on_change", "EventHandler<Option>", "Change handler - called when selection changes For Single mode: returns the selected date or None if cleared For Range mode: returns the start date when selecting, or end date format when complete"),
+                    ("on_change", "Option<EventHandler<Option<String>>>", "Change handler - called when selection changes For Single mode: returns the selected date or None if cleared For Range mode: returns the start date when selecting, or end date format when complete"),
                     ("month", "Option", "Currently displayed month (YYYY-MM format) - for controlled mode"),
-                    ("on_month_change", "EventHandler", "Callback when the displayed month changes"),
+                    ("on_month_change", "Option<EventHandler<String>>", "Callback when the displayed month changes"),
                     ("disabled_dates", "Vec", "List of disabled dates (YYYY-MM-DD format)"),
                     ("min_date", "Option", "Minimum selectable date (YYYY-MM-DD format)"),
                     ("max_date", "Option", "Maximum selectable date (YYYY-MM-DD format)"),
@@ -386,12 +386,12 @@ DateRangePicker {
                 PropsTable { props: vec![
                     ("start_date", "Option", "Selected start date (YYYY-MM-DD format)"),
                     ("end_date", "Option", "Selected end date (YYYY-MM-DD format)"),
-                    ("on_start_date_change", "Option<EventHandler<Option>>", "Start date change handler"),
-                    ("on_end_date_change", "Option<EventHandler<Option>>", "End date change handler"),
-                    ("on_range_change", "Option<EventHandler<(Option, Option)>>", "Range change handler (called when both dates are selected)"),
+                    ("on_start_date_change", "Option<EventHandler<Option<String>>>", "Start date change handler"),
+                    ("on_end_date_change", "Option<EventHandler<Option<String>>>", "End date change handler"),
+                    ("on_range_change", "Option<EventHandler<(Option<String>, Option<String>)>>", "Range change handler (called when both dates are selected)"),
                     ("min_date", "Option", "Minimum selectable date (YYYY-MM-DD)"),
                     ("max_date", "Option", "Maximum selectable date (YYYY-MM-DD)"),
-                    ("placeholder", "String", "Placeholder text"),
+                    ("placeholder", "Option<String>", "Placeholder text"),
                     ("disabled", "bool", "Whether the picker is disabled"),
                     ("presets", "Vec", "Preset date ranges"),
                     ("class", "Option", "Additional CSS classes"),
@@ -406,9 +406,9 @@ DateRangePicker {
                     ("max_date", "Option", ""),
                     ("presets", "Vec", ""),
                     ("selecting_start", "bool", ""),
-                    ("on_select", "EventHandler", ""),
-                    ("on_preset_select", "EventHandler", ""),
-                    ("on_close", "EventHandler", ""),
+                    ("on_select", "Option<EventHandler<String>>", ""),
+                    ("on_preset_select", "Option<EventHandler<(String, String)>>", ""),
+                    ("on_close", "Option<EventHandler<()>>", ""),
                     ("id", "Option", ""),
                     ("class", "Option", ""),
                     ("style", "Option", "")
@@ -416,7 +416,7 @@ DateRangePicker {
                 h4 { "DateRangePresetsProps" }
                 PropsTable { props: vec![
                     ("presets", "Vec", ""),
-                    ("on_preset_select", "EventHandler", ""),
+                    ("on_preset_select", "Option<EventHandler<(String, String)>>", ""),
                     ("id", "Option", ""),
                     ("class", "Option", ""),
                     ("style", "Option", "")
@@ -424,7 +424,7 @@ DateRangePicker {
                 h4 { "PresetButtonProps" }
                 PropsTable { props: vec![
                     ("preset", "DateRangePreset", ""),
-                    ("on_preset_select", "EventHandler", ""),
+                    ("on_preset_select", "Option<EventHandler<(String, String)>>", ""),
                     ("id", "Option", ""),
                     ("class", "Option", ""),
                     ("style", "Option", "")
@@ -691,7 +691,7 @@ Tree {
                 h4 { "TreeNodeBuilderProps" }
                 PropsTable { props: vec![
                     ("initial_data", "Vec", "Initial node data"),
-                    ("on_change", "Option<EventHandler<Vec>>", "Callback when tree data changes"),
+                    ("on_change", "Option<EventHandler<Vec<TreeNodeData>>>", "Callback when tree data changes"),
                     ("id", "Option", ""),
                     ("class", "Option", ""),
                     ("style", "Option", "")
@@ -949,7 +949,7 @@ pub fn MenubarPage() -> Element {
                 ] }
                 h4 { "MenubarTriggerProps" }
                 PropsTable { props: vec![
-                    ("label", "String", "The label text for this menu"),
+                    ("label", "Option<String>", "The label text for this menu"),
                     ("disabled", "bool", "Whether this trigger is disabled"),
                     ("id", "Option", ""),
                     ("class", "Option", ""),
@@ -966,7 +966,7 @@ pub fn MenubarPage() -> Element {
                 h4 { "MenubarItemProps" }
                 PropsTable { props: vec![
                     ("children", "Element", "Item content"),
-                    ("on_click", "EventHandler", "Callback when item is clicked"),
+                    ("on_click", "Option<EventHandler<()>>", "Callback when item is clicked"),
                     ("disabled", "bool", "Whether the item is disabled"),
                     ("shortcut", "Option", "Optional keyboard shortcut display"),
                     ("icon", "Option", "Optional icon element"),
@@ -1008,7 +1008,7 @@ pub fn MenubarPage() -> Element {
                 PropsTable { props: vec![
                     ("children", "Element", "Item label"),
                     ("checked", "bool", "Whether the checkbox is checked"),
-                    ("on_checked_change", "EventHandler", "Callback when checked state changes"),
+                    ("on_checked_change", "Option<EventHandler<bool>>", "Callback when checked state changes"),
                     ("disabled", "bool", "Whether the item is disabled"),
                     ("shortcut", "Option", "Optional keyboard shortcut display"),
                     ("id", "Option", ""),
@@ -1165,7 +1165,7 @@ Kanban {
                 h4 { "KanbanProps" }
                 PropsTable { props: vec![
                     ("columns", "Vec", "Columns with their cards"),
-                    ("on_columns_change", "Option<EventHandler<Vec>>", "Handler for column changes (new column order or content)"),
+                    ("on_columns_change", "Option<EventHandler<Vec<KanbanColumn>>>", "Handler for column changes (new column order or content)"),
                     ("on_card_move", "Option<EventHandler>", "Handler for card moves (card_id, column_id, new_index)"),
                     ("on_card_click", "Option<EventHandler>", "Handler for card clicks"),
                     ("allow_add_column", "bool", "Allow adding new columns"),
@@ -1202,7 +1202,7 @@ Kanban {
                 ] }
                 h4 { "KanbanTagProps" }
                 PropsTable { props: vec![
-                    ("label", "String", ""),
+                    ("label", "Option<String>", ""),
                     ("id", "Option", ""),
                     ("class", "Option", ""),
                     ("style", "Option", "")
@@ -1273,7 +1273,7 @@ pub fn ImageUploaderPage() -> Element {
                 h4 { "ImageUploaderProps" }
                 PropsTable { props: vec![
                     ("value", "Vec", "Current value (list of uploaded images)"),
-                    ("on_change", "EventHandler<Vec>", "Callback when the image list changes"),
+                    ("on_change", "Option<EventHandler<Vec<UploadedImage>>>", "Callback when the image list changes"),
                     ("max_files", "Option", "Maximum number of files allowed"),
                     ("max_size_mb", "f32", "Maximum file size in MB (default: 5.0)"),
                     ("accept", "Vec", "Accepted MIME types (default: [\"image/*\"])"),
@@ -1287,13 +1287,13 @@ pub fn ImageUploaderPage() -> Element {
                     ("class", "Option", "Custom CSS class"),
                     ("id", "Option", "Element id"),
                     ("style", "Option", "Custom inline styles"),
-                    ("placeholder", "String", "Placeholder text for dropzone")
+                    ("placeholder", "Option<String>", "Placeholder text for dropzone")
                 ] }
                 h4 { "ImagePreviewItemProps" }
                 PropsTable { props: vec![
                     ("image", "UploadedImage", "The uploaded image"),
                     ("index", "usize", "Index in the list"),
-                    ("on_remove", "EventHandler", "Remove callback"),
+                    ("on_remove", "Option<EventHandler<()>>", "Remove callback"),
                     ("id", "Option", ""),
                     ("class", "Option", ""),
                     ("style", "Option", "")
@@ -1301,7 +1301,7 @@ pub fn ImageUploaderPage() -> Element {
                 h4 { "ImageListItemProps" }
                 PropsTable { props: vec![
                     ("image", "UploadedImage", "The uploaded image"),
-                    ("on_remove", "EventHandler", "Remove callback"),
+                    ("on_remove", "Option<EventHandler<()>>", "Remove callback"),
                     ("id", "Option", ""),
                     ("class", "Option", ""),
                     ("style", "Option", "")
@@ -1385,11 +1385,11 @@ pub fn RichTextPage() -> Element {
                 ] }
                 h4 { "ToolbarButtonProps" }
                 PropsTable { props: vec![
-                    ("title", "&'static str", "Button title (tooltip)"),
+                    ("title", "Option<String>", "Button title (tooltip)"),
                     ("icon", "&'static str", "Button icon/text"),
                     ("command", "&'static str", "execCommand command name"),
                     ("value", "Option", "Optional command value"),
-                    ("style", "String", "Base style"),
+                    ("style", "Option<String>", "Base style"),
                     ("hover_style", "String", "Hover style"),
                     ("id", "Option", ""),
                     ("class", "Option", "")
@@ -1473,7 +1473,7 @@ pub fn TourPage() -> Element {
                             "Step 3 target: Get started"
                         }
                         Button {
-                            onclick: move |_| tour_open.set(true),
+                            on_click: move |_| tour_open.set(true),
                             "Start Tour"
                         }
                     }
@@ -1504,11 +1504,11 @@ Tour {
                 PropsTable { props: vec![
                     ("steps", "Vec<TourStep>", "Tour steps with target, title, content, placement"),
                     ("open", "bool", "Whether the tour is open"),
-                    ("on_open_change", "EventHandler<bool>", "Callback when tour open state changes"),
-                    ("on_finish", "Option<EventHandler>", "Callback when tour completes"),
+                    ("on_open_change", "Option<EventHandler<bool>>", "Callback when tour open state changes"),
+                    ("on_finish", "Option<EventHandler<()>>", "Callback when tour completes"),
                     ("on_step_change", "Option<EventHandler<usize>>", "Callback when step changes"),
-                    ("mask", "bool", "Show backdrop mask (default: true)"),
-                    ("show_dots", "bool", "Show step dots (default: true)"),
+                    ("mask_color", "Option<String>", "Mask/overlay color"),
+                    ("show_skip", "bool", "Show skip button"),
                     ("show_progress", "bool", "Show step counter (default: true)"),
                     ("allow_interaction", "bool", "Allow interacting with highlighted element (default: false)"),
                     ("class", "Option", "Additional CSS classes"),

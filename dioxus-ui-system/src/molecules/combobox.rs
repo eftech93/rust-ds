@@ -37,7 +37,8 @@ pub struct ComboboxProps {
     #[props(default)]
     pub value: Option<String>,
     /// Change handler
-    pub on_change: EventHandler<String>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<String>>,
     /// Placeholder text
     #[props(default)]
     pub placeholder: Option<String>,
@@ -130,7 +131,9 @@ pub fn Combobox(props: ComboboxProps) -> Element {
         let on_change = props.on_change;
         move |option: ComboboxOption| {
             input_value.set(option.label.clone());
-            on_change.call(option.value);
+            if let Some(handler) = &on_change {
+                handler.call(option.value);
+            }
             is_open.set(false);
         }
     };
@@ -340,7 +343,8 @@ pub struct MultiComboboxProps {
     #[props(default)]
     pub values: Vec<String>,
     /// Change handler
-    pub on_change: EventHandler<Vec<String>>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<Vec<String>>>,
     /// Placeholder text
     #[props(default)]
     pub placeholder: Option<String>,
@@ -420,7 +424,9 @@ pub fn MultiCombobox(props: MultiComboboxProps) -> Element {
                                         e.stop_propagation();
                                         let mut new_values = values.clone();
                                         new_values.retain(|v| v != &option_value);
-                                        on_change.call(new_values);
+                                        if let Some(handler) = &on_change {
+                                            handler.call(new_values);
+                                        }
                                     },
                                     "✕"
                                 }
@@ -465,7 +471,9 @@ pub fn MultiCombobox(props: MultiComboboxProps) -> Element {
                                     onclick: move |_| {
                                         let mut new_values = values.clone();
                                         new_values.push(option.value.clone());
-                                        on_change.call(new_values);
+                                        if let Some(handler) = &on_change {
+                                            handler.call(new_values);
+                                        }
                                         input_value.set(String::new());
                                     },
                                     "{option.label}"

@@ -216,7 +216,8 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct HoverCardHeaderProps {
     /// Header title
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Optional description
     #[props(default)]
     pub description: Option<String>,
@@ -249,9 +250,11 @@ pub fn HoverCardHeader(props: HoverCardHeaderProps) -> Element {
             class: "{props.class.clone().unwrap_or_default()}",
             style: "{header_style}",
 
-            h4 {
-                style: "margin: 0; font-size: 16px; font-weight: 600;",
-                "{props.title}"
+            if let Some(title) = props.title {
+                h4 {
+                    style: "margin: 0; font-size: 16px; font-weight: 600;",
+                    "{title}"
+                }
             }
 
             if let Some(description) = props.description {

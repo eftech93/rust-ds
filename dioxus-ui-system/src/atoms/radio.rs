@@ -12,9 +12,9 @@ pub struct RadioProps {
     /// Whether the radio is selected
     #[props(default)]
     pub checked: bool,
-    /// Callback when selected state changes
+    /// Called with this radio's `value` when it becomes selected
     #[props(default)]
-    pub on_change: Option<EventHandler<()>>,
+    pub on_change: Option<EventHandler<String>>,
     /// Whether the radio is disabled
     #[props(default)]
     pub disabled: bool,
@@ -120,7 +120,7 @@ pub fn Radio(props: RadioProps) -> Element {
                 onchange: move |_| {
                     if !disabled && !checked {
                         if let Some(handler) = &props.on_change {
-                            handler.call(());
+                            handler.call(props.value.clone());
                         }
                     }
                 },
@@ -146,7 +146,8 @@ pub struct RadioGroupProps {
     /// Currently selected value
     pub value: String,
     /// Callback when selection changes
-    pub on_change: EventHandler<String>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<String>>,
     /// Radio group children (Radio components)
     pub children: Element,
     /// Layout direction

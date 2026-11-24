@@ -67,7 +67,8 @@ pub struct SheetProps {
     /// Whether the sheet is open
     pub open: bool,
     /// Callback when open state changes
-    pub on_open_change: EventHandler<bool>,
+    #[props(default)]
+    pub on_open_change: Option<EventHandler<bool>>,
     /// Which edge to slide in from
     #[props(default)]
     pub side: SheetSide,
@@ -150,10 +151,12 @@ pub fn Sheet(props: SheetProps) -> Element {
                 return;
             }
 
-            let on_close = props.on_open_change.clone();
+            let on_close = props.on_open_change;
             let closure = Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
                 if event.key() == "Escape" {
-                    on_close.call(false);
+                    if let Some(handler) = &on_close {
+                        handler.call(false);
+                    }
                 }
             }) as Box<dyn FnMut(_)>);
             let func: js_sys::Function =
@@ -261,7 +264,9 @@ pub fn Sheet(props: SheetProps) -> Element {
 
     let handle_overlay_click = move |_| {
         if props.close_on_overlay_click {
-            props.on_open_change.call(false);
+            if let Some(handler) = &props.on_open_change {
+                handler.call(false);
+            }
         }
     };
 
@@ -303,7 +308,8 @@ struct SheetHeaderProps {
     title: Option<String>,
     description: Option<String>,
     show_close_button: bool,
-    on_close: EventHandler<bool>,
+    #[props(default)]
+    on_close: Option<EventHandler<bool>>,
     /// Element id
     #[props(default)]
     pub id: Option<String>,
@@ -362,7 +368,11 @@ fn SheetHeader(props: SheetHeaderProps) -> Element {
             if props.show_close_button {
                 Button {
                     variant: ButtonVariant::Ghost,
-                    onclick: move |_| props.on_close.call(false),
+                    on_click: move |_| {
+                        if let Some(handler) = &props.on_close {
+                            handler.call(false);
+                        }
+                    },
                     "✕"
                 }
             }

@@ -31,13 +31,13 @@ pub struct CalendarProps {
     /// For Single mode: returns the selected date or None if cleared
     /// For Range mode: returns the start date when selecting, or end date format when complete
     #[props(default)]
-    pub on_change: EventHandler<Option<String>>,
+    pub on_change: Option<EventHandler<Option<String>>>,
     /// Currently displayed month (YYYY-MM format) - for controlled mode
     #[props(default)]
     pub month: Option<String>,
     /// Callback when the displayed month changes
     #[props(default)]
-    pub on_month_change: EventHandler<String>,
+    pub on_month_change: Option<EventHandler<String>>,
     /// List of disabled dates (YYYY-MM-DD format)
     #[props(default)]
     pub disabled_dates: Vec<String>,
@@ -121,9 +121,9 @@ pub fn Calendar(props: CalendarProps) -> Element {
         let new_year = if month == 1 { year - 1 } else { year };
         view_month.set(new_month);
         view_year.set(new_year);
-        props
-            .on_month_change
-            .call(format!("{:04}-{:02}", new_year, new_month));
+        if let Some(h) = &props.on_month_change {
+            h.call(format!("{:04}-{:02}", new_year, new_month));
+        }
     };
 
     // Navigate to next month
@@ -132,19 +132,19 @@ pub fn Calendar(props: CalendarProps) -> Element {
         let new_year = if month == 12 { year + 1 } else { year };
         view_month.set(new_month);
         view_year.set(new_year);
-        props
-            .on_month_change
-            .call(format!("{:04}-{:02}", new_year, new_month));
+        if let Some(h) = &props.on_month_change {
+            h.call(format!("{:04}-{:02}", new_year, new_month));
+        }
     };
 
     // Go to today
-    let go_to_today = move || {
+    let go_to_today = move |_: ()| {
         let today = get_today();
         view_month.set(today.month);
         view_year.set(today.year);
-        props
-            .on_month_change
-            .call(format!("{:04}-{:02}", today.year, today.month));
+        if let Some(h) = &props.on_month_change {
+            h.call(format!("{:04}-{:02}", today.year, today.month));
+        }
     };
 
     // Container style
@@ -246,7 +246,9 @@ pub fn Calendar(props: CalendarProps) -> Element {
                         onchange: move |e: Event<dioxus::html::FormData>| {
                             if let Ok(new_month) = e.value().parse::<u8>() {
                                 view_month.set(new_month);
-                                props.on_month_change.call(format!("{:04}-{:02}", view_year(), new_month));
+                                if let Some(h) = &props.on_month_change {
+                                    h.call(format!("{:04}-{:02}", view_year(), new_month));
+                                }
                             }
                         },
 
@@ -266,7 +268,9 @@ pub fn Calendar(props: CalendarProps) -> Element {
                         onchange: move |e: Event<dioxus::html::FormData>| {
                             if let Ok(new_year) = e.value().parse::<i32>() {
                                 view_year.set(new_year);
-                                props.on_month_change.call(format!("{:04}-{:02}", new_year, view_month()));
+                                if let Some(h) = &props.on_month_change {
+                                    h.call(format!("{:04}-{:02}", new_year, view_month()));
+                                }
                             }
                         },
 
@@ -351,8 +355,10 @@ struct CalendarGridProps {
     max_date: Option<String>,
     show_week_numbers: bool,
     mode: CalendarMode,
-    on_change: EventHandler<Option<String>>,
-    go_to_today: EventHandler<()>,
+    #[props(default)]
+    on_change: Option<EventHandler<Option<String>>>,
+    #[props(default)]
+    go_to_today: Option<EventHandler<()>>,
 }
 
 #[component]
@@ -507,7 +513,8 @@ struct CalendarDayProps {
     selected_dates: Signal<Vec<String>>,
     range_start: Signal<Option<String>>,
     mode: CalendarMode,
-    on_change: EventHandler<Option<String>>,
+    #[props(default)]
+    on_change: Option<EventHandler<Option<String>>>,
 }
 
 #[component]
@@ -599,7 +606,9 @@ fn CalendarDay(mut props: CalendarDayProps) -> Element {
                     "{:04}-{:02}-{:02}",
                     date_clone.year, date_clone.month, date_clone.day
                 );
-                props.on_change.call(Some(date_str));
+                if let Some(h) = &props.on_change {
+                    h.call(Some(date_str));
+                }
             }
             CalendarMode::Multiple => {
                 let mut dates = props.selected_dates.read().clone();
@@ -615,7 +624,9 @@ fn CalendarDay(mut props: CalendarDayProps) -> Element {
                 }
 
                 props.selected_dates.set(dates);
-                props.on_change.call(Some(date_str));
+                if let Some(h) = &props.on_change {
+                    h.call(Some(date_str));
+                }
             }
             CalendarMode::Range => {
                 let date_str = format!(
@@ -652,12 +663,16 @@ fn CalendarDay(mut props: CalendarDayProps) -> Element {
                         );
 
                         props.range_start.set(None);
-                        props.on_change.call(Some(range_str));
+                        if let Some(h) = &props.on_change {
+                            h.call(Some(range_str));
+                        }
                     }
                 } else {
                     // Selecting start date
                     props.range_start.set(Some(date_str.clone()));
-                    props.on_change.call(Some(date_str));
+                    if let Some(h) = &props.on_change {
+                        h.call(Some(date_str));
+                    }
                 }
             }
         }

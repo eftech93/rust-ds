@@ -76,9 +76,9 @@ pub struct SpinnerProps {
     pub size: SpinnerSize,
     /// Color override
     pub color: Option<String>,
-    /// Accessibility label
-    #[props(default = default_loading_label())]
-    pub label: String,
+    /// Accessibility label (`None` falls back to [`default_loading_label`])
+    #[props(default)]
+    pub label: Option<String>,
     /// Speed multiplier (1.0 = default)
     #[props(default = 1.0)]
     pub speed: f32,
@@ -118,6 +118,7 @@ pub fn Spinner(props: SpinnerProps) -> Element {
         .unwrap_or_default();
 
     let id_css = props.id.clone().unwrap_or_default();
+    let label = props.label.clone().unwrap_or_else(default_loading_label);
 
     match props.variant {
         SpinnerVariant::Circular => {
@@ -133,7 +134,7 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                     style: "display: inline-flex; align-items: center; justify-content: center;{style_css}",
                     id: "{id_css}",
                     role: "status",
-                    aria_label: "{props.label}",
+                    aria_label: "{label}",
 
                     svg {
                         width: "{size}px",
@@ -157,7 +158,7 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                     span {
                         class: "sr-only",
                         style: "position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;",
-                        "{props.label}"
+                        "{label}"
                     }
                 }
             }
@@ -172,7 +173,7 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                 span {
                     class: "spinner spinner-dots{class_css}",
                     role: "status",
-                    aria_label: "{props.label}",
+                    aria_label: "{label}",
                     style: "display: inline-flex; align-items: center; gap: {gap}px;{style_css}",
                     id: "{id_css}",
 
@@ -186,7 +187,7 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                     span {
                         class: "sr-only",
                         style: "position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;",
-                        "{props.label}"
+                        "{label}"
                     }
                 }
             }
@@ -200,7 +201,7 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                     style: "display: inline-flex; align-items: center; justify-content: center;{style_css}",
                     id: "{id_css}",
                     role: "status",
-                    aria_label: "{props.label}",
+                    aria_label: "{label}",
 
                     span {
                         style: "display: inline-block; width: {size}px; height: {size}px; background: {color}; border-radius: 50%; animation: pulse {animation_duration} ease-in-out infinite;",
@@ -209,7 +210,7 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                     span {
                         class: "sr-only",
                         style: "position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;",
-                        "{props.label}"
+                        "{label}"
                     }
                 }
             }
@@ -224,7 +225,7 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                 span {
                     class: "spinner spinner-bars{class_css}",
                     role: "status",
-                    aria_label: "{props.label}",
+                    aria_label: "{label}",
                     style: "display: inline-flex; align-items: center; gap: 2px; height: {bar_height}px;{style_css}",
                     id: "{id_css}",
 
@@ -238,7 +239,7 @@ pub fn Spinner(props: SpinnerProps) -> Element {
                     span {
                         class: "sr-only",
                         style: "position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;",
-                        "{props.label}"
+                        "{label}"
                     }
                 }
             }

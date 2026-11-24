@@ -172,7 +172,7 @@ pub fn DatePicker(props: DatePickerProps) -> Element {
                             }
                             is_open.set(false);
                         },
-                        on_close: move || is_open.set(false),
+                        on_close: move |_| is_open.set(false),
                     }
                 }
             }
@@ -194,8 +194,10 @@ pub struct DatePickerCalendarProps {
     pub value: Option<String>,
     pub min: Option<String>,
     pub max: Option<String>,
-    pub on_select: EventHandler<String>,
-    pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub on_select: Option<EventHandler<String>>,
+    #[props(default)]
+    pub on_close: Option<EventHandler<()>>,
 }
 
 #[component]
@@ -223,7 +225,9 @@ fn DatePickerCalendar(props: DatePickerCalendarProps) -> Element {
     };
 
     let onclick_outside = move || {
-        props.on_close.call(());
+        if let Some(h) = &props.on_close {
+            h.call(());
+        }
     };
 
     rsx! {
@@ -334,7 +338,9 @@ fn DatePickerCalendar(props: DatePickerCalendarProps) -> Element {
                                 style: "aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 14px; border-radius: 8px; background: {bg_color}; color: {text_color}; cursor: {cursor}; border: none;",
                                 disabled: is_disabled,
                                 onclick: move |_| {
-                                    on_select.call(format!("{:04}-{:02}-{:02}", year_value, month_value, day_value));
+                                    if let Some(h) = &on_select {
+                                        h.call(format!("{:04}-{:02}-{:02}", year_value, month_value, day_value));
+                                    }
                                 },
                                 "{day}"
                             }
@@ -355,7 +361,9 @@ fn DatePickerCalendar(props: DatePickerCalendarProps) -> Element {
                             style: "font-size: 12px; color: {theme.tokens.read().colors.muted.to_rgba()}; background: none; border: none; cursor: pointer;",
                             onclick: move |_| {
                                 let today_str = format!("{:04}-{:02}-{:02}", today_clone.year, today_clone.month, today_clone.day);
-                                props.on_select.call(today_str);
+                                if let Some(h) = &props.on_select {
+                                    h.call(today_str);
+                                }
                             },
                             "Today"
                         }
@@ -368,7 +376,9 @@ fn DatePickerCalendar(props: DatePickerCalendarProps) -> Element {
                         style: "font-size: 12px; color: {theme.tokens.read().colors.destructive.to_rgba()}; background: none; border: none; cursor: pointer;",
                         onclick: move |_| {
                             // Clear selection - you might want to handle this differently
-                            props.on_close.call(());
+                            if let Some(h) = &props.on_close {
+                                h.call(());
+                            }
                         },
                         "Clear"
                     }

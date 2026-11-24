@@ -247,7 +247,8 @@ pub struct TagGroupProps {
     #[props(default)]
     pub selected: Vec<String>,
     /// Selection change handler
-    pub on_change: EventHandler<Vec<String>>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<Vec<String>>>,
     /// Whether tags are removable
     #[props(default = false)]
     pub removable: bool,
@@ -338,7 +339,9 @@ pub fn TagGroup(props: TagGroupProps) -> Element {
                             } else {
                                 new_selected = vec![tag_id.clone()];
                             }
-                            on_change.call(new_selected);
+                            if let Some(h) = &on_change {
+                                h.call(new_selected);
+                            }
                         }
                     };
 
@@ -378,7 +381,8 @@ pub struct InputTagProps {
     #[props(default)]
     pub tags: Vec<String>,
     /// Change handler
-    pub on_change: EventHandler<Vec<String>>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<Vec<String>>>,
     /// Placeholder text
     #[props(default)]
     pub placeholder: Option<String>,
@@ -443,7 +447,9 @@ pub fn InputTag(props: InputTagProps) -> Element {
                         move |_| {
                             let mut new_tags = tags.clone();
                             new_tags.remove(i);
-                            on_change.call(new_tags);
+                            if let Some(h) = &on_change {
+                                h.call(new_tags);
+                            }
                         }
                     };
 
@@ -482,7 +488,9 @@ pub fn InputTag(props: InputTagProps) -> Element {
                                     && (allow_duplicates || !tags.contains(&trimmed)) {
                                         let mut new_tags = tags.clone();
                                         new_tags.push(trimmed);
-                                        on_change.call(new_tags);
+                                        if let Some(h) = &on_change {
+                                            h.call(new_tags);
+                                        }
                                     }
                                 input_value.set(String::new());
                             }
@@ -505,14 +513,18 @@ pub fn InputTag(props: InputTagProps) -> Element {
                                         && (allow_duplicates || !tags.contains(&trimmed)) {
                                             let mut new_tags = tags.clone();
                                             new_tags.push(trimmed);
-                                            on_change.call(new_tags);
+                                            if let Some(h) = &on_change {
+                                                h.call(new_tags);
+                                            }
                                         }
                                     input_value.set(String::new());
                                 }
                             } else if e.key() == Key::Backspace && input_value().is_empty() && !tags.is_empty() {
                                 let mut new_tags = tags.clone();
                                 new_tags.pop();
-                                on_change.call(new_tags);
+                                if let Some(h) = &on_change {
+                                    h.call(new_tags);
+                                }
                             }
                         }
                     },

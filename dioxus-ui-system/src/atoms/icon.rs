@@ -259,7 +259,7 @@ pub struct IconButtonProps {
     #[props(default)]
     pub disabled: bool,
     #[props(default)]
-    pub onclick: Option<EventHandler<MouseEvent>>,
+    pub on_click: Option<EventHandler<()>>,
     #[props(default)]
     pub aria_label: String,
     #[props(default)]
@@ -278,10 +278,10 @@ pub fn IconButton(props: IconButtonProps) -> Element {
             style: props.style.clone().unwrap_or_default(),
             disabled: props.disabled,
             aria_label: props.aria_label.clone(),
-            onclick: move |e| {
-                if let Some(handler) = &props.onclick {
+            onclick: move |_| {
+                if let Some(handler) = &props.on_click {
                     if !props.disabled {
-                        handler.call(e);
+                        handler.call(());
                     }
                 }
             },

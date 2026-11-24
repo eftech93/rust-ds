@@ -15,7 +15,7 @@ Live component gallery: https://eftech93.github.io/rust-ds/
 ```toml
 [dependencies]
 dioxus = "0.7"
-dioxus-ui-system = "0.0.8"
+dioxus-ui-system = "0.0.9"
 ```
 
 ### Features
@@ -30,7 +30,7 @@ dioxus-ui-system = "0.0.8"
 For non-web targets disable the defaults:
 
 ```toml
-dioxus-ui-system = { version = "0.0.8", default-features = false, features = ["desktop"] }
+dioxus-ui-system = { version = "0.0.9", default-features = false, features = ["desktop"] }
 ```
 
 ## Quick start
@@ -66,7 +66,7 @@ fn App() -> Element {
                     Button { variant: ButtonVariant::Ghost, "Cancel" }
                     Button {
                         variant: ButtonVariant::Primary,
-                        onclick: move |_| println!("submitted {}", email()),
+                        on_click: move |_| println!("submitted {}", email()),
                         "Continue"
                     }
                 }

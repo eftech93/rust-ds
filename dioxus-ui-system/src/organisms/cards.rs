@@ -20,13 +20,16 @@ use crate::molecules::{
 #[derive(Props, Clone, PartialEq)]
 pub struct ActionCardProps {
     /// Card title
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Card description
-    pub description: String,
+    #[props(default)]
+    pub description: Option<String>,
     /// Action button text
     pub action_label: String,
     /// Action button callback
-    pub on_action: EventHandler<()>,
+    #[props(default)]
+    pub on_action: Option<EventHandler<()>>,
     /// Optional icon name
     #[props(default)]
     pub icon: Option<String>,
@@ -80,20 +83,24 @@ pub fn ActionCard(props: ActionCardProps) -> Element {
                         }
                     }
 
-                    Heading {
-                        level: HeadingLevel::H4,
-                        "{props.title}"
+                    if let Some(title) = props.title.clone() {
+                        Heading {
+                            level: HeadingLevel::H4,
+                            "{title}"
+                        }
                     }
 
-                    p {
-                        style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
-                        "{props.description}"
+                    if let Some(desc) = props.description.clone() {
+                        p {
+                            style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
+                            "{desc}"
+                        }
                     }
 
                     Button {
                         variant: ButtonVariant::Primary,
                         full_width: true,
-                        onclick: move |_| props.on_action.call(()),
+                        on_click: props.on_action,
                         "{props.action_label}"
                     }
                 }
@@ -109,17 +116,21 @@ pub fn ActionCard(props: ActionCardProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct DualActionCardProps {
     /// Card title
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Card description
-    pub description: String,
+    #[props(default)]
+    pub description: Option<String>,
     /// Primary action label
     pub primary_label: String,
     /// Secondary action label
     pub secondary_label: String,
     /// Primary action callback
-    pub on_primary: EventHandler<()>,
+    #[props(default)]
+    pub on_primary: Option<EventHandler<()>>,
     /// Secondary action callback
-    pub on_secondary: EventHandler<()>,
+    #[props(default)]
+    pub on_secondary: Option<EventHandler<()>>,
     /// Optional icon
     #[props(default)]
     pub icon: Option<String>,
@@ -160,14 +171,18 @@ pub fn DualActionCard(props: DualActionCardProps) -> Element {
                         }
                     }
 
-                    Heading {
-                        level: HeadingLevel::H4,
-                        "{props.title}"
+                    if let Some(title) = props.title.clone() {
+                        Heading {
+                            level: HeadingLevel::H4,
+                            "{title}"
+                        }
                     }
 
-                    p {
-                        style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
-                        "{props.description}"
+                    if let Some(desc) = props.description.clone() {
+                        p {
+                            style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
+                            "{desc}"
+                        }
                     }
                 }
             }
@@ -177,13 +192,13 @@ pub fn DualActionCard(props: DualActionCardProps) -> Element {
 
                 Button {
                     variant: ButtonVariant::Ghost,
-                    onclick: move |_| props.on_secondary.call(()),
+                    on_click: props.on_secondary,
                     "{props.secondary_label}"
                 }
 
                 Button {
                     variant: ButtonVariant::Primary,
-                    onclick: move |_| props.on_primary.call(()),
+                    on_click: props.on_primary,
                     "{props.primary_label}"
                 }
             }
@@ -203,9 +218,11 @@ pub struct ImageCardProps {
     #[props(default)]
     pub image_alt: String,
     /// Card title
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Card description
-    pub description: String,
+    #[props(default)]
+    pub description: Option<String>,
     /// Optional action
     #[props(default)]
     pub action_label: Option<String>,
@@ -252,21 +269,25 @@ pub fn ImageCard(props: ImageCardProps) -> Element {
                 div {
                     style: "display: flex; flex-direction: column; gap: 8px; padding: 4px 0;",
 
-                    Heading {
-                        level: HeadingLevel::H4,
-                        "{props.title}"
+                    if let Some(title) = props.title.clone() {
+                        Heading {
+                            level: HeadingLevel::H4,
+                            "{title}"
+                        }
                     }
 
-                    p {
-                        style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
-                        "{props.description}"
+                    if let Some(desc) = props.description.clone() {
+                        p {
+                            style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
+                            "{desc}"
+                        }
                     }
 
                     if let Some(label) = props.action_label.clone() {
                         if let Some(handler) = props.on_action {
                             Button {
                                 variant: ButtonVariant::Ghost,
-                                onclick: move |_| handler.call(()),
+                                on_click: move |_| handler.call(()),
                                 "{label} →"
                             }
                         }
@@ -286,17 +307,21 @@ pub struct ImageActionCardProps {
     /// Image URL
     pub image_url: String,
     /// Card title
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Card description
-    pub description: String,
+    #[props(default)]
+    pub description: Option<String>,
     /// Primary action
     pub primary_label: String,
     /// Secondary action
     pub secondary_label: String,
     /// Primary callback
-    pub on_primary: EventHandler<()>,
+    #[props(default)]
+    pub on_primary: Option<EventHandler<()>>,
     /// Secondary callback
-    pub on_secondary: EventHandler<()>,
+    #[props(default)]
+    pub on_secondary: Option<EventHandler<()>>,
     /// Optional badge on image
     #[props(default)]
     pub badge: Option<String>,
@@ -328,7 +353,7 @@ pub fn ImageActionCard(props: ImageActionCardProps) -> Element {
 
                 img {
                     src: "{props.image_url}",
-                    alt: "{props.title}",
+                    alt: props.title.clone().unwrap_or_default(),
                     style: "width: 100%; height: 100%; object-fit: cover;",
                 }
 
@@ -348,14 +373,18 @@ pub fn ImageActionCard(props: ImageActionCardProps) -> Element {
                 div {
                     style: "display: flex; flex-direction: column; gap: 12px; padding: 4px 0;",
 
-                    Heading {
-                        level: HeadingLevel::H4,
-                        "{props.title}"
+                    if let Some(title) = props.title.clone() {
+                        Heading {
+                            level: HeadingLevel::H4,
+                            "{title}"
+                        }
                     }
 
-                    p {
-                        style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
-                        "{props.description}"
+                    if let Some(desc) = props.description.clone() {
+                        p {
+                            style: "margin: 0; color: #64748b; font-size: 14px; line-height: 1.5;",
+                            "{desc}"
+                        }
                     }
                 }
             }
@@ -365,13 +394,13 @@ pub fn ImageActionCard(props: ImageActionCardProps) -> Element {
 
                 Button {
                     variant: ButtonVariant::Secondary,
-                    onclick: move |_| props.on_secondary.call(()),
+                    on_click: props.on_secondary,
                     "{props.secondary_label}"
                 }
 
                 Button {
                     variant: ButtonVariant::Primary,
-                    onclick: move |_| props.on_primary.call(()),
+                    on_click: props.on_primary,
                     "{props.primary_label}"
                 }
             }
@@ -506,7 +535,7 @@ pub fn ProfileCard(props: ProfileCardProps) -> Element {
                         Button {
                             variant: ButtonVariant::Primary,
                             full_width: true,
-                            onclick: move |_| handler.call(()),
+                            on_click: move |_| handler.call(()),
                             "{props.action_label}"
                         }
                     }
@@ -538,7 +567,8 @@ pub struct PricingCardProps {
     #[props(default = "Get Started".to_string())]
     pub cta_label: String,
     /// CTA callback
-    pub on_cta: EventHandler<()>,
+    #[props(default)]
+    pub on_cta: Option<EventHandler<()>>,
     /// Is this the recommended plan
     #[props(default)]
     pub recommended: bool,
@@ -630,7 +660,7 @@ pub fn PricingCard(props: PricingCardProps) -> Element {
                 Button {
                     variant: if props.recommended { ButtonVariant::Primary } else { ButtonVariant::Secondary },
                     full_width: true,
-                    onclick: move |_| props.on_cta.call(()),
+                    on_click: props.on_cta,
                     "{props.cta_label}"
                 }
             }
@@ -647,9 +677,11 @@ pub struct HorizontalCardProps {
     /// Image URL
     pub image_url: String,
     /// Card title
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Card description
-    pub description: String,
+    #[props(default)]
+    pub description: Option<String>,
     /// Optional action
     #[props(default)]
     pub action_label: Option<String>,
@@ -687,7 +719,7 @@ pub fn HorizontalCard(props: HorizontalCardProps) -> Element {
 
                     img {
                         src: "{props.image_url}",
-                        alt: "{props.title}",
+                        alt: props.title.clone().unwrap_or_default(),
                         style: "width: 100%; height: 100%; object-fit: cover; border-radius: 12px 0 0 12px;",
                     }
                 }
@@ -696,14 +728,18 @@ pub fn HorizontalCard(props: HorizontalCardProps) -> Element {
                 div {
                     style: "flex: 1; padding: 16px; display: flex; flex-direction: column; justify-content: center;",
 
-                    Heading {
-                        level: HeadingLevel::H4,
-                        "{props.title}"
+                    if let Some(title) = props.title.clone() {
+                        Heading {
+                            level: HeadingLevel::H4,
+                            "{title}"
+                        }
                     }
 
-                    p {
-                        style: "margin: 4px 0 0 0; color: #64748b; font-size: 13px; line-height: 1.4;",
-                        "{props.description}"
+                    if let Some(desc) = props.description.clone() {
+                        p {
+                            style: "margin: 4px 0 0 0; color: #64748b; font-size: 13px; line-height: 1.4;",
+                            "{desc}"
+                        }
                     }
 
                     if let Some(label) = props.action_label.clone() {
@@ -714,7 +750,7 @@ pub fn HorizontalCard(props: HorizontalCardProps) -> Element {
                                 Button {
                                     variant: ButtonVariant::Ghost,
                                     size: ButtonSize::Sm,
-                                    onclick: move |_| handler.call(()),
+                                    on_click: move |_| handler.call(()),
                                     "{label} →"
                                 }
                             }
@@ -733,7 +769,8 @@ pub fn HorizontalCard(props: HorizontalCardProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct NotificationCardProps {
     /// Notification title
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Notification message
     pub message: String,
     /// Notification type
@@ -814,9 +851,11 @@ pub fn NotificationCard(props: NotificationCardProps) -> Element {
                         div {
                             style: "display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;",
 
-                            Heading {
-                                level: HeadingLevel::H4,
-                                "{props.title}"
+                            if let Some(title) = props.title.clone() {
+                                Heading {
+                                    level: HeadingLevel::H4,
+                                    "{title}"
+                                }
                             }
 
                             if let Some(handler) = props.on_dismiss {
@@ -854,7 +893,8 @@ pub fn NotificationCard(props: NotificationCardProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct StatCardProps {
     /// Stat label
-    pub label: String,
+    #[props(default)]
+    pub label: Option<String>,
     /// Stat value
     pub value: String,
     /// Change indicator (e.g., "+12%")
@@ -899,10 +939,12 @@ pub fn StatCard(props: StatCardProps) -> Element {
 
                     // Text content
                     div {
-                        Label {
-                            size: TextSize::Small,
-                            color: crate::atoms::TextColor::Muted,
-                            "{props.label}"
+                        if let Some(label) = props.label.clone() {
+                            Label {
+                                size: TextSize::Small,
+                                color: crate::atoms::TextColor::Muted,
+                                "{label}"
+                            }
                         }
 
                         div {
@@ -947,7 +989,8 @@ pub fn StatCard(props: StatCardProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct ExpandableCardProps {
     /// Card title
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Preview content (always visible)
     pub preview: Element,
     /// Expanded content (shown when expanded)
@@ -1022,7 +1065,8 @@ pub struct MediaCardProps {
     #[props(default)]
     pub media_type: MediaType,
     /// Card title
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Creator/Author
     #[props(default)]
     pub creator: Option<String>,
@@ -1081,7 +1125,7 @@ pub fn MediaCard(props: MediaCardProps) -> Element {
 
                 img {
                     src: "{props.media_url}",
-                    alt: "{props.title}",
+                    alt: props.title.clone().unwrap_or_default(),
                     style: "width: 100%; height: 100%; object-fit: cover;",
                 }
 
@@ -1122,9 +1166,11 @@ pub fn MediaCard(props: MediaCardProps) -> Element {
                     div {
                         style: "flex: 1; min-width: 0;",
 
-                        Heading {
-                            level: HeadingLevel::H4,
-                            "{props.title}"
+                        if let Some(title) = props.title.clone() {
+                            Heading {
+                                level: HeadingLevel::H4,
+                                "{title}"
+                            }
                         }
 
                         if let Some(creator) = props.creator.clone() {

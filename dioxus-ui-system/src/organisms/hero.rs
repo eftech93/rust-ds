@@ -9,7 +9,8 @@ use dioxus::prelude::*;
 #[derive(Props, Clone, PartialEq)]
 pub struct HeroProps {
     /// Main headline
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Subtitle/description
     #[props(default)]
     pub subtitle: Option<String>,
@@ -145,10 +146,12 @@ pub fn Hero(props: HeroProps) -> Element {
                 style: "position: relative; z-index: 1; max-width: 900px;",
 
                 // Title
-                h1 {
-                    class: "hero-title",
-                    style: "margin: 0 0 24px 0; font-size: clamp(36px, 5vw, 64px); font-weight: 800; line-height: 1.1; color: {theme.tokens.read().colors.foreground.to_rgba()}; letter-spacing: -0.02em;",
-                    "{props.title}"
+                if let Some(title) = props.title.clone() {
+                    h1 {
+                        class: "hero-title",
+                        style: "margin: 0 0 24px 0; font-size: clamp(36px, 5vw, 64px); font-weight: 800; line-height: 1.1; color: {theme.tokens.read().colors.foreground.to_rgba()}; letter-spacing: -0.02em;",
+                        "{title}"
+                    }
                 }
 
                 // Subtitle

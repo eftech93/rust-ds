@@ -23,7 +23,8 @@ pub struct PaginationProps {
     #[props(default = 1)]
     pub current_page: u32,
     /// Page change handler
-    pub on_change: EventHandler<u32>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<u32>>,
     /// Number of sibling pages to show
     #[props(default = 1)]
     pub sibling_count: u32,
@@ -84,7 +85,9 @@ pub fn Pagination(props: PaginationProps) -> Element {
                     disabled: current == 1,
                     onclick: move |_| {
                         if current > 1 {
-                            props.on_change.call(current - 1);
+                            if let Some(handler) = &props.on_change {
+                                handler.call(current - 1);
+                            }
                         }
                     },
                     "← Previous"
@@ -103,7 +106,9 @@ pub fn Pagination(props: PaginationProps) -> Element {
                     disabled: current == props.total_pages,
                     onclick: move |_| {
                         if current < props.total_pages {
-                            props.on_change.call(current + 1);
+                            if let Some(handler) = &props.on_change {
+                                handler.call(current + 1);
+                            }
                         }
                     },
                     "Next →"
@@ -118,7 +123,11 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         class: "pagination-first",
                         style: format!("padding: 8px 12px; font-size: 14px; background: white; color: {text_color}; border: 1px solid {border_color}; border-radius: 6px; cursor: pointer; opacity: {}; min-width: 36px;", if current == 1 { "0.5" } else { "1" }),
                         disabled: current == 1,
-                        onclick: move |_| props.on_change.call(1),
+                        onclick: move |_| {
+                            if let Some(handler) = &props.on_change {
+                                handler.call(1);
+                            }
+                        },
                         "«"
                     }
                 }
@@ -133,7 +142,9 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         disabled: current == 1,
                         onclick: move |_| {
                             if current > 1 {
-                                props.on_change.call(current - 1);
+                                if let Some(handler) = &props.on_change {
+                                    handler.call(current - 1);
+                                }
                             }
                         },
                         "‹"
@@ -158,7 +169,11 @@ pub fn Pagination(props: PaginationProps) -> Element {
                                         class: if is_active { "pagination-active" } else { "" },
                                         style: "padding: 8px 12px; font-size: 14px; background: {btn_bg}; color: {btn_color}; border: 1px solid {btn_border}; border-radius: 6px; cursor: pointer; min-width: 36px; transition: all 0.15s ease;",
                                         aria_current: if is_active { "page" } else { "" },
-                                        onclick: move |_| props.on_change.call(page_num),
+                                        onclick: move |_| {
+                                            if let Some(handler) = &props.on_change {
+                                                handler.call(page_num);
+                                            }
+                                        },
                                         "{page_num}"
                                     }
                                 }
@@ -186,7 +201,9 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         disabled: current == props.total_pages,
                         onclick: move |_| {
                             if current < props.total_pages {
-                                props.on_change.call(current + 1);
+                                if let Some(handler) = &props.on_change {
+                                    handler.call(current + 1);
+                                }
                             }
                         },
                         "›"
@@ -200,7 +217,11 @@ pub fn Pagination(props: PaginationProps) -> Element {
                         class: "pagination-last",
                         style: format!("padding: 8px 12px; font-size: 14px; background: white; color: {text_color}; border: 1px solid {border_color}; border-radius: 6px; cursor: pointer; opacity: {}; min-width: 36px;", if current == props.total_pages { "0.5" } else { "1" }),
                         disabled: current == props.total_pages,
-                        onclick: move |_| props.on_change.call(props.total_pages),
+                        onclick: move |_| {
+                            if let Some(handler) = &props.on_change {
+                                handler.call(props.total_pages);
+                            }
+                        },
                         "»"
                     }
                 }
@@ -271,7 +292,8 @@ pub struct PageSizeSelectorProps {
     /// Current page size
     pub value: u32,
     /// Change handler
-    pub on_change: EventHandler<u32>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<u32>>,
     /// Label
     #[props(default)]
     pub label: Option<String>,
@@ -315,7 +337,9 @@ pub fn PageSizeSelector(props: PageSizeSelectorProps) -> Element {
                 style: "padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: white; cursor: pointer; {props.style.clone().unwrap_or_default()}",
                 onchange: move |e: Event<FormData>| {
                     if let Ok(val) = e.value().parse::<u32>() {
-                        props.on_change.call(val);
+                        if let Some(handler) = &props.on_change {
+                            handler.call(val);
+                        }
                     }
                 },
 

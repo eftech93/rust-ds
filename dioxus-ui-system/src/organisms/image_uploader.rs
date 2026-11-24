@@ -75,7 +75,8 @@ pub struct ImageUploaderProps {
     #[props(default)]
     pub value: Vec<UploadedImage>,
     /// Callback when the image list changes
-    pub on_change: EventHandler<Vec<UploadedImage>>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<Vec<UploadedImage>>>,
     /// Maximum number of files allowed
     #[props(default)]
     pub max_files: Option<usize>,
@@ -116,8 +117,9 @@ pub struct ImageUploaderProps {
     #[props(default)]
     pub style: Option<String>,
     /// Placeholder text for dropzone
-    #[props(default = "Drag and drop images here, or click to browse".to_string())]
-    pub placeholder: String,
+    /// (defaults to "Drag and drop images here, or click to browse")
+    #[props(default)]
+    pub placeholder: Option<String>,
 }
 
 /// Image uploader component
@@ -215,7 +217,9 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
 
             if !has_error {
                 images.set(current_images.clone());
-                on_change.call(current_images);
+                if let Some(h) = &on_change {
+                    h.call(current_images);
+                }
             }
         }
     };
@@ -228,7 +232,9 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
             if index < current.len() {
                 current.remove(index);
                 images.set(current.clone());
-                on_change.call(current);
+                if let Some(h) = &on_change {
+                    h.call(current);
+                }
             }
         }
     };
@@ -326,7 +332,7 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
                 // Placeholder text
                 p {
                     style: "margin: 0 0 8px 0; font-size: 16px; font-weight: 500; color: {theme.tokens.read().colors.foreground.to_rgba()}; text-align: center;",
-                    "{props.placeholder}"
+                    {props.placeholder.clone().unwrap_or_else(|| "Drag and drop images here, or click to browse".to_string())}
                 }
 
                 // Helper text
@@ -423,7 +429,7 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
                             index: index,
                             on_remove: {
                                 let mut remove_image = remove_image;
-                                move || remove_image(index)
+                                move |_| remove_image(index)
                             },
                         }
                     }
@@ -442,7 +448,7 @@ pub fn ImageUploader(props: ImageUploaderProps) -> Element {
                             image: image.clone(),
                             on_remove: {
                                 let mut remove_image = remove_image;
-                                move || remove_image(index)
+                                move |_| remove_image(index)
                             },
                         }
                     }
@@ -460,7 +466,8 @@ pub struct ImagePreviewItemProps {
     /// Index in the list
     pub index: usize,
     /// Remove callback
-    pub on_remove: EventHandler<()>,
+    #[props(default)]
+    pub on_remove: Option<EventHandler<()>>,
     #[props(default)]
     pub id: Option<String>,
     #[props(default)]
@@ -537,7 +544,11 @@ fn ImagePreviewItem(props: ImagePreviewItemProps) -> Element {
                 r#type: "button",
                 class: "image-preview-remove",
                 style: "position: absolute; top: 4px; left: 4px; width: 24px; height: 24px; border-radius: 50%; background: rgba(0, 0, 0, 0.5); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; transition: background 0.15s ease;",
-                onclick: move |_| props.on_remove.call(()),
+                onclick: move |_| {
+                    if let Some(h) = &props.on_remove {
+                        h.call(());
+                    }
+                },
                 "✕"
             }
 
@@ -558,7 +569,8 @@ pub struct ImageListItemProps {
     /// The uploaded image
     pub image: UploadedImage,
     /// Remove callback
-    pub on_remove: EventHandler<()>,
+    #[props(default)]
+    pub on_remove: Option<EventHandler<()>>,
     #[props(default)]
     pub id: Option<String>,
     #[props(default)]
@@ -655,7 +667,11 @@ fn ImageListItem(props: ImageListItemProps) -> Element {
                 r#type: "button",
                 class: "image-list-remove",
                 style: "flex-shrink: 0; background: none; border: none; cursor: pointer; font-size: 18px; color: {theme.tokens.read().colors.muted.to_rgba()}; padding: 4px; transition: color 0.15s ease;",
-                onclick: move |_| props.on_remove.call(()),
+                onclick: move |_| {
+                    if let Some(h) = &props.on_remove {
+                        h.call(());
+                    }
+                },
                 "✕"
             }
         }

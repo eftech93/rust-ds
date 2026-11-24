@@ -219,7 +219,7 @@ fn InputShowcase() -> Element {
                     Button {
                         variant: ButtonVariant::Primary,
                         full_width: true,
-                        onclick: move |_| {},
+                        on_click: move |_| {},
                         "Submit"
                     }
                 }
@@ -587,7 +587,7 @@ fn StepperShowcase() -> Element {
                             variant: ButtonVariant::Secondary,
                             size: ButtonSize::Sm,
                             disabled: active_step() == 0,
-                            onclick: move |_| if active_step() > 0 { active_step -= 1 },
+                            on_click: move |_| if active_step() > 0 { active_step -= 1 },
                             "Previous"
                         }
 
@@ -595,7 +595,7 @@ fn StepperShowcase() -> Element {
                             variant: ButtonVariant::Primary,
                             size: ButtonSize::Sm,
                             disabled: active_step() >= steps_len - 1,
-                            onclick: move |_| if active_step() < steps_len - 1 { active_step += 1 },
+                            on_click: move |_| if active_step() < steps_len - 1 { active_step += 1 },
                             "Next"
                         }
                     }
@@ -1080,13 +1080,13 @@ fn DialogShowcase() -> Element {
 
                     Button {
                         variant: ButtonVariant::Primary,
-                        onclick: move |_| dialog_open.set(true),
+                        on_click: move |_| dialog_open.set(true),
                         "Open Dialog"
                     }
 
                     Button {
                         variant: ButtonVariant::Destructive,
-                        onclick: move |_| alert_open.set(true),
+                        on_click: move |_| alert_open.set(true),
                         "Open Alert Dialog"
                     }
 
@@ -1106,13 +1106,13 @@ fn DialogShowcase() -> Element {
 
                             Button {
                                 variant: ButtonVariant::Ghost,
-                                onclick: move |_| dialog_open.set(false),
+                                on_click: move |_| dialog_open.set(false),
                                 "Cancel"
                             }
 
                             Button {
                                 variant: ButtonVariant::Primary,
-                                onclick: move |_| dialog_open.set(false),
+                                on_click: move |_| dialog_open.set(false),
                                 "Confirm"
                             }
                         }
@@ -1439,7 +1439,7 @@ fn InteractiveDemo() -> Element {
 
                         Button {
                             variant: ButtonVariant::Secondary,
-                            onclick: move |_| {
+                            on_click: move |_| {
                                 count -= 1;
                                 message.set("Decremented!".to_string());
                             },
@@ -1452,7 +1452,7 @@ fn InteractiveDemo() -> Element {
 
                         Button {
                             variant: ButtonVariant::Destructive,
-                            onclick: move |_| {
+                            on_click: move |_| {
                                 count.set(0);
                                 message.set("Reset!".to_string());
                             },
@@ -1461,7 +1461,7 @@ fn InteractiveDemo() -> Element {
 
                         Button {
                             variant: ButtonVariant::Primary,
-                            onclick: move |_| {
+                            on_click: move |_| {
                                 count += 1;
                                 message.set("Incremented!".to_string());
                             },
@@ -2302,7 +2302,7 @@ fn NewOrganismsShowcase() -> Element {
                         gap: SpacingSize::Sm,
                         Label { size: TextSize::Small, "Tour / Onboarding" }
                         Button {
-                            onclick: move |_| tour_open.set(true),
+                            on_click: move |_| tour_open.set(true),
                             "Start Tour"
                         }
                     }
@@ -2354,7 +2354,7 @@ fn NewComponentsShowcase() -> Element {
                         Label { size: TextSize::Small, "Sheet (Side Panel)" }
                         Button {
                             variant: ButtonVariant::Primary,
-                            onclick: move |_| sheet_open.set(true),
+                            on_click: move |_| sheet_open.set(true),
                             "Open Sheet"
                         }
                         Sheet {
@@ -2364,7 +2364,7 @@ fn NewComponentsShowcase() -> Element {
                             description: Some("This is a sheet component that slides in from the right.".to_string()),
                             VStack { gap: SpacingSize::Md,
                                 p { "Sheets are great for displaying secondary content without leaving the current page." }
-                                Button { onclick: move |_| sheet_open.set(false), "Close Sheet" }
+                                Button { on_click: move |_| sheet_open.set(false), "Close Sheet" }
                             }
                         }
                     }
@@ -2377,9 +2377,9 @@ fn NewComponentsShowcase() -> Element {
                         Label { size: TextSize::Small, "Sonner (Toast Notifications)" }
                         HStack {
                             gap: SpacingSize::Sm,
-                            Button { onclick: move |_| { sonner.toast("Hello World!"); }, "Show Toast" }
-                            Button { variant: ButtonVariant::Secondary, onclick: move |_| { sonner.success("Success!"); }, "Success" }
-                            Button { variant: ButtonVariant::Destructive, onclick: move |_| { sonner.error("Error!"); }, "Error" }
+                            Button { on_click: move |_| { sonner.toast("Hello World!"); }, "Show Toast" }
+                            Button { variant: ButtonVariant::Secondary, on_click: move |_| { sonner.success("Success!"); }, "Success" }
+                            Button { variant: ButtonVariant::Destructive, on_click: move |_| { sonner.error("Error!"); }, "Error" }
                         }
                         // Sonner renders at page level in real usage
                     }

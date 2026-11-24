@@ -144,7 +144,8 @@ pub struct RatingInputProps {
     #[props(default = 24)]
     pub size: u16,
     /// Change handler
-    pub on_change: EventHandler<f32>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<f32>>,
     /// Label
     #[props(default)]
     pub label: Option<String>,
@@ -216,7 +217,9 @@ pub fn RatingInput(props: RatingInputProps) -> Element {
                                 } else {
                                     star_value
                                 };
-                                props.on_change.call(new_value);
+                                if let Some(h) = &props.on_change {
+                                    h.call(new_value);
+                                }
                                 hover_value.set(None);
                             };
 
@@ -258,7 +261,11 @@ pub fn RatingInput(props: RatingInputProps) -> Element {
                     button {
                         type: "button",
                         style: "font-size: 12px; color: #6b7280; background: none; border: none; cursor: pointer; text-decoration: underline;",
-                        onclick: move |_| props.on_change.call(0.0),
+                        onclick: move |_| {
+                            if let Some(h) = &props.on_change {
+                                h.call(0.0);
+                            }
+                        },
                         "Clear"
                     }
                 }

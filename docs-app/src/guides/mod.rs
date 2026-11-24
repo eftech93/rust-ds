@@ -47,7 +47,7 @@ pub fn QuickStartPage() -> Element {
             h1 { style: "margin: 0; font-size: 32px; font-weight: 800;", "Quick Start" }
 
             Section { number: 1, title: "Add Dependencies",
-                CodeBlock { code: "# Cargo.toml\n[dependencies]\ndioxus = \"0.7\"\ndioxus-ui-system = \"0.0.8\"".to_string() }
+                CodeBlock { code: "# Cargo.toml\n[dependencies]\ndioxus = \"0.7\"\ndioxus-ui-system = \"0.0.9\"".to_string() }
             }
 
             Section { number: 2, title: "Wrap with ThemeProvider",
@@ -121,7 +121,7 @@ pub fn FormsPage() -> Element {
                         Button {
                             variant: ButtonVariant::Primary,
                             disabled: name().is_empty() || email().is_empty(),
-                            onclick: move |_| submitted.set(true),
+                            on_click: move |_| submitted.set(true),
                             "Submit"
                         }
                     }
