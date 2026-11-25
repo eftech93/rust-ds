@@ -66,7 +66,8 @@ pub struct PasswordInputProps {
     #[props(default)]
     pub value: String,
     /// Callback when value changes
-    pub on_change: EventHandler<String>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<String>>,
     /// Placeholder text
     #[props(default)]
     pub placeholder: Option<String>,
@@ -363,7 +364,9 @@ pub fn PasswordInput(props: PasswordInputProps) -> Element {
                     onfocus: move |_| is_focused.set(true),
                     onblur: move |_| is_focused.set(false),
                     oninput: move |e| {
-                        props.on_change.call(e.value());
+                        if let Some(h) = &props.on_change {
+                            h.call(e.value());
+                        }
                     },
                 }
 

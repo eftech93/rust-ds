@@ -425,9 +425,12 @@ struct PieSliceProps {
     show_labels: bool,
     point: ChartDataPoint,
     tooltip_content: String,
+    #[props(default)]
     on_slice_click: Option<EventHandler<ChartDataPoint>>,
     tooltip_enabled: bool,
+    #[props(default)]
     on_tooltip_show: Option<EventHandler<(i32, i32, String)>>,
+    #[props(default)]
     on_tooltip_hide: Option<EventHandler<()>>,
 }
 

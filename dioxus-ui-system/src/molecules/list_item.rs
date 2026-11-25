@@ -19,7 +19,8 @@ pub enum ListItemVariant {
 #[derive(Props, Clone, PartialEq)]
 pub struct ListItemProps {
     /// Primary text
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Secondary text/description
     #[props(default)]
     pub description: Option<String>,
@@ -128,10 +129,12 @@ pub fn ListItem(props: ListItemProps) -> Element {
                 class: "list-item-content",
                 style: "flex: 1; min-width: 0;",
 
-                div {
-                    class: "list-item-title",
-                    style: "font-size: 14px; font-weight: 500; color: {title_color}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;",
-                    "{props.title}"
+                if let Some(title) = props.title {
+                    div {
+                        class: "list-item-title",
+                        style: "font-size: 14px; font-weight: 500; color: {title_color}; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;",
+                        "{title}"
+                    }
                 }
 
                 if let Some(description) = props.description {
@@ -225,7 +228,8 @@ pub fn ListGroup(props: ListGroupProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct ActionListItemProps {
     /// Action label
-    pub label: String,
+    #[props(default)]
+    pub label: Option<String>,
     /// Icon
     #[props(default)]
     pub icon: Option<String>,
@@ -236,7 +240,8 @@ pub struct ActionListItemProps {
     #[props(default)]
     pub shortcut: Option<String>,
     /// Click handler
-    pub on_click: EventHandler<()>,
+    #[props(default)]
+    pub on_click: Option<EventHandler<()>>,
     /// Disabled state
     #[props(default = false)]
     pub disabled: bool,
@@ -302,7 +307,11 @@ pub fn ActionListItem(props: ActionListItemProps) -> Element {
             class: "action-list-item{class_css}",
             style: "display: flex; align-items: center; gap: 12px; width: 100%; padding: 10px 14px; background: transparent; border: none; text-align: left; cursor: {cursor}; opacity: {opacity}; border-radius: 6px; transition: background 0.15s ease;",
             disabled: props.disabled,
-            onclick: move |_| props.on_click.call(()),
+            onclick: move |_| {
+                if let Some(handler) = &props.on_click {
+                    handler.call(());
+                }
+            },
 
             if let Some(icon) = props.icon {
                 span {
@@ -316,10 +325,12 @@ pub fn ActionListItem(props: ActionListItemProps) -> Element {
                 class: "action-list-item-content",
                 style: "flex: 1; min-width: 0;",
 
-                div {
-                    class: "action-list-item-label",
-                    style: "font-size: 14px; color: {text_color}; font-weight: 500;",
-                    "{props.label}"
+                if let Some(label) = props.label {
+                    div {
+                        class: "action-list-item-label",
+                        style: "font-size: 14px; color: {text_color}; font-weight: 500;",
+                        "{label}"
+                    }
                 }
 
                 if let Some(description) = props.description {

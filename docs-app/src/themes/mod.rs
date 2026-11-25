@@ -988,7 +988,7 @@ pub fn CustomThemePage() -> Element {
                 Button {
                     variant: ButtonVariant::Primary,
                     size: ButtonSize::Sm,
-                    onclick: move |_| show_code.set(!show_code()),
+                    on_click: move |_| show_code.set(!show_code()),
                     if show_code() { "Hide Code" } else { "Show Generated Code" }
                 }
 
@@ -1000,7 +1000,7 @@ pub fn CustomThemePage() -> Element {
                             variant: ButtonVariant::Secondary,
                             size: ButtonSize::Sm,
                             style: "position: absolute; top: 8px; right: 8px;",
-                            onclick: move |_| {
+                            on_click: move |_| {
                                 // Copy to clipboard
                                 if let Some(window) = web_sys::window() {
                                     let _ = window.navigator().clipboard().write_text(&generated_code());
@@ -1026,7 +1026,7 @@ pub fn CustomThemePage() -> Element {
                     Button {
                         variant: ButtonVariant::Secondary,
                         size: ButtonSize::Sm,
-                        onclick: move |_| {
+                        on_click: move |_| {
                             theme_state.set(CustomThemeState::default());
                         },
                         "Reset to Default"
@@ -1035,7 +1035,7 @@ pub fn CustomThemePage() -> Element {
                     Button {
                         variant: ButtonVariant::Destructive,
                         size: ButtonSize::Sm,
-                        onclick: move |_| {
+                        on_click: move |_| {
                             // Clear local storage
                             if let Some(storage) = web_sys::window().and_then(|w| w.local_storage().ok()).flatten() {
                                 let _ = storage.remove_item(CUSTOM_THEME_STORAGE_KEY);

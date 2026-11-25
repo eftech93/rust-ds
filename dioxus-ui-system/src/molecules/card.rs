@@ -39,7 +39,7 @@ pub struct CardProps {
     pub full_width: bool,
     /// Click handler (makes card interactive)
     #[props(default)]
-    pub onclick: Option<EventHandler<MouseEvent>>,
+    pub on_click: Option<EventHandler<()>>,
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
@@ -73,7 +73,7 @@ pub struct CardProps {
 pub fn Card(props: CardProps) -> Element {
     let variant = props.variant.clone();
     let full_width = props.full_width;
-    let has_onclick = props.onclick.is_some();
+    let has_on_click = props.on_click.is_some();
 
     // Interactive states
     let mut is_hovered = use_signal(|| false);
@@ -106,7 +106,7 @@ pub fn Card(props: CardProps) -> Element {
         };
 
         // Interactive states
-        let styled = if has_onclick && !is_pressed() && is_hovered() {
+        let styled = if has_on_click && !is_pressed() && is_hovered() {
             match variant {
                 CardVariant::Elevated => Style {
                     box_shadow: Some(t.shadows.lg.clone()),
@@ -129,7 +129,7 @@ pub fn Card(props: CardProps) -> Element {
         };
 
         // Cursor
-        let styled = if has_onclick {
+        let styled = if has_on_click {
             styled.cursor_pointer()
         } else {
             styled
@@ -139,7 +139,7 @@ pub fn Card(props: CardProps) -> Element {
     });
 
     // Transform for pressed state
-    let transform = if is_pressed() && has_onclick {
+    let transform = if is_pressed() && has_on_click {
         "transform: scale(0.99);"
     } else {
         ""
@@ -153,20 +153,20 @@ pub fn Card(props: CardProps) -> Element {
 
     let class = props.class.clone().unwrap_or_default();
 
-    let onclick_handler = props.onclick;
+    let on_click_handler = props.on_click;
 
     rsx! {
         div {
             id: "{props.id.clone().unwrap_or_default()}",
             style: "{final_style}",
             class: "{class}",
-            onmouseenter: move |_| if has_onclick { is_hovered.set(true) },
+            onmouseenter: move |_| if has_on_click { is_hovered.set(true) },
             onmouseleave: move |_| { is_hovered.set(false); is_pressed.set(false); },
-            onmousedown: move |_| if has_onclick { is_pressed.set(true) },
-            onmouseup: move |_| if has_onclick { is_pressed.set(false) },
-            onclick: move |e| {
-                if let Some(handler) = &onclick_handler {
-                    handler.call(e);
+            onmousedown: move |_| if has_on_click { is_pressed.set(true) },
+            onmouseup: move |_| if has_on_click { is_pressed.set(false) },
+            onclick: move |_| {
+                if let Some(handler) = &on_click_handler {
+                    handler.call(());
                 }
             },
             {props.children}

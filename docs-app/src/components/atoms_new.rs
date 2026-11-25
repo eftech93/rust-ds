@@ -128,7 +128,7 @@ NumberInput {
             Section { title: "Props",
                 PropsTable { props: vec![
                     ("value", "f64", "Current value"),
-                    ("on_change", "EventHandler<f64>", "Callback when value changes"),
+                    ("on_change", "Option<EventHandler<f64>>", "Callback when value changes"),
                     ("min", "Option<f64>", "Minimum value"),
                     ("max", "Option<f64>", "Maximum value"),
                     ("step", "f64", "Step increment (default: 1.0)"),
@@ -260,7 +260,7 @@ pub fn PasswordInputPage() -> Element {
             Section { title: "Props",
                 PropsTable { props: vec![
                     ("value", "String", "Current value"),
-                    ("on_change", "EventHandler<String>", "Callback when value changes"),
+                    ("on_change", "Option<EventHandler<String>>", "Callback when value changes"),
                     ("placeholder", "Option<String>", "Placeholder text"),
                     ("disabled", "bool", "Disabled state"),
                     ("error", "Option<String>", "Error message to display"),

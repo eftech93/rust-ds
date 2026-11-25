@@ -432,7 +432,7 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
                     Button {
                         variant: ButtonVariant::Ghost,
                         size: crate::atoms::ButtonSize::Icon,
-                        onclick: move |_| drawer_open.set(true),
+                        on_click: move |_| drawer_open.set(true),
                         Icon {
                             name: "menu".to_string(),
                             size: IconSize::Medium,
@@ -476,7 +476,7 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
                     width: Some("100%".to_string()),
                     height: Some("100%".to_string()),
                     style: Some("background: rgba(0,0,0,0.5); z-index: 40;".to_string()),
-                    onclick: move |_| drawer_open.set(false),
+                    on_click: move |_| drawer_open.set(false),
                 }
 
                 // Drawer
@@ -502,7 +502,7 @@ fn DrawerLayoutRenderer(props: DrawerLayoutProps) -> Element {
                         Button {
                             variant: ButtonVariant::Ghost,
                             size: crate::atoms::ButtonSize::Icon,
-                            onclick: move |_| drawer_open.set(false),
+                            on_click: move |_| drawer_open.set(false),
                             "✕"
                         }
                     }

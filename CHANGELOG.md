@@ -4,7 +4,81 @@ All notable changes to `dioxus-ui-system` are documented here. The format follow
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/) (pre-1.0: minor bumps may break APIs).
 
-## [Unreleased] - 0.0.8
+## [0.0.9] - Unreleased
+
+**Breaking:** one pass that makes component props consistent (#17, #18), so you
+migrate once. The workspace now builds with zero warnings (`-D warnings` for build,
+clippy and rustdoc).
+
+### Migration guide
+
+**General rules**
+
+| Before | After |
+|---|---|
+| `onclick`, `onmouseenter`, `onmouseleave`, `onfocus`, `onblur`, `oninput` | `on_click`, `on_mouse_enter`, `on_mouse_leave`, `on_focus`, `on_blur`, `on_input` |
+| Required `EventHandler<T>` props | `Option<EventHandler<T>>`, default `None`. Passing a closure still works. |
+| Click/hover/focus payloads `MouseEvent` / `FocusEvent` | `()`. Write `move \|_\| ...` |
+| `Input.oninput: FormEvent` | `on_input: String` (the current value) |
+| `error: bool` (`Select`, `TextArea`, `OtpInput`) | `error: Option<String>`: the message, rendered below the field |
+| Required `label` / `title` / `description` / `placeholder` / `style` `String` | `Option<String>`; `label: "x"` call sites keep compiling |
+
+Native element attributes inside `rsx!` (`button { onclick: ... }`) are DOM listeners and
+are unchanged. Only our components' props were renamed.
+
+**Renamed handlers**
+
+- `Button`, `IconButton`, `Box`, `Badge`, `Card`, `Sparkline`, `MobileMenuToggle`:
+  `onclick: EventHandler<MouseEvent>` → `on_click: EventHandler<()>`. `UserMenuItem.onclick`
+  (data struct field) → `on_click`.
+- `Box`: `onmouseenter` / `onmouseleave` → `on_mouse_enter` / `on_mouse_leave` (payload `()`).
+- `Input`: `onfocus` / `onblur` → `on_focus` / `on_blur` (payload `()`); `oninput` →
+  `on_input: EventHandler<String>`.
+- `Radio.on_change` now receives the radio's `value` (`String`) instead of `()`.
+
+**Handlers that were required and are now optional**
+
+`NumberInput`, `PasswordInput`, `RatingInput`, `Slider`, `RangeSlider`, `RadioGroup`,
+`TagGroup`, `InputTag`, `Combobox`, `MultiCombobox`, `MultiSelect`, `OtpInput`,
+`Pagination`, `PageSizeSelector`, `TimePicker`, `TimeInput`, `Accordion`, `Calendar`
+(also `on_month_change`), `Tabs`, `VerticalTabs`, `ImageUploader` (`on_change`),
+`CommandInput.on_value_change`, `CommandItem.on_select`, `DropdownMenu.on_select`,
+`ActionListItem.on_click`, `Sheet.on_open_change`, `Toast.on_close`, `Dialog.on_close`,
+`AlertDialog.on_close`/`on_confirm`, `ConfirmationDialog`, `DeleteConfirmDialog`,
+`UnsavedChangesDialog`, `SignOutDialog` (all handlers), `ActionCard.on_action`,
+`DualActionCard`/`ImageActionCard` `on_primary`/`on_secondary`, `PricingCard.on_cta`,
+`FileUpload.on_upload`, `MenubarItem.on_click`, `MenubarCheckboxItem.on_checked_change`,
+`Wizard.on_step_change`/`on_finish`, `Tour.on_open_change`, and the data_table
+`Pagination.on_page_change`. `sonner::ToastAction.on_click` (data struct field) is now
+`Option<EventHandler<()>>`. Construct it with `Some(EventHandler::new(...))`.
+
+**`error` props**
+
+- `Select.error`, `OtpInput.error`: `bool` → `Option<String>`.
+- `TextArea.error`: `bool` → `Option<String>`, and `error_message` is removed:
+  `error: true, error_message: Some(msg)` → `error: msg`.
+
+**Content props that became optional (`Option<String>`)**
+
+- `Spinner.label` (`None` still shows "Loading"), `StepLabel.label`, `InputGroup.label`,
+  `StatCard.label`, `KanbanTag.label`, `MenubarTrigger.label`, `ActionListItem.label`
+- `ListItem.title`, `AlertDialog.title`/`description`, `HoverCardHeader.title`,
+  `PopoverHeader.title`, `AccordionItem2.title`, `ConfirmationDialog.title`, `Hero.title`
+- `ActionCard`, `DualActionCard`, `ImageCard`, `ImageActionCard`, `HorizontalCard`:
+  `title`/`description`; `NotificationCard`, `ExpandableCard`, `MediaCard`: `title`
+- `DateRangePicker.placeholder`, `ImageUploader.placeholder` (`None` keeps the old
+  default text)
+- `rich_text::ToolbarButton`: `title` (`&'static str`) and `style` → `Option<String>`
+
+### Docs and release
+
+- Docs site: props tables and code samples match the 0.0.9 API, and a new
+  "Migrating to 0.0.9" guide is at `/guides/migration`.
+- Release workflow: publishing now runs on the push to `main` that the release PR's
+  merge creates (only when the version is not on crates.io yet). This lets the
+  GitHub Pages deploy pass the `github-pages` environment's main-only rule.
+
+## [0.0.8] - 2026-11-24
 
 0.0.7 was never published to crates.io; its changes are included here.
 

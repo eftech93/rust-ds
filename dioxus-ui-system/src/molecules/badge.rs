@@ -55,7 +55,7 @@ pub struct BadgeProps {
     pub icon: Option<String>,
     /// Click handler (makes badge interactive)
     #[props(default)]
-    pub onclick: Option<EventHandler<MouseEvent>>,
+    pub on_click: Option<EventHandler<()>>,
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
@@ -87,7 +87,7 @@ pub fn Badge(props: BadgeProps) -> Element {
     let variant = props.variant.clone();
     let size = props.size;
     let has_icon = props.icon.is_some();
-    let has_onclick = props.onclick.is_some();
+    let has_on_click = props.on_click.is_some();
 
     // Interactive state
     let mut is_hovered = use_signal(|| false);
@@ -110,7 +110,7 @@ pub fn Badge(props: BadgeProps) -> Element {
         // Variant styles
         let styled = match variant {
             BadgeVariant::Default => {
-                let bg = if is_hovered() && has_onclick {
+                let bg = if is_hovered() && has_on_click {
                     t.colors.primary.darken(0.1)
                 } else {
                     t.colors.primary.clone()
@@ -118,7 +118,7 @@ pub fn Badge(props: BadgeProps) -> Element {
                 sized.bg(&bg).text_color(&t.colors.primary_foreground)
             }
             BadgeVariant::Secondary => {
-                let bg = if is_hovered() && has_onclick {
+                let bg = if is_hovered() && has_on_click {
                     t.colors.secondary.darken(0.05)
                 } else {
                     t.colors.secondary.clone()
@@ -140,7 +140,7 @@ pub fn Badge(props: BadgeProps) -> Element {
                 sized.bg(&bg).text_color(&fg)
             }
             BadgeVariant::Destructive => {
-                let bg = if is_hovered() && has_onclick {
+                let bg = if is_hovered() && has_on_click {
                     t.colors.destructive.darken(0.1)
                 } else {
                     t.colors.destructive.clone()
@@ -148,7 +148,7 @@ pub fn Badge(props: BadgeProps) -> Element {
                 sized.bg(&bg).text_color(&Color::new(255, 255, 255))
             }
             BadgeVariant::Outline => {
-                let border_color = if is_hovered() && has_onclick {
+                let border_color = if is_hovered() && has_on_click {
                     t.colors.foreground.darken(0.2)
                 } else {
                     t.colors.border.clone()
@@ -158,7 +158,7 @@ pub fn Badge(props: BadgeProps) -> Element {
                     .text_color(&t.colors.foreground)
             }
             BadgeVariant::Ghost => {
-                let bg = if is_hovered() && has_onclick {
+                let bg = if is_hovered() && has_on_click {
                     t.colors.muted.clone()
                 } else {
                     Color::new_rgba(0, 0, 0, 0.0)
@@ -168,7 +168,7 @@ pub fn Badge(props: BadgeProps) -> Element {
         };
 
         // Cursor
-        if has_onclick {
+        if has_on_click {
             styled.cursor_pointer().build()
         } else {
             styled.build()
@@ -183,7 +183,7 @@ pub fn Badge(props: BadgeProps) -> Element {
 
     let class = props.class.clone().unwrap_or_default();
     let icon_element = props.icon.clone();
-    let onclick_handler = props.onclick;
+    let on_click_handler = props.on_click;
 
     let id = props.id.clone().unwrap_or_default();
 
@@ -192,11 +192,11 @@ pub fn Badge(props: BadgeProps) -> Element {
             id: "{id}",
             style: "{final_style} display: inline-flex; align-items: center; gap: 4px;",
             class: "{class}",
-            onmouseenter: move |_| if has_onclick { is_hovered.set(true) },
+            onmouseenter: move |_| if has_on_click { is_hovered.set(true) },
             onmouseleave: move |_| is_hovered.set(false),
-            onclick: move |e| {
-                if let Some(handler) = &onclick_handler {
-                    handler.call(e);
+            onclick: move |_| {
+                if let Some(handler) = &on_click_handler {
+                    handler.call(());
                 }
             },
 

@@ -57,7 +57,7 @@ pub struct ButtonProps {
     pub full_width: bool,
     /// Click handler
     #[props(default)]
-    pub onclick: Option<EventHandler<MouseEvent>>,
+    pub on_click: Option<EventHandler<()>>,
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
@@ -102,7 +102,7 @@ impl ButtonType {
 ///     Button {
 ///         variant: ButtonVariant::Primary,
 ///         size: ButtonSize::Md,
-///         onclick: move |_| println!("Clicked!"),
+///         on_click: move |_| println!("Clicked!"),
 ///         "Click me"
 ///     }
 /// }
@@ -262,10 +262,10 @@ pub fn Button(props: ButtonProps) -> Element {
             onmouseup: move |_| if !disabled { is_pressed.set(false) },
             onfocus: move |_| is_focused.set(true),
             onblur: move |_| is_focused.set(false),
-            onclick: move |e| {
-                if let Some(handler) = &props.onclick {
+            onclick: move |_| {
+                if let Some(handler) = &props.on_click {
                     if !disabled {
-                        handler.call(e);
+                        handler.call(());
                     }
                 }
             },
@@ -281,14 +281,14 @@ pub fn IconButton(
     #[props(default)] variant: ButtonVariant,
     #[props(default)] size: ButtonSize,
     #[props(default)] disabled: bool,
-    #[props(default)] onclick: Option<EventHandler<MouseEvent>>,
+    #[props(default)] on_click: Option<EventHandler<()>>,
 ) -> Element {
     rsx! {
         Button {
             variant: variant,
             size: ButtonSize::Icon,
             disabled: disabled,
-            onclick: onclick,
+            on_click: on_click,
             {icon}
         }
     }

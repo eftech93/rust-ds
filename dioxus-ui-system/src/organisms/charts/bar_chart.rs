@@ -467,9 +467,12 @@ type BarGeometry = (
 struct BarElementsProps {
     bars: Vec<BarGeometry>,
     animation_enabled: bool,
+    #[props(default)]
     on_bar_click: Option<EventHandler<ChartDataPoint>>,
     tooltip_enabled: bool,
+    #[props(default)]
     on_tooltip_show: Option<EventHandler<(i32, i32, String)>>,
+    #[props(default)]
     on_tooltip_hide: Option<EventHandler<()>>,
 }
 
@@ -503,6 +506,7 @@ struct BarPathProps {
     color_css: String,
     animation_enabled: bool,
     point: ChartDataPoint,
+    #[props(default)]
     on_bar_click: Option<EventHandler<ChartDataPoint>>,
     tooltip_enabled: bool,
     bar_x: f64,
@@ -510,7 +514,9 @@ struct BarPathProps {
     bar_w: f64,
     bar_h: f64,
     tooltip_content: String,
+    #[props(default)]
     on_tooltip_show: Option<EventHandler<(i32, i32, String)>>,
+    #[props(default)]
     on_tooltip_hide: Option<EventHandler<()>>,
 }
 

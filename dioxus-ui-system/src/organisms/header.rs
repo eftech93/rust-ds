@@ -258,7 +258,7 @@ pub fn HeaderNavLink(props: HeaderNavLinkProps) -> Element {
 #[component]
 pub fn MobileMenuToggle(
     #[props(default)] is_open: bool,
-    #[props(default)] onclick: Option<EventHandler<()>>,
+    #[props(default)] on_click: Option<EventHandler<()>>,
 ) -> Element {
     let icon_name = if is_open {
         "x".to_string()
@@ -270,11 +270,7 @@ pub fn MobileMenuToggle(
         Button {
             variant: ButtonVariant::Ghost,
             size: crate::atoms::ButtonSize::Icon,
-            onclick: move |_| {
-                if let Some(handler) = &onclick {
-                    handler.call(());
-                }
-            },
+            on_click: on_click,
             Icon {
                 name: icon_name,
                 size: IconSize::Medium,
@@ -311,7 +307,7 @@ pub struct UserMenuProps {
 pub struct UserMenuItem {
     pub label: String,
     pub icon: Option<String>,
-    pub onclick: Option<EventHandler<()>>,
+    pub on_click: Option<EventHandler<()>>,
 }
 
 /// User Menu component
@@ -371,7 +367,7 @@ pub fn UserMenu(props: UserMenuProps) -> Element {
 
             Button {
                 variant: ButtonVariant::Ghost,
-                onclick: move |_| is_open.toggle(),
+                on_click: move |_| is_open.toggle(),
 
                 div {
                     style: "display: flex; align-items: center; gap: 8px;",
@@ -387,7 +383,7 @@ pub fn UserMenu(props: UserMenuProps) -> Element {
             if is_open() {
                 UserMenuDropdown {
                     items: props.menu_items.clone(),
-                    on_close: move || is_open.set(false),
+                    on_close: move |_| is_open.set(false),
                 }
             }
         }
@@ -398,7 +394,8 @@ pub fn UserMenu(props: UserMenuProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct UserMenuDropdownProps {
     pub items: Vec<UserMenuItem>,
-    pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub on_close: Option<EventHandler<()>>,
     #[props(default)]
     pub id: Option<String>,
     #[props(default)]
@@ -448,7 +445,8 @@ pub fn UserMenuDropdown(props: UserMenuDropdownProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct UserMenuItemViewProps {
     pub item: UserMenuItem,
-    pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub on_close: Option<EventHandler<()>>,
     #[props(default)]
     pub id: Option<String>,
     #[props(default)]
@@ -487,10 +485,12 @@ pub fn UserMenuItemView(props: UserMenuItemViewProps) -> Element {
             class: "{class}",
             style: "{style} background: transparent; border: none; text-align: left; color: inherit; {custom_style}",
             onclick: move |_| {
-                if let Some(handler) = &item.onclick {
+                if let Some(handler) = &item.on_click {
                     handler.call(());
                 }
-                props.on_close.call(());
+                if let Some(handler) = &props.on_close {
+                    handler.call(());
+                }
             },
 
             if let Some(name) = icon {

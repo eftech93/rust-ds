@@ -3,19 +3,19 @@ name: Release
 # Branch-based releases:
 #   1. scripts/dev.sh bump X.Y.Z   -> bumps versions, creates branch release/vX.Y.Z
 #   2. push the branch             -> this workflow verifies it (dry run)
-#   3. merge the PR into main      -> this workflow publishes vX.Y.Z
-# The branch name must equal v<crate version>. A manual run from the Actions
-# tab is a dry run unless "dry_run" is unticked.
+#   3. merge the PR into main      -> the push to main publishes vX.Y.Z
+#      (only when that version is not on crates.io yet, so other pushes to
+#      main are no-ops). Running from main keeps the github-pages environment
+#      rule (deploys only from main) satisfied.
+# The release branch name must equal v<crate version>. A manual run from the
+# Actions tab is a dry run unless "dry_run" is unticked.
 #
 # Runs on a self-hosted runner. Override the runner label with the
 # repository variable RELEASE_RUNNER (defaults to "self-hosted").
 
 on:
   push:
-    branches: ["release/v*"]
-  pull_request:
-    types: [closed]
-    branches: [main]
+    branches: ["release/v*", main]
   workflow_dispatch:
     inputs:
       dry_run:
@@ -28,7 +28,7 @@ on:
         default: true
 
 concurrency:
-  group: release-${{ github.event.pull_request.head.ref || github.ref }}
+  group: release-${{ github.ref }}
   cancel-in-progress: false
 
 env:
@@ -36,19 +36,13 @@ env:
   CRATE: dioxus-ui-system
   DIOXUS_CLI_VERSION: "0.7"
   PAGES_BASE_PATH: rust-ds
-  # Merged PR -> the merge commit on main; otherwise the triggering commit.
-  RELEASE_SHA: ${{ github.event.pull_request.merge_commit_sha || github.sha }}
+  RELEASE_SHA: ${{ github.sha }}
 
 permissions:
   contents: read
 
 jobs:
   verify:
-    # For pull_request events, only merged PRs from a release/v* branch.
-    if: >-
-      github.event_name != 'pull_request' ||
-      (github.event.pull_request.merged &&
-       startsWith(github.event.pull_request.head.ref, 'release/v'))
     runs-on: ${{ vars.RELEASE_RUNNER || 'self-hosted' }}
     outputs:
       version: ${{ steps.meta.outputs.version }}
@@ -64,18 +58,23 @@ jobs:
         id: meta
         shell: bash
         env:
-          HEAD_REF: ${{ github.event.pull_request.head.ref }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
           version=$(cargo metadata --no-deps --format-version 1 \
             | python3 -c "import json,sys; print(next(p['version'] for p in json.load(sys.stdin)['packages'] if p['name']=='$CRATE'))")
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-          case "$GITHUB_EVENT_NAME" in
-            push)              branch="$GITHUB_REF_NAME"; publish=false ;;
-            pull_request)      branch="$HEAD_REF";        publish=true ;;
-            workflow_dispatch) branch="";                 publish=$([[ "$DRY_RUN" == "false" ]] && echo true || echo false) ;;
-          esac
+          branch=""
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" ]]; then
+            publish=$([[ "$DRY_RUN" == "false" ]] && echo true || echo false)
+          elif [[ "$GITHUB_REF_NAME" == "main" ]]; then
+            # Publish only versions that are not on crates.io yet.
+            code=$(curl -s -o /dev/null -w '%{http_code}' -A "rust-ds-release (github.com/eftech93/rust-ds)" \
+              "https://crates.io/api/v1/crates/$CRATE/$version")
+            if [[ "$code" == "200" ]]; then publish=false; echo "$CRATE $version already published; nothing to release"; else publish=true; fi
+          else
+            branch="$GITHUB_REF_NAME"; publish=false
+          fi
           if [[ -n "$branch" && "$branch" != "release/v$version" ]]; then
             echo "::error::Branch $branch does not match $CRATE version $version (expected release/v$version)"
             exit 1

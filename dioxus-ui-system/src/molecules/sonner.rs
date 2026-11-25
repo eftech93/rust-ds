@@ -50,7 +50,7 @@ pub struct Toast {
 #[derive(Clone, PartialEq, Debug)]
 pub struct ToastAction {
     pub label: String,
-    pub on_click: EventHandler<()>,
+    pub on_click: Option<EventHandler<()>>,
 }
 
 /// Sonner (toast) properties
@@ -312,7 +312,11 @@ fn ToastItem(props: ToastItemProps) -> Element {
                     if let Some(action) = props.toast.action.clone() {
                         button {
                             style: "margin-top: 8px; padding: 4px 12px; font-size: 12px; font-weight: 500; color: {theme_primary().to_rgba()}; background: transparent; border: 1px solid {theme_border().to_rgba()}; border-radius: 4px; cursor: pointer;",
-                            onclick: move |_| action.on_click.call(()),
+                            onclick: move |_| {
+                                if let Some(handler) = &action.on_click {
+                                    handler.call(());
+                                }
+                            },
                             "{action.label}"
                         }
                     }

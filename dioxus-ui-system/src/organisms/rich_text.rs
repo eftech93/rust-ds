@@ -225,7 +225,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     title: "Bold",
                     icon: "B",
                     command: "bold",
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
             }
@@ -234,7 +234,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     title: "Italic",
                     icon: "I",
                     command: "italic",
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
             }
@@ -243,7 +243,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     title: "Underline",
                     icon: "U",
                     command: "underline",
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
             }
@@ -252,7 +252,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     title: "Strikethrough",
                     icon: "S",
                     command: "strikeThrough",
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
             }
@@ -269,7 +269,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     icon: "H1",
                     command: "formatBlock",
                     value: Some("H1"),
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
                 ToolbarButton {
@@ -277,7 +277,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     icon: "H2",
                     command: "formatBlock",
                     value: Some("H2"),
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
                 ToolbarButton {
@@ -285,7 +285,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     icon: "H3",
                     command: "formatBlock",
                     value: Some("H3"),
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
                 ToolbarSeparator {}
@@ -297,7 +297,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     title: "Bullet List",
                     icon: "•",
                     command: "insertUnorderedList",
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
             }
@@ -306,7 +306,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     title: "Numbered List",
                     icon: "1.",
                     command: "insertOrderedList",
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
             }
@@ -322,7 +322,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     title: "Align Left",
                     icon: "←",
                     command: "justifyLeft",
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
             }
@@ -331,7 +331,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     title: "Align Center",
                     icon: "↔",
                     command: "justifyCenter",
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
             }
@@ -340,7 +340,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     title: "Align Right",
                     icon: "→",
                     command: "justifyRight",
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
             }
@@ -357,7 +357,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     icon: "\"",
                     command: "formatBlock",
                     value: Some("BLOCKQUOTE"),
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
             }
@@ -367,7 +367,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     icon: "</>",
                     command: "formatBlock",
                     value: Some("PRE"),
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
             }
@@ -377,7 +377,7 @@ pub fn RichTextToolbar(props: RichTextToolbarProps) -> Element {
                     icon: "L",
                     command: "createLink",
                     value: Some("https://"),
-                    style: "{button_style}",
+                    style: button_style(),
                     hover_style: &button_hover_style,
                 }
             }
@@ -402,7 +402,8 @@ fn ToolbarSeparator() -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct ToolbarButtonProps {
     /// Button title (tooltip)
-    pub title: &'static str,
+    #[props(default)]
+    pub title: Option<String>,
     /// Button icon/text
     pub icon: &'static str,
     /// execCommand command name
@@ -411,7 +412,8 @@ pub struct ToolbarButtonProps {
     #[props(default)]
     pub value: Option<&'static str>,
     /// Base style
-    pub style: String,
+    #[props(default)]
+    pub style: Option<String>,
     /// Hover style
     pub hover_style: String,
     #[props(default)]
@@ -427,8 +429,8 @@ fn ToolbarButton(props: ToolbarButtonProps) -> Element {
         button {
             type: "button",
             class: "rich-text-toolbar-button",
-            title: "{props.title}",
-            style: "{props.style} {props.hover_style}",
+            title: props.title.clone(),
+            style: "{props.style.clone().unwrap_or_default()} {props.hover_style}",
             onclick: move |_| {
                 // Execute the formatting command
                 execute_command(props.command, props.value);

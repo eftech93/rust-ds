@@ -483,13 +483,13 @@ pub struct BoxProps {
     pub cursor: Option<String>,
     /// Click handler
     #[props(default)]
-    pub onclick: Option<EventHandler<MouseEvent>>,
+    pub on_click: Option<EventHandler<()>>,
     /// Mouse enter handler
     #[props(default)]
-    pub onmouseenter: Option<EventHandler<MouseEvent>>,
+    pub on_mouse_enter: Option<EventHandler<()>>,
     /// Mouse leave handler
     #[props(default)]
-    pub onmouseleave: Option<EventHandler<MouseEvent>>,
+    pub on_mouse_leave: Option<EventHandler<()>>,
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
@@ -795,19 +795,19 @@ pub fn Box(props: BoxProps) -> Element {
             style: "{final_style}",
             class: "{class}",
             id: "{id}",
-            onclick: move |e| {
-                if let Some(handler) = &props.onclick {
-                    handler.call(e);
+            onclick: move |_| {
+                if let Some(handler) = &props.on_click {
+                    handler.call(());
                 }
             },
-            onmouseenter: move |e| {
-                if let Some(handler) = &props.onmouseenter {
-                    handler.call(e);
+            onmouseenter: move |_| {
+                if let Some(handler) = &props.on_mouse_enter {
+                    handler.call(());
                 }
             },
-            onmouseleave: move |e| {
-                if let Some(handler) = &props.onmouseleave {
-                    handler.call(e);
+            onmouseleave: move |_| {
+                if let Some(handler) = &props.on_mouse_leave {
+                    handler.call(());
                 }
             },
             {props.children}

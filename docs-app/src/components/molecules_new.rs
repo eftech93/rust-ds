@@ -93,7 +93,7 @@ Command {
                 PropsTable { props: vec![
                     ("placeholder", "Option<String>", "Placeholder text"),
                     ("value", "String", "Current value"),
-                    ("on_value_change", "EventHandler<String>", "Callback when value changes"),
+                    ("on_value_change", "Option<EventHandler<String>>", "Callback when value changes"),
                     ("id", "Option<String>", "Element id"),
                     ("class", "Option<String>", "Custom CSS classes"),
                     ("style", "Option<String>", "Custom inline styles"),
@@ -116,7 +116,7 @@ Command {
                 h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "CommandItemProps" }
                 PropsTable { props: vec![
                     ("value", "String", "Search value for filtering"),
-                    ("on_select", "EventHandler<()>", "Callback when item is selected"),
+                    ("on_select", "Option<EventHandler<()>>", "Callback when item is selected"),
                     ("children", "Element", "Child elements"),
                     ("disabled", "bool", "Whether the item is disabled"),
                     ("id", "Option<String>", "Element id"),
@@ -155,7 +155,7 @@ pub fn SheetPage() -> Element {
 
             Section { title: "Basic (Right Side)",
                 ExampleBox {
-                    Button { onclick: move |_| open.set(true), "Open Sheet" }
+                    Button { on_click: move |_| open.set(true), "Open Sheet" }
 
                     Sheet {
                         open: open(),
@@ -176,7 +176,7 @@ pub fn SheetPage() -> Element {
                 }
                 CodeBlock { code: r#"let mut open = use_signal(|| false);
 
-Button { onclick: move |_| open.set(true), "Open Sheet" }
+Button { on_click: move |_| open.set(true), "Open Sheet" }
 
 Sheet {
     open: open(),
@@ -189,7 +189,7 @@ Sheet {
 
             Section { title: "Left Side",
                 ExampleBox {
-                    Button { onclick: move |_| open_left.set(true), "Open Left Sheet" }
+                    Button { on_click: move |_| open_left.set(true), "Open Left Sheet" }
 
                     Sheet {
                         open: open_left(),
@@ -209,7 +209,7 @@ Sheet {
                 h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "SheetProps" }
                 PropsTable { props: vec![
                     ("open", "bool", "Whether the sheet is open"),
-                    ("on_open_change", "EventHandler<bool>", "Callback when open state changes"),
+                    ("on_open_change", "Option<EventHandler<bool>>", "Callback when open state changes"),
                     ("side", "SheetSide", "Which edge to slide in from (Top, Right, Bottom, Left)"),
                     ("children", "Element", "Sheet content"),
                     ("title", "Option<String>", "Sheet title"),
@@ -292,7 +292,7 @@ MultiSelect {
                 PropsTable { props: vec![
                     ("options", "Vec<SelectOption>", "Available options"),
                     ("value", "Vec<String>", "Currently selected values"),
-                    ("on_change", "EventHandler<Vec<String>>", "Callback when selection changes"),
+                    ("on_change", "Option<EventHandler<Vec<String>>>", "Callback when selection changes"),
                     ("placeholder", "Option<String>", "Placeholder text"),
                     ("disabled", "bool", "Whether the select is disabled"),
                     ("max_selected", "Option<usize>", "Maximum number of selections allowed"),
@@ -347,7 +347,7 @@ pub fn OtpInputPage() -> Element {
                         length: 6,
                         value: "123".to_string(),
                         on_change: move |_| {},
-                        error: true,
+                        error: "Invalid code",
                     }
                 }
             }
@@ -356,9 +356,9 @@ pub fn OtpInputPage() -> Element {
                 PropsTable { props: vec![
                     ("length", "usize", "Number of input boxes (default: 6)"),
                     ("value", "String", "Current value"),
-                    ("on_change", "EventHandler<String>", "Change handler"),
+                    ("on_change", "Option<EventHandler<String>>", "Change handler"),
                     ("disabled", "bool", "Disabled state"),
-                    ("error", "bool", "Error state styling"),
+                    ("error", "Option<String>", "Error message rendered below the inputs (shows error state when Some)"),
                     ("mask", "bool", "Mask input (show • instead of numbers)"),
                     ("auto_focus", "bool", "Auto-focus first input on mount"),
                     ("style", "Option<String>", "Custom inline styles for the container"),
@@ -424,7 +424,7 @@ pub fn TimePickerPage() -> Element {
                 h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "TimePickerProps" }
                 PropsTable { props: vec![
                     ("value", "Option<String>", "Current time value (HH:MM or HH:MM:SS)"),
-                    ("on_change", "EventHandler<Option<String>>", "Change handler"),
+                    ("on_change", "Option<EventHandler<Option<String>>>", "Change handler"),
                     ("use_24h", "bool", "Use 24-hour format (default: true)"),
                     ("show_seconds", "bool", "Show seconds column"),
                     ("disabled", "bool", "Disabled state"),
@@ -439,7 +439,7 @@ pub fn TimePickerPage() -> Element {
                 h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "TimeInputProps" }
                 PropsTable { props: vec![
                     ("value", "Option<String>", "Current time value"),
-                    ("on_change", "EventHandler<Option<String>>", "Change handler"),
+                    ("on_change", "Option<EventHandler<Option<String>>>", "Change handler"),
                     ("use_24h", "bool", "Use 24-hour format (default: true)"),
                     ("show_seconds", "bool", "Show seconds"),
                     ("disabled", "bool", "Disabled state"),
@@ -636,7 +636,7 @@ pub fn HoverCardPage() -> Element {
                 ]}
                 h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "HoverCardHeaderProps" }
                 PropsTable { props: vec![
-                    ("title", "String", "Header title"),
+                    ("title", "Option<String>", "Header title"),
                     ("description", "Option<String>", "Optional description"),
                     ("id", "Option<String>", "Element id"),
                     ("class", "Option<String>", "Custom CSS classes"),
@@ -699,17 +699,17 @@ pub fn SonnerPage() -> Element {
                 ExampleBox {
                     HStack { gap: SpacingSize::Md, style: "flex-wrap: wrap;",
                         Button {
-                            onclick: move |_| { sonner.toast("Hello World!"); },
+                            on_click: move |_| { sonner.toast("Hello World!"); },
                             "Show Toast"
                         }
                         Button {
                             variant: ButtonVariant::Secondary,
-                            onclick: move |_| { sonner.success("Operation completed!"); },
+                            on_click: move |_| { sonner.success("Operation completed!"); },
                             "Success"
                         }
                         Button {
                             variant: ButtonVariant::Destructive,
-                            onclick: move |_| { sonner.error("Something went wrong"); },
+                            on_click: move |_| { sonner.error("Something went wrong"); },
                             "Error"
                         }
                     }
@@ -1085,7 +1085,7 @@ pub fn InputGroupPage() -> Element {
 
             Section { title: "Props",
                 PropsTable { props: vec![
-                    ("label", "String", "Field label"),
+                    ("label", "Option<String>", "Field label"),
                     ("value", "String", "Current input value"),
                     ("placeholder", "Option<String>", "Placeholder text"),
                     ("input_type", "InputType", "Input type"),

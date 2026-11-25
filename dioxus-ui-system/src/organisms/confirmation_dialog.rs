@@ -12,9 +12,11 @@ pub struct ConfirmationDialogProps {
     /// Whether the dialog is open
     pub open: bool,
     /// On close handler
-    pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub on_close: Option<EventHandler<()>>,
     /// Dialog title
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Confirmation message
     pub message: String,
     /// Confirm button text
@@ -30,7 +32,8 @@ pub struct ConfirmationDialogProps {
     #[props(default)]
     pub icon: Option<String>,
     /// On confirm handler
-    pub on_confirm: EventHandler<()>,
+    #[props(default)]
+    pub on_confirm: Option<EventHandler<()>>,
     /// Loading state
     #[props(default = false)]
     pub loading: bool,
@@ -127,7 +130,11 @@ pub fn ConfirmationDialog(props: ConfirmationDialogProps) -> Element {
                         type: "button",
                         class: "confirmation-dialog-cancel",
                         style: "padding: 12px 24px; font-size: 14px; font-weight: 500; color: {theme.tokens.read().colors.foreground.to_rgba()}; background: white; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px; cursor: pointer; transition: background 0.15s ease;",
-                        onclick: move |_| props.on_close.call(()),
+                        onclick: move |_| {
+                            if let Some(h) = &props.on_close {
+                                h.call(());
+                            }
+                        },
                         "{props.cancel_text.clone().unwrap_or_else(|| \"Cancel\".to_string())}"
                     }
 
@@ -136,7 +143,11 @@ pub fn ConfirmationDialog(props: ConfirmationDialogProps) -> Element {
                         class: "confirmation-dialog-confirm",
                         style: format!("padding: 12px 24px; font-size: 14px; font-weight: 500; color: white; background: {bg_color}; border: none; border-radius: 8px; cursor: pointer; transition: background 0.15s ease; opacity: {};", if props.loading { "0.7" } else { "1" }),
                         disabled: props.loading,
-                        onclick: move |_| props.on_confirm.call(()),
+                        onclick: move |_| {
+                            if let Some(h) = &props.on_confirm {
+                                h.call(());
+                            }
+                        },
 
                         if props.loading {
                             span {
@@ -159,11 +170,13 @@ pub fn ConfirmationDialog(props: ConfirmationDialogProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct DeleteConfirmDialogProps {
     pub open: bool,
-    pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub on_close: Option<EventHandler<()>>,
     #[props(default)]
     pub title: Option<String>,
     pub item_name: String,
-    pub on_confirm: EventHandler<()>,
+    #[props(default)]
+    pub on_confirm: Option<EventHandler<()>>,
     #[props(default = false)]
     pub loading: bool,
     /// Element id
@@ -203,9 +216,12 @@ pub fn DeleteConfirmDialog(props: DeleteConfirmDialogProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct UnsavedChangesDialogProps {
     pub open: bool,
-    pub on_close: EventHandler<()>,
-    pub on_save: EventHandler<()>,
-    pub on_discard: EventHandler<()>,
+    #[props(default)]
+    pub on_close: Option<EventHandler<()>>,
+    #[props(default)]
+    pub on_save: Option<EventHandler<()>>,
+    #[props(default)]
+    pub on_discard: Option<EventHandler<()>>,
     /// Element id
     #[props(default)]
     pub id: Option<String>,
@@ -250,21 +266,33 @@ pub fn UnsavedChangesDialog(props: UnsavedChangesDialogProps) -> Element {
                     button {
                         type: "button",
                         style: "padding: 12px 24px; font-size: 14px; font-weight: 500; color: {theme.tokens.read().colors.foreground.to_rgba()}; background: white; border: 1px solid {theme.tokens.read().colors.border.to_rgba()}; border-radius: 8px; cursor: pointer;",
-                        onclick: move |_| props.on_close.call(()),
+                        onclick: move |_| {
+                            if let Some(h) = &props.on_close {
+                                h.call(());
+                            }
+                        },
                         "Keep editing"
                     }
 
                     button {
                         type: "button",
                         style: "padding: 12px 24px; font-size: 14px; font-weight: 500; color: white; background: #ef4444; border: none; border-radius: 8px; cursor: pointer;",
-                        onclick: move |_| props.on_discard.call(()),
+                        onclick: move |_| {
+                            if let Some(h) = &props.on_discard {
+                                h.call(());
+                            }
+                        },
                         "Discard changes"
                     }
 
                     button {
                         type: "button",
                         style: "padding: 12px 24px; font-size: 14px; font-weight: 500; color: white; background: {theme.tokens.read().colors.primary.to_rgba()}; border: none; border-radius: 8px; cursor: pointer;",
-                        onclick: move |_| props.on_save.call(()),
+                        onclick: move |_| {
+                            if let Some(h) = &props.on_save {
+                                h.call(());
+                            }
+                        },
                         "Save changes"
                     }
                 }
@@ -277,8 +305,10 @@ pub fn UnsavedChangesDialog(props: UnsavedChangesDialogProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct SignOutDialogProps {
     pub open: bool,
-    pub on_close: EventHandler<()>,
-    pub on_confirm: EventHandler<()>,
+    #[props(default)]
+    pub on_close: Option<EventHandler<()>>,
+    #[props(default)]
+    pub on_confirm: Option<EventHandler<()>>,
     /// Element id
     #[props(default)]
     pub id: Option<String>,

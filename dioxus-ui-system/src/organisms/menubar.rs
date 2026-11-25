@@ -177,7 +177,8 @@ pub fn MenubarMenu(props: MenubarMenuProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct MenubarTriggerProps {
     /// The label text for this menu
-    pub label: String,
+    #[props(default)]
+    pub label: Option<String>,
     /// Whether this trigger is disabled
     #[props(default = false)]
     pub disabled: bool,
@@ -282,7 +283,9 @@ pub fn MenubarTrigger(props: MenubarTriggerProps) -> Element {
             onmouseenter: handle_mouse_enter,
             onmouseleave: handle_mouse_leave,
             onclick: handle_click,
-            "{props.label}"
+            if let Some(label) = props.label.clone() {
+                "{label}"
+            }
         }
     }
 }
@@ -444,7 +447,8 @@ pub struct MenubarItemProps {
     /// Item content
     pub children: Element,
     /// Callback when item is clicked
-    pub on_click: EventHandler<()>,
+    #[props(default)]
+    pub on_click: Option<EventHandler<()>>,
     /// Whether the item is disabled
     #[props(default = false)]
     pub disabled: bool,
@@ -505,7 +509,9 @@ pub fn MenubarItem(props: MenubarItemProps) -> Element {
 
     let handle_click = move |_| {
         if !props.disabled {
-            props.on_click.call(());
+            if let Some(h) = &props.on_click {
+                h.call(());
+            }
             // Close the menu
             active_menu_sig.set(None);
             is_open_sig.set(false);
@@ -857,7 +863,8 @@ pub struct MenubarCheckboxItemProps {
     #[props(default = false)]
     pub checked: bool,
     /// Callback when checked state changes
-    pub on_checked_change: EventHandler<bool>,
+    #[props(default)]
+    pub on_checked_change: Option<EventHandler<bool>>,
     /// Whether the item is disabled
     #[props(default = false)]
     pub disabled: bool,
@@ -910,7 +917,9 @@ pub fn MenubarCheckboxItem(props: MenubarCheckboxItemProps) -> Element {
 
     let handle_click = move |_| {
         if !props.disabled {
-            props.on_checked_change.call(!props.checked);
+            if let Some(h) = &props.on_checked_change {
+                h.call(!props.checked);
+            }
         }
     };
 

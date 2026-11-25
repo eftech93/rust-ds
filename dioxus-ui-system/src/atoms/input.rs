@@ -74,13 +74,13 @@ pub struct InputProps {
     pub on_change: Option<EventHandler<String>>,
     /// Focus handler
     #[props(default)]
-    pub onfocus: Option<EventHandler<FocusEvent>>,
+    pub on_focus: Option<EventHandler<()>>,
     /// Blur handler
     #[props(default)]
-    pub onblur: Option<EventHandler<FocusEvent>>,
-    /// Input handler (real-time)
+    pub on_blur: Option<EventHandler<()>>,
+    /// Input handler (real-time), receives the current value
     #[props(default)]
-    pub oninput: Option<EventHandler<FormEvent>>,
+    pub on_input: Option<EventHandler<String>>,
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
@@ -202,21 +202,21 @@ pub fn Input(props: InputProps) -> Element {
             disabled: disabled,
             onmouseenter: move |_| is_hovered.set(true),
             onmouseleave: move |_| is_hovered.set(false),
-            onfocus: move |e| {
+            onfocus: move |_| {
                 is_focused.set(true);
-                if let Some(handler) = &props.onfocus {
-                    handler.call(e);
+                if let Some(handler) = &props.on_focus {
+                    handler.call(());
                 }
             },
-            onblur: move |e| {
+            onblur: move |_| {
                 is_focused.set(false);
-                if let Some(handler) = &props.onblur {
-                    handler.call(e);
+                if let Some(handler) = &props.on_blur {
+                    handler.call(());
                 }
             },
             oninput: move |e| {
-                if let Some(handler) = &props.oninput {
-                    handler.call(e);
+                if let Some(handler) = &props.on_input {
+                    handler.call(e.value());
                 }
             },
             onchange: move |e| {

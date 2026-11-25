@@ -54,9 +54,9 @@ pub struct SelectProps {
     /// Whether the select is disabled
     #[props(default)]
     pub disabled: bool,
-    /// Whether the select has an error
+    /// Error message; `None` means no error
     #[props(default)]
-    pub error: bool,
+    pub error: Option<String>,
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
@@ -75,7 +75,7 @@ pub fn Select(props: SelectProps) -> Element {
     let mut is_focused = use_signal(|| false);
 
     let disabled = props.disabled;
-    let error = props.error;
+    let error = props.error.is_some();
 
     let select_style = use_style(move |t| {
         let base = Style::new()
@@ -116,6 +116,15 @@ pub fn Select(props: SelectProps) -> Element {
         format!("{} appearance: none; background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E\"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 40px;", style_str)
     });
 
+    let error_style = use_style(|t| {
+        Style::new()
+            .block()
+            .mt(&t.spacing, "xs")
+            .font_size(12)
+            .text_color(&t.colors.destructive)
+            .build()
+    });
+
     let handle_change = move |e: Event<FormData>| {
         let data = e.data();
         let new_value = data.value();
@@ -154,6 +163,13 @@ pub fn Select(props: SelectProps) -> Element {
                     selected: props.value == option.value,
                     "{option.label}"
                 }
+            }
+        }
+
+        if let Some(error) = props.error.clone() {
+            span {
+                style: "{error_style}",
+                "{error}"
             }
         }
     }
@@ -305,7 +321,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                     options: props.options.clone(),
                     selected: selected(),
                     on_select: add_selected,
-                    on_close: move || is_open.set(false),
+                    on_close: move |_| is_open.set(false),
                 }
             }
         }
@@ -316,8 +332,10 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
 struct MultiSelectDropdownProps {
     options: Vec<SelectOption>,
     selected: Vec<String>,
-    on_select: EventHandler<String>,
-    on_close: EventHandler<()>,
+    #[props(default)]
+    on_select: Option<EventHandler<String>>,
+    #[props(default)]
+    on_close: Option<EventHandler<()>>,
 }
 
 #[derive(Props, Clone, PartialEq)]
@@ -345,9 +363,11 @@ fn CheckBoxIndicator(props: CheckBoxIndicatorProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 struct MultiSelectTagProps {
     value: String,
-    label: String,
+    #[props(default)]
+    label: Option<String>,
     tag_style: String,
-    on_remove: EventHandler<String>,
+    #[props(default)]
+    on_remove: Option<EventHandler<String>>,
 }
 
 #[component]
@@ -356,12 +376,16 @@ fn MultiSelectTag(props: MultiSelectTagProps) -> Element {
     rsx! {
         span {
             style: "{props.tag_style}",
-            "{props.label}"
+            if let Some(label) = props.label.clone() {
+                "{label}"
+            }
             button {
                 style: "background: none; border: none; cursor: pointer; padding: 0; margin: 0; display: flex; align-items: center;",
                 onclick: move |e: Event<MouseData>| {
                     e.stop_propagation();
-                    props.on_remove.call(value.clone());
+                    if let Some(h) = &props.on_remove {
+                        h.call(value.clone());
+                    }
                 },
                 "×"
             }
@@ -422,7 +446,8 @@ struct DropdownOptionItemProps {
     option: SelectOption,
     item_style: String,
     is_selected: bool,
-    on_select: EventHandler<String>,
+    #[props(default)]
+    on_select: Option<EventHandler<String>>,
 }
 
 #[component]
@@ -433,7 +458,9 @@ fn DropdownOptionItem(props: DropdownOptionItemProps) -> Element {
             style: "{props.item_style}",
             disabled: props.option.disabled,
             onclick: move |_| {
-                props.on_select.call(value.clone());
+                if let Some(h) = &props.on_select {
+                    h.call(value.clone());
+                }
             },
 
             div {

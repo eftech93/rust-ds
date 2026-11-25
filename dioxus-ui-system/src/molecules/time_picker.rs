@@ -14,7 +14,8 @@ pub struct TimePickerProps {
     #[props(default)]
     pub value: Option<String>,
     /// Change handler called when time changes
-    pub on_change: EventHandler<Option<String>>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<Option<String>>>,
     /// Use 24-hour format (default: true, false for AM/PM)
     #[props(default = true)]
     pub use_24h: bool,
@@ -224,7 +225,9 @@ pub fn TimePicker(props: TimePickerProps) -> Element {
         let show_seconds = props.show_seconds;
         move |time: TimeValue| {
             let value = time.to_string(use_24h, show_seconds);
-            on_change.call(Some(value));
+            if let Some(handler) = &on_change {
+                handler.call(Some(value));
+            }
             is_open.set(false);
         }
     };
@@ -233,7 +236,9 @@ pub fn TimePicker(props: TimePickerProps) -> Element {
         let on_change = props.on_change;
         move |e: Event<MouseData>| {
             e.stop_propagation();
-            on_change.call(None);
+            if let Some(handler) = &on_change {
+                handler.call(None);
+            }
         }
     };
 
@@ -303,7 +308,7 @@ pub fn TimePicker(props: TimePickerProps) -> Element {
                         show_seconds: props.show_seconds,
                         minute_step: props.minute_step,
                         on_select: on_select_time,
-                        on_close: move || is_open.set(false),
+                        on_close: move |_| is_open.set(false),
                     }
                 }
             }
@@ -326,8 +331,10 @@ struct TimePickerDropdownProps {
     use_24h: bool,
     show_seconds: bool,
     minute_step: u32,
-    on_select: EventHandler<TimeValue>,
-    on_close: EventHandler<()>,
+    #[props(default)]
+    on_select: Option<EventHandler<TimeValue>>,
+    #[props(default)]
+    on_close: Option<EventHandler<()>>,
     /// Element id
     #[props(default)]
     pub id: Option<String>,
@@ -429,12 +436,14 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
     let on_select = {
         let on_select = props.on_select;
         move || {
-            on_select.call(TimeValue {
-                hour: hour(),
-                minute: minute(),
-                second: second(),
-                is_pm: is_pm(),
-            });
+            if let Some(handler) = &on_select {
+                handler.call(TimeValue {
+                    hour: hour(),
+                    minute: minute(),
+                    second: second(),
+                    is_pm: is_pm(),
+                });
+            }
         }
     };
 
@@ -445,13 +454,15 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
         let mut is_pm = is_pm;
         let on_select = props.on_select;
         let use_24h = props.use_24h;
-        move || {
+        move |_: ()| {
             let now = TimeValue::now(use_24h);
             hour.set(now.hour);
             minute.set(now.minute);
             second.set(now.second);
             is_pm.set(now.is_pm);
-            on_select.call(now);
+            if let Some(handler) = &on_select {
+                handler.call(now);
+            }
         }
     };
 
@@ -461,7 +472,11 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
             id: "{props.id.clone().unwrap_or_default()}",
             class: "time-picker-backdrop {props.class.clone().unwrap_or_default()}",
             style: "position: fixed; inset: 0; z-index: 9998; {props.style.clone().unwrap_or_default()}",
-            onclick: move |_| props.on_close.call(()),
+            onclick: move |_| {
+                if let Some(handler) = &props.on_close {
+                    handler.call(());
+                }
+            },
         }
 
         div {
@@ -679,7 +694,8 @@ fn TimePickerDropdown(props: TimePickerDropdownProps) -> Element {
 /// Now button component with hover state
 #[derive(Props, Clone, PartialEq)]
 struct TimePickerNowButtonProps {
-    on_click: EventHandler<()>,
+    #[props(default)]
+    on_click: Option<EventHandler<()>>,
     /// Element id
     #[props(default)]
     pub id: Option<String>,
@@ -713,7 +729,11 @@ fn TimePickerNowButton(props: TimePickerNowButtonProps) -> Element {
                 style: "font-size: 13px; font-weight: 500; color: {theme.tokens.read().colors.primary.to_rgba()}; background: {bg_color}; border: none; cursor: pointer; padding: 6px 12px; border-radius: 6px; transition: all 100ms ease; {props.style.clone().unwrap_or_default()}",
                 onmouseenter: move |_| is_hovered.set(true),
                 onmouseleave: move |_| is_hovered.set(false),
-                onclick: move |_| props.on_click.call(()),
+                onclick: move |_| {
+                    if let Some(handler) = &props.on_click {
+                        handler.call(());
+                    }
+                },
                 "Now"
             }
         }
@@ -727,7 +747,8 @@ pub struct TimeInputProps {
     #[props(default)]
     pub value: Option<String>,
     /// Change handler
-    pub on_change: EventHandler<Option<String>>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<Option<String>>>,
     /// Use 24-hour format
     #[props(default = true)]
     pub use_24h: bool,
@@ -803,7 +824,9 @@ pub fn TimeInput(props: TimeInputProps) -> Element {
 
         // Validate and emit if valid
         if is_valid_time(&formatted, props.show_seconds) {
-            props.on_change.call(Some(formatted));
+            if let Some(handler) = &props.on_change {
+                handler.call(Some(formatted));
+            }
         }
     };
 

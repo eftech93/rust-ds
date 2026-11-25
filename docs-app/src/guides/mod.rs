@@ -21,6 +21,7 @@ pub fn GuidesPage() -> Element {
                 GuideCard { title: "Styling", description: "Learn different styling approaches", route: "/guides/styling" }
                 GuideCard { title: "Forms", description: "Building forms with validation", route: "/guides/forms" }
                 GuideCard { title: "Layouts", description: "Creating consistent page layouts", route: "/guides/layouts" }
+                GuideCard { title: "Migrating to 0.0.9", description: "Prop and event handler changes in 0.0.9", route: "/guides/migration" }
             }
         }
     }
@@ -47,7 +48,7 @@ pub fn QuickStartPage() -> Element {
             h1 { style: "margin: 0; font-size: 32px; font-weight: 800;", "Quick Start" }
 
             Section { number: 1, title: "Add Dependencies",
-                CodeBlock { code: "# Cargo.toml\n[dependencies]\ndioxus = \"0.7\"\ndioxus-ui-system = \"0.0.8\"".to_string() }
+                CodeBlock { code: "# Cargo.toml\n[dependencies]\ndioxus = \"0.7\"\ndioxus-ui-system = \"0.0.9\"".to_string() }
             }
 
             Section { number: 2, title: "Wrap with ThemeProvider",
@@ -121,7 +122,7 @@ pub fn FormsPage() -> Element {
                         Button {
                             variant: ButtonVariant::Primary,
                             disabled: name().is_empty() || email().is_empty(),
-                            onclick: move |_| submitted.set(true),
+                            on_click: move |_| submitted.set(true),
                             "Submit"
                         }
                     }
@@ -142,6 +143,92 @@ pub fn LayoutsPage() -> Element {
             Section { number: 1, title: "Layout Component",
                 p { "Use the Layout organism for consistent page structure:" }
                 CodeBlock { code: "Layout {{\n    layout_type: LayoutType::Sidebar,\n    nav_items: vec![\n        LayoutNavItem::new(\"home\", \"Home\", \"/\"),\n    ],\n    brand: Some(rsx! {{ \"MyApp\" }}),\n    \n    // Your content\n    div {{ \"Page content\" }}\n}}".to_string() }
+            }
+        }
+    }
+}
+
+/// Breaking changes between 0.0.8 and 0.0.9 (#17, #18).
+const MIGRATION_RULES: &[(&str, &str)] = &[
+    (
+        "onclick / onfocus / onblur / oninput",
+        "on_click / on_focus / on_blur / on_input",
+    ),
+    (
+        "onmouseenter / onmouseleave (Box)",
+        "on_mouse_enter / on_mouse_leave",
+    ),
+    (
+        "Required EventHandler<T> props",
+        "Option<EventHandler<T>>, default None (closures still work)",
+    ),
+    (
+        "Click / hover / focus payload: MouseEvent, FocusEvent",
+        "()",
+    ),
+    (
+        "Input.oninput: FormEvent",
+        "Input.on_input: String (the current value)",
+    ),
+    (
+        "Radio.on_change: ()",
+        "Radio.on_change: String (the radio's value)",
+    ),
+    (
+        "error: bool (Select, TextArea, OtpInput)",
+        "error: Option<String> (message shown below the field)",
+    ),
+    (
+        "TextArea.error_message",
+        "removed: pass the message as error",
+    ),
+    (
+        "Required label / title / description / placeholder / style: String",
+        "Option<String> (label: \"x\" still compiles)",
+    ),
+];
+
+#[component]
+pub fn MigrationPage() -> Element {
+    rsx! {
+        VStack {
+            style: "gap: 32px;",
+
+            Box {
+                h1 { style: "margin: 0 0 12px 0; font-size: 32px; font-weight: 800;", "Migrating to 0.0.9" }
+                p { style: "margin: 0; font-size: 16px; color: rgb(100,116,139);",
+                    "0.0.9 makes component props consistent in one breaking release. Native rsx elements (button {{ onclick: ... }}) are unchanged; only dioxus-ui-system component props were renamed." }
+            }
+
+            Section { number: 1, title: "What changed",
+                table { style: "width: 100%; border-collapse: collapse; font-size: 14px;",
+                    thead {
+                        tr {
+                            th { style: "text-align: left; padding: 8px; border-bottom: 2px solid rgb(226,232,240);", "0.0.8" }
+                            th { style: "text-align: left; padding: 8px; border-bottom: 2px solid rgb(226,232,240);", "0.0.9" }
+                        }
+                    }
+                    tbody {
+                        for (before, after) in MIGRATION_RULES.iter() {
+                            tr {
+                                td { style: "padding: 8px; border-bottom: 1px solid rgb(226,232,240); font-family: monospace;", "{before}" }
+                                td { style: "padding: 8px; border-bottom: 1px solid rgb(226,232,240); font-family: monospace;", "{after}" }
+                            }
+                        }
+                    }
+                }
+            }
+
+            Section { number: 2, title: "Before (0.0.8)",
+                CodeBlock { code: "Button {{\n    onclick: move |_evt: MouseEvent| save(),\n    \"Save\"\n}}\nInput {{\n    value: name(),\n    oninput: move |e: FormEvent| name.set(e.value()),\n}}\nTextArea {{\n    error: true,\n    error_message: Some(\"Required\".to_string()),\n}}\nTabs {{ tabs: items, value: tab(), on_change: move |v| tab.set(v) }}".to_string() }
+            }
+
+            Section { number: 3, title: "After (0.0.9)",
+                CodeBlock { code: "Button {{\n    on_click: move |_| save(),\n    \"Save\"\n}}\nInput {{\n    value: name(),\n    on_input: move |v: String| name.set(v),\n}}\nTextArea {{\n    error: \"Required\",\n}}\n// on_change is now optional; passing a closure works as before\nTabs {{ tabs: items, value: tab(), on_change: move |v| tab.set(v) }}".to_string() }
+            }
+
+            Section { number: 4, title: "Full list",
+                p { "Every renamed or retyped prop, per component, is listed in the CHANGELOG (section 0.0.9) in the repository." }
             }
         }
     }

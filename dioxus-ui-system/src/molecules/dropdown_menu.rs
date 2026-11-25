@@ -62,7 +62,8 @@ pub struct DropdownMenuProps {
     /// Menu items
     pub items: Vec<DropdownMenuItem>,
     /// Callback when an item is selected
-    pub on_select: EventHandler<String>,
+    #[props(default)]
+    pub on_select: Option<EventHandler<String>>,
     /// Menu alignment
     #[props(default)]
     pub align: DropdownAlign,
@@ -181,7 +182,7 @@ pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
                             key: "{item.value}",
                             item: item.clone(),
                             on_select: props.on_select,
-                            on_close: move || is_open.set(false),
+                            on_close: move |_| is_open.set(false),
                         }
                     }
                 }
@@ -193,8 +194,10 @@ pub fn DropdownMenu(props: DropdownMenuProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 struct DropdownMenuItemViewProps {
     item: DropdownMenuItem,
-    on_select: EventHandler<String>,
-    on_close: EventHandler<()>,
+    #[props(default)]
+    on_select: Option<EventHandler<String>>,
+    #[props(default)]
+    on_close: Option<EventHandler<()>>,
     /// Element id
     #[props(default)]
     pub id: Option<String>,
@@ -249,8 +252,12 @@ fn DropdownMenuItemView(props: DropdownMenuItemViewProps) -> Element {
             onmouseleave: move |_| is_hovered.set(false),
             onclick: move |_| {
                 if !props.item.disabled {
-                    on_select.call(value.clone());
-                    on_close.call(());
+                    if let Some(handler) = &on_select {
+                        handler.call(value.clone());
+                    }
+                    if let Some(handler) = &on_close {
+                        handler.call(());
+                    }
                 }
             },
 

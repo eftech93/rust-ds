@@ -22,7 +22,8 @@ pub struct SliderProps {
     #[props(default = 1.0)]
     pub step: f64,
     /// Change handler
-    pub on_change: EventHandler<f64>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<f64>>,
     /// Label
     #[props(default)]
     pub label: Option<String>,
@@ -179,7 +180,9 @@ pub fn Slider(props: SliderProps) -> Element {
                     style: format!("position: absolute; width: 100%; height: 100%; opacity: 0; cursor: {}; z-index: 2;", if props.disabled { "not-allowed" } else { "pointer" }),
                     oninput: move |e: Event<FormData>| {
                         if let Ok(val) = e.value().parse::<f64>() {
-                            props.on_change.call(val);
+                            if let Some(h) = &props.on_change {
+                                h.call(val);
+                            }
                         }
                     },
                 }
@@ -259,7 +262,8 @@ pub struct RangeSliderProps {
     #[props(default = 1.0)]
     pub step: f64,
     /// Change handler
-    pub on_change: EventHandler<(f64, f64)>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<(f64, f64)>>,
     /// Label
     #[props(default)]
     pub label: Option<String>,
@@ -329,7 +333,9 @@ pub fn RangeSlider(props: RangeSliderProps) -> Element {
                     oninput: move |e: Event<FormData>| {
                         if let Ok(val) = e.value().parse::<f64>() {
                             let new_min = val.min(props.max_value);
-                            props.on_change.call((new_min, props.max_value));
+                            if let Some(h) = &props.on_change {
+                                h.call((new_min, props.max_value));
+                            }
                         }
                     },
                 }
@@ -374,7 +380,9 @@ pub fn RangeSlider(props: RangeSliderProps) -> Element {
                     oninput: move |e: Event<FormData>| {
                         if let Ok(val) = e.value().parse::<f64>() {
                             let new_max = val.max(props.min_value);
-                            props.on_change.call((props.min_value, new_max));
+                            if let Some(h) = &props.on_change {
+                                h.call((props.min_value, new_max));
+                            }
                         }
                     },
                 }

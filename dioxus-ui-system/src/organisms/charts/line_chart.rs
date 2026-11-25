@@ -482,9 +482,12 @@ struct LineSeriesProps {
     series_data: Vec<ChartDataPoint>,
     tooltip_contents: Vec<String>,
     series_name: String,
+    #[props(default)]
     on_point_click: Option<EventHandler<ChartDataPoint>>,
     tooltip_enabled: bool,
+    #[props(default)]
     on_tooltip_show: Option<EventHandler<(i32, i32, String)>>,
+    #[props(default)]
     on_tooltip_hide: Option<EventHandler<()>>,
 }
 
@@ -546,9 +549,12 @@ struct LinePointProps {
     point: ChartDataPoint,
     tooltip_content: String,
     series_name: String,
+    #[props(default)]
     on_point_click: Option<EventHandler<ChartDataPoint>>,
     tooltip_enabled: bool,
+    #[props(default)]
     on_tooltip_show: Option<EventHandler<(i32, i32, String)>>,
+    #[props(default)]
     on_tooltip_hide: Option<EventHandler<()>>,
 }
 

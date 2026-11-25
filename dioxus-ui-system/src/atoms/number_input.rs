@@ -13,7 +13,8 @@ pub struct NumberInputProps {
     #[props(default)]
     pub value: f64,
     /// Callback when value changes
-    pub on_change: EventHandler<f64>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<f64>>,
     /// Minimum value
     #[props(default)]
     pub min: Option<f64>,
@@ -149,7 +150,9 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
         } else {
             new_value
         };
-        props.on_change.call(clamped);
+        if let Some(h) = &props.on_change {
+            h.call(clamped);
+        }
     };
 
     let handle_decrement = move |_| {
@@ -162,7 +165,9 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
         } else {
             new_value
         };
-        props.on_change.call(clamped);
+        if let Some(h) = &props.on_change {
+            h.call(clamped);
+        }
     };
 
     let handle_input = move |e: Event<FormData>| {
@@ -171,7 +176,9 @@ pub fn NumberInput(props: NumberInputProps) -> Element {
         }
         if let Ok(val) = e.value().parse::<f64>() {
             let clamped = clamp_value(val, props.min, props.max);
-            props.on_change.call(clamped);
+            if let Some(h) = &props.on_change {
+                h.call(clamped);
+            }
         }
     };
 

@@ -314,8 +314,9 @@ pub fn StepConnector(props: StepConnectorProps) -> Element {
 /// Step label atom
 #[derive(Props, Clone, PartialEq)]
 pub struct StepLabelProps {
-    /// Label text
-    pub label: String,
+    /// Label text (nothing is rendered for the label when `None`)
+    #[props(default)]
+    pub label: Option<String>,
     /// Optional description/subtitle
     #[props(default)]
     pub description: Option<String>,
@@ -370,14 +371,16 @@ pub fn StepLabel(props: StepLabelProps) -> Element {
             style: "display: flex; flex-direction: column; gap: 2px;{style_css}",
             id: "{id_css}",
 
-            span {
-                style: "
-                    font-size: {font_size_val}; 
-                    font-weight: {weight_val}; 
-                    color: {label_color};
-                    white-space: nowrap;
-                ",
-                "{props.label}"
+            if let Some(label) = props.label.clone() {
+                span {
+                    style: "
+                        font-size: {font_size_val}; 
+                        font-weight: {weight_val}; 
+                        color: {label_color};
+                        white-space: nowrap;
+                    ",
+                    "{label}"
+                }
             }
 
             if let Some(desc) = props.description.clone() {

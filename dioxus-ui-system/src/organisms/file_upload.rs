@@ -97,7 +97,8 @@ pub struct FileUploadProps {
     #[props(default)]
     pub single: bool,
     /// Upload handler
-    pub on_upload: EventHandler<Vec<UploadedFile>>,
+    #[props(default)]
+    pub on_upload: Option<EventHandler<Vec<UploadedFile>>>,
     /// Change handler (called when files are selected)
     #[props(default)]
     pub on_change: Option<EventHandler<Vec<UploadedFile>>>,
@@ -282,7 +283,9 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
 
                                 // Call callbacks
                                 let all_files = files_signal();
-                                on_upload.call(all_files.clone());
+                                if let Some(ref on_upload_cb) = on_upload {
+                                    on_upload_cb.call(all_files.clone());
+                                }
                                 if let Some(ref on_change_cb) = on_change {
                                     on_change_cb.call(all_files.clone());
                                 }
@@ -323,7 +326,9 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
 
             // Call callbacks with updated files
             let all_files = files_signal();
-            on_upload.call(all_files.clone());
+            if let Some(ref on_upload_cb) = on_upload {
+                on_upload_cb.call(all_files.clone());
+            }
             if let Some(ref on_change_cb) = on_change {
                 on_change_cb.call(all_files.clone());
             }
@@ -336,7 +341,9 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
         let on_change = props.on_change;
         move || {
             files.set(Vec::new());
-            on_upload.call(Vec::new());
+            if let Some(ref on_upload_cb) = on_upload {
+                on_upload_cb.call(Vec::new());
+            }
             if let Some(ref on_change_cb) = on_change {
                 on_change_cb.call(Vec::new());
             }
@@ -465,7 +472,9 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                                             });
 
                                             let all_files = files_signal();
-                                            on_upload.call(all_files.clone());
+                                            if let Some(ref on_upload_cb) = on_upload {
+                                                on_upload_cb.call(all_files.clone());
+                                            }
                                             if let Some(ref on_change_cb) = on_change {
                                                 on_change_cb.call(all_files.clone());
                                             }
@@ -577,7 +586,7 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
                                 key: "{i}",
                                 file: file.clone(),
                                 on_remove: {
-                                    move || remove_file(i)
+                                    move |_| remove_file(i)
                                 },
                             }
                         }
@@ -592,7 +601,8 @@ pub fn FileUpload(props: FileUploadProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 pub struct FileUploadItemProps {
     pub file: UploadedFile,
-    pub on_remove: EventHandler<()>,
+    #[props(default)]
+    pub on_remove: Option<EventHandler<()>>,
     #[props(default)]
     pub id: Option<String>,
     #[props(default)]
@@ -651,7 +661,11 @@ fn FileUploadItem(props: FileUploadItemProps) -> Element {
                 r#type: "button",
                 class: "file-upload-item-remove",
                 style: "flex-shrink: 0; background: none; border: none; cursor: pointer; font-size: 18px; color: {theme.tokens.read().colors.muted.to_rgba()}; padding: 4px; transition: color 0.15s ease;",
-                onclick: move |_| props.on_remove.call(()),
+                onclick: move |_| {
+                    if let Some(h) = &props.on_remove {
+                        h.call(());
+                    }
+                },
                 "✕"
             }
         }

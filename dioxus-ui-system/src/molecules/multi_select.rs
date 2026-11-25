@@ -16,7 +16,8 @@ pub struct MultiSelectProps {
     #[props(default)]
     pub value: Vec<String>,
     /// Callback when selection changes
-    pub on_change: EventHandler<Vec<String>>,
+    #[props(default)]
+    pub on_change: Option<EventHandler<Vec<String>>>,
     /// Placeholder text when no value selected
     #[props(default)]
     pub placeholder: Option<String>,
@@ -105,7 +106,9 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                 new_values.push(value);
             }
             selected_values.set(new_values.clone());
-            on_change.call(new_values);
+            if let Some(handler) = &on_change {
+                handler.call(new_values);
+            }
         }
     });
 
@@ -117,7 +120,9 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             let mut new_values = selected_values();
             new_values.retain(|v| v != &value);
             selected_values.set(new_values.clone());
-            on_change.call(new_values);
+            if let Some(handler) = &on_change {
+                handler.call(new_values);
+            }
         }
     });
 
@@ -140,7 +145,9 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             }
 
             selected_values.set(new_values.clone());
-            on_change.call(new_values);
+            if let Some(handler) = &on_change {
+                handler.call(new_values);
+            }
         }
     });
 
@@ -150,7 +157,9 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
         let on_change = props.on_change;
         move |()| {
             selected_values.set(Vec::new());
-            on_change.call(Vec::new());
+            if let Some(handler) = &on_change {
+                handler.call(Vec::new());
+            }
         }
     });
 
@@ -166,7 +175,9 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                 if !new_values.contains(&value) {
                     new_values.push(value);
                     selected_values.set(new_values.clone());
-                    on_change.call(new_values);
+                    if let Some(handler) = &on_change {
+                        handler.call(new_values);
+                    }
                 }
                 search_value.set(String::new());
             }

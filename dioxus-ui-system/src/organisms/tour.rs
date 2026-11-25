@@ -68,7 +68,8 @@ pub struct TourProps {
     /// Whether the tour is open
     pub open: bool,
     /// Callback when open state changes
-    pub on_open_change: EventHandler<bool>,
+    #[props(default)]
+    pub on_open_change: Option<EventHandler<bool>>,
     /// Callback when tour is finished
     #[props(default)]
     pub on_finish: Option<EventHandler<()>>,
@@ -170,7 +171,9 @@ pub fn Tour(props: TourProps) -> Element {
             if let Some(on_finish) = props.on_finish {
                 on_finish.call(());
             }
-            props.on_open_change.call(false);
+            if let Some(on_open_change) = props.on_open_change {
+                on_open_change.call(false);
+            }
         }
     };
 
@@ -185,7 +188,9 @@ pub fn Tour(props: TourProps) -> Element {
     };
 
     let handle_skip = move |_| {
-        props.on_open_change.call(false);
+        if let Some(on_open_change) = props.on_open_change {
+            on_open_change.call(false);
+        }
     };
 
     let is_first = current_step == 0;
@@ -371,7 +376,7 @@ mod tests {
 
     #[test]
     fn open_tour_with_no_steps_renders_nothing() {
-        let html = render(|| rsx! { Tour { steps: vec![], open: true, on_open_change: |_| {} } });
+        let html = render(|| rsx! { Tour { steps: vec![], open: true } });
         assert!(html.is_empty(), "{html}");
     }
 

@@ -446,7 +446,7 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
                     crate::atoms::Button {
                         variant: crate::atoms::ButtonVariant::Secondary,
                         disabled: props.disable_back,
-                        onclick: move |_| on_back.call(()),
+                        on_click: on_back,
                         "{props.back_label}"
                     }
                 }
@@ -459,7 +459,7 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
                 if let Some(on_skip) = props.on_skip {
                     crate::atoms::Button {
                         variant: crate::atoms::ButtonVariant::Ghost,
-                        onclick: move |_| on_skip.call(()),
+                        on_click: on_skip,
                         "Skip"
                     }
                 }
@@ -471,7 +471,7 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
                     crate::atoms::Button {
                         variant: crate::atoms::ButtonVariant::Primary,
                         disabled: props.disable_next,
-                        onclick: move |_| on_finish.call(()),
+                        on_click: on_finish,
                         "{props.finish_label}"
                     }
                 }
@@ -480,7 +480,7 @@ pub fn StepperActions(props: StepperActionsProps) -> Element {
                     crate::atoms::Button {
                         variant: crate::atoms::ButtonVariant::Primary,
                         disabled: props.disable_next,
-                        onclick: move |_| on_next.call(()),
+                        on_click: on_next,
                         "{props.next_label}"
                     }
                 }

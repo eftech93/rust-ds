@@ -235,9 +235,11 @@ pub struct WizardProps {
     /// Current active step
     pub active_step: usize,
     /// Step change callback
-    pub on_step_change: EventHandler<usize>,
+    #[props(default)]
+    pub on_step_change: Option<EventHandler<usize>>,
     /// Finish callback
-    pub on_finish: EventHandler<()>,
+    #[props(default)]
+    pub on_finish: Option<EventHandler<()>>,
     /// Cancel callback
     #[props(default)]
     pub on_cancel: Option<EventHandler<()>>,
@@ -394,7 +396,9 @@ pub fn Wizard(props: WizardProps) -> Element {
                     on_step_click: Some(EventHandler::new(move |step: usize| {
                         // Only allow going back or to completed steps
                         if step <= current {
-                            props.on_step_change.call(step);
+                            if let Some(h) = &props.on_step_change {
+                                h.call(step);
+                            }
                         }
                     })),
                 }
@@ -413,7 +417,9 @@ pub fn Wizard(props: WizardProps) -> Element {
                     on_back: if current > 0 {
                         Some(EventHandler::new(move |_| {
                             if current > 0 {
-                                props.on_step_change.call(current - 1);
+                                if let Some(h) = &props.on_step_change {
+                                    h.call(current - 1);
+                                }
                             }
                         }))
                     } else {
@@ -422,16 +428,16 @@ pub fn Wizard(props: WizardProps) -> Element {
                     on_next: if !can_finish {
                         Some(EventHandler::new(move |_| {
                             if current < total_steps - 1 {
-                                props.on_step_change.call(current + 1);
+                                if let Some(h) = &props.on_step_change {
+                                    h.call(current + 1);
+                                }
                             }
                         }))
                     } else {
                         None
                     },
                     on_finish: if can_finish {
-                        Some(EventHandler::new(move |_| {
-                            props.on_finish.call(());
-                        }))
+                        props.on_finish
                     } else {
                         None
                     },
@@ -530,7 +536,7 @@ pub fn StepSummary(props: StepSummaryProps) -> Element {
                             crate::atoms::Button {
                                 variant: crate::atoms::ButtonVariant::Ghost,
                                 size: crate::atoms::ButtonSize::Sm,
-                                onclick: move |_| on_edit.call(index),
+                                on_click: move |_| on_edit.call(index),
                                 "Edit"
                             }
                         }

@@ -56,7 +56,7 @@ pub struct SparklineProps {
     pub animation: ChartAnimation,
     /// Click handler
     #[props(default)]
-    pub onclick: Option<EventHandler<()>>,
+    pub on_click: Option<EventHandler<()>>,
     /// Custom styles
     #[props(default)]
     pub style: Option<String>,
@@ -147,7 +147,7 @@ pub fn Sparkline(props: SparklineProps) -> Element {
     let show_last_point = props.show_last_point;
     let show_min_max = props.show_min_max;
     let line_width = props.line_width;
-    let onclick = props.onclick;
+    let on_click = props.on_click;
 
     // Calculate points for line/area
     let points: Vec<(f64, f64)> = data
@@ -246,11 +246,7 @@ pub fn Sparkline(props: SparklineProps) -> Element {
             height: Some(props.height.clone()),
             display: crate::atoms::BoxDisplay::InlineBlock,
             style: Some(container_style),
-            onclick: move |_| {
-                if let Some(handler) = &onclick {
-                    handler.call(());
-                }
-            },
+            on_click: on_click,
             svg {
                 view_box: "0 0 {svg_width} {svg_height}",
                 width: "100%",

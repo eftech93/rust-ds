@@ -293,7 +293,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
                                 Button {
                                     variant: ButtonVariant::Ghost,
                                     size: ButtonSize::Sm,
-                                    onclick: move |_| {
+                                    on_click: move |_| {
                                         if let Some(handler) = &props.on_search_change {
                                             handler.call("".to_string());
                                         }
@@ -359,6 +359,7 @@ pub fn DataTable<T: Clone + PartialEq + 'static>(props: DataTableProps<T>) -> El
 pub struct DataTableFilterProps {
     pub filter: TableFilter,
     pub active_value: String,
+    #[props(default)]
     pub on_change: Option<EventHandler<(String, String)>>,
     #[props(default)]
     pub id: Option<String>,
@@ -415,6 +416,7 @@ pub struct DataTableHeaderProps<T: Clone + PartialEq + 'static> {
     pub selectable: bool,
     pub selected_count: usize,
     pub total_count: usize,
+    #[props(default)]
     pub on_select_all: Option<EventHandler<Vec<String>>>,
     #[props(default)]
     pub all_keys: Vec<String>,
@@ -512,7 +514,9 @@ pub struct DataTableRowProps<T: Clone + PartialEq + 'static> {
     pub key_extractor: fn(&T) -> String,
     pub selectable: bool,
     pub is_selected: bool,
+    #[props(default)]
     pub on_select: Option<EventHandler<Vec<String>>>,
+    #[props(default)]
     pub on_click: Option<EventHandler<T>>,
     #[props(default)]
     pub selected_keys: Vec<String>,
@@ -659,7 +663,8 @@ pub fn DataTableCell<T: Clone + PartialEq>(props: DataTableCellProps<T>) -> Elem
 pub struct PaginationProps {
     pub current_page: usize,
     pub total_pages: usize,
-    pub on_page_change: EventHandler<usize>,
+    #[props(default)]
+    pub on_page_change: Option<EventHandler<usize>>,
     #[props(default)]
     pub show_first_last: bool,
     #[props(default)]
@@ -719,7 +724,11 @@ pub fn Pagination(props: PaginationProps) -> Element {
                     Button {
                         variant: ButtonVariant::Ghost,
                         size: ButtonSize::Sm,
-                        onclick: move |_| props.on_page_change.call(0),
+                        on_click: move |_| {
+                            if let Some(h) = &props.on_page_change {
+                                h.call(0);
+                            }
+                        },
                         Icon {
                             name: "chevron-left".to_string(),
                             size: IconSize::Small,
@@ -732,7 +741,11 @@ pub fn Pagination(props: PaginationProps) -> Element {
                     variant: ButtonVariant::Ghost,
                     size: ButtonSize::Sm,
                     disabled: current == 0,
-                    onclick: move |_| props.on_page_change.call(current.saturating_sub(1)),
+                    on_click: move |_| {
+                        if let Some(h) = &props.on_page_change {
+                            h.call(current.saturating_sub(1));
+                        }
+                    },
                     Icon {
                         name: "chevron-left".to_string(),
                         size: IconSize::Small,
@@ -744,7 +757,11 @@ pub fn Pagination(props: PaginationProps) -> Element {
                     variant: ButtonVariant::Ghost,
                     size: ButtonSize::Sm,
                     disabled: current >= total - 1,
-                    onclick: move |_| props.on_page_change.call((current + 1).min(total - 1)),
+                    on_click: move |_| {
+                        if let Some(h) = &props.on_page_change {
+                            h.call((current + 1).min(total - 1));
+                        }
+                    },
                     Icon {
                         name: "chevron-right".to_string(),
                         size: IconSize::Small,
@@ -756,7 +773,11 @@ pub fn Pagination(props: PaginationProps) -> Element {
                     Button {
                         variant: ButtonVariant::Ghost,
                         size: ButtonSize::Sm,
-                        onclick: move |_| props.on_page_change.call(total - 1),
+                        on_click: move |_| {
+                            if let Some(h) = &props.on_page_change {
+                                h.call(total - 1);
+                            }
+                        },
                         Icon {
                             name: "chevron-right".to_string(),
                             size: IconSize::Small,

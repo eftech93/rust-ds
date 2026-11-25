@@ -183,9 +183,9 @@ pub fn BoxPage() -> Element {
                     ("z_index", "Option<i16>", "Z-index"),
                     ("opacity", "Option<f32>", "Opacity (0.0 - 1.0)"),
                     ("cursor", "Option<String>", "Cursor style"),
-                    ("onclick", "Option<EventHandler<MouseEvent>>", "Click handler"),
-                    ("onmouseenter", "Option<EventHandler<MouseEvent>>", "Mouse enter handler"),
-                    ("onmouseleave", "Option<EventHandler<MouseEvent>>", "Mouse leave handler"),
+                    ("on_click", "Option<EventHandler<()>>", "Click handler"),
+                    ("on_mouse_enter", "Option<EventHandler<()>>", "Mouse enter handler"),
+                    ("on_mouse_leave", "Option<EventHandler<()>>", "Mouse leave handler"),
                     ("style", "Option<String>", "Custom inline styles"),
                     ("class", "Option<String>", "Custom CSS classes"),
                     ("id", "Option<String>", "Element id"),
@@ -233,7 +233,7 @@ pub fn ButtonPage() -> Element {
                     ("size", "ButtonSize", "Button size"),
                     ("disabled", "bool", "Disabled state"),
                     ("full_width", "bool", "Full width button"),
-                    ("onclick", "EventHandler", "Click handler"),
+                    ("on_click", "Option<EventHandler<()>>", "Click handler"),
                 ]}
             }
         }
@@ -259,7 +259,7 @@ pub fn InputPage() -> Element {
                         }
                     }
                 }
-                CodeBlock { code: "InputGroup {{\n    label: \"Email\",\n    value: email(),\n    input_type: InputType::Email,\n    onchange: move |v| email.set(v),\n}}".to_string() }
+                CodeBlock { code: "InputGroup {{\n    label: \"Email\",\n    value: email(),\n    input_type: InputType::Email,\n    on_change: move |v| email.set(v),\n}}".to_string() }
             }
 
             Section { title: "Input Types",
@@ -276,9 +276,9 @@ pub fn InputPage() -> Element {
                     ("required", "bool", "Required field"),
                     ("autofocus", "bool", "Autofocus on mount"),
                     ("on_change", "Option<EventHandler<String>>", "Change handler"),
-                    ("onfocus", "Option<EventHandler<FocusEvent>>", "Focus handler"),
-                    ("onblur", "Option<EventHandler<FocusEvent>>", "Blur handler"),
-                    ("oninput", "Option<EventHandler<FormEvent>>", "Input handler (real-time)"),
+                    ("on_focus", "Option<EventHandler<()>>", "Focus handler"),
+                    ("on_blur", "Option<EventHandler<()>>", "Blur handler"),
+                    ("on_input", "Option<EventHandler<String>>", "Input handler (real-time), receives the current value"),
                     ("style", "Option<String>", "Custom inline styles"),
                     ("class", "Option<String>", "Custom CSS classes"),
                     ("name", "Option<String>", "Input name attribute"),
@@ -412,7 +412,7 @@ pub fn CheckboxPage() -> Element {
                         on_change: move |v| checked.set(v),
                     }
                 }
-                CodeBlock { code: "Checkbox {{\n    checked: checked(),\n    label: Some(\"Accept terms\".to_string()),\n    onchange: move |v| checked.set(v),\n}}".to_string() }
+                CodeBlock { code: "Checkbox {{\n    checked: checked(),\n    label: Some(\"Accept terms\".to_string()),\n    on_change: move |v| checked.set(v),\n}}".to_string() }
             }
 
             Section { title: "Props",
@@ -464,14 +464,14 @@ pub fn RadioPage() -> Element {
     value: \"option1\".to_string(),
     checked: selected() == \"option1\",
     label: Some(\"Option 1\".to_string()),
-    onchange: move |_| selected.set(\"option1\".to_string()),
+    on_change: move |v| selected.set(v),
 }}".to_string() }
             }
 
             Section { title: "Props",
                 PropsTable { props: vec![
                     ("checked", "bool", "Whether the radio is selected"),
-                    ("on_change", "Option<EventHandler<()>>", "Callback when selected state changes"),
+                    ("on_change", "Option<EventHandler<String>>", "Callback when selected; receives the radio's value"),
                     ("disabled", "bool", "Whether the radio is disabled"),
                     ("label", "Option<String>", "Radio label"),
                     ("value", "String", "Radio value"),
@@ -486,7 +486,7 @@ pub fn RadioPage() -> Element {
                 PropsTable { props: vec![
                     ("name", "String", "Radio group name"),
                     ("value", "String", "Currently selected value"),
-                    ("on_change", "EventHandler<String>", "Callback when selection changes"),
+                    ("on_change", "Option<EventHandler<String>>", "Callback when selection changes"),
                     ("children", "Element", "Radio group children (Radio components)"),
                     ("direction", "RadioDirection", "Layout direction (Horizontal/Vertical)"),
                 ]}
@@ -516,7 +516,7 @@ pub fn SwitchPage() -> Element {
                 CodeBlock { code: "Switch {{
     checked: enabled(),
     label: Some(\"Enable notifications\".to_string()),
-    onchange: move |v| enabled.set(v),
+    on_change: move |v| enabled.set(v),
 }}".to_string() }
             }
 
@@ -564,7 +564,7 @@ pub fn SelectPage() -> Element {
         SelectOption::new(\"option1\", \"Option 1\"),
         SelectOption::new(\"option2\", \"Option 2\"),
     ],
-    onchange: move |v| selected.set(v),
+    on_change: move |v| selected.set(v),
 }}".to_string() }
             }
 
@@ -575,7 +575,7 @@ pub fn SelectPage() -> Element {
                     ("options", "Vec<SelectOption>", "Available options"),
                     ("placeholder", "Option<String>", "Placeholder text when no value selected"),
                     ("disabled", "bool", "Whether the select is disabled"),
-                    ("error", "bool", "Whether the select has an error"),
+                    ("error", "Option<String>", "Error message rendered below the select (shows error state when Some)"),
                     ("style", "Option<String>", "Custom inline styles"),
                     ("class", "Option<String>", "Custom CSS classes"),
                     ("id", "Option<String>", "Element id"),
@@ -619,7 +619,7 @@ pub fn TextAreaPage() -> Element {
     value: description(),
     rows: 4,
     placeholder: Some(\"Enter description...\".to_string()),
-    onchange: move |v| description.set(v),
+    on_change: move |v| description.set(v),
 }}".to_string() }
             }
 
@@ -631,8 +631,7 @@ pub fn TextAreaPage() -> Element {
                     ("rows", "u8", "Number of rows (default: 3)"),
                     ("disabled", "bool", "Whether the textarea is disabled"),
                     ("readonly", "bool", "Whether the textarea is read-only"),
-                    ("error", "bool", "Whether the textarea has an error"),
-                    ("error_message", "Option<String>", "Error message"),
+                    ("error", "Option<String>", "Error message rendered below the textarea (shows error state when Some)"),
                     ("required", "bool", "Whether the field is required"),
                     ("max_length", "Option<usize>", "Maximum number of characters"),
                     ("style", "Option<String>", "Custom inline styles"),
@@ -719,7 +718,7 @@ pub fn StepPage() -> Element {
 
             Section { title: "StepLabel Props",
                 PropsTable { props: vec![
-                    ("label", "String", "Label text"),
+                    ("label", "Option<String>", "Label text"),
                     ("description", "Option<String>", "Optional description/subtitle"),
                     ("state", "StepState", "Step state (affects color)"),
                     ("size", "StepSize", "Text size"),
@@ -882,7 +881,7 @@ pub fn ProgressPage() -> Element {
                 ExampleBox {
                     VStack { gap: SpacingSize::Md,
                         Progress { value: Some(value()), max: 100.0, show_label: true, variant: ProgressVariant::Linear, size: ProgressSize::Md }
-                        Button { onclick: move |_| value.set((value() + 10.0) % 100.0), "Increase" }
+                        Button { on_click: move |_| value.set((value() + 10.0) % 100.0), "Increase" }
                     }
                 }
             }
@@ -970,7 +969,7 @@ pub fn SpinnerPage() -> Element {
                     ("variant", "SpinnerVariant", "Spinner variant/style (default: Circular)"),
                     ("size", "SpinnerSize", "Size variant (Xs, Sm, Md, Lg, Xl, default: Md)"),
                     ("color", "Option<String>", "Color override"),
-                    ("label", "String", "Accessibility label (default: 'Loading')"),
+                    ("label", "Option<String>", "Accessibility label (default: 'Loading')"),
                     ("speed", "f32", "Speed multiplier (default: 1.0)"),
                     ("class", "Option<String>", "Additional CSS classes"),
                     ("id", "Option<String>", "Element id"),
@@ -1122,7 +1121,7 @@ pub fn RatingPage() -> Element {
                     ("max", "u8", "Maximum rating (default: 5)"),
                     ("allow_half", "bool", "Allow half stars (default: false)"),
                     ("size", "u16", "Size in pixels (default: 24)"),
-                    ("on_change", "EventHandler<f32>", "Change handler"),
+                    ("on_change", "Option<EventHandler<f32>>", "Change handler"),
                     ("label", "Option<String>", "Label"),
                     ("clearable", "bool", "Show clear button (default: false)"),
                     ("class", "Option<String>", "Additional CSS classes"),
@@ -1244,7 +1243,7 @@ pub fn SliderPage() -> Element {
                     ("min", "f64", "Minimum value (default: 0.0)"),
                     ("max", "f64", "Maximum value (default: 100.0)"),
                     ("step", "f64", "Step increment (default: 1.0)"),
-                    ("on_change", "EventHandler<f64>", "Change handler"),
+                    ("on_change", "Option<EventHandler<f64>>", "Change handler"),
                     ("label", "Option<String>", "Label"),
                     ("disabled", "bool", "Whether the slider is disabled (default: false)"),
                     ("show_value", "bool", "Show current value (default: true)"),
@@ -1265,7 +1264,7 @@ pub fn SliderPage() -> Element {
                     ("min", "f64", "Overall minimum (default: 0.0)"),
                     ("max", "f64", "Overall maximum (default: 100.0)"),
                     ("step", "f64", "Step increment (default: 1.0)"),
-                    ("on_change", "EventHandler<(f64, f64)>", "Change handler"),
+                    ("on_change", "Option<EventHandler<(f64, f64)>>", "Change handler"),
                     ("label", "Option<String>", "Label"),
                     ("class", "Option<String>", "Additional CSS classes"),
                     ("id", "Option<String>", "Element id"),
@@ -1360,7 +1359,7 @@ pub fn TagPage() -> Element {
                     ("tags", "Vec<TagData>", "Tags to display"),
                     ("multiple", "bool", "Whether multiple tags can be selected (default: false)"),
                     ("selected", "Vec<String>", "Currently selected tag(s)"),
-                    ("on_change", "EventHandler<Vec<String>>", "Selection change handler"),
+                    ("on_change", "Option<EventHandler<Vec<String>>>", "Selection change handler"),
                     ("removable", "bool", "Whether tags are removable (default: false)"),
                     ("on_remove", "Option<EventHandler<String>>", "Remove handler"),
                     ("size", "TagSize", "Size variant (default: Md)"),
@@ -1373,7 +1372,7 @@ pub fn TagPage() -> Element {
             Section { title: "InputTag Props",
                 PropsTable { props: vec![
                     ("tags", "Vec<String>", "Current tags"),
-                    ("on_change", "EventHandler<Vec<String>>", "Change handler"),
+                    ("on_change", "Option<EventHandler<Vec<String>>>", "Change handler"),
                     ("placeholder", "Option<String>", "Placeholder text"),
                     ("max_tags", "usize", "Maximum number of tags (default: MAX)"),
                     ("allow_duplicates", "bool", "Whether duplicates are allowed (default: false)"),

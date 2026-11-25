@@ -13,7 +13,8 @@ pub struct DialogProps {
     /// Whether the dialog is open
     pub open: bool,
     /// Callback when dialog should close
-    pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub on_close: Option<EventHandler<()>>,
     /// Dialog content
     pub children: Element,
     /// Dialog title
@@ -82,7 +83,9 @@ pub fn Dialog(props: DialogProps) -> Element {
 
     let handle_overlay_click = move |_| {
         if props.close_on_overlay_click {
-            props.on_close.call(());
+            if let Some(handler) = &props.on_close {
+                handler.call(());
+            }
         }
     };
 
@@ -129,7 +132,8 @@ use crate::theme::tokens::Color;
 struct DialogHeaderProps {
     title: Option<String>,
     show_close_button: bool,
-    on_close: EventHandler<()>,
+    #[props(default)]
+    on_close: Option<EventHandler<()>>,
     /// Element id
     #[props(default)]
     pub id: Option<String>,
@@ -173,7 +177,7 @@ fn DialogHeader(props: DialogHeaderProps) -> Element {
             if props.show_close_button {
                 Button {
                     variant: ButtonVariant::Ghost,
-                    onclick: move |_| props.on_close.call(()),
+                    on_click: props.on_close,
                     "✕"
                 }
             }
@@ -183,7 +187,8 @@ fn DialogHeader(props: DialogHeaderProps) -> Element {
 
 #[derive(Props, Clone, PartialEq)]
 struct DialogDescriptionProps {
-    description: String,
+    #[props(default)]
+    description: Option<String>,
     /// Element id
     #[props(default)]
     pub id: Option<String>,
@@ -202,7 +207,9 @@ fn DialogDescription(props: DialogDescriptionProps) -> Element {
             id: "{props.id.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
             style: "margin: 0; padding: 16px 24px 0 24px; font-size: 14px; color: #64748b; {props.style.clone().unwrap_or_default()}",
-            "{props.description}"
+            if let Some(description) = props.description {
+                "{description}"
+            }
         }
     }
 }
@@ -278,11 +285,14 @@ pub struct AlertDialogProps {
     /// Whether the dialog is open
     pub open: bool,
     /// Callback when dialog should close
-    pub on_close: EventHandler<()>,
+    #[props(default)]
+    pub on_close: Option<EventHandler<()>>,
     /// Dialog title
-    pub title: String,
+    #[props(default)]
+    pub title: Option<String>,
     /// Dialog description
-    pub description: String,
+    #[props(default)]
+    pub description: Option<String>,
     /// Cancel button text
     #[props(default = "Cancel".to_string())]
     pub cancel_text: String,
@@ -290,7 +300,8 @@ pub struct AlertDialogProps {
     #[props(default = "Confirm".to_string())]
     pub confirm_text: String,
     /// Callback when confirmed
-    pub on_confirm: EventHandler<()>,
+    #[props(default)]
+    pub on_confirm: Option<EventHandler<()>>,
     /// Whether the action is destructive
     #[props(default)]
     pub destructive: bool,
@@ -324,9 +335,11 @@ pub fn AlertDialog(props: AlertDialogProps) -> Element {
             show_close_button: false,
             close_on_overlay_click: false,
 
-            p {
-                style: "margin: 0 0 24px 0; font-size: 14px; color: #64748b; line-height: 1.5; {props.style.clone().unwrap_or_default()}",
-                "{props.description}"
+            if let Some(description) = props.description.clone() {
+                p {
+                    style: "margin: 0 0 24px 0; font-size: 14px; color: #64748b; line-height: 1.5; {props.style.clone().unwrap_or_default()}",
+                    "{description}"
+                }
             }
 
             DialogFooter {
@@ -334,13 +347,13 @@ pub fn AlertDialog(props: AlertDialogProps) -> Element {
 
                 Button {
                     variant: ButtonVariant::Ghost,
-                    onclick: move |_| props.on_close.call(()),
+                    on_click: props.on_close,
                     "{props.cancel_text}"
                 }
 
                 Button {
                     variant: confirm_variant,
-                    onclick: move |_| props.on_confirm.call(()),
+                    on_click: props.on_confirm,
                     "{props.confirm_text}"
                 }
             }

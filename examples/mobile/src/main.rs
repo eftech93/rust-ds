@@ -242,7 +242,7 @@ fn WelcomePage(props: WelcomePageProps) -> Element {
                     variant: ButtonVariant::Primary,
                     size: ButtonSize::Lg,
                     full_width: true,
-                    onclick: move |_| props.on_get_started.call(()),
+                    on_click: move |_| props.on_get_started.call(()),
 
                     HStack {
                         align: AlignItems::Center,
@@ -262,7 +262,7 @@ fn WelcomePage(props: WelcomePageProps) -> Element {
                     variant: ButtonVariant::Secondary,
                     size: ButtonSize::Lg,
                     full_width: true,
-                    onclick: move |_| props.on_view_layouts.call(()),
+                    on_click: move |_| props.on_view_layouts.call(()),
 
                     div {
                         style: "display: flex; align-items: center; justify-content: center; gap: 8px;",
@@ -347,7 +347,7 @@ fn LayoutsPage(props: LayoutsPageProps) -> Element {
                 Button {
                     variant: ButtonVariant::Ghost,
                     size: ButtonSize::Icon,
-                    onclick: move |_| props.on_back.call(()),
+                    on_click: move |_| props.on_back.call(()),
                     Icon {
                         name: "arrow-left".to_string(),
                         size: IconSize::Medium,
@@ -649,7 +649,7 @@ fn ComponentsPage(props: ComponentsPageProps) -> Element {
                 Button {
                     variant: ButtonVariant::Ghost,
                     size: ButtonSize::Icon,
-                    onclick: move |_| props.on_back.call(()),
+                    on_click: move |_| props.on_back.call(()),
                     Icon {
                         name: "arrow-left".to_string(),
                         size: IconSize::Medium,
@@ -974,7 +974,7 @@ fn MobileStepperShowcase() -> Element {
                     variant: ButtonVariant::Secondary,
                     size: ButtonSize::Sm,
                     disabled: step() == 0,
-                    onclick: move |_| if step() > 0 { step -= 1 },
+                    on_click: move |_| if step() > 0 { step -= 1 },
                     "Back"
                 }
 
@@ -982,7 +982,7 @@ fn MobileStepperShowcase() -> Element {
                     variant: ButtonVariant::Primary,
                     size: ButtonSize::Sm,
                     disabled: step() >= 2,
-                    onclick: move |_| if step() < 2 { step += 1 },
+                    on_click: move |_| if step() < 2 { step += 1 },
                     "Next"
                 }
             }
@@ -1114,7 +1114,7 @@ fn InputShowcase() -> Element {
             Button {
                 variant: ButtonVariant::Primary,
                 full_width: true,
-                onclick: move |_| {
+                on_click: move |_| {
                     println!("Login: {} / {}", email(), password());
                 },
                 "Sign In"
@@ -1144,19 +1144,19 @@ fn CounterDemo() -> Element {
 
                 Button {
                     variant: ButtonVariant::Secondary,
-                    onclick: move |_| count -= 1,
+                    on_click: move |_| count -= 1,
                     Icon { name: "minus".to_string(), size: IconSize::Small, color: IconColor::Current }
                 }
 
                 Button {
                     variant: ButtonVariant::Destructive,
-                    onclick: move |_| count.set(0),
+                    on_click: move |_| count.set(0),
                     "Reset"
                 }
 
                 Button {
                     variant: ButtonVariant::Primary,
-                    onclick: move |_| count += 1,
+                    on_click: move |_| count += 1,
                     Icon { name: "plus".to_string(), size: IconSize::Small, color: IconColor::Current }
                 }
             }
