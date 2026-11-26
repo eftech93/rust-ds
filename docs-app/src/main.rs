@@ -234,6 +234,8 @@ pub enum Route {
     LayoutsPage {},
     #[route("/guides/migration")]
     MigrationPage {},
+    #[route("/guides/accessibility")]
+    AccessibilityPage {},
 }
 
 /// Docs layout with custom sidebar using Dioxus Router
@@ -647,6 +649,7 @@ fn Sidebar(current_route: Route) -> Element {
                     ("Forms", Route::FormsPage {}),
                     ("Layouts", Route::LayoutsPage {}),
                     ("Migrating to 0.0.9", Route::MigrationPage {}),
+                    ("Accessibility", Route::AccessibilityPage {}),
                 ]}
             }
         }
@@ -1152,4 +1155,8 @@ fn LayoutsPage() -> Element {
 #[component]
 fn MigrationPage() -> Element {
     guides::MigrationPage()
+}
+#[component]
+fn AccessibilityPage() -> Element {
+    guides::AccessibilityPage()
 }

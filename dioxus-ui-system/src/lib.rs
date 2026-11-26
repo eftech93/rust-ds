@@ -32,6 +32,7 @@
 //! }
 //! ```
 
+pub mod a11y;
 pub mod atoms;
 pub mod config;
 pub mod molecules;

@@ -1,7 +1,9 @@
 //! New Organism component documentation pages (Phase 1-4)
 
 use crate::components::three_demo::ThreeViewDemo;
-use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, PropsTable, Section};
+use crate::docs_ui::{
+    CodeBlock, DocPage, ExampleBox, KeyboardTable, PropsTable, RoleList, Section,
+};
 use dioxus::prelude::*;
 use dioxus_ui_system::organisms::{Calendar, CalendarMode, ImageUploader, Menubar};
 use dioxus_ui_system::prelude::*;
@@ -518,6 +520,18 @@ pub fn CarouselPage() -> Element {
                 }
             }
 
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "The region has an aria-label and tabindex=\"0\"; slides have aria-label=\"n of m\"",
+                    "CarouselContent has aria-live=\"polite\" (\"off\" while autoplay is running)",
+                    "Autoplay pauses while the carousel has focus (and on hover when pause_on_hover is set)",
+                ]}
+                KeyboardTable { rows: vec![
+                    ("ArrowLeft / ArrowRight", "Previous / next slide (ArrowUp / ArrowDown when vertical)"),
+                    ("Home / End", "Jump to the first / last slide"),
+                ]}
+            }
+
             Section { title: "Props",
                 h4 { "CarouselProps" }
                 PropsTable { props: vec![
@@ -525,6 +539,7 @@ pub fn CarouselPage() -> Element {
                     ("opts", "CarouselOptions", "Carousel configuration options"),
                     ("orientation", "Orientation", "Orientation of the carousel"),
                     ("on_index_change", "Option<EventHandler>", "Callback when active index changes"),
+                    ("aria_label", "Option<String>", "Accessible name of the carousel region (default: \"Carousel\")"),
                     ("style", "Option", "Custom inline styles"),
                     ("id", "Option", "Element id"),
                     ("class", "Option", "Custom CSS classes")
@@ -540,6 +555,7 @@ pub fn CarouselPage() -> Element {
                 PropsTable { props: vec![
                     ("children", "Element", "Item content"),
                     ("index", "usize", "Item index (used for tracking position)"),
+                    ("total", "Option<usize>", "Total number of slides for the \"n of m\" label (defaults to the count tracked by Carousel)"),
                     ("style", "Option", "Custom inline styles"),
                     ("id", "Option", "Element id"),
                     ("class", "Option", "Custom CSS classes")
@@ -572,6 +588,7 @@ pub fn CarouselPage() -> Element {
                     ("on_index_change", "Option<EventHandler>", "Callback when index changes"),
                     ("show_arrows", "bool", "Show navigation arrows"),
                     ("show_dots", "bool", "Show pagination dots"),
+                    ("aria_label", "Option<String>", "Accessible name of the carousel region (default: \"Carousel\")"),
                     ("style", "Option", "Custom inline styles"),
                     ("id", "Option", "Element id"),
                     ("class", "Option", "Custom CSS classes")
@@ -583,6 +600,7 @@ pub fn CarouselPage() -> Element {
                     ("orientation", "Orientation", "Orientation"),
                     ("on_index_change", "Option<EventHandler>", "Callback when index changes"),
                     ("style", "Option", "Custom inline styles"),
+                    ("aria_label", "Option<String>", "Accessible name of the carousel region (default: \"Carousel\")"),
                     ("id", "Option", "Element id"),
                     ("class", "Option", "Custom CSS classes")
                 ] }
@@ -675,6 +693,21 @@ Tree {
 }"#.to_string() }
             }
 
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "Implements the WAI-ARIA tree pattern: role=\"tree\" with role=\"treeitem\" nodes",
+                    "Each treeitem has aria-level, aria-setsize, aria-posinset and aria-expanded (branches)",
+                    "Roving tabindex across visible nodes; the chevron button is out of the Tab order and hidden from assistive tech",
+                ]}
+                KeyboardTable { rows: vec![
+                    ("ArrowUp / ArrowDown", "Move to the previous / next visible node"),
+                    ("ArrowRight", "Expand a branch, or move to its first child"),
+                    ("ArrowLeft", "Collapse a branch, or move to its parent"),
+                    ("Home / End", "Move to the first / last visible node"),
+                    ("Enter / Space", "Select the focused node"),
+                ]}
+            }
+
             Section { title: "Props",
                 h4 { "TreeProps" }
                 PropsTable { props: vec![
@@ -684,6 +717,7 @@ Tree {
                     ("expanded_ids", "Vec", "List of expanded node IDs"),
                     ("on_toggle_expand", "Option<EventHandler>", "Callback when a node's expand/collapse state changes"),
                     ("show_lines", "bool", "Whether to show connector lines between nodes"),
+                    ("aria_label", "Option<String>", "Accessible name of the tree"),
                     ("style", "Option", "Custom inline styles"),
                     ("id", "Option", ""),
                     ("class", "Option", "")

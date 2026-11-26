@@ -3,6 +3,7 @@
 //! A hierarchical tree view for displaying nested data with expand/collapse,
 //! selection, and optional connector lines.
 
+use crate::a11y::{focus_element, use_unique_id};
 use crate::styles::Style;
 use crate::theme::{use_style, use_theme};
 use dioxus::prelude::*;
@@ -91,6 +92,9 @@ pub struct TreeProps {
     pub id: Option<String>,
     #[props(default)]
     pub class: Option<String>,
+    /// Accessible name for the tree (`aria-label`)
+    #[props(default)]
+    pub aria_label: Option<String>,
 }
 
 /// Tree organism component
@@ -123,9 +127,23 @@ pub struct TreeProps {
 ///     }
 /// }
 /// ```
+///
+/// # Accessibility
+///
+/// Follows the WAI-ARIA tree view pattern: the container has `role="tree"`,
+/// nodes are `role="treeitem"` with `aria-level`, `aria-setsize`,
+/// `aria-posinset`, `aria-selected` and (for branches) `aria-expanded`, and
+/// expanded children sit in a `role="group"`. A roving tabindex keeps a single
+/// visible node in the Tab order. Keys: Up/Down move between visible nodes,
+/// Right expands a collapsed branch or moves to its first child, Left collapses
+/// an expanded branch or moves to the parent, Home/End jump to the first/last
+/// visible node, Enter/Space select the focused node. Expanding and selecting
+/// go through `on_toggle_expand` / `on_select`.
 #[component]
 pub fn Tree(props: TreeProps) -> Element {
     let _theme = use_theme();
+    let generated_id = use_unique_id("tree");
+    let mut focused_id = use_signal(|| None::<String>);
 
     let container_style = use_style(|t| {
         Style::new()
@@ -139,6 +157,53 @@ pub fn Tree(props: TreeProps) -> Element {
 
     let id = props.id.clone().unwrap_or_default();
     let class = props.class.clone().unwrap_or_default();
+    let id_prefix = props.id.clone().unwrap_or(generated_id);
+
+    let visible = flatten_visible(&props.data, &props.expanded_ids);
+    let active_id = active_index(
+        &visible,
+        focused_id.read().as_deref(),
+        props.selected_id.as_deref(),
+    )
+    .map(|i| visible[i].id.clone());
+
+    let handle_keydown = {
+        let id_prefix = id_prefix.clone();
+        let active_id = active_id.clone();
+        let on_select = props.on_select;
+        let on_toggle_expand = props.on_toggle_expand;
+        move |e: KeyboardEvent| {
+            let Some(current) = active_id
+                .as_ref()
+                .and_then(|id| visible.iter().position(|n| &n.id == id))
+            else {
+                return;
+            };
+            let Some(action) = tree_key_action(&e.key(), current, &visible) else {
+                return;
+            };
+            e.prevent_default();
+            match action {
+                TreeAction::Focus(i) => {
+                    let node_id = visible[i].id.clone();
+                    focus_element(&tree_item_dom_id(&id_prefix, &node_id));
+                    focused_id.set(Some(node_id));
+                }
+                TreeAction::Toggle(i) => {
+                    if let Some(handler) = &on_toggle_expand {
+                        handler.call(visible[i].id.clone());
+                    }
+                }
+                TreeAction::Select(i) => {
+                    if let Some(handler) = &on_select {
+                        handler.call(visible[i].id.clone());
+                    }
+                }
+            }
+        }
+    };
+
+    let set_size = props.data.len();
 
     rsx! {
         div {
@@ -147,21 +212,135 @@ pub fn Tree(props: TreeProps) -> Element {
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
             role: "tree",
             aria_multiselectable: "false",
+            "aria-label": props.aria_label.clone(),
+            onkeydown: handle_keydown,
 
-            for node in &props.data {
+            for (position, node) in props.data.iter().enumerate() {
                 TreeNode {
                     key: "{node.id}",
                     node: node.clone(),
                     depth: 0,
+                    position: position + 1,
+                    set_size: set_size,
                     selected_id: props.selected_id.clone(),
                     on_select: props.on_select,
                     expanded_ids: props.expanded_ids.clone(),
                     on_toggle_expand: props.on_toggle_expand,
                     show_lines: props.show_lines,
+                    id_prefix: id_prefix.clone(),
+                    active_id: active_id.clone(),
+                    on_focus_node: move |node_id: String| focused_id.set(Some(node_id)),
                 }
             }
         }
     }
+}
+
+/// A node that is currently visible (all its ancestors are expanded), in
+/// document order.
+#[derive(Clone, Debug, PartialEq)]
+struct VisibleNode {
+    /// Node id
+    id: String,
+    /// Index of the parent in the visible list (`None` for root nodes)
+    parent: Option<usize>,
+    /// Whether the node has children
+    has_children: bool,
+    /// Whether the node is expanded
+    expanded: bool,
+    /// Whether the node is disabled
+    disabled: bool,
+}
+
+/// Flatten the visible part of the tree in document order.
+fn flatten_visible(data: &[TreeNodeData], expanded_ids: &[String]) -> Vec<VisibleNode> {
+    fn walk(
+        nodes: &[TreeNodeData],
+        parent: Option<usize>,
+        expanded_ids: &[String],
+        out: &mut Vec<VisibleNode>,
+    ) {
+        for node in nodes {
+            let has_children = !node.is_leaf();
+            let expanded = has_children && expanded_ids.contains(&node.id);
+            let index = out.len();
+            out.push(VisibleNode {
+                id: node.id.clone(),
+                parent,
+                has_children,
+                expanded,
+                disabled: node.disabled,
+            });
+            if expanded {
+                walk(&node.children, Some(index), expanded_ids, out);
+            }
+        }
+    }
+    let mut out = Vec::new();
+    walk(data, None, expanded_ids, &mut out);
+    out
+}
+
+/// Index of the node that holds the roving tabindex: the focused node if it is
+/// visible, else the selected node if visible, else the first node.
+fn active_index(
+    nodes: &[VisibleNode],
+    focused: Option<&str>,
+    selected: Option<&str>,
+) -> Option<usize> {
+    let find = |id: Option<&str>| id.and_then(|id| nodes.iter().position(|n| n.id == id));
+    find(focused)
+        .or_else(|| find(selected))
+        .or((!nodes.is_empty()).then_some(0))
+}
+
+/// What a key press on the focused tree node should do.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum TreeAction {
+    /// Move focus to the visible node at this index
+    Focus(usize),
+    /// Expand or collapse the node at this index
+    Toggle(usize),
+    /// Select the node at this index
+    Select(usize),
+}
+
+/// Map a key press on visible node `current` to a [`TreeAction`].
+fn tree_key_action(key: &Key, current: usize, nodes: &[VisibleNode]) -> Option<TreeAction> {
+    let node = nodes.get(current)?;
+    match key {
+        Key::ArrowDown if current + 1 < nodes.len() => Some(TreeAction::Focus(current + 1)),
+        Key::ArrowUp if current > 0 => Some(TreeAction::Focus(current - 1)),
+        Key::Home => Some(TreeAction::Focus(0)),
+        Key::End => Some(TreeAction::Focus(nodes.len() - 1)),
+        Key::ArrowRight if node.has_children => {
+            if !node.expanded {
+                (!node.disabled).then_some(TreeAction::Toggle(current))
+            } else {
+                // The first child directly follows an expanded node.
+                Some(TreeAction::Focus(current + 1))
+            }
+        }
+        Key::ArrowLeft => {
+            if node.expanded && !node.disabled {
+                Some(TreeAction::Toggle(current))
+            } else {
+                node.parent.map(TreeAction::Focus)
+            }
+        }
+        Key::Enter if !node.disabled => Some(TreeAction::Select(current)),
+        Key::Character(c) if c == " " && !node.disabled => Some(TreeAction::Select(current)),
+        _ => None,
+    }
+}
+
+/// DOM id of the treeitem element for `node_id`.
+fn tree_item_dom_id(prefix: &str, node_id: &str) -> String {
+    let node_id: String = node_id
+        .chars()
+        .map(|c| if c.is_whitespace() { '-' } else { c })
+        .collect();
+    format!("{prefix}-node-{node_id}")
 }
 
 /// Internal properties for TreeNode component
@@ -171,6 +350,10 @@ struct TreeNodeProps {
     node: TreeNodeData,
     /// Current depth level (for indentation)
     depth: usize,
+    /// 1-based position among siblings (`aria-posinset`)
+    position: usize,
+    /// Number of siblings (`aria-setsize`)
+    set_size: usize,
     /// Currently selected node ID
     selected_id: Option<String>,
     /// Callback when node is selected
@@ -183,6 +366,12 @@ struct TreeNodeProps {
     on_toggle_expand: Option<EventHandler<String>>,
     /// Whether to show connector lines
     show_lines: bool,
+    /// Prefix for treeitem element ids
+    id_prefix: String,
+    /// Id of the node that holds the roving tabindex
+    active_id: Option<String>,
+    /// Called when a node is focused by pointer
+    on_focus_node: EventHandler<String>,
 }
 
 /// Individual tree node component
@@ -237,10 +426,12 @@ fn TreeNode(props: TreeNodeProps) -> Element {
 
     let children_container_style = use_style(|_| Style::new().w_full().flex().flex_col().build());
 
+    let on_focus_node = props.on_focus_node;
     let handle_select = {
         let node_id = node_id.clone();
         let on_select = props.on_select;
         move |_| {
+            on_focus_node.call(node_id.clone());
             if is_disabled {
                 return;
             }
@@ -255,6 +446,7 @@ fn TreeNode(props: TreeNodeProps) -> Element {
         let on_toggle = props.on_toggle_expand;
         move |e: Event<MouseData>| {
             e.stop_propagation();
+            on_focus_node.call(node_id.clone());
             if is_disabled {
                 return;
             }
@@ -267,12 +459,25 @@ fn TreeNode(props: TreeNodeProps) -> Element {
     // Chevron rotation based on expanded state
     let chevron_rotation = if is_expanded { 90.0 } else { 0.0 };
 
+    let dom_id = tree_item_dom_id(&props.id_prefix, &node_id);
+    let tabindex = if props.active_id.as_ref() == Some(&node_id) {
+        "0"
+    } else {
+        "-1"
+    };
+    let child_count = props.node.children.len();
+
     rsx! {
         div {
+            id: "{dom_id}",
             role: "treeitem",
+            tabindex: "{tabindex}",
             aria_expanded: if has_children { Some(is_expanded.to_string()) } else { None },
             aria_selected: is_selected.to_string(),
             aria_disabled: is_disabled.to_string(),
+            "aria-level": "{depth + 1}",
+            "aria-setsize": "{props.set_size}",
+            "aria-posinset": "{props.position}",
 
             // Node row
             div {
@@ -286,6 +491,8 @@ fn TreeNode(props: TreeNodeProps) -> Element {
                     button {
                         style: "display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; padding: 0; border: none; background: transparent; cursor: pointer; flex-shrink: 0;",
                         type: "button",
+                        tabindex: "-1",
+                        aria_hidden: "true",
                         aria_label: if is_expanded { "Collapse" } else { "Expand" },
                         onclick: handle_toggle,
 
@@ -325,16 +532,21 @@ fn TreeNode(props: TreeNodeProps) -> Element {
                     style: "{children_container_style}",
                     role: "group",
 
-                    for child in &props.node.children {
+                    for (position, child) in props.node.children.iter().enumerate() {
                         TreeNode {
                             key: "{child.id}",
                             node: child.clone(),
                             depth: depth + 1,
+                            position: position + 1,
+                            set_size: child_count,
                             selected_id: props.selected_id.clone(),
                             on_select: props.on_select,
                             expanded_ids: props.expanded_ids.clone(),
                             on_toggle_expand: props.on_toggle_expand,
                             show_lines: props.show_lines,
+                            id_prefix: props.id_prefix.clone(),
+                            active_id: props.active_id.clone(),
+                            on_focus_node: props.on_focus_node,
                         }
                     }
                 }
@@ -498,6 +710,7 @@ pub fn TreeWithState(props: TreeProps) -> Element {
             expanded_ids: expanded_ids,
             on_toggle_expand: on_toggle_expand,
             show_lines: props.show_lines,
+            aria_label: props.aria_label.clone(),
         }
     }
 }
@@ -527,5 +740,166 @@ mod tests {
 
         let parent = TreeNodeData::new("2", "Parent").with_child(TreeNodeData::new("2.1", "Child"));
         assert!(!parent.is_leaf());
+    }
+
+    fn sample() -> Vec<TreeNodeData> {
+        vec![
+            TreeNodeData::new("a", "A")
+                .with_child(TreeNodeData::new("a1", "A1").with_child(TreeNodeData::new("a1x", "X")))
+                .with_child(TreeNodeData::new("a2", "A2")),
+            TreeNodeData::new("b", "B").with_child(TreeNodeData::new("b1", "B1")),
+            TreeNodeData::new("c", "C"),
+        ]
+    }
+
+    fn expanded(ids: &[&str]) -> Vec<String> {
+        ids.iter().map(|s| s.to_string()).collect()
+    }
+
+    fn ids(nodes: &[VisibleNode]) -> Vec<&str> {
+        nodes.iter().map(|n| n.id.as_str()).collect()
+    }
+
+    #[test]
+    fn flatten_visible_follows_expanded_branches() {
+        let nodes = flatten_visible(&sample(), &[]);
+        assert_eq!(ids(&nodes), ["a", "b", "c"]);
+
+        let nodes = flatten_visible(&sample(), &expanded(&["a", "a1x", "b1"]));
+        assert_eq!(ids(&nodes), ["a", "a1", "a2", "b", "c"]);
+        assert_eq!(nodes[1].parent, Some(0));
+        assert!(!nodes[1].expanded);
+
+        let nodes = flatten_visible(&sample(), &expanded(&["a", "a1"]));
+        assert_eq!(ids(&nodes), ["a", "a1", "a1x", "a2", "b", "c"]);
+        assert_eq!(nodes[2].parent, Some(1));
+        assert_eq!(nodes[3].parent, Some(0));
+        assert_eq!(nodes[4].parent, None);
+    }
+
+    #[test]
+    fn active_index_prefers_focused_then_selected() {
+        let nodes = flatten_visible(&sample(), &expanded(&["a"]));
+        assert_eq!(active_index(&nodes, Some("a2"), Some("b")), Some(2));
+        assert_eq!(active_index(&nodes, Some("hidden"), Some("b")), Some(3));
+        assert_eq!(active_index(&nodes, None, Some("b1")), Some(0));
+        assert_eq!(active_index(&[], None, None), None);
+    }
+
+    #[test]
+    fn tree_keys_move_expand_collapse_and_select() {
+        let nodes = flatten_visible(&sample(), &expanded(&["a"]));
+        // a, a1, a2, b, c
+        assert_eq!(
+            tree_key_action(&Key::ArrowDown, 0, &nodes),
+            Some(TreeAction::Focus(1))
+        );
+        assert_eq!(tree_key_action(&Key::ArrowDown, 4, &nodes), None);
+        assert_eq!(tree_key_action(&Key::ArrowUp, 0, &nodes), None);
+        assert_eq!(
+            tree_key_action(&Key::ArrowUp, 3, &nodes),
+            Some(TreeAction::Focus(2))
+        );
+        assert_eq!(
+            tree_key_action(&Key::Home, 3, &nodes),
+            Some(TreeAction::Focus(0))
+        );
+        assert_eq!(
+            tree_key_action(&Key::End, 0, &nodes),
+            Some(TreeAction::Focus(4))
+        );
+        // Right: expanded branch -> first child; collapsed branch -> expand; leaf -> nothing
+        assert_eq!(
+            tree_key_action(&Key::ArrowRight, 0, &nodes),
+            Some(TreeAction::Focus(1))
+        );
+        assert_eq!(
+            tree_key_action(&Key::ArrowRight, 1, &nodes),
+            Some(TreeAction::Toggle(1))
+        );
+        assert_eq!(tree_key_action(&Key::ArrowRight, 4, &nodes), None);
+        // Left: expanded branch -> collapse; child -> parent; root leaf -> nothing
+        assert_eq!(
+            tree_key_action(&Key::ArrowLeft, 0, &nodes),
+            Some(TreeAction::Toggle(0))
+        );
+        assert_eq!(
+            tree_key_action(&Key::ArrowLeft, 2, &nodes),
+            Some(TreeAction::Focus(0))
+        );
+        assert_eq!(tree_key_action(&Key::ArrowLeft, 4, &nodes), None);
+        // Enter / Space select
+        assert_eq!(
+            tree_key_action(&Key::Enter, 2, &nodes),
+            Some(TreeAction::Select(2))
+        );
+        assert_eq!(
+            tree_key_action(&Key::Character(" ".to_string()), 3, &nodes),
+            Some(TreeAction::Select(3))
+        );
+        assert_eq!(
+            tree_key_action(&Key::Character("x".to_string()), 3, &nodes),
+            None
+        );
+    }
+
+    #[test]
+    fn disabled_nodes_are_focusable_but_not_actionable() {
+        let data = vec![
+            TreeNodeData::new("a", "A")
+                .with_child(TreeNodeData::new("a1", "A1"))
+                .disabled(true),
+            TreeNodeData::new("b", "B"),
+        ];
+        let nodes = flatten_visible(&data, &[]);
+        assert_eq!(tree_key_action(&Key::ArrowRight, 0, &nodes), None);
+        assert_eq!(tree_key_action(&Key::Enter, 0, &nodes), None);
+        assert_eq!(
+            tree_key_action(&Key::ArrowDown, 0, &nodes),
+            Some(TreeAction::Focus(1))
+        );
+    }
+
+    #[test]
+    fn tree_item_dom_id_replaces_whitespace() {
+        assert_eq!(tree_item_dom_id("t", "my node"), "t-node-my-node");
+    }
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    #[test]
+    fn tree_renders_aria_tree_structure_with_roving_tabindex() {
+        let html = render(|| {
+            rsx! {
+                Tree {
+                    id: "files",
+                    aria_label: "Files",
+                    data: sample(),
+                    expanded_ids: vec!["a".to_string()],
+                    selected_id: "a2".to_string(),
+                }
+            }
+        });
+        assert!(html.contains("role=\"tree\""), "{html}");
+        assert!(html.contains("aria-label=\"Files\""), "{html}");
+        assert!(html.contains("role=\"group\""), "{html}");
+        assert!(html.contains("aria-level=\"2\""), "{html}");
+        assert!(html.contains("aria-expanded=\"true\""), "{html}");
+        assert!(html.contains("aria-expanded=\"false\""), "{html}");
+        assert!(html.contains("aria-selected=\"true\""), "{html}");
+        assert!(html.contains("aria-posinset=\"2\""), "{html}");
+        assert!(html.contains("aria-setsize=\"3\""), "{html}");
+        assert_eq!(html.matches("role=\"treeitem\"").count(), 5, "{html}");
+        assert_eq!(html.matches("tabindex=\"0\"").count(), 1, "{html}");
+        let at = html.find("id=\"files-node-a2\"").expect("a2 rendered");
+        let start = html[..at].rfind('<').expect("tag start");
+        let end = at + html[at..].find('>').expect("tag end");
+        assert!(html[start..end].contains("tabindex=\"0\""), "{html}");
+        // Children of collapsed branches are not rendered.
+        assert!(!html.contains("files-node-b1"), "{html}");
     }
 }

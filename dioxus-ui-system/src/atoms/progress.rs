@@ -91,6 +91,35 @@ pub struct ProgressProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Accessible name announced by screen readers (`aria-label`).
+    ///
+    /// Defaults to `"Loading"` for indeterminate indicators and `"Progress"`
+    /// otherwise.
+    #[props(default)]
+    pub aria_label: Option<String>,
+    /// Human-readable value announced instead of the percentage
+    /// (`aria-valuetext`), e.g. `"Step 2 of 5"`. Ignored when indeterminate.
+    #[props(default)]
+    pub value_text: Option<String>,
+}
+
+/// ARIA value attributes for a progress bar: `(aria-valuenow, aria-valuetext)`.
+///
+/// Returns `None` for indeterminate indicators (no value or `indeterminate`),
+/// which must omit `aria-valuenow`. The value is clamped to `0..=max`.
+fn progress_aria_values(
+    value: Option<f32>,
+    max: f32,
+    indeterminate: bool,
+    value_text: Option<String>,
+) -> Option<(String, String)> {
+    let value = value.filter(|_| !indeterminate)?;
+    let now = value.clamp(0.0, max.max(0.0));
+    let text = value_text.unwrap_or_else(|| {
+        let pct = if max > 0.0 { now / max * 100.0 } else { 0.0 };
+        format!("{pct:.0}%")
+    });
+    Some((now.to_string(), text))
 }
 
 /// Label position
@@ -103,9 +132,34 @@ pub enum LabelPosition {
 }
 
 /// Progress indicator component
+///
+/// # Accessibility
+/// The root element has `role="progressbar"` with `aria-valuemin="0"`,
+/// `aria-valuemax` (the `max` prop) and, for determinate indicators,
+/// `aria-valuenow` plus `aria-valuetext` (the percentage, or `value_text`).
+/// Indeterminate indicators omit `aria-valuenow`/`aria-valuetext` and set
+/// `aria-busy="true"`. The accessible name comes from `aria_label`.
 #[component]
 pub fn Progress(props: ProgressProps) -> Element {
     let theme = use_theme();
+
+    let is_indeterminate = props.indeterminate || props.value.is_none();
+    let (aria_valuenow, aria_valuetext) = progress_aria_values(
+        props.value,
+        props.max,
+        props.indeterminate,
+        props.value_text.clone(),
+    )
+    .unzip();
+    let aria_valuemax = props.max.to_string();
+    let aria_busy = is_indeterminate.then_some("true");
+    let aria_label = props.aria_label.clone().unwrap_or_else(|| {
+        if is_indeterminate {
+            "Loading".to_string()
+        } else {
+            "Progress".to_string()
+        }
+    });
 
     let color = props
         .color
@@ -151,6 +205,13 @@ pub fn Progress(props: ProgressProps) -> Element {
             rsx! {
                 div {
                     class: "progress progress-linear{class_css}",
+                    role: "progressbar",
+                    "aria-label": "{aria_label}",
+                    "aria-valuemin": "0",
+                    "aria-valuemax": "{aria_valuemax}",
+                    "aria-valuenow": aria_valuenow,
+                    "aria-valuetext": aria_valuetext,
+                    "aria-busy": aria_busy,
                     style: "display: flex; align-items: center; gap: 8px; width: {props.width};{style_css}",
                     id: "{id_css}",
 
@@ -170,6 +231,7 @@ pub fn Progress(props: ProgressProps) -> Element {
 
                     if props.show_label {
                         span {
+                            "aria-hidden": "true",
                             style: "font-size: 12px; color: {theme.tokens.read().colors.foreground.to_rgba()}; min-width: 40px; text-align: right;",
                             "{label_text}"
                         }
@@ -200,10 +262,18 @@ pub fn Progress(props: ProgressProps) -> Element {
             rsx! {
                 div {
                     class: "progress progress-circular{class_css}",
+                    role: "progressbar",
+                    "aria-label": "{aria_label}",
+                    "aria-valuemin": "0",
+                    "aria-valuemax": "{aria_valuemax}",
+                    "aria-valuenow": aria_valuenow,
+                    "aria-valuetext": aria_valuetext,
+                    "aria-busy": aria_busy,
                     style: "display: inline-flex; align-items: center; justify-content: center; position: relative;{style_css}",
                     id: "{id_css}",
 
                     svg {
+                        "aria-hidden": "true",
                         width: "{diameter}px",
                         height: "{diameter}px",
                         view_box: "0 0 {diameter} {diameter}",
@@ -240,6 +310,7 @@ pub fn Progress(props: ProgressProps) -> Element {
 
                     if props.show_label {
                         span {
+                            "aria-hidden": "true",
                             style: format!("position: absolute; font-size: {}px; color: {}; font-weight: 500;", diameter / 4, theme.tokens.read().colors.foreground.to_rgba()),
                             "{label_text}"
                         }
@@ -329,5 +400,58 @@ pub fn StepProgress(props: StepProgressProps) -> Element {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    #[test]
+    fn aria_values_clamp_and_format() {
+        assert_eq!(
+            progress_aria_values(Some(42.0), 100.0, false, None),
+            Some(("42".to_string(), "42%".to_string()))
+        );
+        assert_eq!(
+            progress_aria_values(Some(15.0), 10.0, false, None),
+            Some(("10".to_string(), "100%".to_string()))
+        );
+        assert_eq!(
+            progress_aria_values(Some(1.0), 4.0, false, Some("1 of 4".into())),
+            Some(("1".to_string(), "1 of 4".to_string()))
+        );
+        assert_eq!(progress_aria_values(Some(5.0), 100.0, true, None), None);
+        assert_eq!(progress_aria_values(None, 100.0, false, None), None);
+    }
+
+    #[test]
+    fn linear_progress_exposes_progressbar_values() {
+        let html = render(|| rsx! { Progress { value: Some(30.0), aria_label: "Upload" } });
+        assert!(html.contains("role=\"progressbar\""), "{html}");
+        assert!(html.contains("aria-valuenow=\"30\""), "{html}");
+        assert!(html.contains("aria-valuemin=\"0\""), "{html}");
+        assert!(html.contains("aria-valuemax=\"100\""), "{html}");
+        assert!(html.contains("aria-valuetext=\"30%\""), "{html}");
+        assert!(html.contains("aria-label=\"Upload\""), "{html}");
+        assert!(!html.contains("aria-busy"), "{html}");
+    }
+
+    #[test]
+    fn indeterminate_circular_progress_omits_valuenow() {
+        let html = render(|| {
+            rsx! { Progress { variant: ProgressVariant::Circular, indeterminate: true } }
+        });
+        assert!(html.contains("role=\"progressbar\""), "{html}");
+        assert!(!html.contains("aria-valuenow"), "{html}");
+        assert!(!html.contains("aria-valuetext"), "{html}");
+        assert!(html.contains("aria-busy=\"true\""), "{html}");
+        assert!(html.contains("aria-label=\"Loading\""), "{html}");
     }
 }

@@ -18,7 +18,7 @@ theme tokens, so there are no CSS files to ship. Works on web (WASM), desktop an
 ```toml
 [dependencies]
 dioxus = "0.7"
-dioxus-ui-system = "0.0.9"
+dioxus-ui-system = "0.0.10"
 ```
 
 Cargo features (default: `web`):
@@ -32,7 +32,7 @@ Cargo features (default: `web`):
 
 ```toml
 # Desktop app, no web dependencies
-dioxus-ui-system = { version = "0.0.9", default-features = false, features = ["desktop"] }
+dioxus-ui-system = { version = "0.0.10", default-features = false, features = ["desktop"] }
 ```
 
 ## Example

@@ -1,6 +1,8 @@
 //! Organism component documentation pages
 
-use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, PropsTable, Section};
+use crate::docs_ui::{
+    CodeBlock, DocPage, ExampleBox, KeyboardTable, PropsTable, RoleList, Section,
+};
 use dioxus::prelude::*;
 use dioxus_ui_system::atoms::{Box, HStack, VStack};
 use dioxus_ui_system::molecules::ToastVariant;
@@ -247,6 +249,19 @@ Tabs {{
 }}".to_string() }
             }
 
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "Tab strip is role=\"tablist\" with aria-orientation (horizontal, or vertical for VerticalTabs)",
+                    "Tabs are role=\"tab\" with stable ids, aria-selected and (active tab) aria-controls; roving tabindex",
+                    "TabPanel has tabindex=\"0\" and aria-labelledby pointing at the active tab",
+                ]}
+                KeyboardTable { rows: vec![
+                    ("ArrowLeft / ArrowRight", "Move to and activate the previous / next tab (ArrowUp / ArrowDown for VerticalTabs)"),
+                    ("Home / End", "Move to and activate the first / last tab"),
+                    ("Tab", "Move focus from the active tab into the panel"),
+                ]}
+            }
+
             Section { title: "Props",
                 h4 { "TabsProps" }
                 PropsTable { props: vec![
@@ -328,6 +343,19 @@ Accordion {{
     on_change: move |ids| expanded.set(ids),
     multiple: true,
 }}".to_string() }
+            }
+
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "Headers are buttons with stable ids, aria-expanded and aria-controls",
+                    "Panels are role=\"region\" with aria-labelledby and use hidden when collapsed",
+                    "Arrow-key navigation is provided by Accordion (not by a standalone AccordionItem2)",
+                ]}
+                KeyboardTable { rows: vec![
+                    ("ArrowUp / ArrowDown", "Move focus to the previous / next enabled header (wraps)"),
+                    ("Home / End", "Focus the first / last header"),
+                    ("Enter / Space", "Toggle the focused section"),
+                ]}
             }
 
             Section { title: "Props",
@@ -2411,6 +2439,18 @@ DeleteConfirmDialog {{
     }}),
     loading: false,
 }}".to_string() }
+            }
+
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "All confirmation dialogs render as role=\"alertdialog\" with aria-modal=\"true\"",
+                    "The title is wired to aria-labelledby and the message to aria-describedby",
+                    "Focus is trapped while open and restored to the previously focused element on close",
+                ]}
+                KeyboardTable { rows: vec![
+                    ("Tab / Shift+Tab", "Cycle focus inside the dialog"),
+                    ("Escape", "Call on_close"),
+                ]}
             }
 
             Section { title: "Props",

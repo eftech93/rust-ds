@@ -74,6 +74,13 @@ pub struct HoverCardProps {
 /// - Click outside to close
 /// - Escape key to close
 /// - Smooth fade animation
+///
+/// # Accessibility
+///
+/// The card is supplementary, mouse-driven content, so it gets no widget role.
+/// It stays in the DOM while hidden (for the fade), so it carries
+/// `aria-hidden="true"` whenever it is not visible; the decorative arrow is
+/// always `aria-hidden`. Escape hides a visible card.
 #[component]
 pub fn HoverCard(props: HoverCardProps) -> Element {
     let _theme = use_theme();
@@ -189,6 +196,7 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
 
             // Card content - sibling to trigger, not child of overlay
             div {
+                "aria-hidden": (!is_visible()).then_some("true"),
                 style: "{card_style} {position_style} {visibility_style} {transform_style} {custom_style}",
                 onmouseenter: move |_| {
                     is_visible.set(true);
@@ -199,6 +207,7 @@ pub fn HoverCard(props: HoverCardProps) -> Element {
 
                 // Arrow
                 div {
+                    "aria-hidden": "true",
                     style: "{arrow_style} {arrow_position}",
                 }
 
@@ -460,5 +469,31 @@ pub fn HoverCardUserInfo(props: HoverCardUserInfoProps) -> Element {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    #[test]
+    fn hidden_card_is_hidden_from_assistive_tech() {
+        let html = render(|| {
+            rsx! {
+                HoverCard {
+                    trigger: rsx! { a { href: "#", "@user" } },
+                    "Profile"
+                }
+            }
+        });
+        // Both the hidden card and its decorative arrow.
+        assert_eq!(html.matches("aria-hidden=\"true\"").count(), 2, "{html}");
+        assert!(!html.contains("role="), "{html}");
     }
 }

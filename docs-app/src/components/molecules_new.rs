@@ -1,6 +1,8 @@
 //! New Molecule component documentation pages (Phase 1-4)
 
-use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, PropsTable, Section};
+use crate::docs_ui::{
+    CodeBlock, DocPage, ExampleBox, KeyboardTable, PropsTable, RoleList, Section,
+};
 use dioxus::prelude::*;
 use dioxus_ui_system::atoms::{Box, HStack, SpacingSize, VStack};
 use dioxus_ui_system::molecules::{
@@ -205,6 +207,19 @@ Sheet {
                 }
             }
 
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "Panel has role=\"dialog\" and aria-modal=\"true\"",
+                    "Title and description are linked through aria-labelledby / aria-describedby",
+                    "Focus is trapped while open and restored to the previously focused element on close",
+                    "The close button has the accessible name \"Close\"",
+                ]}
+                KeyboardTable { rows: vec![
+                    ("Tab / Shift+Tab", "Cycle focus inside the sheet"),
+                    ("Escape", "Close the sheet (on_open_change(false)); works on web, desktop and mobile"),
+                ]}
+            }
+
             Section { title: "Props",
                 h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "SheetProps" }
                 PropsTable { props: vec![
@@ -216,6 +231,7 @@ Sheet {
                     ("description", "Option<String>", "Sheet description"),
                     ("show_close_button", "bool", "Whether to show the close button (default: true)"),
                     ("close_on_overlay_click", "bool", "Whether clicking the overlay closes the sheet (default: true)"),
+                    ("aria_label", "Option<String>", "Accessible name, for sheets without a title"),
                     ("id", "Option<String>", "Element id"),
                     ("class", "Option<String>", "Custom CSS classes"),
                     ("style", "Option<String>", "Custom inline styles"),
@@ -288,6 +304,22 @@ MultiSelect {
                 }
             }
 
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "The search input (or the focusable trigger when searchable is false or disabled) is role=\"combobox\" with aria-haspopup, aria-expanded, aria-controls and aria-activedescendant",
+                    "The search input also sets aria-autocomplete=\"list\"",
+                    "Options list is role=\"listbox\" with aria-multiselectable=\"true\"; options and the \"Create\" entry are role=\"option\" with aria-selected",
+                    "Tag remove buttons have an aria-label",
+                ]}
+                KeyboardTable { rows: vec![
+                    ("Enter / ArrowDown", "Open the dropdown"),
+                    ("ArrowUp / ArrowDown", "Move the highlighted option"),
+                    ("Enter", "Toggle the highlighted option (or create a new one when creatable)"),
+                    ("Escape", "Close the dropdown"),
+                    ("Backspace", "With an empty search, remove the last selected tag"),
+                ]}
+            }
+
             Section { title: "Props",
                 PropsTable { props: vec![
                     ("options", "Vec<SelectOption>", "Available options"),
@@ -298,6 +330,7 @@ MultiSelect {
                     ("max_selected", "Option<usize>", "Maximum number of selections allowed"),
                     ("creatable", "bool", "Allow creating new options"),
                     ("searchable", "bool", "Enable search/filter functionality (default: true)"),
+                    ("aria_label", "Option<String>", "Accessible name of the combobox (defaults to the placeholder)"),
                     ("class", "Option<String>", "Additional CSS classes"),
                     ("id", "Option<String>", "Element id"),
                     ("style", "Option<String>", "Custom inline styles"),

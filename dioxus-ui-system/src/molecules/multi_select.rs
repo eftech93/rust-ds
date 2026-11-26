@@ -2,6 +2,7 @@
 //!
 //! A dropdown that allows selecting multiple items with tag/chip display.
 
+use crate::a11y::use_unique_id;
 use crate::atoms::select::SelectOption;
 use crate::styles::Style;
 use crate::theme::{use_style, use_theme};
@@ -42,12 +43,37 @@ pub struct MultiSelectProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Accessible name of the combobox (`aria-label`); defaults to the
+    /// placeholder text
+    #[props(default)]
+    pub aria_label: Option<String>,
+}
+
+/// Element id of the option at `index` inside the listbox `listbox_id`.
+fn option_id(listbox_id: &str, index: usize) -> String {
+    format!("{listbox_id}-option-{index}")
+}
+
+/// Element id of the "create option" entry inside the listbox `listbox_id`.
+fn create_option_id(listbox_id: &str) -> String {
+    format!("{listbox_id}-create")
 }
 
 /// MultiSelect molecule component
+///
+/// # Accessibility
+/// The search input (or, when `searchable` is false or the control is
+/// disabled, the focusable trigger) is a `role="combobox"` with
+/// `aria-haspopup="listbox"`, `aria-expanded`, `aria-controls` and
+/// `aria-activedescendant` pointing at the highlighted option. The options
+/// list is a `role="listbox"` with `aria-multiselectable="true"`; items are
+/// `role="option"` with `aria-selected`. Keys: ArrowDown opens / moves down,
+/// ArrowUp moves up, Enter toggles the highlighted option (or opens),
+/// Escape closes, Backspace on an empty search removes the last tag.
 #[component]
 pub fn MultiSelect(props: MultiSelectProps) -> Element {
     let _theme = use_theme();
+    let generated_id = use_unique_id("multi-select");
     let mut is_open = use_signal(|| false);
     let mut search_value = use_signal(String::new);
     let mut highlighted_index = use_signal(|| 0usize);
@@ -362,6 +388,40 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
         .clone()
         .unwrap_or_else(|| "Select items...".to_string());
 
+    // ARIA wiring
+    let base_id = props.id.clone().unwrap_or(generated_id);
+    let listbox_id = format!("{base_id}-listbox");
+    let aria_label = props
+        .aria_label
+        .clone()
+        .unwrap_or_else(|| placeholder_text.clone());
+    let input_is_combobox = props.searchable && !props.disabled;
+    let searchable = props.searchable;
+    let disabled = props.disabled;
+    let active_descendant = if is_open() && !disabled {
+        let len = filtered_options().len();
+        let index = highlighted_index();
+        if index < len {
+            Some(option_id(&listbox_id, index))
+        } else if index == len && can_create() {
+            Some(create_option_id(&listbox_id))
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+    let aria_expanded = (is_open() && !disabled).to_string();
+    let trigger_role = (!input_is_combobox).then_some("combobox");
+    let trigger_tabindex = (!input_is_combobox && !disabled).then_some("0");
+    let trigger_aria = |value: &str| (!input_is_combobox).then(|| value.to_string());
+    let trigger_haspopup = trigger_aria("listbox");
+    let trigger_expanded = trigger_aria(&aria_expanded);
+    let trigger_controls = trigger_aria(&listbox_id);
+    let trigger_label = trigger_aria(&aria_label);
+    let trigger_disabled = (!input_is_combobox && disabled).then_some("true");
+    let trigger_active = active_descendant.clone().filter(|_| !input_is_combobox);
+
     // Colors for styling
     let muted_color = use_style(|t| t.colors.muted.to_rgba());
     let border_color = use_style(|t| t.colors.border.to_rgba());
@@ -382,9 +442,23 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             div {
                 class: "multi-select-container",
                 style: "{container_style}; {container_shadow_style}",
+                role: trigger_role,
+                tabindex: trigger_tabindex,
+                "aria-haspopup": trigger_haspopup,
+                "aria-expanded": trigger_expanded,
+                "aria-controls": trigger_controls,
+                "aria-label": trigger_label,
+                "aria-disabled": trigger_disabled,
+                "aria-activedescendant": trigger_active,
                 onclick: move |_| {
                     if !props.disabled {
                         is_open.toggle();
+                    }
+                },
+                onkeydown: move |e: KeyboardEvent| {
+                    if !searchable && !disabled {
+                        let mut handler = handle_key_down;
+                        handler(e);
                     }
                 },
 
@@ -392,6 +466,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                 for value in selected_values().iter() {
                     {
                         let label = get_label.call(value.clone());
+                        let remove_label = format!("Remove {label}");
                         let value_clone = value.clone();
                         let value_key = value.clone();
                         rsx! {
@@ -405,6 +480,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                                 button {
                                     r#type: "button",
                                     class: "multi-select-tag-remove",
+                                    "aria-label": "{remove_label}",
                                     style: "display: inline-flex; align-items: center; justify-content: center; margin-left: 4px; padding: 2px; background: none; border: none; cursor: pointer; font-size: 12px; color: inherit; opacity: 0.7; border-radius: 50%; transition: opacity 0.15s;",
                                     onclick: move |e: Event<dioxus::html::MouseData>| {
                                         e.stop_propagation();
@@ -422,6 +498,13 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                     input {
                         r#type: "text",
                         class: "multi-select-input",
+                        role: "combobox",
+                        "aria-haspopup": "listbox",
+                        "aria-autocomplete": "list",
+                        "aria-expanded": "{aria_expanded}",
+                        "aria-controls": "{listbox_id}",
+                        "aria-label": "{aria_label}",
+                        "aria-activedescendant": active_descendant.clone(),
                         style: "flex: 1; min-width: 80px; border: none; outline: none; font-size: 14px; padding: 4px; background: transparent;",
                         placeholder: if selected_values().is_empty() { "{placeholder_text}" } else { "" },
                         value: "{search_value}",
@@ -447,6 +530,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                 // Dropdown arrow
                 span {
                     class: "multi-select-arrow",
+                    "aria-hidden": "true",
                     style: "margin-left: auto; color: {muted_color}; transition: transform 0.2s;",
                     style: if is_open() { "transform: rotate(180deg);" } else { "" },
                     "▼"
@@ -475,11 +559,14 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                                 class: "multi-select-search-input",
                                 style: "width: 100%; padding: 8px 12px; border: 1px solid {border_color}; border-radius: 6px; font-size: 14px; outline: none;",
                                 placeholder: "Search...",
+                                "aria-label": "Search options",
+                                "aria-controls": "{listbox_id}",
                                 value: "{search_value}",
                                 oninput: move |e: Event<FormData>| {
                                     search_value.set(e.value());
                                     highlighted_index.set(0);
                                 },
+                                onkeydown: handle_key_down,
                             }
                         }
                     }
@@ -517,6 +604,10 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                     // Options list
                     div {
                         class: "multi-select-options",
+                        id: "{listbox_id}",
+                        role: "listbox",
+                        "aria-multiselectable": "true",
+                        "aria-label": "{aria_label}",
                         style: "max-height: 200px; overflow-y: auto;",
 
                         if filtered_options().is_empty() && !can_create() {
@@ -529,6 +620,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                             for (index, option) in filtered_options().iter().enumerate() {
                                 MultiSelectOptionItem {
                                     key: "{option.value}",
+                                    id: Some(option_id(&listbox_id, index)),
                                     option: option.clone(),
                                     is_selected: selected_values().contains(&option.value),
                                     is_highlighted: index == highlighted_index(),
@@ -550,6 +642,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
                             // Create option
                             if can_create() {
                                 MultiSelectCreateOptionItem {
+                                    id: Some(create_option_id(&listbox_id)),
                                     search_value: search_value().trim().to_string(),
                                     is_highlighted: highlighted_index() == filtered_options().len(),
                                     item_style_base: item_style_base,
@@ -637,6 +730,9 @@ fn MultiSelectOptionItem(props: MultiSelectOptionItemProps) -> Element {
         div {
             id: "{props.id.clone().unwrap_or_default()}",
             class: "multi-select-option",
+            role: "option",
+            "aria-selected": "{props.is_selected}",
+            "aria-disabled": props.is_disabled.then_some("true"),
             style: "{props.item_style_base}; background: {bg_color}; opacity: {opacity};",
             onclick: move |_| {
                 if !props.is_disabled {
@@ -648,6 +744,7 @@ fn MultiSelectOptionItem(props: MultiSelectOptionItemProps) -> Element {
             // Checkbox indicator
             div {
                 class: "multi-select-checkbox",
+                "aria-hidden": "true",
                 style: "width: 16px; height: 16px; border: 1px solid {checkbox_border}; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: {checkbox_bg}; transition: all 0.15s;",
 
                 if props.is_selected {
@@ -706,6 +803,8 @@ fn MultiSelectCreateOptionItem(props: MultiSelectCreateOptionItemProps) -> Eleme
         div {
             id: "{props.id.clone().unwrap_or_default()}",
             class: "multi-select-create {props.class.clone().unwrap_or_default()}",
+            role: "option",
+            "aria-selected": "false",
             style: "{props.item_style_base}; background: {bg_color}; border-top: 1px solid {props.border_color};",
             onclick: move |_| props.on_create.call(()),
             onmouseenter: move |_| props.set_highlighted_index.call(()),
@@ -715,5 +814,100 @@ fn MultiSelectCreateOptionItem(props: MultiSelectCreateOptionItemProps) -> Eleme
                 "+ Create \"{props.search_value}\""
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    fn opts() -> Vec<SelectOption> {
+        vec![
+            SelectOption::new("rs", "Rust"),
+            SelectOption::new("go", "Go"),
+        ]
+    }
+
+    #[test]
+    fn searchable_input_is_the_combobox() {
+        let html = render(|| {
+            rsx! {
+                MultiSelect {
+                    id: "langs",
+                    options: opts(),
+                    value: vec!["rs".to_string()],
+                    aria_label: "Languages",
+                }
+            }
+        });
+        assert_eq!(html.matches("role=\"combobox\"").count(), 1, "{html}");
+        assert!(html.contains("aria-autocomplete=\"list\""), "{html}");
+        assert!(html.contains("aria-expanded=\"false\""), "{html}");
+        assert!(html.contains("aria-haspopup=\"listbox\""), "{html}");
+        assert!(html.contains("aria-controls=\"langs-listbox\""), "{html}");
+        assert!(html.contains("aria-label=\"Languages\""), "{html}");
+        assert!(html.contains("aria-label=\"Remove Rust\""), "{html}");
+        assert!(!html.contains("aria-activedescendant"), "{html}");
+    }
+
+    #[test]
+    fn non_searchable_trigger_is_focusable_combobox() {
+        let html = render(|| {
+            rsx! {
+                MultiSelect { options: opts(), searchable: false, placeholder: "Pick" }
+            }
+        });
+        assert_eq!(html.matches("role=\"combobox\"").count(), 1, "{html}");
+        assert!(html.contains("tabindex=\"0\""), "{html}");
+        assert!(html.contains("aria-label=\"Pick\""), "{html}");
+        assert!(html.contains("aria-controls=\"multi-select-"), "{html}");
+        assert!(!html.contains("aria-autocomplete"), "{html}");
+    }
+
+    #[test]
+    fn disabled_trigger_is_aria_disabled() {
+        let html = render(|| rsx! { MultiSelect { options: opts(), disabled: true } });
+        assert!(html.contains("role=\"combobox\""), "{html}");
+        assert!(html.contains("aria-disabled=\"true\""), "{html}");
+        assert!(!html.contains("tabindex"), "{html}");
+    }
+
+    #[test]
+    fn option_item_exposes_option_role_and_selection() {
+        let html = render(|| {
+            rsx! {
+                MultiSelectOptionItem {
+                    id: "lb-option-0",
+                    option: SelectOption::new("rs", "Rust"),
+                    is_selected: true,
+                    is_highlighted: false,
+                    is_disabled: true,
+                    item_style_base: String::new(),
+                    primary_color: String::new(),
+                    border_color: String::new(),
+                    foreground_color: String::new(),
+                    highlighted_bg: String::new(),
+                    on_toggle: |_| {},
+                    set_highlighted_index: |_| {},
+                    index: 0,
+                }
+            }
+        });
+        assert!(html.contains("role=\"option\""), "{html}");
+        assert!(html.contains("id=\"lb-option-0\""), "{html}");
+        assert!(html.contains("aria-selected=\"true\""), "{html}");
+        assert!(html.contains("aria-disabled=\"true\""), "{html}");
+    }
+
+    #[test]
+    fn option_ids_are_derived_from_listbox() {
+        assert_eq!(option_id("x-listbox", 2), "x-listbox-option-2");
+        assert_eq!(create_option_id("x-listbox"), "x-listbox-create");
     }
 }

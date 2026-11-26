@@ -1,6 +1,8 @@
 //! Atom component documentation pages
 
-use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, PropsTable, Section};
+use crate::docs_ui::{
+    CodeBlock, DocPage, ExampleBox, KeyboardTable, PropsTable, RoleList, Section,
+};
 use dioxus::prelude::*;
 use dioxus_ui_system::atoms::{
     Box, DatePicker, Divider, DividerOrientation, HStack, Heading, HeadingLevel, Progress,
@@ -468,6 +470,19 @@ pub fn RadioPage() -> Element {
 }}".to_string() }
             }
 
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "RadioGroup has role=\"radiogroup\" with aria-orientation taken from direction",
+                    "The group is named by its visible label (aria-labelledby) or by aria_label",
+                    "Each Radio is a native radio input, so browser keyboard behaviour applies",
+                ]}
+                KeyboardTable { rows: vec![
+                    ("Tab", "Move focus into / out of the group (to the checked radio)"),
+                    ("Arrow keys", "Move to and select the previous / next radio in the group"),
+                    ("Space", "Select the focused radio"),
+                ]}
+            }
+
             Section { title: "Props",
                 PropsTable { props: vec![
                     ("checked", "bool", "Whether the radio is selected"),
@@ -489,6 +504,9 @@ pub fn RadioPage() -> Element {
                     ("on_change", "Option<EventHandler<String>>", "Callback when selection changes"),
                     ("children", "Element", "Radio group children (Radio components)"),
                     ("direction", "RadioDirection", "Layout direction (Horizontal/Vertical)"),
+                    ("label", "Option<String>", "Visible group label, rendered above the radios and referenced by aria-labelledby"),
+                    ("aria_label", "Option<String>", "Accessible name when there is no visible label"),
+                    ("id", "Option<String>", "Element id of the group (also used to derive the label id)"),
                 ]}
             }
         }
@@ -568,6 +586,22 @@ pub fn SelectPage() -> Element {
 }}".to_string() }
             }
 
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "Select renders a native select element",
+                    "MultiSelect trigger is a focusable role=\"combobox\" with aria-haspopup=\"listbox\", aria-expanded, aria-controls, aria-activedescendant and aria-disabled",
+                    "MultiSelect dropdown is role=\"listbox\" with aria-multiselectable=\"true\"; items are role=\"option\" with aria-selected / aria-disabled",
+                    "Tag remove buttons are labelled \"Remove <label>\"",
+                ]}
+                KeyboardTable { rows: vec![
+                    ("Enter / Space / ArrowUp / ArrowDown", "Open the MultiSelect dropdown"),
+                    ("ArrowUp / ArrowDown", "Move the highlighted option"),
+                    ("Home / End", "Highlight the first / last option"),
+                    ("Enter / Space", "Toggle the highlighted option"),
+                    ("Escape", "Close the dropdown"),
+                ]}
+            }
+
             Section { title: "Props",
                 PropsTable { props: vec![
                     ("value", "String", "Currently selected value"),
@@ -590,6 +624,7 @@ pub fn SelectPage() -> Element {
                     ("placeholder", "Option<String>", "Placeholder text"),
                     ("disabled", "bool", "Whether the select is disabled"),
                     ("max_selections", "Option<usize>", "Maximum number of selections"),
+                    ("aria_label", "Option<String>", "Accessible name of the combobox (defaults to the placeholder)"),
                 ]}
             }
         }
@@ -908,6 +943,16 @@ pub fn ProgressPage() -> Element {
 }}".to_string() }
             }
 
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "Root has role=\"progressbar\" with aria-valuemin=\"0\" and aria-valuemax",
+                    "Determinate bars set aria-valuenow and aria-valuetext (the percentage, or value_text)",
+                    "Indeterminate bars omit aria-valuenow/aria-valuetext and set aria-busy=\"true\"",
+                    "The visual label and SVG are aria-hidden; name the bar with aria_label",
+                    "Not focusable: there are no keyboard interactions",
+                ]}
+            }
+
             Section { title: "Props",
                 PropsTable { props: vec![
                     ("value", "Option<f32>", "Current progress value (0-100)"),
@@ -923,6 +968,8 @@ pub fn ProgressPage() -> Element {
                     ("indeterminate", "bool", "Indeterminate state (default: false)"),
                     ("id", "Option<String>", "Element id"),
                     ("style", "Option<String>", "Custom inline styles"),
+                    ("aria_label", "Option<String>", "Accessible name (default: \"Progress\", or \"Loading\" when indeterminate)"),
+                    ("value_text", "Option<String>", "Custom aria-valuetext announced instead of the percentage, e.g. \"Step 2 of 5\" (ignored when indeterminate)"),
                 ]}
             }
         }

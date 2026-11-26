@@ -2,6 +2,7 @@
 //!
 //! A set of checkable buttons—known as radio buttons—where no more than one of the buttons can be checked at a time.
 
+use crate::a11y::use_unique_id;
 use crate::styles::Style;
 use crate::theme::use_style;
 use dioxus::prelude::*;
@@ -153,6 +154,16 @@ pub struct RadioGroupProps {
     /// Layout direction
     #[props(default)]
     pub direction: RadioDirection,
+    /// Visible group label, rendered above the radios and referenced by
+    /// `aria-labelledby`
+    #[props(default)]
+    pub label: Option<String>,
+    /// Accessible name when there is no visible `label` (`aria-label`)
+    #[props(default)]
+    pub aria_label: Option<String>,
+    /// Element id of the group (also used to derive the label id)
+    #[props(default)]
+    pub id: Option<String>,
 }
 
 /// Radio group layout direction
@@ -165,18 +176,108 @@ pub enum RadioDirection {
     Vertical,
 }
 
+impl RadioDirection {
+    /// Value for `aria-orientation`.
+    fn aria_orientation(&self) -> &'static str {
+        match self {
+            RadioDirection::Horizontal => "horizontal",
+            RadioDirection::Vertical => "vertical",
+        }
+    }
+}
+
 /// Radio group component for managing a set of radio buttons
+///
+/// # Accessibility
+/// Renders `role="radiogroup"` with `aria-orientation` from `direction`. The
+/// group is named by its visible `label` (via `aria-labelledby`) or by
+/// `aria_label`. Radios are native `<input type="radio">` elements sharing
+/// `name`, so the browser provides Tab into the group and arrow-key movement
+/// between its radios.
 #[component]
 pub fn RadioGroup(props: RadioGroupProps) -> Element {
+    let generated_id = use_unique_id("radio-group");
+    let group_id = props.id.clone().unwrap_or(generated_id);
+    let label_id = format!("{group_id}-label");
+
     let direction = match props.direction {
         RadioDirection::Horizontal => "row",
         RadioDirection::Vertical => "column",
     };
+    let orientation = props.direction.aria_orientation();
+    let labelledby = props.label.as_ref().map(|_| label_id.clone());
+    let aria_label = if props.label.is_none() {
+        props.aria_label.clone()
+    } else {
+        None
+    };
 
     rsx! {
+        if let Some(label) = props.label.clone() {
+            span {
+                id: "{label_id}",
+                class: "radio-group-label",
+                style: "display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500;",
+                "{label}"
+            }
+        }
         div {
+            id: "{group_id}",
+            role: "radiogroup",
+            "aria-labelledby": labelledby,
+            "aria-label": aria_label,
+            "aria-orientation": "{orientation}",
             style: "display: flex; flex-direction: {direction}; gap: 12px;",
             {props.children}
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    #[test]
+    fn radio_group_is_labelled_by_visible_label() {
+        let html = render(|| {
+            rsx! {
+                RadioGroup {
+                    id: "plan",
+                    name: "plan".to_string(),
+                    value: "a".to_string(),
+                    label: "Plan",
+                    direction: RadioDirection::Vertical,
+                    Radio { name: "plan".to_string(), value: "a".to_string(), checked: true }
+                    Radio { name: "plan".to_string(), value: "b".to_string() }
+                }
+            }
+        });
+        assert!(html.contains("role=\"radiogroup\""), "{html}");
+        assert!(html.contains("id=\"plan-label\""), "{html}");
+        assert!(html.contains("aria-labelledby=\"plan-label\""), "{html}");
+        assert!(html.contains("aria-orientation=\"vertical\""), "{html}");
+        assert!(!html.contains("aria-label=\""), "{html}");
+        assert!(html.contains("type=\"radio\""), "{html}");
+    }
+
+    #[test]
+    fn radio_group_without_label_uses_aria_label() {
+        let html = render(|| {
+            rsx! {
+                RadioGroup { name: "size".to_string(), value: "s".to_string(), aria_label: "Size",
+                    Radio { name: "size".to_string(), value: "s".to_string() }
+                }
+            }
+        });
+        assert!(html.contains("role=\"radiogroup\""), "{html}");
+        assert!(html.contains("aria-label=\"Size\""), "{html}");
+        assert!(html.contains("aria-orientation=\"horizontal\""), "{html}");
+        assert!(!html.contains("aria-labelledby"), "{html}");
     }
 }
