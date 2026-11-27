@@ -2,6 +2,8 @@
 //!
 //! Critical decision dialogs with clear action labeling.
 
+use crate::a11y::use_unique_id;
+use crate::molecules::dialog::resolve_base_id;
 use crate::molecules::Dialog;
 use crate::theme::use_theme;
 use dioxus::prelude::*;
@@ -79,9 +81,19 @@ impl ConfirmVariant {
 }
 
 /// Confirmation dialog component
+///
+/// # Accessibility
+///
+/// Built on [`Dialog`] with `role="alertdialog"` and `aria-modal="true"`:
+/// `aria-labelledby` points at the title and `aria-describedby` at the
+/// message. Escape (like the cancel button) calls `on_close`; focus is
+/// trapped while open and restored on close.
 #[component]
 pub fn ConfirmationDialog(props: ConfirmationDialogProps) -> Element {
     let theme = use_theme();
+    let auto_id = use_unique_id("confirmation-dialog");
+    let base_id = resolve_base_id(props.id.as_deref(), &auto_id);
+    let message_id = format!("{base_id}-message");
 
     let class_css = props
         .class
@@ -102,6 +114,8 @@ pub fn ConfirmationDialog(props: ConfirmationDialogProps) -> Element {
             open: props.open,
             on_close: props.on_close,
             title: props.title.clone(),
+            alert: true,
+            aria_describedby: message_id.clone(),
 
             div {
                 class: "confirmation-dialog{class_css}",
@@ -116,6 +130,7 @@ pub fn ConfirmationDialog(props: ConfirmationDialogProps) -> Element {
 
                 // Message
                 p {
+                    id: "{message_id}",
                     class: "confirmation-dialog-message",
                     style: "margin: 0 0 32px 0; font-size: 16px; line-height: 1.6; color: {theme.tokens.read().colors.foreground.to_rgba()};",
                     "{props.message}"
@@ -234,9 +249,17 @@ pub struct UnsavedChangesDialogProps {
 }
 
 /// Unsaved changes confirmation dialog
+///
+/// # Accessibility
+///
+/// `role="alertdialog"` labelled by its title and described by its message;
+/// Escape calls `on_close` ("Keep editing").
 #[component]
 pub fn UnsavedChangesDialog(props: UnsavedChangesDialogProps) -> Element {
     let theme = use_theme();
+    let auto_id = use_unique_id("unsaved-changes-dialog");
+    let base_id = resolve_base_id(props.id.as_deref(), &auto_id);
+    let message_id = format!("{base_id}-message");
 
     rsx! {
         Dialog {
@@ -246,6 +269,8 @@ pub fn UnsavedChangesDialog(props: UnsavedChangesDialogProps) -> Element {
             open: props.open,
             on_close: props.on_close,
             title: "Unsaved changes",
+            alert: true,
+            aria_describedby: message_id.clone(),
 
             div {
                 style: "text-align: center; padding: 24px 0;",
@@ -256,6 +281,7 @@ pub fn UnsavedChangesDialog(props: UnsavedChangesDialogProps) -> Element {
                 }
 
                 p {
+                    id: "{message_id}",
                     style: "margin: 0 0 32px 0; font-size: 16px; line-height: 1.6; color: {theme.tokens.read().colors.foreground.to_rgba()};",
                     "You have unsaved changes. What would you like to do?"
                 }
@@ -338,5 +364,57 @@ pub fn SignOutDialog(props: SignOutDialogProps) -> Element {
             icon: "👋",
             on_confirm: props.on_confirm,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    #[test]
+    fn confirmation_dialog_is_alertdialog_labelled_and_described() {
+        let html = render(|| {
+            rsx! {
+                ConfirmationDialog {
+                    open: true,
+                    id: "confirm",
+                    title: "Delete project",
+                    message: "This cannot be undone.",
+                }
+            }
+        });
+        assert!(html.contains("role=\"alertdialog\""), "{html}");
+        assert!(html.contains("aria-modal=\"true\""), "{html}");
+        assert!(html.contains("aria-labelledby=\"confirm-title\""), "{html}");
+        assert!(html.contains("id=\"confirm-title\""), "{html}");
+        assert!(
+            html.contains("aria-describedby=\"confirm-message\""),
+            "{html}"
+        );
+        assert!(html.contains("id=\"confirm-message\""), "{html}");
+    }
+
+    #[test]
+    fn wrappers_inherit_dialog_semantics() {
+        let html = render(|| {
+            rsx! {
+                DeleteConfirmDialog { open: true, id: "del", item_name: "report.pdf" }
+                UnsavedChangesDialog { open: true, id: "unsaved" }
+            }
+        });
+        assert_eq!(html.matches("role=\"alertdialog\"").count(), 2, "{html}");
+        assert!(html.contains("aria-describedby=\"del-message\""), "{html}");
+        assert!(html.contains("id=\"del-message\""), "{html}");
+        assert!(
+            html.contains("aria-describedby=\"unsaved-message\""),
+            "{html}"
+        );
+        assert!(html.contains("id=\"unsaved-message\""), "{html}");
     }
 }

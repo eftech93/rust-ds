@@ -4,7 +4,62 @@ All notable changes to `dioxus-ui-system` are documented here. The format follow
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/) (pre-1.0: minor bumps may break APIs).
 
-## [0.0.9] - Unreleased
+## [0.0.10] - Unreleased
+
+Accessibility release (#19, #20, #21, #22, #31). **Not breaking:** every change only adds
+roles, ARIA attributes, keyboard behaviour or optional props.
+
+### Added
+
+- `dioxus_ui_system::a11y`: shared helpers: `use_unique_id`, `focus_element`,
+  `install_focus_trap` / `release_focus_trap`, and `next_index` / `next_enabled_index`
+  for arrow-key / Home / End navigation.
+- **Dialog, AlertDialog, Sheet, ConfirmationDialog family** (#19): `role="dialog"` /
+  `"alertdialog"`, `aria-modal`, `aria-labelledby` / `aria-describedby` wired to the title
+  and description. Escape closes, focus is trapped while open and restored on close, and
+  close buttons have a "Close" label. Sheet's web-only `web_sys` Escape listener, which
+  leaked a closure on every open, is replaced by a handler that also works on desktop and
+  mobile. New optional props: `Dialog.alert`, `Dialog.aria_label`,
+  `Dialog.aria_describedby`, `Sheet.aria_label`.
+- **Popover** (#31): `aria-haspopup` / `aria-expanded` / `aria-controls` on the trigger,
+  `role="dialog"` content, Escape closes, focus moves in and returns to the trigger.
+  HoverCard's hidden card is `aria-hidden`.
+- **Tabs / VerticalTabs** (#20): `tablist` / `tab` / `tabpanel` roles, `aria-selected`,
+  `aria-controls`, `aria-labelledby`, roving tabindex. Arrow keys (Left/Right, or Up/Down
+  for vertical), Home and End move to and activate a tab and skip disabled ones.
+- **DropdownMenu** (#21): `aria-haspopup="menu"`, `aria-expanded`, `role="menu"` /
+  `menuitem` / `separator`, `aria-disabled`. Enter, Space or ArrowDown opens the menu;
+  arrows, Home and End move between items; Enter or Space selects; Escape closes and
+  returns focus to the trigger.
+- **Progress** (#22): `role="progressbar"` with `aria-valuenow` / `min` / `max` /
+  `valuetext`, plus `aria-busy` when indeterminate. New optional props: `aria_label` and
+  `value_text`.
+- **RadioGroup** (#22): `role="radiogroup"` and `aria-orientation`. New optional props:
+  `label` (a visible group label), `aria_label` and `id`.
+- **MultiSelect** (atoms and molecules) (#22): combobox and listbox pattern with
+  `aria-expanded`, `aria-activedescendant` and `aria-multiselectable`, plus keyboard
+  support (open, move the highlight, toggle, Escape). New optional prop: `aria_label`.
+- **ThemeToggle / ThemeSelector** (#22): an action label ("Switch to dark theme") and
+  listbox roles.
+- **Accordion** (#31): `aria-controls`, `role="region"` panels; Up/Down/Home/End move
+  between headers.
+- **Tree** (#31): the WAI-ARIA tree pattern: `aria-level` / `setsize` / `posinset`,
+  roving tabindex, Up/Down, Right/Left expand-collapse-or-move, Home/End, and Enter/Space
+  to select. New optional prop: `aria_label`.
+- **Carousel** (#31): `aria-roledescription` region and slides ("n of m"), `aria-live`.
+  Left/Right (Up/Down when vertical) and Home/End change slides, and `is_paused` is set
+  while the carousel is focused. New optional props: `aria_label` (Carousel,
+  SimpleCarousel, TouchCarousel) and `CarouselItem.total`.
+- Docs site: an "Accessibility" guide and keyboard sections on the affected component
+  pages.
+
+### Fixed
+
+- `Tabs` now renders its `children` (e.g. `TabPanel`); before, they were dropped.
+- Tab buttons restyle when the active tab changes; a memo had kept the old state.
+- Dialog and Sheet no longer call hooks conditionally when `open` changes.
+
+## [0.0.9] - 2026-11-25
 
 **Breaking:** one pass that makes component props consistent (#17, #18), so you
 migrate once. The workspace now builds with zero warnings (`-D warnings` for build,

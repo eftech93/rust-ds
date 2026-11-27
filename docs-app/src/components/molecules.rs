@@ -1,6 +1,8 @@
 //! Molecule component documentation pages
 
-use crate::docs_ui::{CodeBlock, DocPage, ExampleBox, PropsTable, Section};
+use crate::docs_ui::{
+    CodeBlock, DocPage, ExampleBox, KeyboardTable, PropsTable, RoleList, Section,
+};
 use dioxus::prelude::*;
 use dioxus_ui_system::atoms::{Box, HStack, VStack};
 use dioxus_ui_system::molecules::{
@@ -315,6 +317,20 @@ Dialog {{
 }}".to_string() }
             }
 
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "Panel has role=\"dialog\" (role=\"alertdialog\" with alert: true) and aria-modal=\"true\"",
+                    "aria-labelledby points at the title and aria-describedby at the description (ids derived from id or auto-generated)",
+                    "AlertDialog always uses role=\"alertdialog\" with its description linked through aria-describedby",
+                    "Focus moves into the dialog when it opens and returns to the previously focused element when it closes",
+                    "The close button has the accessible name \"Close\"",
+                ]}
+                KeyboardTable { rows: vec![
+                    ("Tab / Shift+Tab", "Cycle focus inside the dialog (focus is trapped while open)"),
+                    ("Escape", "Call on_close (AlertDialog: cancel)"),
+                ]}
+            }
+
             Section { title: "Props",
                 h3 { style: "font-size: 16px; margin: 16px 0 8px 0;", "DialogProps" }
                 PropsTable { props: vec![
@@ -325,6 +341,9 @@ Dialog {{
                     ("description", "Option<String>", "Dialog description"),
                     ("show_close_button", "bool", "Whether to show close button (default: true)"),
                     ("close_on_overlay_click", "bool", "Whether clicking overlay closes the dialog (default: true)"),
+                    ("alert", "bool", "Use role=\"alertdialog\" instead of role=\"dialog\" (default: false)"),
+                    ("aria_label", "Option<String>", "Accessible name, for dialogs without a title"),
+                    ("aria_describedby", "Option<String>", "Id of an element that describes the dialog; takes precedence over description"),
                     ("content_style", "Option<String>", "Custom inline styles for the content"),
                     ("id", "Option<String>", "Element id"),
                     ("class", "Option<String>", "Custom CSS classes"),
@@ -440,6 +459,23 @@ pub fn DropdownPage() -> Element {
                         }
                     }
                 }
+            }
+
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "Trigger has aria-haspopup=\"menu\", aria-expanded and aria-controls",
+                    "Popup is role=\"menu\", labelled by the trigger; items are role=\"menuitem\" with aria-disabled",
+                    "Separators have role=\"separator\"",
+                ]}
+                KeyboardTable { rows: vec![
+                    ("Enter / Space / ArrowDown", "On the trigger: open and focus the first enabled item"),
+                    ("ArrowUp", "On the trigger: open and focus the last enabled item"),
+                    ("ArrowUp / ArrowDown", "Move focus between items, skipping disabled ones"),
+                    ("Home / End", "Focus the first / last enabled item"),
+                    ("Enter / Space", "Select the focused item"),
+                    ("Escape", "Close the menu and return focus to the trigger"),
+                    ("Tab", "Close the menu"),
+                ]}
             }
 
             Section { title: "Props",
@@ -893,6 +929,17 @@ Popover {
         Button { variant: ButtonVariant::Primary, on_click: move |_| open.set(false), "Confirm" }
     }
 }"#.to_string() }
+            }
+
+            Section { title: "Accessibility",
+                RoleList { items: vec![
+                    "Trigger exposes aria-haspopup=\"dialog\", aria-expanded and (while open) aria-controls",
+                    "Content has role=\"dialog\" and is labelled by the trigger",
+                    "Focus moves into the content when it opens and returns to the trigger when it closes",
+                ]}
+                KeyboardTable { rows: vec![
+                    ("Escape", "Close the popover (on_open_change(false))"),
+                ]}
             }
 
             Section { title: "Props",

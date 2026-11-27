@@ -3,7 +3,8 @@
 //! Provides a context provider and hooks for accessing and modifying the theme
 //! throughout the component tree.
 
-use super::tokens::ThemeTokens;
+use super::tokens::{ThemeMode, ThemeTokens};
+use crate::a11y::use_unique_id;
 use dioxus::prelude::*;
 
 /// Theme context providing access to current theme and theme switching
@@ -243,9 +244,21 @@ pub fn ThemeProvider(
     rsx! { {children} }
 }
 
+/// Accessible label for [`ThemeToggle`], describing what pressing it does.
+fn toggle_action_label(mode: &ThemeMode) -> &'static str {
+    match mode {
+        ThemeMode::Light => "Switch to dark theme",
+        ThemeMode::Dark | ThemeMode::Brand(_) => "Switch to light theme",
+    }
+}
+
 /// Theme toggle button component
 ///
 /// A convenience component that toggles between light and dark modes
+///
+/// # Accessibility
+/// The icon-only button has an `aria-label` describing the action
+/// (e.g. "Switch to dark theme"); the icon itself is `aria-hidden`.
 #[component]
 pub fn ThemeToggle() -> Element {
     let theme = use_theme();
@@ -256,11 +269,15 @@ pub fn ThemeToggle() -> Element {
         super::tokens::ThemeMode::Dark => "☀️",
         super::tokens::ThemeMode::Brand(_) => "🎨",
     };
+    let label = toggle_action_label(&mode());
 
     rsx! {
         button {
+            r#type: "button",
+            "aria-label": "{label}",
+            title: "{label}",
             onclick: move |_| theme.toggle_mode.call(()),
-            "{button_text}"
+            span { "aria-hidden": "true", "{button_text}" }
         }
     }
 }
@@ -268,10 +285,17 @@ pub fn ThemeToggle() -> Element {
 /// Theme selector dropdown component
 ///
 /// Allows users to select from all available preset themes
+///
+/// # Accessibility
+/// The trigger has `aria-haspopup="listbox"`, `aria-expanded` and
+/// `aria-controls`; the popup is a `role="listbox"` whose items are
+/// `role="option"` with `aria-selected` marking the active theme. Escape
+/// closes the popup.
 #[component]
 pub fn ThemeSelector() -> Element {
     let theme = use_theme();
     let mut is_open = use_signal(|| false);
+    let listbox_id = use_unique_id("theme-selector-listbox");
     let current_mode = use_style(|t| t.mode.clone());
 
     let presets = ThemeTokens::presets();
@@ -292,24 +316,41 @@ pub fn ThemeSelector() -> Element {
     rsx! {
         div {
             style: "position: relative; display: inline-block;",
+            onkeydown: move |e: KeyboardEvent| {
+                if e.key() == Key::Escape && is_open() {
+                    e.prevent_default();
+                    is_open.set(false);
+                }
+            },
 
             // Trigger button
             button {
+                r#type: "button",
+                "aria-haspopup": "listbox",
+                "aria-expanded": "{is_open()}",
+                "aria-controls": "{listbox_id}",
+                "aria-label": "Theme: {current_name}",
                 style: "display: flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; background: white; cursor: pointer;",
                 onclick: move |_| is_open.toggle(),
 
-                span { "🎨" }
+                span { "aria-hidden": "true", "🎨" }
                 span { "{current_name}" }
-                span { "▼" }
+                span { "aria-hidden": "true", "▼" }
             }
 
             // Dropdown
             if is_open() {
                 div {
+                    id: "{listbox_id}",
+                    role: "listbox",
+                    "aria-label": "Themes",
                     style: "position: absolute; top: calc(100% + 4px); right: 0; min-width: 150px; background: white; border-radius: 8px; border: 1px solid #e2e8f0; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index: 100;",
 
                     for (name, _) in presets {
                         button {
+                            r#type: "button",
+                            role: "option",
+                            "aria-selected": "{current_name.to_lowercase() == name}",
                             style: "display: block; width: 100%; padding: 8px 12px; text-align: left; background: none; border: none; cursor: pointer; border-radius: 6px; margin: 2px;",
                             style: if current_name.to_lowercase() == name { "background: #f1f5f9;" } else { "" },
                             onclick: move |_| {
@@ -327,7 +368,6 @@ pub fn ThemeSelector() -> Element {
 
 #[cfg(test)]
 mod tests {
-    use super::super::tokens::ThemeMode;
     use super::*;
 
     #[test]
@@ -364,6 +404,54 @@ mod tests {
             rsx! { span { "{mode}" } }
         }
         assert!(render(app).contains("Light"));
+    }
+
+    #[test]
+    fn toggle_label_describes_action() {
+        assert_eq!(
+            toggle_action_label(&ThemeMode::Light),
+            "Switch to dark theme"
+        );
+        assert_eq!(
+            toggle_action_label(&ThemeMode::Dark),
+            "Switch to light theme"
+        );
+        assert_eq!(
+            toggle_action_label(&ThemeMode::Brand("rose".into())),
+            "Switch to light theme"
+        );
+    }
+
+    #[test]
+    fn theme_toggle_has_action_label() {
+        let html = render(|| rsx! { ThemeToggle {} });
+        assert!(
+            html.contains("aria-label=\"Switch to dark theme\""),
+            "{html}"
+        );
+        assert!(html.contains("aria-hidden=\"true\""), "{html}");
+
+        fn dark() -> Element {
+            rsx! { ThemeProvider { initial_theme: ThemeTokens::dark(), ThemeToggle {} } }
+        }
+        let html = render(dark);
+        assert!(
+            html.contains("aria-label=\"Switch to light theme\""),
+            "{html}"
+        );
+    }
+
+    #[test]
+    fn theme_selector_trigger_announces_listbox() {
+        let html = render(|| rsx! { ThemeSelector {} });
+        assert!(html.contains("aria-haspopup=\"listbox\""), "{html}");
+        assert!(html.contains("aria-expanded=\"false\""), "{html}");
+        assert!(
+            html.contains("aria-controls=\"theme-selector-listbox-"),
+            "{html}"
+        );
+        assert!(html.contains("aria-label=\"Theme: Light\""), "{html}");
+        assert!(!html.contains("role=\"listbox\""), "{html}");
     }
 
     #[test]

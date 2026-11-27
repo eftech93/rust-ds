@@ -3,20 +3,13 @@
 //! A side panel/drawer that slides in from any edge of the screen.
 //! Similar to shadcn/ui Sheet component.
 
+use super::dialog::{is_dismiss_key, resolve_base_id, FocusTrapScope, SR_ONLY_STYLE};
+use crate::a11y::use_unique_id;
 use crate::atoms::{Box, Button, ButtonVariant};
 use crate::styles::Style;
 use crate::theme::tokens::Color;
 use crate::theme::{use_style, use_theme};
 use dioxus::prelude::*;
-#[cfg(all(feature = "web", target_arch = "wasm32"))]
-use std::cell::RefCell;
-#[cfg(all(feature = "web", target_arch = "wasm32"))]
-use std::rc::Rc;
-
-#[cfg(all(feature = "web", target_arch = "wasm32"))]
-use wasm_bindgen::prelude::*;
-#[cfg(all(feature = "web", target_arch = "wasm32"))]
-use wasm_bindgen::JsCast;
 
 /// Which edge the sheet slides in from
 #[derive(Default, Clone, PartialEq)]
@@ -95,6 +88,9 @@ pub struct SheetProps {
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
+    /// Accessible name, for sheets without a `title`
+    #[props(default)]
+    pub aria_label: Option<String>,
 }
 
 /// Sheet molecule component
@@ -125,70 +121,22 @@ pub struct SheetProps {
 ///     }
 /// }
 /// ```
+///
+/// # Accessibility
+///
+/// - The panel has `role="dialog"` and `aria-modal="true"`; `aria-labelledby`
+///   / `aria-describedby` point at the rendered title / description (ids
+///   derive from the `id` prop when set). Use `aria_label` when there is no
+///   title.
+/// - Escape calls `on_open_change(false)`.
+/// - While open, Tab / Shift+Tab cycle inside the panel; when it closes, focus
+///   returns to the element that was focused before it opened.
 #[component]
 pub fn Sheet(props: SheetProps) -> Element {
     let _theme = use_theme();
     let side = props.side.clone();
     let side_for_transform = props.side.clone();
-
-    // Handle escape key
-    #[cfg(all(feature = "web", target_arch = "wasm32"))]
-    let keydown_func: Rc<RefCell<Option<js_sys::Function>>> =
-        use_hook(|| Rc::new(RefCell::new(None)));
-    #[cfg(all(feature = "web", target_arch = "wasm32"))]
-    {
-        let func_for_effect = (*keydown_func).clone();
-        let func_for_drop = (*keydown_func).clone();
-
-        use_effect(move || {
-            if !props.open {
-                if let Some(ref f) = *func_for_effect.borrow() {
-                    if let Some(window) = web_sys::window() {
-                        let _ = window.remove_event_listener_with_callback("keydown", f);
-                    }
-                }
-                *func_for_effect.borrow_mut() = None;
-                return;
-            }
-
-            let on_close = props.on_open_change;
-            let closure = Closure::wrap(Box::new(move |event: web_sys::KeyboardEvent| {
-                if event.key() == "Escape" {
-                    if let Some(handler) = &on_close {
-                        handler.call(false);
-                    }
-                }
-            }) as Box<dyn FnMut(_)>);
-            let func: js_sys::Function =
-                closure.as_ref().unchecked_ref::<js_sys::Function>().clone();
-            if let Some(window) = web_sys::window() {
-                window
-                    .add_event_listener_with_callback("keydown", &func)
-                    .unwrap();
-            }
-            *func_for_effect.borrow_mut() = Some(func);
-            closure.forget();
-        });
-
-        use_drop(move || {
-            if let Some(ref f) = *func_for_drop.borrow() {
-                if let Some(window) = web_sys::window() {
-                    let _ = window.remove_event_listener_with_callback("keydown", f);
-                }
-            }
-        });
-    }
-
-    #[cfg(not(all(feature = "web", target_arch = "wasm32")))]
-    {
-        use_effect(move || {
-            let _ = props.on_open_change;
-        });
-    }
-
-    if !props.open {
-        return rsx! {};
-    }
+    let auto_id = use_unique_id("sheet");
 
     let overlay_style = use_style(|_| {
         Style::new()
@@ -200,9 +148,6 @@ pub fn Sheet(props: SheetProps) -> Element {
             .z_index(9999)
             .build()
     });
-
-    let overlay_opacity = if props.open { "1" } else { "0" };
-    let overlay_transition = "transition: opacity 0.3s ease-out;";
 
     // Build sheet content style based on side
     let sheet_style = use_style(move |t| {
@@ -254,6 +199,26 @@ pub fn Sheet(props: SheetProps) -> Element {
         style.build()
     });
 
+    // Hooks above run unconditionally; only rendering depends on `open`.
+    if !props.open {
+        return rsx! {};
+    }
+
+    let overlay_opacity = if props.open { "1" } else { "0" };
+    let overlay_transition = "transition: opacity 0.3s ease-out;";
+
+    let base_id = resolve_base_id(props.id.as_deref(), &auto_id);
+    let content_id = format!("{base_id}-content");
+    let title_id = format!("{base_id}-title");
+    let description_id = format!("{base_id}-description");
+    let header_shown = props.title.is_some() || props.show_close_button;
+    let labelledby = props.title.as_ref().map(|_| title_id.clone());
+    let describedby = props
+        .description
+        .as_ref()
+        .filter(|_| header_shown)
+        .map(|_| description_id.clone());
+
     // Transform for slide animation
     let transform = if props.open {
         side_for_transform.open_transform()
@@ -270,6 +235,16 @@ pub fn Sheet(props: SheetProps) -> Element {
         }
     };
 
+    let on_open_change = props.on_open_change;
+    let handle_keydown = move |e: KeyboardEvent| {
+        if is_dismiss_key(&e.key()) {
+            e.stop_propagation();
+            if let Some(handler) = &on_open_change {
+                handler.call(false);
+            }
+        }
+    };
+
     rsx! {
         // Overlay - separate element at root level
         div {
@@ -281,14 +256,26 @@ pub fn Sheet(props: SheetProps) -> Element {
 
         // Sheet content - sibling to overlay, prevents click propagation issues
         div {
+            id: "{content_id}",
+            role: "dialog",
+            "aria-modal": "true",
+            "aria-labelledby": labelledby,
+            "aria-label": props.aria_label.clone(),
+            "aria-describedby": describedby,
+            tabindex: "-1",
             style: "{sheet_style} transform: {transform}; {sheet_transition}",
             onclick: move |e| e.stop_propagation(),
+            onkeydown: handle_keydown,
+
+            FocusTrapScope { container_id: content_id.clone() }
 
             // Header
-            if props.title.is_some() || props.show_close_button {
+            if header_shown {
                 SheetHeader {
                     title: props.title.clone(),
+                    title_id: title_id.clone(),
                     description: props.description.clone(),
+                    description_id: description_id.clone(),
                     show_close_button: props.show_close_button,
                     on_close: props.on_open_change,
                 }
@@ -306,7 +293,11 @@ pub fn Sheet(props: SheetProps) -> Element {
 #[derive(Props, Clone, PartialEq)]
 struct SheetHeaderProps {
     title: Option<String>,
+    #[props(default)]
+    title_id: Option<String>,
     description: Option<String>,
+    #[props(default)]
+    description_id: Option<String>,
     show_close_button: bool,
     #[props(default)]
     on_close: Option<EventHandler<bool>>,
@@ -349,6 +340,7 @@ fn SheetHeader(props: SheetHeaderProps) -> Element {
 
                     if let Some(title) = props.title {
                         h2 {
+                            id: props.title_id.clone(),
                             style: "margin: 0; font-size: 18px; font-weight: 600;",
                             "{title}"
                         }
@@ -356,6 +348,7 @@ fn SheetHeader(props: SheetHeaderProps) -> Element {
 
                     if let Some(description) = props.description {
                         p {
+                            id: props.description_id.clone(),
                             style: "margin: 0; font-size: 14px; color: #64748b; {props.style.clone().unwrap_or_default()}",
                             "{description}"
                         }
@@ -373,7 +366,8 @@ fn SheetHeader(props: SheetHeaderProps) -> Element {
                             handler.call(false);
                         }
                     },
-                    "✕"
+                    span { "aria-hidden": "true", "✕" }
+                    span { style: SR_ONLY_STYLE, "Close" }
                 }
             }
         }
@@ -442,5 +436,67 @@ pub fn SheetFooter(props: SheetFooterProps) -> Element {
             style: "{footer_style} justify-content: {justify}; {props.style.clone().unwrap_or_default()}",
             {props.children}
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    #[test]
+    fn open_sheet_is_modal_dialog_with_relationships() {
+        let html = render(|| {
+            rsx! {
+                Sheet {
+                    open: true,
+                    id: "nav",
+                    title: "Navigation",
+                    description: "Site sections",
+                    "Links"
+                }
+            }
+        });
+        assert!(html.contains("role=\"dialog\""), "{html}");
+        assert!(html.contains("aria-modal=\"true\""), "{html}");
+        assert!(html.contains("id=\"nav-content\""), "{html}");
+        assert!(html.contains("aria-labelledby=\"nav-title\""), "{html}");
+        assert!(html.contains("id=\"nav-title\""), "{html}");
+        assert!(
+            html.contains("aria-describedby=\"nav-description\""),
+            "{html}"
+        );
+        assert!(html.contains("id=\"nav-description\""), "{html}");
+        assert!(html.contains(">Close<"), "{html}");
+    }
+
+    #[test]
+    fn sheet_without_header_uses_aria_label_only() {
+        let html = render(|| {
+            rsx! {
+                Sheet {
+                    open: true,
+                    show_close_button: false,
+                    description: "Not rendered without a header",
+                    aria_label: "Filters",
+                    "Body"
+                }
+            }
+        });
+        assert!(html.contains("aria-label=\"Filters\""), "{html}");
+        assert!(!html.contains("aria-labelledby"), "{html}");
+        assert!(!html.contains("aria-describedby"), "{html}");
+    }
+
+    #[test]
+    fn closed_sheet_renders_nothing() {
+        let html = render(|| rsx! { Sheet { open: false, title: "Hidden", "Body" } });
+        assert!(!html.contains("role="), "{html}");
+        assert!(!html.contains("Hidden"), "{html}");
     }
 }

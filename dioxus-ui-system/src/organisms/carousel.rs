@@ -133,11 +133,27 @@ pub struct CarouselProps {
     /// Custom CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Accessible name of the carousel region (`aria-label`, default "Carousel")
+    #[props(default)]
+    pub aria_label: Option<String>,
 }
 
 /// Carousel container component
 ///
 /// Provides context for child components and manages the carousel state.
+///
+/// # Accessibility
+///
+/// Follows the WAI-ARIA carousel pattern: the container is a focusable
+/// `role="region"` with `aria-roledescription="carousel"` and an `aria-label`
+/// (see `aria_label`), slides are `role="group"` with
+/// `aria-roledescription="slide"` and `aria-label="n of m"`, and the
+/// previous/next buttons have `aria-label`s. While focus is inside the
+/// carousel, Left/Right (Up/Down when vertical) move to the previous/next
+/// slide and Home/End jump to the first/last one. `is_paused` in the context
+/// becomes `true` while the carousel has focus (and while hovered when
+/// `pause_on_hover` is set), so autoplay implementations built on the context
+/// should honour it.
 #[component]
 pub fn Carousel(props: CarouselProps) -> Element {
     let opts = props.opts.clone();
@@ -146,6 +162,8 @@ pub fn Carousel(props: CarouselProps) -> Element {
     let mut current_index = use_signal(|| opts.start_index);
     let total_items = use_signal(|| 0usize);
     let mut is_paused = use_signal(|| false);
+    let mut is_hovered = use_signal(|| false);
+    let mut has_focus = use_signal(|| false);
 
     // Track if we can navigate
     let can_go_prev: Memo<bool> = use_memo(move || {
@@ -224,19 +242,50 @@ pub fn Carousel(props: CarouselProps) -> Element {
     let container_style =
         use_style(move |_t| Style::new().relative().w_full().overflow_hidden().build());
 
+    let pause_on_hover = opts.pause_on_hover;
+    let looping = opts.r#loop;
+
     let handle_mouse_enter = move |_| {
-        if opts.pause_on_hover {
-            is_paused.set(true);
-        }
+        is_hovered.set(true);
+        is_paused.set(should_pause(true, has_focus(), pause_on_hover));
     };
 
     let handle_mouse_leave = move |_| {
-        if opts.pause_on_hover {
-            is_paused.set(false);
+        is_hovered.set(false);
+        is_paused.set(should_pause(false, has_focus(), pause_on_hover));
+    };
+
+    let handle_focus_in = move |_| {
+        has_focus.set(true);
+        is_paused.set(should_pause(is_hovered(), true, pause_on_hover));
+    };
+
+    let handle_focus_out = move |_| {
+        has_focus.set(false);
+        is_paused.set(should_pause(is_hovered(), false, pause_on_hover));
+    };
+
+    let key_orientation = orientation;
+    let handle_keydown = move |e: KeyboardEvent| {
+        let target = carousel_key_target(
+            &e.key(),
+            current_index(),
+            total_items(),
+            &key_orientation,
+            looping,
+        );
+        if let Some(target) = target {
+            e.prevent_default();
+            go_to.call(target);
         }
     };
 
     use_context_provider(|| context);
+
+    let label = props
+        .aria_label
+        .clone()
+        .unwrap_or_else(|| "Carousel".to_string());
 
     rsx! {
         div {
@@ -244,11 +293,60 @@ pub fn Carousel(props: CarouselProps) -> Element {
             class: "{props.class.clone().unwrap_or_default()}",
             role: "region",
             aria_roledescription: "carousel",
+            "aria-label": "{label}",
+            tabindex: "0",
             style: "{container_style} {props.style.clone().unwrap_or_default()}",
             onmouseenter: handle_mouse_enter,
             onmouseleave: handle_mouse_leave,
+            onfocusin: handle_focus_in,
+            onfocusout: handle_focus_out,
+            onkeydown: handle_keydown,
             {props.children}
         }
+    }
+}
+
+/// Whether autoplay should be paused given hover/focus state.
+fn should_pause(hovered: bool, focused: bool, pause_on_hover: bool) -> bool {
+    focused || (hovered && pause_on_hover)
+}
+
+/// Slide index to show after pressing `key`, or `None` if the key is not
+/// handled (or would move past an end of a non-looping carousel).
+fn carousel_key_target(
+    key: &Key,
+    current: usize,
+    total: usize,
+    orientation: &Orientation,
+    looping: bool,
+) -> Option<usize> {
+    if total == 0 {
+        return None;
+    }
+    let last = total - 1;
+    let current = current.min(last);
+    let (prev, next) = match orientation {
+        Orientation::Horizontal => (Key::ArrowLeft, Key::ArrowRight),
+        Orientation::Vertical => (Key::ArrowUp, Key::ArrowDown),
+    };
+    match key {
+        k if *k == next => {
+            if current < last {
+                Some(current + 1)
+            } else {
+                looping.then_some(0)
+            }
+        }
+        k if *k == prev => {
+            if current > 0 {
+                Some(current - 1)
+            } else {
+                looping.then_some(last)
+            }
+        }
+        Key::Home => Some(0),
+        Key::End => Some(last),
+        _ => None,
     }
 }
 
@@ -278,6 +376,12 @@ pub fn CarouselContent(props: CarouselContentProps) -> Element {
     // Get current index for transform calculation
     let current_idx = carousel.as_ref().map_or(0, |ctx| *ctx.current_index.read());
 
+    // Announce slide changes unless autoplay is actively rotating them.
+    let aria_live = match &carousel {
+        Some(ctx) if ctx.options.autoplay_ms.is_some() && !*ctx.is_paused.read() => "off",
+        _ => "polite",
+    };
+
     // Count children and update total_items
     // This is done by rendering and letting CarouselItem update the count
     let content_style = use_style(move |_t| {
@@ -293,6 +397,7 @@ pub fn CarouselContent(props: CarouselContentProps) -> Element {
             id: "{props.id.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
             style: "{content_style} {props.style.clone().unwrap_or_default()}",
+            "aria-live": "{aria_live}",
             {props.children}
         }
     }
@@ -305,6 +410,10 @@ pub struct CarouselItemProps {
     pub children: Element,
     /// Item index (used for tracking position)
     pub index: usize,
+    /// Total number of slides, for the "n of m" label. Defaults to the count
+    /// tracked by the parent [`Carousel`].
+    #[props(default)]
+    pub total: Option<usize>,
     /// Custom inline styles
     #[props(default)]
     pub style: Option<String>,
@@ -339,6 +448,12 @@ pub fn CarouselItem(props: CarouselItemProps) -> Element {
         .as_ref()
         .is_some_and(|ctx| *ctx.current_index.read() == props.index);
 
+    let total = props
+        .total
+        .or_else(|| carousel.as_ref().map(|ctx| *ctx.total_items.read()))
+        .unwrap_or(0)
+        .max(index + 1);
+
     let item_style = use_style(move |_t| Style::new().min_w("100%").w_full().h_full().build());
 
     rsx! {
@@ -347,6 +462,7 @@ pub fn CarouselItem(props: CarouselItemProps) -> Element {
             class: "{props.class.clone().unwrap_or_default()}",
             role: "group",
             aria_roledescription: "slide",
+            "aria-label": "{index + 1} of {total}",
             aria_hidden: "{!is_active}",
             style: "{item_style} {props.style.clone().unwrap_or_default()}",
             {props.children}
@@ -683,9 +799,14 @@ pub struct SimpleCarouselProps {
     /// Custom CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Accessible name of the carousel region (`aria-label`, default "Carousel")
+    #[props(default)]
+    pub aria_label: Option<String>,
 }
 
 /// Simple carousel with built-in controls
+///
+/// See [`Carousel`] for roles and keyboard support.
 #[component]
 pub fn SimpleCarousel(props: SimpleCarouselProps) -> Element {
     let items_len = props.items.len();
@@ -698,12 +819,14 @@ pub fn SimpleCarousel(props: SimpleCarouselProps) -> Element {
             opts: props.opts.clone(),
             orientation: props.orientation.clone(),
             on_index_change: props.on_index_change,
+            aria_label: props.aria_label.clone(),
 
             CarouselContent {
                 for (index, item) in props.items.iter().enumerate() {
                     CarouselItem {
                         key: "{index}",
                         index: index,
+                        total: items_len,
                         {item.clone()}
                     }
                 }
@@ -744,6 +867,9 @@ pub struct TouchCarouselProps {
     /// Custom CSS classes
     #[props(default)]
     pub class: Option<String>,
+    /// Accessible name of the carousel region (`aria-label`, default "Carousel")
+    #[props(default)]
+    pub aria_label: Option<String>,
 }
 
 /// Touch-enabled carousel with swipe support
@@ -763,8 +889,91 @@ pub fn TouchCarousel(props: TouchCarouselProps) -> Element {
             orientation: props.orientation,
             on_index_change: props.on_index_change,
             style: props.style,
+            aria_label: props.aria_label,
 
             {props.children}
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    #[test]
+    fn simple_carousel_has_carousel_semantics() {
+        let html = render(|| {
+            rsx! {
+                SimpleCarousel {
+                    aria_label: "Featured",
+                    items: vec![rsx! { "One" }, rsx! { "Two" }, rsx! { "Three" }],
+                }
+            }
+        });
+        assert!(html.contains("role=\"region\""), "{html}");
+        assert!(html.contains("aria-roledescription=\"carousel\""), "{html}");
+        assert!(html.contains("aria-label=\"Featured\""), "{html}");
+        assert!(html.contains("tabindex=\"0\""), "{html}");
+        assert_eq!(
+            html.matches("aria-roledescription=\"slide\"").count(),
+            3,
+            "{html}"
+        );
+        assert!(html.contains("aria-label=\"1 of 3\""), "{html}");
+        assert!(html.contains("aria-label=\"3 of 3\""), "{html}");
+        assert!(html.contains("aria-label=\"Previous slide\""), "{html}");
+        assert!(html.contains("aria-label=\"Next slide\""), "{html}");
+        assert!(html.contains("aria-live=\"polite\""), "{html}");
+    }
+
+    #[test]
+    fn carousel_defaults_label() {
+        let html = render(|| rsx! { Carousel { CarouselContent { "x" } } });
+        assert!(html.contains("aria-label=\"Carousel\""), "{html}");
+    }
+
+    #[test]
+    fn carousel_keys_respect_orientation_and_loop() {
+        let h = Orientation::Horizontal;
+        assert_eq!(
+            carousel_key_target(&Key::ArrowRight, 0, 3, &h, false),
+            Some(1)
+        );
+        assert_eq!(
+            carousel_key_target(&Key::ArrowLeft, 1, 3, &h, false),
+            Some(0)
+        );
+        assert_eq!(carousel_key_target(&Key::ArrowRight, 2, 3, &h, false), None);
+        assert_eq!(carousel_key_target(&Key::ArrowLeft, 0, 3, &h, false), None);
+        assert_eq!(
+            carousel_key_target(&Key::ArrowRight, 2, 3, &h, true),
+            Some(0)
+        );
+        assert_eq!(
+            carousel_key_target(&Key::ArrowLeft, 0, 3, &h, true),
+            Some(2)
+        );
+        assert_eq!(carousel_key_target(&Key::Home, 2, 3, &h, false), Some(0));
+        assert_eq!(carousel_key_target(&Key::End, 0, 3, &h, false), Some(2));
+        assert_eq!(carousel_key_target(&Key::ArrowDown, 0, 3, &h, true), None);
+        assert_eq!(
+            carousel_key_target(&Key::ArrowDown, 0, 3, &Orientation::Vertical, true),
+            Some(1)
+        );
+        assert_eq!(carousel_key_target(&Key::ArrowRight, 0, 0, &h, true), None);
+    }
+
+    #[test]
+    fn pauses_on_focus_and_optionally_on_hover() {
+        assert!(should_pause(false, true, false));
+        assert!(should_pause(true, false, true));
+        assert!(!should_pause(true, false, false));
+        assert!(!should_pause(false, false, true));
     }
 }

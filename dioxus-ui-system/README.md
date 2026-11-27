@@ -15,7 +15,7 @@ Live component gallery: https://eftech93.github.io/rust-ds/
 ```toml
 [dependencies]
 dioxus = "0.7"
-dioxus-ui-system = "0.0.9"
+dioxus-ui-system = "0.0.10"
 ```
 
 ### Features
@@ -30,7 +30,7 @@ dioxus-ui-system = "0.0.9"
 For non-web targets disable the defaults:
 
 ```toml
-dioxus-ui-system = { version = "0.0.9", default-features = false, features = ["desktop"] }
+dioxus-ui-system = { version = "0.0.10", default-features = false, features = ["desktop"] }
 ```
 
 ## Quick start

@@ -2,6 +2,7 @@
 //!
 //! Displays a list of options for the user to pick from.
 
+use crate::a11y::{next_index, use_unique_id, Orientation};
 use crate::styles::Style;
 use crate::theme::{use_style, use_theme};
 use dioxus::prelude::*;
@@ -195,14 +196,67 @@ pub struct MultiSelectProps {
     /// Maximum number of selections
     #[props(default)]
     pub max_selections: Option<usize>,
+    /// Accessible name of the combobox (`aria-label`); defaults to the
+    /// placeholder text
+    #[props(default)]
+    pub aria_label: Option<String>,
+}
+
+/// What a key press does in a multi-select listbox.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum ListboxAction {
+    /// Open the listbox.
+    Open,
+    /// Close the listbox.
+    Close,
+    /// Move the highlight to this option index.
+    Move(usize),
+    /// Toggle selection of the option at this index.
+    Toggle(usize),
+}
+
+/// Map a key press to a [`ListboxAction`] (`None` means "not handled").
+///
+/// Closed: Enter, Space, ArrowDown and ArrowUp open. Open: Escape closes,
+/// ArrowUp/ArrowDown/Home/End move the highlight, Enter/Space toggle it.
+fn listbox_key_action(
+    key: &Key,
+    open: bool,
+    highlighted: usize,
+    len: usize,
+) -> Option<ListboxAction> {
+    let is_space = matches!(key, Key::Character(c) if c == " ");
+    if !open {
+        return match key {
+            Key::Enter | Key::ArrowDown | Key::ArrowUp => Some(ListboxAction::Open),
+            _ if is_space => Some(ListboxAction::Open),
+            _ => None,
+        };
+    }
+    match key {
+        Key::Escape => Some(ListboxAction::Close),
+        Key::Enter if len > 0 => Some(ListboxAction::Toggle(highlighted.min(len - 1))),
+        _ if is_space && len > 0 => Some(ListboxAction::Toggle(highlighted.min(len - 1))),
+        _ => next_index(key, highlighted, len, Orientation::Vertical).map(ListboxAction::Move),
+    }
 }
 
 /// Multi-select component with tags
+///
+/// # Accessibility
+/// The trigger is a focusable `role="combobox"` with `aria-haspopup="listbox"`,
+/// `aria-expanded`, `aria-controls` and `aria-activedescendant` pointing at the
+/// highlighted option. The dropdown is a `role="listbox"` with
+/// `aria-multiselectable="true"`; each item is a `role="option"` with
+/// `aria-selected`. Keys: Enter/Space/ArrowDown open; ArrowUp/ArrowDown/Home/End
+/// move the highlight; Enter/Space toggle the highlighted option; Escape closes.
 #[component]
 pub fn MultiSelect(props: MultiSelectProps) -> Element {
     let _theme = use_theme();
     let mut selected = use_signal(|| props.values.clone());
     let mut is_open = use_signal(|| false);
+    let mut highlighted = use_signal(|| 0usize);
+    let listbox_id = use_unique_id("multi-select-listbox");
 
     // Sync with props
     use_effect(move || {
@@ -271,6 +325,51 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
         });
     };
 
+    let disabled = props.disabled;
+    let key_options = props.options.clone();
+    let handle_key_down = move |e: KeyboardEvent| {
+        if disabled {
+            return;
+        }
+        let len = key_options.len();
+        let Some(action) = listbox_key_action(&e.key(), is_open(), highlighted(), len) else {
+            return;
+        };
+        e.prevent_default();
+        match action {
+            ListboxAction::Open => is_open.set(true),
+            ListboxAction::Close => is_open.set(false),
+            ListboxAction::Move(i) => highlighted.set(i),
+            ListboxAction::Toggle(i) => {
+                if let Some(option) = key_options.get(i).filter(|o| !o.disabled) {
+                    let (mut remove, mut add) = (remove_selected, add_selected);
+                    if selected.read().contains(&option.value) {
+                        remove(option.value.clone());
+                    } else {
+                        add(option.value.clone());
+                    }
+                }
+            }
+        }
+    };
+
+    let placeholder = props
+        .placeholder
+        .clone()
+        .unwrap_or_else(|| "Select options...".to_string());
+    let aria_label = props
+        .aria_label
+        .clone()
+        .unwrap_or_else(|| placeholder.clone());
+    let active_descendant = (is_open() && !props.options.is_empty()).then(|| {
+        option_id(
+            &listbox_id,
+            highlighted().min(props.options.len().saturating_sub(1)),
+        )
+    });
+    let tabindex = if disabled { "-1" } else { "0" };
+    let aria_disabled = disabled.then_some("true");
+
     let selected_labels: Vec<_> = selected()
         .iter()
         .filter_map(|v| {
@@ -286,15 +385,24 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
         div {
             style: "position: relative;",
 
-            // Selected tags container
+            // Selected tags container (combobox)
             div {
                 style: "{container_style}",
+                role: "combobox",
+                tabindex: "{tabindex}",
+                "aria-haspopup": "listbox",
+                "aria-expanded": "{is_open()}",
+                "aria-controls": "{listbox_id}",
+                "aria-label": "{aria_label}",
+                "aria-disabled": aria_disabled,
+                "aria-activedescendant": active_descendant,
                 onclick: move |_| if !props.disabled { is_open.toggle() },
+                onkeydown: handle_key_down,
 
                 if selected_labels.is_empty() {
                     span {
                         style: "color: #64748b; font-size: 14px;",
-                        "{props.placeholder.clone().unwrap_or_else(|| \"Select options...\".to_string())}"
+                        "{placeholder}"
                     }
                 }
 
@@ -310,6 +418,7 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
 
                 // Dropdown arrow
                 span {
+                    "aria-hidden": "true",
                     style: "margin-left: auto; color: #64748b;",
                     if is_open() { "▲" } else { "▼" }
                 }
@@ -318,6 +427,8 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
             // Dropdown
             if is_open() && !props.disabled {
                 MultiSelectDropdown {
+                    id: listbox_id.clone(),
+                    highlighted: highlighted(),
                     options: props.options.clone(),
                     selected: selected(),
                     on_select: add_selected,
@@ -328,8 +439,15 @@ pub fn MultiSelect(props: MultiSelectProps) -> Element {
     }
 }
 
+/// Element id of the option at `index` inside the listbox `listbox_id`.
+fn option_id(listbox_id: &str, index: usize) -> String {
+    format!("{listbox_id}-option-{index}")
+}
+
 #[derive(Props, Clone, PartialEq)]
 struct MultiSelectDropdownProps {
+    id: String,
+    highlighted: usize,
     options: Vec<SelectOption>,
     selected: Vec<String>,
     #[props(default)]
@@ -352,6 +470,7 @@ fn CheckBoxIndicator(props: CheckBoxIndicatorProps) -> Element {
     };
     rsx! {
         div {
+            "aria-hidden": "true",
             style: "width: 16px; height: 16px; border: 1px solid #cbd5e1; border-radius: 4px; display: flex; align-items: center; justify-content: center; background: {bg_color}; color: white;",
             if props.is_selected {
                 "✓"
@@ -373,6 +492,10 @@ struct MultiSelectTagProps {
 #[component]
 fn MultiSelectTag(props: MultiSelectTagProps) -> Element {
     let value = props.value.clone();
+    let remove_label = format!(
+        "Remove {}",
+        props.label.clone().unwrap_or_else(|| props.value.clone())
+    );
     rsx! {
         span {
             style: "{props.tag_style}",
@@ -380,6 +503,9 @@ fn MultiSelectTag(props: MultiSelectTagProps) -> Element {
                 "{label}"
             }
             button {
+                r#type: "button",
+                tabindex: "-1",
+                "aria-label": "{remove_label}",
                 style: "background: none; border: none; cursor: pointer; padding: 0; margin: 0; display: flex; align-items: center;",
                 onclick: move |e: Event<MouseData>| {
                     e.stop_propagation();
@@ -423,16 +549,25 @@ fn MultiSelectDropdown(props: MultiSelectDropdownProps) -> Element {
             .transition("all 100ms ease")
             .build()
     });
+    let highlighted_bg = use_style(|t| t.colors.muted.to_rgba());
 
     rsx! {
         div {
+            id: "{props.id}",
+            role: "listbox",
+            "aria-multiselectable": "true",
             style: "{dropdown_style}",
 
-            for option in props.options.iter().cloned() {
+            for (index, option) in props.options.iter().cloned().enumerate() {
                 DropdownOptionItem {
                     key: "{option.value}",
+                    id: option_id(&props.id, index),
                     option: option.clone(),
-                    item_style: item_style,
+                    item_style: if index == props.highlighted {
+                        format!("{item_style}; background: {highlighted_bg};")
+                    } else {
+                        item_style()
+                    },
                     is_selected: props.selected.contains(&option.value),
                     on_select: props.on_select,
                 }
@@ -443,6 +578,7 @@ fn MultiSelectDropdown(props: MultiSelectDropdownProps) -> Element {
 
 #[derive(Props, Clone, PartialEq)]
 struct DropdownOptionItemProps {
+    id: String,
     option: SelectOption,
     item_style: String,
     is_selected: bool,
@@ -455,6 +591,12 @@ fn DropdownOptionItem(props: DropdownOptionItemProps) -> Element {
     let value = props.option.value.clone();
     rsx! {
         button {
+            r#type: "button",
+            id: "{props.id}",
+            role: "option",
+            tabindex: "-1",
+            "aria-selected": "{props.is_selected}",
+            "aria-disabled": props.option.disabled.then_some("true"),
             style: "{props.item_style}",
             disabled: props.option.disabled,
             onclick: move |_| {
@@ -475,5 +617,101 @@ fn DropdownOptionItem(props: DropdownOptionItemProps) -> Element {
                 }
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    fn opts() -> Vec<SelectOption> {
+        vec![
+            SelectOption::new("a", "Alpha"),
+            SelectOption::new("b", "Beta"),
+        ]
+    }
+
+    #[test]
+    fn listbox_keys_open_move_toggle_close() {
+        let space = Key::Character(" ".to_string());
+        assert_eq!(
+            listbox_key_action(&Key::ArrowDown, false, 0, 3),
+            Some(ListboxAction::Open)
+        );
+        assert_eq!(
+            listbox_key_action(&space, false, 0, 3),
+            Some(ListboxAction::Open)
+        );
+        assert_eq!(listbox_key_action(&Key::Escape, false, 0, 3), None);
+        assert_eq!(
+            listbox_key_action(&Key::ArrowDown, true, 2, 3),
+            Some(ListboxAction::Move(0))
+        );
+        assert_eq!(
+            listbox_key_action(&Key::ArrowUp, true, 0, 3),
+            Some(ListboxAction::Move(2))
+        );
+        assert_eq!(
+            listbox_key_action(&Key::End, true, 0, 3),
+            Some(ListboxAction::Move(2))
+        );
+        assert_eq!(
+            listbox_key_action(&Key::Enter, true, 9, 3),
+            Some(ListboxAction::Toggle(2))
+        );
+        assert_eq!(
+            listbox_key_action(&space, true, 1, 3),
+            Some(ListboxAction::Toggle(1))
+        );
+        assert_eq!(
+            listbox_key_action(&Key::Escape, true, 0, 3),
+            Some(ListboxAction::Close)
+        );
+        assert_eq!(listbox_key_action(&Key::Enter, true, 0, 0), None);
+    }
+
+    #[test]
+    fn multi_select_trigger_is_collapsed_combobox() {
+        let html = render(|| {
+            rsx! { MultiSelect { options: opts(), placeholder: "Pick letters" } }
+        });
+        assert!(html.contains("role=\"combobox\""), "{html}");
+        assert!(html.contains("aria-expanded=\"false\""), "{html}");
+        assert!(html.contains("aria-haspopup=\"listbox\""), "{html}");
+        assert!(
+            html.contains("aria-controls=\"multi-select-listbox-"),
+            "{html}"
+        );
+        assert!(html.contains("aria-label=\"Pick letters\""), "{html}");
+        assert!(html.contains("tabindex=\"0\""), "{html}");
+        assert!(!html.contains("aria-activedescendant"), "{html}");
+        assert!(!html.contains("role=\"listbox\""), "{html}");
+    }
+
+    #[test]
+    fn multi_select_dropdown_is_multiselectable_listbox() {
+        let html = render(|| {
+            rsx! {
+                MultiSelectDropdown {
+                    id: "lb".to_string(),
+                    highlighted: 1,
+                    options: opts(),
+                    selected: vec!["a".to_string()],
+                }
+            }
+        });
+        assert!(html.contains("role=\"listbox\""), "{html}");
+        assert!(html.contains("id=\"lb\""), "{html}");
+        assert!(html.contains("aria-multiselectable=\"true\""), "{html}");
+        assert_eq!(html.matches("role=\"option\"").count(), 2, "{html}");
+        assert!(html.contains("id=\"lb-option-0\""), "{html}");
+        assert!(html.contains("aria-selected=\"true\""), "{html}");
+        assert!(html.contains("aria-selected=\"false\""), "{html}");
     }
 }

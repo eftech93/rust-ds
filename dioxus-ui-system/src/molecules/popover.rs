@@ -2,6 +2,8 @@
 //!
 //! Displays rich content in a portal, triggered by a button.
 
+use super::dialog::{is_dismiss_key, resolve_base_id, FocusTrapScope};
+use crate::a11y::use_unique_id;
 use crate::atoms::{AlignItems, Box, HStack, JustifyContent, SpacingSize, VStack};
 use crate::styles::Style;
 use crate::theme::{use_style, use_theme};
@@ -64,11 +66,31 @@ pub enum PopoverPlacement {
     LeftEnd,
 }
 
+/// Close the popover and notify the owner.
+fn close_popover(mut is_open: Signal<bool>, on_open_change: Option<EventHandler<bool>>) {
+    is_open.set(false);
+    if let Some(handler) = &on_open_change {
+        handler.call(false);
+    }
+}
+
 /// Popover component
+///
+/// # Accessibility
+///
+/// - The trigger wrapper has `aria-haspopup="dialog"`, `aria-expanded` and,
+///   while open, `aria-controls` pointing at the content.
+/// - The content has `role="dialog"` and is labelled by the trigger. Ids
+///   derive from the `id` prop when set.
+/// - Escape closes the popover (calling `on_open_change(false)`).
+/// - While open, focus moves into the content and Tab / Shift+Tab cycle inside
+///   it; on close (Escape, outside click or toggle) focus returns to the
+///   trigger element that opened it.
 #[component]
 pub fn Popover(props: PopoverProps) -> Element {
     let _theme = use_theme();
     let mut is_open = use_signal(|| props.open);
+    let auto_id = use_unique_id("popover");
 
     // Sync with props
     use_effect(move || {
@@ -116,34 +138,54 @@ pub fn Popover(props: PopoverProps) -> Element {
 
     let custom_style = props.style.clone().unwrap_or_default();
 
+    let base_id = resolve_base_id(props.id.as_deref(), &auto_id);
+    let trigger_id = format!("{base_id}-trigger");
+    let content_id = format!("{base_id}-content");
+    let open = is_open();
+    let controls = open.then(|| content_id.clone());
+    let on_open_change = props.on_open_change;
+
+    let handle_keydown = move |e: KeyboardEvent| {
+        if is_open() && is_dismiss_key(&e.key()) {
+            e.stop_propagation();
+            close_popover(is_open, on_open_change);
+        }
+    };
+
     rsx! {
         div {
             id: "{props.id.clone().unwrap_or_default()}",
             class: "{props.class.clone().unwrap_or_default()}",
             style: "position: relative; display: inline-block;",
+            onkeydown: handle_keydown,
 
             // Trigger
             div {
+                id: "{trigger_id}",
+                "aria-haspopup": "dialog",
+                "aria-expanded": "{open}",
+                "aria-controls": controls,
                 onclick: move |_| toggle(),
                 {props.trigger}
             }
 
             // Content
-            if is_open() {
+            if open {
                 // Overlay to close on outside click
                 div {
                     style: "position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 40;",
-                    onclick: move |_| {
-                        is_open.set(false);
-                        if let Some(handler) = &props.on_open_change {
-                            handler.call(false);
-                        }
-                    },
+                    onclick: move |_| close_popover(is_open, on_open_change),
                 }
 
                 div {
+                    id: "{content_id}",
+                    role: "dialog",
+                    "aria-labelledby": "{trigger_id}",
+                    tabindex: "-1",
                     style: "{popover_style} {position_style} {custom_style}",
                     onclick: move |e: Event<MouseData>| e.stop_propagation(),
+
+                    FocusTrapScope { container_id: content_id.clone() }
 
                     PopoverContent { children: props.children.clone() }
                 }
@@ -277,5 +319,53 @@ pub fn PopoverFooter(props: PopoverFooterProps) -> Element {
             gap: SpacingSize::Sm,
             {props.children}
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn render(app: fn() -> Element) -> String {
+        let mut dom = VirtualDom::new(app);
+        dom.rebuild_in_place();
+        dioxus_ssr::render(&dom)
+    }
+
+    #[test]
+    fn closed_popover_trigger_advertises_dialog() {
+        let html = render(|| {
+            rsx! {
+                Popover {
+                    id: "pop",
+                    trigger: rsx! { button { "Open" } },
+                    "Content"
+                }
+            }
+        });
+        assert!(html.contains("id=\"pop-trigger\""), "{html}");
+        assert!(html.contains("aria-haspopup=\"dialog\""), "{html}");
+        assert!(html.contains("aria-expanded=\"false\""), "{html}");
+        assert!(!html.contains("aria-controls"), "{html}");
+        assert!(!html.contains("role=\"dialog\""), "{html}");
+    }
+
+    #[test]
+    fn open_popover_content_is_dialog_controlled_by_trigger() {
+        let html = render(|| {
+            rsx! {
+                Popover {
+                    id: "pop",
+                    open: true,
+                    trigger: rsx! { button { "Open" } },
+                    "Content"
+                }
+            }
+        });
+        assert!(html.contains("aria-expanded=\"true\""), "{html}");
+        assert!(html.contains("aria-controls=\"pop-content\""), "{html}");
+        assert!(html.contains("id=\"pop-content\""), "{html}");
+        assert!(html.contains("role=\"dialog\""), "{html}");
+        assert!(html.contains("aria-labelledby=\"pop-trigger\""), "{html}");
     }
 }
